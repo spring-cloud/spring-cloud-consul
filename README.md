@@ -1,5 +1,7 @@
-spring-cloud-consul
-===================
+## Spring Cloud Consul
+
+Preview of Spring Cloud Consul implementation
+
 - [X] consul config
 - [X] consul service discovery
 - [X] consul ribbon load balancer
