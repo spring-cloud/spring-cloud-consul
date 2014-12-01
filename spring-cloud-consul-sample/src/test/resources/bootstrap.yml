@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: testConsulApp
+  cloud:
+    config:
+      # TODO: refactor spring-cloud-config to use refresh, etc.. with out config client
+      enabled: false
