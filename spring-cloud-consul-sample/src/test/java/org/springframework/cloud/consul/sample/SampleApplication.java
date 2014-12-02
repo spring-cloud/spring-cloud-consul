@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cloud.bus.jackson.SubtypeModule;
 import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.consul.bus.SimpleRemoteEvent;
 import org.springframework.cloud.consul.discovery.ConsulLoadBalancerClient;
 import org.springframework.context.ApplicationListener;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Configuration
 @EnableAutoConfiguration
+@EnableDiscoveryClient
 @RestController
 @Slf4j
 public class SampleApplication implements ApplicationListener<SimpleRemoteEvent> {

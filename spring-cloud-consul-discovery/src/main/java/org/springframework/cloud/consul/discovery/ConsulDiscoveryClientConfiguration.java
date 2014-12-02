@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Spencer Gibb
  */
 @Configuration
-public class ConsulDiscoveryAutoConfiguration {
+public class ConsulDiscoveryClientConfiguration {
     @Bean
     public ConsulLifecycle consulLifecycle() {
         return new ConsulLifecycle();

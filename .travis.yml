@@ -13,7 +13,7 @@ script:
 - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] || mvn --settings .settings.xml install -nsu -Dmaven.test.redirectTestOutputToFile=true'
 env:
   global:
-  - GIT_NAME="Dave Syer"
-  - GIT_EMAIL=dsyer@pivotal.io
-  - CI_DEPLOY_USERNAME=buildmaster
-  - secure: aeLXRC5oFSddwnZt1/7G2/OHr7jDbxz0ET7sej3I+eSbe3N5vbzQ6FC08es4l89l54ciXd90I1g2BMw7DTYKOO373FP78XPdAEbifJTU4DGd6fCELmoTtUPhjunBIk7E49hisPbv82892IYYA7qi/hzG548cPyZ1IgiJjq0NCsc=
+  - GIT_NAME="Spencer Gibb"
+  - GIT_EMAIL=sgibb@pivotal.io
+  - CI_DEPLOY_USERNAME=sgibb
+  - secure: MX+bQxI10+lHI1rbX/xPSH+Ybey08YwfUQeiJIc2L7wymY5zFtOB63Hf2Iy9sf4FXmM+nNj/OWtg/ROPZNqjcNHNoqF7L8Kz2g/S2T+bHUI7KvMzcSdqief+Z1ywk8XfcEVAjPjUYS6wo6kPFUQy7SDRPOxFO9II1+zdKv4vI80=
