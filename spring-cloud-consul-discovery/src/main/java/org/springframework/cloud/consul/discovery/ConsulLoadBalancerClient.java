@@ -1,5 +1,6 @@
 package org.springframework.cloud.consul.discovery;
 
+import com.google.common.base.Throwables;
 import com.netflix.client.config.DefaultClientConfigImpl;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.*;
@@ -9,7 +10,9 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerRequest;
 import org.springframework.cloud.consul.client.CatalogClient;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -50,7 +53,22 @@ public class ConsulLoadBalancerClient implements LoadBalancerClient {
     }
 
     @Override
-    public <T> T choose(String serviceId, LoadBalancerRequest<T> request) {
-        return request.apply(choose(serviceId));
+    public <T> T execute(String serviceId, LoadBalancerRequest<T> request) {
+        try {
+            return request.apply(choose(serviceId));
+        } catch (Exception e) {
+            Throwables.propagate(e);
+            return null;
+        }
+    }
+
+    @Override
+    public URI reconstructURI(ServiceInstance instance, URI original) {
+        URI uri = UriComponentsBuilder.fromUri(original)
+                .host(instance.getHost())
+                .port(instance.getPort())
+                .build()
+                .toUri();
+        return uri;
     }
 }
