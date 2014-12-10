@@ -64,6 +64,7 @@ public class ConsulLoadBalancerClient implements LoadBalancerClient {
 
     @Override
     public URI reconstructURI(ServiceInstance instance, URI original) {
+        //TODO: move this pattern to a helper method
         URI uri = UriComponentsBuilder.fromUri(original)
                 .host(instance.getHost())
                 .port(instance.getPort())

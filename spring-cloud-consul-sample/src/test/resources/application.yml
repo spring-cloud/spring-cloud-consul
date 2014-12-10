@@ -6,11 +6,6 @@ spring:
   application:
     name: testConsulApp
 
-security:
-  user:
-    name: user
-    password: password
-
 endpoints:
   health:
     sensitive: false
