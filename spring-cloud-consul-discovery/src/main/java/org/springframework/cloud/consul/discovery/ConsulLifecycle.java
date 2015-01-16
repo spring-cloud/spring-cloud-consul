@@ -23,10 +23,10 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     protected void register() {
         Service service = new Service();
         String appName = getAppName();
-        service.setId(context.getId());
+        service.setId(getContext().getId());
         service.setName(appName);
         //TODO: support port = 0 random assignment
-        Integer port = new Integer(environment.getProperty("server.port", "8080"));
+        Integer port = new Integer(getEnvironment().getProperty("server.port", "8080"));
         service.setPort(port);
         service.setTags(consulProperties.getTags());
 
@@ -56,8 +56,8 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     }
 
     @Override
-    protected void deregister() {
-        deregister(context.getId());
+    protected void deregister(){
+        deregister(getContext().getId());
     }
 
     @Override

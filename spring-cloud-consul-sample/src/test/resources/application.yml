@@ -6,6 +6,9 @@ spring:
   application:
     name: testConsulApp
 
+ribbon:
+  ServerListRefreshInterval: 1000
+
 endpoints:
   health:
     sensitive: false

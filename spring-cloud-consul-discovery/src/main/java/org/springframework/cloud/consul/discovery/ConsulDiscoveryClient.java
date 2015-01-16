@@ -33,6 +33,11 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
     CatalogClient catalogClient;
 
     @Override
+    public String description() {
+        return "Spring Cloud Consul Discovery Client";
+    }
+
+    @Override
     public ServiceInstance getLocalServiceInstance() {
         Map<String, Service> services = agentClient.getServices();
         Service service = services.get(context.getId());
