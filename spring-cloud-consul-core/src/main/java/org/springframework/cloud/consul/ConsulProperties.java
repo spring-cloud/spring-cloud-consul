@@ -15,7 +15,10 @@ import java.util.List;
 @Data
 public class ConsulProperties {
     @NotNull
-    private String url = "http://localhost:8500";
+    private String host = "localhost";
+
+    @NotNull
+    private int port = 8500;
 
     private List<String> tags = new ArrayList<>();
 

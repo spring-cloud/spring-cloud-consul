@@ -1,5 +1,6 @@
 package org.springframework.cloud.consul.discovery;
 
+import com.ecwid.consul.v1.ConsulClient;
 import com.google.common.base.Throwables;
 import com.netflix.client.config.DefaultClientConfigImpl;
 import com.netflix.client.config.IClientConfig;
@@ -9,7 +10,6 @@ import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerRequest;
-import org.springframework.cloud.consul.client.CatalogClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -24,7 +24,7 @@ public class ConsulLoadBalancerClient implements LoadBalancerClient {
     private ConcurrentHashMap<String, IClientConfig> namedClientConfigs = new ConcurrentHashMap<>();
 
     @Autowired
-    CatalogClient catalogClient;
+    ConsulClient client;
 
     @Override
     public ServiceInstance choose(String serviceId) {
@@ -44,7 +44,7 @@ public class ConsulLoadBalancerClient implements LoadBalancerClient {
                     .withRule(new AvailabilityFilteringRule())
                     //TODO: figure out ping
                     //.withPing()
-                    .withDynamicServerList(new ConsulServerList(catalogClient, serviceId))
+                    //FIXME: .withDynamicServerList(new ConsulServerList(catalogClient, serviceId))
                     .buildDynamicServerListLoadBalancer();
             namedLoadBalancers.put(serviceId, lb);
         }

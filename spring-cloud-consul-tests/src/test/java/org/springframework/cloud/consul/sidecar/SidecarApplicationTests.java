@@ -30,6 +30,7 @@ import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.annotation.*;
@@ -37,6 +38,7 @@ import java.lang.annotation.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SidecarApplicationTests.SidecarApplication.class)
 @IntegrationTest("server.port=0")
+@WebAppConfiguration
 public class SidecarApplicationTests {
 
 	@Test

@@ -20,11 +20,11 @@ import static com.netflix.client.config.CommonClientConfigKey.*;
 
 import javax.annotation.PostConstruct;
 
+import com.ecwid.consul.v1.ConsulClient;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.cloud.consul.client.CatalogClient;
 import org.springframework.cloud.netflix.ribbon.ZonePreferenceServerListFilter;
 import org.springframework.context.annotation.Configuration;
 
@@ -46,7 +46,7 @@ import com.netflix.loadbalancer.ZoneAvoidanceRule;
 @Configuration
 public class ConsulRibbonClientConfiguration implements BeanPostProcessor {
 	@Autowired
-	CatalogClient client;
+	private ConsulClient client;
 
 	@Value("${ribbon.client.name}")
 	private String serviceId = "client";

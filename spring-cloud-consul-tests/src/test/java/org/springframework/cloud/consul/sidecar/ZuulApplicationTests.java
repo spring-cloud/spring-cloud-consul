@@ -28,10 +28,12 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ZuulApplicationTests.ZuulApplication.class)
 @IntegrationTest("server.port=0")
+@WebAppConfiguration
 public class ZuulApplicationTests {
 
 	@Test
