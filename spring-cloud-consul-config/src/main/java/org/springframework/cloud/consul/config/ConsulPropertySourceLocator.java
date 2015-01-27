@@ -1,9 +1,9 @@
 package org.springframework.cloud.consul.config;
 
+import com.ecwid.consul.v1.ConsulClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.config.client.PropertySourceLocator;
 import org.springframework.cloud.consul.ConsulProperties;
-import org.springframework.cloud.consul.client.KeyValueClient;
 import org.springframework.core.env.*;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.List;
 public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
     @Autowired
-    private KeyValueClient keyValueClient;
+    private ConsulClient consul;
 
     @Autowired
     private ConsulProperties properties;
@@ -53,7 +53,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
     }
 
     private ConsulPropertySource create(String context) {
-        return new ConsulPropertySource(context, keyValueClient);
+        return new ConsulPropertySource(context, consul);
     }
 
     private void addProfiles(List<String> contexts, String baseContext, List<String> profiles) {

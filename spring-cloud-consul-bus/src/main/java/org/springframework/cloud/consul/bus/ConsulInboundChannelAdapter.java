@@ -2,8 +2,6 @@ package org.springframework.cloud.consul.bus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.consul.client.EventService;
-import org.springframework.cloud.consul.model.Event;
 import org.springframework.integration.endpoint.MessageProducerSupport;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -18,8 +16,8 @@ import java.util.Map;
  * @author Spencer Gibb
  */
 public class ConsulInboundChannelAdapter extends MessageProducerSupport {
-    @Autowired
-    private EventService eventService;
+    //@Autowired
+    //private EventService eventService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -47,7 +45,7 @@ public class ConsulInboundChannelAdapter extends MessageProducerSupport {
 
     @Scheduled(fixedDelayString = "10")
     public void getEvents() throws IOException {
-        List<Event> events = eventService.watch();
+        /*FIXME: List<Event> events = eventService.watch();
         for (Event event : events) {
             Map<String, Object> headers = new HashMap<>();
             //headers.put(MessageHeaders.REPLY_CHANNEL, outputChannel.)
@@ -56,7 +54,7 @@ public class ConsulInboundChannelAdapter extends MessageProducerSupport {
                     .withPayload(objectMapper.readValue(event.getDecoded(), String.class))
                             //TODO: support headers
                     .build());
-        }
+        }*/
     }
 
     @Override

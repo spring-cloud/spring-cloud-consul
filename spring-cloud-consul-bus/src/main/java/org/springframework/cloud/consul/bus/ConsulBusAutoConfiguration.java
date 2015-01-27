@@ -1,5 +1,6 @@
 package org.springframework.cloud.consul.bus;
 
+import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -8,7 +9,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.cloud.bus.BusAutoConfiguration;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
-import org.springframework.cloud.consul.client.EventClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
@@ -22,7 +22,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author Spencer Gibb
  */
 @Configuration
-@ConditionalOnClass(EventClient.class)
+@ConditionalOnClass(ConsulClient.class)
 @ConditionalOnExpression("${bus.consul.enabled:true}")
 @AutoConfigureAfter(BusAutoConfiguration.class)
 @EnableScheduling

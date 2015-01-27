@@ -1,9 +1,12 @@
 package org.springframework.cloud.consul.discovery;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.QueryParams;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.catalog.model.CatalogService;
+import com.google.common.base.Function;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.AbstractServerList;
-import org.springframework.cloud.consul.client.CatalogClient;
-import org.springframework.cloud.consul.model.ServiceNode;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,19 +17,19 @@ import java.util.List;
  */
 public class ConsulServerList extends AbstractServerList<ConsulServer> {
 
-    private CatalogClient client;
+    private ConsulClient client;
 
     private String serviceId;
 
     public ConsulServerList() {
     }
 
-    public ConsulServerList(CatalogClient client, String serviceId) {
+    public ConsulServerList(ConsulClient client, String serviceId) {
         this.client = client;
         this.serviceId = serviceId;
     }
 
-    public void setClient(CatalogClient client) {
+    public void setClient(ConsulClient client) {
         this.client = client;
     }
 
@@ -49,14 +52,14 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
         if (client == null) {
             return Collections.emptyList();
         }
-        List<ServiceNode> nodes = client.getServiceNodes(serviceId);
-        if (nodes == null || nodes.isEmpty()) {
+        Response<List<CatalogService>> response = client.getCatalogService(this.serviceId, QueryParams.DEFAULT);
+        if (response.getValue() == null || response.getValue().isEmpty()) {
             return Collections.EMPTY_LIST;
         }
 
 		List<ConsulServer> servers = new ArrayList<>();
-		for (ServiceNode node : nodes) {
-			ConsulServer server = new ConsulServer(node);
+		for (CatalogService service : response.getValue()) {
+			ConsulServer server = new ConsulServer(service);
 			servers.add(server);
 		}
 

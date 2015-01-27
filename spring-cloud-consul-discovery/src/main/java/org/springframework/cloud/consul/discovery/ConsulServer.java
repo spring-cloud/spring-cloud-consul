@@ -1,7 +1,7 @@
 package org.springframework.cloud.consul.discovery;
 
+import com.ecwid.consul.v1.catalog.model.CatalogService;
 import com.netflix.loadbalancer.Server;
-import org.springframework.cloud.consul.model.ServiceNode;
 
 /**
  * @author Spencer Gibb
@@ -10,12 +10,12 @@ public class ConsulServer extends Server {
 
     private final MetaInfo metaInfo;
 
-    public ConsulServer(final ServiceNode node) {
-        super(node.getNode(), node.getServicePort());
+    public ConsulServer(final CatalogService service) {
+        super(service.getNode(), service.getServicePort());
         metaInfo = new MetaInfo() {
             @Override
             public String getAppName() {
-                return node.getServiceName();
+                return service.getServiceName();
             }
 
             @Override
@@ -30,7 +30,7 @@ public class ConsulServer extends Server {
 
             @Override
             public String getInstanceId() {
-                return node.getServiceID();
+                return service.getServiceId();
             }
         };
     }

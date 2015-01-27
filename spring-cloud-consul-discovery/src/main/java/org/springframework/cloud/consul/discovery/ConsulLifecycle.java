@@ -1,11 +1,11 @@
 package org.springframework.cloud.consul.discovery;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.agent.model.NewService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
 import org.springframework.cloud.consul.ConsulProperties;
-import org.springframework.cloud.consul.client.AgentClient;
-import org.springframework.cloud.consul.model.Service;
 
 /**
  * @author Spencer Gibb
@@ -14,15 +14,16 @@ import org.springframework.cloud.consul.model.Service;
 public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
     @Autowired
-    private AgentClient agentClient;
+    private ConsulClient client;
 
     @Autowired
     private ConsulProperties consulProperties;
 
     @Override
     protected void register() {
-        Service service = new Service();
+        NewService service = new NewService();
         String appName = getAppName();
+        //TODO: move id to properties with context ID as default
         service.setId(getContext().getId());
         service.setName(appName);
         //TODO: support port = 0 random assignment
@@ -36,7 +37,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
     @Override
     protected void registerManagement() {
-        Service management = new Service();
+        NewService management = new NewService();
         management.setId(getManagementServiceId());
         management.setName(getManagementServiceName());
         management.setPort(getManagementPort());
@@ -45,9 +46,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
         register(management);
     }
 
-    protected void register(Service service) {
+    protected void register(NewService service) {
         log.info("Registering service with consul: {}", service.toString());
-        agentClient.register(service);
+        client.agentServiceRegister(service);
     }
 
     @Override
@@ -66,7 +67,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     }
 
     private void deregister(String serviceId) {
-        agentClient.deregister(serviceId);
+        client.agentServiceDeregister(serviceId);
     }
 
     @Override

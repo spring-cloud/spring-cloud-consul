@@ -21,11 +21,12 @@ import static com.netflix.client.config.CommonClientConfigKey.EnableZoneAffinity
 
 import javax.annotation.PostConstruct;
 
+import com.ecwid.consul.v1.ConsulClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.cloud.netflix.ribbon.ZonePreferenceServerListFilter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.cloud.consul.client.CatalogClient;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.netflix.client.config.IClientConfig;
@@ -45,7 +46,7 @@ import com.netflix.loadbalancer.ServerList;
 @Configuration
 public class ConsulRibbonClientConfiguration {
 	@Autowired
-	CatalogClient client;
+	private ConsulClient client;
 
 	@Value("${ribbon.client.name}")
 	private String serviceId = "client";
