@@ -1,0 +1,21 @@
+server:
+  port: 5678
+spring:
+  application:
+    name: sidecarTest
+
+sidecar:
+  port: 8000
+  health-uri: http://localhost:8000/src/test/resources/health.json
+
+ribbon:
+  ServerListRefreshInterval: 5000
+
+endpoints:
+  refresh:
+    enabled: true
+  shutdown:
+    enabled: true
+  health:
+    sensitive: false
+

@@ -3,12 +3,12 @@ package org.springframework.cloud.consul.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.common.base.Throwables;
+import feign.Param;
 import feign.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.consul.model.Event;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Named;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class EventService {
         return lastIndex.get();
     }
 
-    public Event fire(@Named("name") String name, String payload) {
+    public Event fire(@Param("name") String name, String payload) {
         return client.fire(name, payload);
     }
 

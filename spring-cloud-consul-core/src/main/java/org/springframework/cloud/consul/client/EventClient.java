@@ -1,10 +1,10 @@
 package org.springframework.cloud.consul.client;
 
+import feign.Param;
 import feign.RequestLine;
 import feign.Response;
 import org.springframework.cloud.consul.model.Event;
 
-import javax.inject.Named;
 import java.util.List;
 
 /**
@@ -13,7 +13,7 @@ import java.util.List;
 public interface EventClient {
     //?node=, ?service=, and ?tag= ?dc=
     @RequestLine("PUT /v1/event/fire/{name}")
-    Event fire(@Named("name") String name, String payload);
+    Event fire(@Param("name") String name, String payload);
 
     //?name=
     //?wait=<interval>&index=<idx>
@@ -24,5 +24,5 @@ public interface EventClient {
     Response getEventsResponse();
 
     @RequestLine("GET /v1/event/list?wait={wait}&index={index}")
-    Response watch(@Named("wait") String wait, @Named("index") String index);
+    Response watch(@Param("wait") String wait, @Param("index") String index);
 }

@@ -30,6 +30,7 @@
         <module>spring-cloud-consul-config</module>
         <module>spring-cloud-consul-discovery</module>
         <module>spring-cloud-consul-bus</module>
+        <module>spring-cloud-consul-sidecar</module>
         <module>spring-cloud-consul-sample</module>
     </modules>
 
@@ -107,6 +108,26 @@
                 <version>1.0.0.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-netflix-sidecar</artifactId>
+                <version>1.0.0.BUILD-SNAPSHOT</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.netflix.eureka</groupId>
+                        <artifactId>eureka-client</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.netflix.ribbon</groupId>
+                        <artifactId>ribbon-eureka</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-netflix-core</artifactId>
+                <version>1.0.0.BUILD-SNAPSHOT</version>
+            </dependency>
+            <dependency>
                 <groupId>com.netflix.feign</groupId>
                 <artifactId>feign-core</artifactId>
                 <version>${feign.version}</version>
@@ -117,6 +138,11 @@
                 <version>${feign.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.netflix.feign</groupId>
+                <artifactId>feign-slf4j</artifactId>
+                <version>${feign.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.netflix.ribbon</groupId>
                 <artifactId>ribbon</artifactId>
                 <version>${ribbon.version}</version>
@@ -124,6 +150,11 @@
             <dependency>
                 <groupId>com.netflix.ribbon</groupId>
                 <artifactId>ribbon-core</artifactId>
+                <version>${ribbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.netflix.ribbon</groupId>
+                <artifactId>ribbon-httpclient</artifactId>
                 <version>${ribbon.version}</version>
             </dependency>
             <dependency>
@@ -141,8 +172,8 @@
     </dependencyManagement>
 
     <properties>
-        <feign.version>6.1.2</feign.version>
-        <ribbon.version>2.0-RC9</ribbon.version>
+        <feign.version>7.1.0</feign.version>
+        <ribbon.version>2.0-RC13</ribbon.version>
     </properties>
 
 </project>

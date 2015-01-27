@@ -1,9 +1,9 @@
 package org.springframework.cloud.consul.client;
 
+import feign.Param;
 import feign.RequestLine;
 import org.springframework.cloud.consul.model.Service;
 
-import javax.inject.Named;
 import java.util.Map;
 
 /**
@@ -21,5 +21,5 @@ public interface AgentClient {
     void register(Service service);
 
     @RequestLine("PUT /v1/agent/service/deregister/{serviceId}")
-    void deregister(@Named("serviceId") String serviceId);
+    void deregister(@Param("serviceId") String serviceId);
 }

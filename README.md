@@ -12,16 +12,3 @@ Preview of Spring Cloud Consul implementation
 6. visit [http://localhost:8080](http://localhost:8080), verify that `{"serviceId":"<yourhost>:8080","host":"<yourhost>","port":8080}` results
 5. run `java -jar spring-cloud-consul-sample/target/spring-cloud-consul-sample-1.0.0.BUILD-SNAPSHOT.jar --server.port=8081`
 6. visit [http://localhost:8080](http://localhost:8080) again, verify that `{"serviceId":"<yourhost>:8081","host":"<yourhost>","port":8081}` eventually shows up in the results in a round robbin fashion (may take a minute or so).
-
-### TODO
-
-- [X] consul config
-- [X] consul service discovery
-- [X] consul ribbon load balancer
-- [X] consul ui (on the sample agent)
-- [X] consul property source
-- [X] consul event bus
-  - [X] send messages
-  - [X] receive messages
-- [ ] consul locks
-- [ ] consul leader election

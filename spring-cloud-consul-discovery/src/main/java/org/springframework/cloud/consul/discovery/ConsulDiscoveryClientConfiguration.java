@@ -13,10 +13,10 @@ public class ConsulDiscoveryClientConfiguration {
         return new ConsulLifecycle();
     }
 
-    @Bean
+    /*@Bean
     public ConsulLoadBalancerClient consulLoadBalancerClient() {
         return new ConsulLoadBalancerClient();
-    }
+    }*/
 
     @Bean
     public ConsulDiscoveryClient consulDiscoveryClient() {

@@ -20,6 +20,10 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-consul-core</artifactId>
         </dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-netflix-core</artifactId>
+		</dependency>
         <dependency>
             <groupId>com.netflix.ribbon</groupId>
             <artifactId>ribbon</artifactId>
@@ -28,6 +32,10 @@
             <groupId>com.netflix.ribbon</groupId>
             <artifactId>ribbon-core</artifactId>
         </dependency>
+		<dependency>
+			<groupId>com.netflix.ribbon</groupId>
+			<artifactId>ribbon-httpclient</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
