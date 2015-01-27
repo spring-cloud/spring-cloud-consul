@@ -93,13 +93,14 @@ public class ConsulRibbonClientConfiguration implements BeanPostProcessor {
 	}
 
 	private void wrapServerList(DynamicServerListLoadBalancer<?> balancer) {
-			@SuppressWarnings("unchecked")
-			DynamicServerListLoadBalancer<ConsulServer> dynamic = (DynamicServerListLoadBalancer<ConsulServer>) balancer;
-			ServerList<ConsulServer> list = dynamic.getServerListImpl();
-			if (list instanceof ConsulServerList) {
-				ConsulServerList csl = (ConsulServerList) list;
-				csl.setClient(client);
-			}
+		// TODO: fix this set client hack
+		@SuppressWarnings("unchecked")
+		DynamicServerListLoadBalancer<ConsulServer> dynamic = (DynamicServerListLoadBalancer<ConsulServer>) balancer;
+		ServerList<ConsulServer> list = dynamic.getServerListImpl();
+		if (list instanceof ConsulServerList) {
+			ConsulServerList csl = (ConsulServerList) list;
+			csl.setClient(client);
+		}
 	}
 
 	protected void setProp(String serviceId, String suffix, String value) {

@@ -30,8 +30,8 @@
         <module>spring-cloud-consul-config</module>
         <module>spring-cloud-consul-discovery</module>
         <module>spring-cloud-consul-bus</module>
-        <module>spring-cloud-consul-sidecar</module>
         <module>spring-cloud-consul-sample</module>
+        <module>spring-cloud-consul-tests</module>
     </modules>
 
     <build>
@@ -105,6 +105,11 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-config-client</artifactId>
+                <version>1.0.0.BUILD-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-zuul</artifactId>
                 <version>1.0.0.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>

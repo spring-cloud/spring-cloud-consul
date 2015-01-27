@@ -4,10 +4,10 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>spring-cloud-consul-sidecar</artifactId>
+	<artifactId>spring-cloud-consul-tests</artifactId>
 	<packaging>jar</packaging>
-	<name>Spring Cloud Consul Sidecar</name>
-	<description>Spring Cloud Consul Sidecar</description>
+	<name>Spring Cloud Consul Tests</name>
+	<description>Spring Cloud Consul Tests</description>
 
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
@@ -32,6 +32,10 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-consul-discovery</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-zuul</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>

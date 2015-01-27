@@ -23,15 +23,16 @@ import org.springframework.boot.actuate.metrics.repository.InMemoryMetricReposit
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.cloud.netflix.sidecar.*;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.web.bind.annotation.RestController;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = SidecarApplicationTests.SidecarApplication.class)
+@SpringApplicationConfiguration(classes = ZuulApplicationTests.ZuulApplication.class)
 @IntegrationTest("server.port=0")
-public class SidecarApplicationTests {
+public class ZuulApplicationTests {
 
 	@Test
 	public void contextLoads() {
@@ -39,9 +40,10 @@ public class SidecarApplicationTests {
 
 
 	@SpringBootApplication
-	@org.springframework.cloud.netflix.sidecar.EnableSidecar
-	@RestController
-	public static class SidecarApplication {
+	@EnableCircuitBreaker
+	@EnableDiscoveryClient
+	@EnableZuulProxy
+	public static class ZuulApplication {
 
 		@Bean
 		public InMemoryMetricRepository inMemoryMetricRepository() {
@@ -49,7 +51,7 @@ public class SidecarApplicationTests {
 		}
 
 		public static void main(String[] args) {
-			SpringApplication.run(SidecarApplication.class, args);
+			SpringApplication.run(ZuulApplication.class, args);
 		}
 
 	}
