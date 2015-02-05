@@ -6,7 +6,7 @@
 
 	<groupId>org.springframework.cloud</groupId>
 	<artifactId>spring-cloud-consul</artifactId>
-	<version>1.0.0.BUILD-SNAPSHOT</version>
+	<version>1.0.0.SAS-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Spring Cloud Consul</name>
 	<description>Spring Cloud Consul</description>
@@ -76,22 +76,22 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-core</artifactId>
-				<version>1.0.0.BUILD-SNAPSHOT</version>
+				<version>1.0.0.SAS-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-bus</artifactId>
-				<version>1.0.0.BUILD-SNAPSHOT</version>
+				<version>1.0.0.SAS-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-config</artifactId>
-				<version>1.0.0.BUILD-SNAPSHOT</version>
+				<version>1.0.0.SAS-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-discovery</artifactId>
-				<version>1.0.0.BUILD-SNAPSHOT</version>
+				<version>1.0.0.SAS-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
@@ -232,4 +232,11 @@
 		</dependencies>
 	</dependencyManagement>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>svcartifact.unx.sas.com</id>
+            <name>svcartifact.unx.sas.com-snapshots</name>
+            <url>http://svcartifact.unx.sas.com:8081/artifactory/ext-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
