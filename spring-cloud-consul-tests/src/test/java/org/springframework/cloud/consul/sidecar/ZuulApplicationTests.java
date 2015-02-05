@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.consul.sidecar;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.SpringApplication;
@@ -35,6 +36,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class ZuulApplicationTests {
 
 	@Test
+	@Ignore
 	public void contextLoads() {
 	}
 
