@@ -6,7 +6,7 @@
 
 	<groupId>org.springframework.cloud</groupId>
 	<artifactId>spring-cloud-consul</artifactId>
-	<version>1.0.0.BUILD-SNAPSHOT</version>
+	<version>1.0.0.SAS-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Spring Cloud Consul</name>
 	<description>Spring Cloud Consul</description>
