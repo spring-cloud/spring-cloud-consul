@@ -16,24 +16,23 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static com.netflix.client.config.CommonClientConfigKey.*;
+import static com.netflix.client.config.CommonClientConfigKey.DeploymentContextBasedVipAddresses;
+import static com.netflix.client.config.CommonClientConfigKey.EnableZoneAffinity;
 
 import javax.annotation.PostConstruct;
 
-import com.ecwid.consul.v1.ConsulClient;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.cloud.netflix.ribbon.ZonePreferenceServerListFilter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.netflix.client.config.IClientConfig;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.config.DynamicPropertyFactory;
 import com.netflix.config.DynamicStringProperty;
-import com.netflix.loadbalancer.DynamicServerListLoadBalancer;
 import com.netflix.loadbalancer.ServerList;
-import com.netflix.loadbalancer.ZoneAvoidanceRule;
 
 /**
  * Preprocessor that configures defaults for eureka-discovered ribbon clients. Such as:
@@ -44,7 +43,7 @@ import com.netflix.loadbalancer.ZoneAvoidanceRule;
  * @author Dave Syer
  */
 @Configuration
-public class ConsulRibbonClientConfiguration implements BeanPostProcessor {
+public class ConsulRibbonClientConfiguration {
 	@Autowired
 	private ConsulClient client;
 
@@ -56,51 +55,24 @@ public class ConsulRibbonClientConfiguration implements BeanPostProcessor {
 	protected static final String DEFAULT_NAMESPACE = "ribbon";
 
 	public ConsulRibbonClientConfiguration() {
-		System.out.println("here");
 	}
 
 	public ConsulRibbonClientConfiguration(String serviceId) {
 		this.serviceId = serviceId;
 	}
 
+	@Bean
+	@ConditionalOnMissingBean
+	public ServerList<?> ribbonServerList(IClientConfig config) {
+		ConsulServerList serverList = new ConsulServerList(client);
+		serverList.initWithNiwsConfig(config);
+		return serverList;
+	}
+
 	@PostConstruct
 	public void preprocess() {
-		// TODO: should this look more like hibernate spring boot props?
-		setProp(this.serviceId, NIWSServerListClassName.key(),
-				ConsulServerList.class.getName());
-		// FIXME: what should this be?
 		setProp(this.serviceId, DeploymentContextBasedVipAddresses.key(), this.serviceId);
-		setProp(this.serviceId, NFLoadBalancerRuleClassName.key(),
-				ZoneAvoidanceRule.class.getName());
-		setProp(this.serviceId, NIWSServerListFilterClassName.key(),
-				ZonePreferenceServerListFilter.class.getName());
 		setProp(this.serviceId, EnableZoneAffinity.key(), "true");
-	}
-
-	@Override
-	public Object postProcessBeforeInitialization(Object bean, String beanName)
-			throws BeansException {
-		return bean;
-	}
-
-	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName)
-			throws BeansException {
-		if (bean instanceof DynamicServerListLoadBalancer) {
-			wrapServerList((DynamicServerListLoadBalancer<?>) bean);
-		}
-		return bean;
-	}
-
-	private void wrapServerList(DynamicServerListLoadBalancer<?> balancer) {
-		// TODO: fix this set client hack
-		@SuppressWarnings("unchecked")
-		DynamicServerListLoadBalancer<ConsulServer> dynamic = (DynamicServerListLoadBalancer<ConsulServer>) balancer;
-		ServerList<ConsulServer> list = dynamic.getServerListImpl();
-		if (list instanceof ConsulServerList) {
-			ConsulServerList csl = (ConsulServerList) list;
-			csl.setClient(client);
-		}
 	}
 
 	protected void setProp(String serviceId, String suffix, String value) {

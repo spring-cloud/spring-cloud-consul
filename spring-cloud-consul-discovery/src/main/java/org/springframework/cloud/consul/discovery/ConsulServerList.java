@@ -16,19 +16,11 @@ import java.util.List;
  */
 public class ConsulServerList extends AbstractServerList<ConsulServer> {
 
-    private ConsulClient client;
+    private final ConsulClient client;
 
     private String serviceId;
 
-    public ConsulServerList() {
-    }
-
-    public ConsulServerList(ConsulClient client, String serviceId) {
-        this.client = client;
-        this.serviceId = serviceId;
-    }
-
-    public void setClient(ConsulClient client) {
+    public ConsulServerList(ConsulClient client) {
         this.client = client;
     }
 
@@ -55,13 +47,10 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
         if (response.getValue() == null || response.getValue().isEmpty()) {
             return Collections.EMPTY_LIST;
         }
-
-		List<ConsulServer> servers = new ArrayList<>();
-		for (ServiceNode node : nodes) {
-			ConsulServer server = new ConsulServer(node);
-			servers.add(server);
+        ArrayList<ConsulServer> servers = new ArrayList<>();
+		for (CatalogService service : response.getValue()) {
+			servers.add(new ConsulServer(service));
 		}
-
         return servers;
     }
 }
