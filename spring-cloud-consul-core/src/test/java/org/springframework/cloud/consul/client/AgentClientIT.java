@@ -1,6 +1,5 @@
 package org.springframework.cloud.consul.client;
 
-import com.google.common.collect.Lists;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +10,7 @@ import org.springframework.cloud.consul.model.Check;
 import org.springframework.cloud.consul.model.Service;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -34,7 +34,7 @@ public class AgentClientIT {
         service.setId("test1id");
         service.setName("test1Name");
         service.setPort(9999);
-        service.setTags(Lists.newArrayList("test1tag1", "test1tag2"));
+        service.setTags(Arrays.asList("test1tag1", "test1tag2"));
         Check check = new Check();
         check.setScript("/usr/local/bin/gtrue");
         check.setInterval(60);

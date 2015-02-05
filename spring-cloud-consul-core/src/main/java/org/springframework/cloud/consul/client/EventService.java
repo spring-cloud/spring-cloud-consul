@@ -2,7 +2,6 @@ package org.springframework.cloud.consul.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.google.common.base.Throwables;
 import feign.Param;
 import feign.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.springframework.util.ReflectionUtils.rethrowRuntimeException;
 /**
  * @author Spencer Gibb
  */
@@ -105,7 +105,7 @@ public class EventService {
             return objectMapper.readValue(response.body().asInputStream(),
                     TypeFactory.defaultInstance().constructCollectionType(ArrayList.class, Event.class));
         } catch (IOException e) {
-            Throwables.propagate(e);
+            rethrowRuntimeException(e);
         }
         return null;
     }

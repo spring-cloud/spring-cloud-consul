@@ -1,6 +1,5 @@
 package org.springframework.cloud.consul.discovery;
 
-import com.google.common.base.Throwables;
 import com.netflix.client.config.DefaultClientConfigImpl;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.*;
@@ -14,6 +13,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.springframework.util.ReflectionUtils.rethrowRuntimeException;
 
 /**
  * @author Spencer Gibb
@@ -57,7 +58,7 @@ public class ConsulLoadBalancerClient implements LoadBalancerClient {
         try {
             return request.apply(choose(serviceId));
         } catch (Exception e) {
-            Throwables.propagate(e);
+            rethrowRuntimeException(e);
             return null;
         }
     }

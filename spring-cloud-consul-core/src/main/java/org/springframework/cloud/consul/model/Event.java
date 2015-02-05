@@ -4,9 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import static com.google.common.base.Charsets.UTF_8;
-import static com.google.common.base.MoreObjects.toStringHelper;
-import static com.google.common.io.BaseEncoding.base64;
+import static org.springframework.util.Base64Utils.*;
 
 /**
  * @author Spencer Gibb
@@ -50,21 +48,22 @@ public class Event {
     public String getDecoded() {
         if (payload == null)
             return null;
-        return new String(base64().decode(payload), UTF_8);
+        return new String(decodeFromString(payload));
     }
 
-    @Override
-    public String toString() {
-        return toStringHelper(this)
-                .add("id", id)
-                .add("name", name)
-                .add("nodeFilter", nodeFilter)
-                .add("serviceFilter", serviceFilter)
-                .add("tagFilter", tagFilter)
-                .add("version", version)
-                .add("lTime", lTime)
-                .add("payload", payload)
-                .add("decodedPayload", getDecoded())
-                .toString();
-    }
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer("Event{");
+		sb.append("id='").append(id).append('\'');
+		sb.append(", name='").append(name).append('\'');
+		sb.append(", nodeFilter='").append(nodeFilter).append('\'');
+		sb.append(", serviceFilter='").append(serviceFilter).append('\'');
+		sb.append(", tagFilter='").append(tagFilter).append('\'');
+		sb.append(", version=").append(version);
+		sb.append(", lTime=").append(lTime);
+		sb.append(", payload='").append(payload).append('\'');
+		sb.append(", decoded='").append(getDecoded()).append('\'');
+		sb.append('}');
+		return sb.toString();
+	}
 }

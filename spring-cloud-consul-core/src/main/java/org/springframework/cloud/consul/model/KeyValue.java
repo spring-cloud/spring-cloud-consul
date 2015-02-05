@@ -3,9 +3,7 @@ package org.springframework.cloud.consul.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import static com.google.common.base.Charsets.UTF_8;
-import static com.google.common.base.MoreObjects.toStringHelper;
-import static com.google.common.io.BaseEncoding.base64;
+import static org.springframework.util.Base64Utils.*;
 
 /**
  * @author Spencer Gibb
@@ -31,22 +29,7 @@ public class KeyValue {
     public String getDecoded() {
         if (value == null)
             return null;
-        return new String(base64().decode(value), UTF_8);
+        return new String(decodeFromString(value));
     }
 
-    public void setUnencoded(String unencoded) {
-        setValue(base64().encode(unencoded.getBytes(UTF_8)));
-    }
-
-    @Override
-    public String toString() {
-        return toStringHelper(this)
-                .add("key", key)
-                .add("value", value)
-                .add("decodedValue", getDecoded())
-                .add("createIndex", createIndex)
-                .add("modifyIndex", modifyIndex)
-                .add("flags", flags)
-                .toString();
-    }
 }
