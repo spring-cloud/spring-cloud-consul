@@ -8,8 +8,7 @@ import org.springframework.core.env.EnumerablePropertySource;
 
 import java.util.*;
 
-import static com.google.common.base.Charsets.UTF_8;
-import static com.google.common.io.BaseEncoding.base64;
+import static org.springframework.util.Base64Utils.*;
 
 /**
  * @author Spencer Gibb
@@ -47,7 +46,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
     public String getDecoded(String value) {
         if (value == null)
             return null;
-        return new String(base64().decode(value), UTF_8);
+		return new String(decodeFromString(value));
     }
 
     @Override

@@ -1,8 +1,12 @@
 package org.springframework.cloud.consul.discovery;
 
 import com.ecwid.consul.v1.ConsulClient;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import com.ecwid.consul.v1.QueryParams;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.Member;
+import com.ecwid.consul.v1.agent.model.Self;
+import com.ecwid.consul.v1.agent.model.Service;
+import com.ecwid.consul.v1.catalog.model.CatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
@@ -31,53 +35,51 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
     @Override
     public ServiceInstance getLocalServiceInstance() {
-        /*Map<String, Service> services = agentClient.getServices();
-        Service service = services.get(context.getId());
+		Response<Map<String, Service>> agentServices = client.getAgentServices();
+		Service service = agentServices.getValue().get(context.getId());
         if (service == null) {
             throw new IllegalStateException("Unable to locate service in consul agent: "+context.getId());
         }
         String host = "localhost";
-        Map<String, Object> self = agentClient.getSelf();
-        Map<String, Object> member = (Map<String, Object>) self.get("Member");
+		Response<Self> agentSelf = client.getAgentSelf();
+		Member member = agentSelf.getValue().getMember();
         if (member != null) {
-            if (member.containsKey("Name")) {
-                host = (String) member.get("Name");
+			if (member.getName() != null) {
+                host = member.getName();
             }
         }
-        return new DefaultServiceInstance(service.getId(), host, service.getPort() false);*/
-        return null;
+        return new DefaultServiceInstance(service.getId(), host, service.getPort());
     }
 
     @Override
     public List<ServiceInstance> getInstances(final String serviceId) {
-        /*List<ServiceNode> nodes = catalogClient.getServiceNodes(serviceId);
 		List<ServiceInstance> instances = new ArrayList<>();
-		for (ServiceNode node : nodes) {
-            instances.add(new DefaultServiceInstance(serviceId, node.getNode(), node.getServicePort(), false));
-		}
 
-        return instances;*/
-        return new ArrayList<>();
+		addInstancesToList(instances, serviceId);
+
+        return instances;
     }
 
-    public List<ServiceInstance> getAllInstances() {
-        /*List<ServiceInstance> instances = new ArrayList<>();
-
-		for (String serviceId : catalogClient.getServices().keySet()) {
-			List<ServiceNode> serviceNodes = catalogClient.getServiceNodes(serviceId);
-			if (serviceNodes != null) {
-				for (ServiceNode node : serviceNodes) {
-					instances.add(new DefaultServiceInstance(node.getServiceName(), node.getNode(), node.getServicePort(), false));
-				}
-			}
+	private void addInstancesToList(List<ServiceInstance> instances, String serviceId) {
+		Response<List<CatalogService>> services = client.getCatalogService(serviceId, QueryParams.DEFAULT);
+		for (CatalogService service : services.getValue()) {
+            instances.add(new DefaultServiceInstance(serviceId, service.getNode(), service.getServicePort()));
 		}
-		return instances;*/
-        return new ArrayList<>();
+	}
+
+	@Override
+    public List<ServiceInstance> getAllInstances() {
+        List<ServiceInstance> instances = new ArrayList<>();
+
+		Response<Map<String, List<String>>> services = client.getCatalogServices(QueryParams.DEFAULT);
+		for (String serviceId : services.getValue().keySet()) {
+			addInstancesToList(instances, serviceId);
+		}
+		return instances;
     }
 
     @Override
     public List<String> getServices() {
-        //return new ArrayList<>(catalogClient.getServices().keySet());
-        return new ArrayList<>();
+        return new ArrayList<>(client.getCatalogServices(QueryParams.DEFAULT).getValue().keySet());
     }
 }

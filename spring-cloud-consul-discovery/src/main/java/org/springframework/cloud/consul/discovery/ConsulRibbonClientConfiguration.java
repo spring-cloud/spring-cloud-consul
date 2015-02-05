@@ -21,14 +21,13 @@ import static com.netflix.client.config.CommonClientConfigKey.EnableZoneAffinity
 
 import javax.annotation.PostConstruct;
 
-import com.ecwid.consul.v1.ConsulClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.cloud.netflix.ribbon.ZonePreferenceServerListFilter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.ecwid.consul.v1.ConsulClient;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.config.DynamicPropertyFactory;
@@ -56,7 +55,6 @@ public class ConsulRibbonClientConfiguration {
 	protected static final String DEFAULT_NAMESPACE = "ribbon";
 
 	public ConsulRibbonClientConfiguration() {
-		System.out.println("here");
 	}
 
 	public ConsulRibbonClientConfiguration(String serviceId) {
@@ -66,13 +64,13 @@ public class ConsulRibbonClientConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ServerList<?> ribbonServerList(IClientConfig config) {
-		ConsulServerList serverList = new ConsulServerList(client, serviceId);
+		ConsulServerList serverList = new ConsulServerList(client);
+		serverList.initWithNiwsConfig(config);
 		return serverList;
 	}
 
 	@PostConstruct
 	public void preprocess() {
-		// FIXME: what should this be?
 		setProp(this.serviceId, DeploymentContextBasedVipAddresses.key(), this.serviceId);
 		setProp(this.serviceId, EnableZoneAffinity.key(), "true");
 	}
