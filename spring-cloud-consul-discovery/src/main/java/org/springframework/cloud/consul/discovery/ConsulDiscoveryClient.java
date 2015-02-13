@@ -48,7 +48,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
                 host = member.getName();
             }
         }
-        return new DefaultServiceInstance(service.getId(), host, service.getPort());
+        return new DefaultServiceInstance(service.getId(), host, service.getPort(), false);
     }
 
     @Override
@@ -63,11 +63,10 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	private void addInstancesToList(List<ServiceInstance> instances, String serviceId) {
 		Response<List<CatalogService>> services = client.getCatalogService(serviceId, QueryParams.DEFAULT);
 		for (CatalogService service : services.getValue()) {
-            instances.add(new DefaultServiceInstance(serviceId, service.getNode(), service.getServicePort()));
+            instances.add(new DefaultServiceInstance(serviceId, service.getNode(), service.getServicePort(), false));
 		}
 	}
 
-	@Override
     public List<ServiceInstance> getAllInstances() {
         List<ServiceInstance> instances = new ArrayList<>();
 
