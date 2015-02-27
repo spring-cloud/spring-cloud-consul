@@ -32,6 +32,7 @@
         <module>spring-cloud-consul-bus</module>
         <module>spring-cloud-consul-sample</module>
         <module>spring-cloud-consul-tests</module>
+		<module>docs</module>
     </modules>
 
     <build>
