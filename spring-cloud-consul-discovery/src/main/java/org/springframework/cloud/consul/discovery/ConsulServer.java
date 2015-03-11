@@ -9,9 +9,11 @@ import org.springframework.cloud.consul.model.ServiceNode;
 public class ConsulServer extends Server {
 
     private final MetaInfo metaInfo;
+    private final String address;
 
     public ConsulServer(final ServiceNode node) {
         super(node.getNode(), node.getServicePort());
+        address = node.getAddress();
         metaInfo = new MetaInfo() {
             @Override
             public String getAppName() {
@@ -38,5 +40,9 @@ public class ConsulServer extends Server {
     @Override
     public MetaInfo getMetaInfo() {
         return metaInfo;
+    }
+
+    public String getAddress() {
+        return address;
     }
 }
