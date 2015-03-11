@@ -18,12 +18,12 @@
         <!-- lookup parent from repository -->
     </parent>
 
-	<scm>
-		<url>https://github.com/spring-cloud/spring-cloud-consul</url>
-		<connection>scm:git:git://github.com/spring-cloud/spring-cloud-consul.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/spring-cloud/spring-cloud-consul.git</developerConnection>
-		<tag>HEAD</tag>
-	</scm>
+    <scm>
+        <url>https://github.com/spring-cloud/spring-cloud-consul</url>
+        <connection>scm:git:git://github.com/spring-cloud/spring-cloud-consul.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/spring-cloud/spring-cloud-consul.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
 
     <modules>
         <module>spring-cloud-consul-core</module>
@@ -32,6 +32,7 @@
         <module>spring-cloud-consul-bus</module>
         <module>spring-cloud-consul-sample</module>
         <module>spring-cloud-consul-tests</module>
+        <module>spring-cloud-consul-utils</module>
     </modules>
 
     <build>
@@ -56,9 +57,9 @@
                 <version>1.0.0.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
-              <groupId>org.springframework.cloud</groupId>
-              <artifactId>spring-cloud-consul-core</artifactId>
-              <version>1.0.0.BUILD-SNAPSHOT</version>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-consul-core</artifactId>
+                <version>1.0.0.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -110,7 +111,7 @@
             <dependency>
                 <groupId>com.ecwid.consul</groupId>
                 <artifactId>consul-api</artifactId>
-                <version>0.1</version>
+                <version>1.0.8</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.servlet</groupId>

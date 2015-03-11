@@ -13,6 +13,11 @@ public class ConsulDiscoveryClientConfiguration {
         return new ConsulLifecycle();
     }
 
+    @Bean
+    public TtlScheduler ttlScheduler() {
+        return new TtlScheduler();
+    }
+
     /*@Bean
     public ConsulLoadBalancerClient consulLoadBalancerClient() {
         return new ConsulLoadBalancerClient();
