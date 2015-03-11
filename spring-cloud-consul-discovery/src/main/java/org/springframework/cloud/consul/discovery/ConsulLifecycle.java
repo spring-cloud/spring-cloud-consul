@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.client.AgentClient;
+import org.springframework.cloud.consul.model.Check;
 import org.springframework.cloud.consul.model.Service;
 
 /**
@@ -19,6 +20,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     @Autowired
     private ConsulProperties consulProperties;
 
+    @Autowired
+    private TtlScheduler ttlScheduler;
+
     @Override
     protected void register() {
         Service service = new Service();
@@ -29,8 +33,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
         Integer port = new Integer(getEnvironment().getProperty("server.port", "8080"));
         service.setPort(port);
         service.setTags(consulProperties.getTags());
-
-        //TODO: add support for Check
+        Check check = new Check();
+        check.setTtl(ttlScheduler.getTTL() + "s");
+        service.setCheck(check);
         register(service);
     }
 
@@ -45,9 +50,10 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
         register(management);
     }
 
-    protected void register(Service service) {
+    protected void register(final Service service) {
         log.info("Registering service with consul: {}", service.toString());
         agentClient.register(service);
+        ttlScheduler.add(service);
     }
 
     @Override
@@ -56,7 +62,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     }
 
     @Override
-    protected void deregister(){
+    protected void deregister() {
         deregister(getContext().getId());
     }
 
@@ -66,6 +72,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     }
 
     private void deregister(String serviceId) {
+        ttlScheduler.remove(serviceId);
         agentClient.deregister(serviceId);
     }
 

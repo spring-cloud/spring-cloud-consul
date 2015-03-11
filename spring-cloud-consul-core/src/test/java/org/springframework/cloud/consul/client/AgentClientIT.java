@@ -12,8 +12,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Spencer Gibb
@@ -25,37 +27,46 @@ import static org.junit.Assert.*;
 @SpringApplicationConfiguration(classes = TestClientConfiguration.class)
 public class AgentClientIT {
 
+    private static final String SERVICE_ID = "testId"+ UUID.randomUUID().toString();
+    private static final String SERVICE_NAME = "testId"+ UUID.randomUUID().toString();
+
     @Autowired
     AgentClient client;
 
     @Test
     public void test001RegisterService() {
         Service service = new Service();
-        service.setId("test1id");
-        service.setName("test1Name");
+        service.setId(SERVICE_ID);
+        service.setName(SERVICE_NAME);
         service.setPort(9999);
         service.setTags(Arrays.asList("test1tag1", "test1tag2"));
         Check check = new Check();
         check.setScript("/usr/local/bin/gtrue");
-        check.setInterval(60);
+        check.setInterval(60 + "s");
+        check.setTtl(10 + "s");
         service.setCheck(check);
         client.register(service);
     }
 
     @Test
-    public void test002GetServices() {
+    public void test002CheckIsThere() {
+        client.pass(SERVICE_ID);
+    }
+
+    @Test
+    public void test003GetServices() {
         Map<String, Service> services = client.getServices();
         assertNotNull("services was null", services);
         assertFalse("services was empty", services.isEmpty());
     }
 
     @Test
-    public void test003DeregisterService() {
-        client.deregister("test1id");
+    public void test004DeregisterService() {
+        client.deregister(SERVICE_ID);
     }
 
     @Test
-    public void test004GetSelf() {
+    public void test005GetSelf() {
         Map<String, Object> self = client.getSelf();
         assertNotNull("self was null", self);
     }
