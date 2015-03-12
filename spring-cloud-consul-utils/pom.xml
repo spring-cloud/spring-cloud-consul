@@ -3,10 +3,10 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>spring-cloud-consul</artifactId>
         <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-consul</artifactId>
         <version>1.0.0.BUILD-SNAPSHOT</version>
-        <relativePath>../spring-cloud-consul-sample/pom.xml</relativePath>
+        <relativePath>..</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <name>Spring Cloud Consul Utils</name>
