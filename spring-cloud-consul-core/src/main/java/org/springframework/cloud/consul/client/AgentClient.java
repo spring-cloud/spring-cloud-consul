@@ -2,6 +2,7 @@ package org.springframework.cloud.consul.client;
 
 import feign.Param;
 import feign.RequestLine;
+import org.springframework.cloud.consul.model.Check;
 import org.springframework.cloud.consul.model.Service;
 
 import java.util.Map;
@@ -28,5 +29,4 @@ public interface AgentClient {
 
     @RequestLine("GET /v1/agent/check/pass/service:{checkId}")
     void pass(@Param("checkId") String checkId);
-
 }
