@@ -4,7 +4,6 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.NewService;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.Map;
@@ -19,13 +18,15 @@ public class TtlScheduler {
 
     public static final DateTime EXPIRED_DATE = new DateTime(0);
     private final Map<String, DateTime> serviceHeartbeats = new ConcurrentHashMap<>();
-    private final AtomicBoolean heartbeatingNow = new AtomicBoolean();
 
-    @Autowired
-    private TtlHeartbeatProperties configuration;
+    private HeartbeatProperties configuration;
 
-    @Autowired
     private ConsulClient client;
+
+    public TtlScheduler(HeartbeatProperties configuration, ConsulClient client) {
+        this.configuration = configuration;
+        this.client = client;
+    }
 
     /**
      * Add a service to the checks loop.
@@ -38,16 +39,19 @@ public class TtlScheduler {
         serviceHeartbeats.remove(serviceId);
     }
 
-    @Scheduled(initialDelay = 0, fixedRateString = "${consul.heartbeat.fixedRate:201000}")
+    @Scheduled(initialDelay = 0, fixedRateString = "${consul.heartbeat.fixedRate:15000}")
     private void heartbeatServices() {
-        if (heartbeatingNow.compareAndSet(false, true)) {
-            for (String serviceId : serviceHeartbeats.keySet()) {
-                DateTime latestHeartbeatDoneForService = serviceHeartbeats.get(serviceId);
-                if (latestHeartbeatDoneForService.plus(configuration.getHeartbeatInterval())
-                        .isBefore(DateTime.now())) {
-                    client.agentCheckPass(serviceId);
-                    serviceHeartbeats.put(serviceId, DateTime.now());
+        for (String serviceId : serviceHeartbeats.keySet()) {
+            DateTime latestHeartbeatDoneForService = serviceHeartbeats.get(serviceId);
+            if (latestHeartbeatDoneForService.plus(configuration.getHeartbeatInterval())
+                    .isBefore(DateTime.now())) {
+                String checkId = serviceId;
+                if (!checkId.startsWith("service:")) {
+                    checkId = "service:"+checkId;
                 }
+                client.agentCheckPass(checkId);
+                log.info("Sending consul heartbeat for: "+serviceId);
+                serviceHeartbeats.put(serviceId, DateTime.now());
             }
         }
     }

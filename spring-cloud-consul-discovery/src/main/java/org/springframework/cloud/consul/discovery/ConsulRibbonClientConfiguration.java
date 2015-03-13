@@ -21,6 +21,8 @@ import static com.netflix.client.config.CommonClientConfigKey.EnableZoneAffinity
 
 import javax.annotation.PostConstruct;
 
+import com.netflix.loadbalancer.Server;
+import com.netflix.loadbalancer.ServerListFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -71,7 +73,7 @@ public class ConsulRibbonClientConfiguration {
 	}
 
     @Bean
-    public ServiceCheckServerListFilter ribbonServerListFilter() {
+    public ServerListFilter<Server> ribbonServerListFilter() {
         return new ServiceCheckServerListFilter(client);
     }
 
