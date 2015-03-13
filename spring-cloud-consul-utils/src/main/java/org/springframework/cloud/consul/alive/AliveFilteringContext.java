@@ -16,7 +16,6 @@ import java.util.List;
  * @author nicu marasoiu on 10.03.2015.
  */
 @Configuration
-@ComponentScan
 public class AliveFilteringContext {
     @Bean
     @Autowired
