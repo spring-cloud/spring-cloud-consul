@@ -73,7 +73,7 @@ public class EventService {
     }
 
     /**
-     * from https://github.com/armon/consul-api/blob/master/event.go#L92-L104
+     * from https://github.com/hashicorp/consul/blob/master/api/event.go#L90-L104
      // IDToIndex is a bit of a hack. This simulates the index generation to
      // convert an event ID into a WaitIndex.
      func (e *Event) IDToIndex(uuid string) uint64 {
@@ -112,7 +112,7 @@ public class EventService {
         //TODO: parameterized or configurable watch time
         long index = -1;
         if (lastIndex != null) {
-            lastIndex.longValue();
+            index = lastIndex.longValue();
         }
         Response<List<Event>> watch = consul.eventList(new QueryParams(2, index));
         return filterEvents(readEvents(watch), lastIndex);
