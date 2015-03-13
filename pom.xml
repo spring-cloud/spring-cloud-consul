@@ -25,6 +25,13 @@
 		<tag>HEAD</tag>
 	</scm>
 
+    <repositories>
+        <repository>
+            <id>ecwid</id>
+            <url>http://nexus.ecwid.com/content/groups/public</url>
+        </repository>
+    </repositories>
+
     <modules>
         <module>spring-cloud-consul-core</module>
         <module>spring-cloud-consul-config</module>
@@ -32,6 +39,7 @@
         <module>spring-cloud-consul-bus</module>
         <module>spring-cloud-consul-sample</module>
         <module>spring-cloud-consul-tests</module>
+        <module>spring-cloud-consul-utils</module>
 		<module>docs</module>
     </modules>
 
@@ -111,13 +119,18 @@
             <dependency>
                 <groupId>com.ecwid.consul</groupId>
                 <artifactId>consul-api</artifactId>
-                <version>0.1</version>
+                <version>1.0.8</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
                         <artifactId>servlet-api</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.3.1</version>
             </dependency>
             <!-- force httpclient version -->
             <dependency>
@@ -164,6 +177,11 @@
                 <groupId>com.netflix.ribbon</groupId>
                 <artifactId>ribbon-httpclient</artifactId>
                 <version>${ribbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.7</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>

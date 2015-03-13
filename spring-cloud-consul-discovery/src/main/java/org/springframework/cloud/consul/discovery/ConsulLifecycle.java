@@ -19,6 +19,12 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     @Autowired
     private ConsulProperties consulProperties;
 
+    @Autowired
+    private TtlScheduler ttlScheduler;
+
+    @Autowired
+    private TtlHeartbeatProperties ttlConfig;
+
     @Override
     protected void register() {
         NewService service = new NewService();
@@ -30,8 +36,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
         Integer port = new Integer(getEnvironment().getProperty("server.port", "8080"));
         service.setPort(port);
         service.setTags(consulProperties.getTags());
-
-        //TODO: add support for Check
+        NewService.Check check = new NewService.Check();
+        check.setTtl(ttlConfig.getTtlAsString());
+        service.setCheck(check);
         register(service);
     }
 
@@ -49,6 +56,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     protected void register(NewService service) {
         log.info("Registering service with consul: {}", service.toString());
         client.agentServiceRegister(service);
+        ttlScheduler.add(service);
     }
 
     @Override
@@ -57,7 +65,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     }
 
     @Override
-    protected void deregister(){
+    protected void deregister() {
         deregister(getContext().getId());
     }
 
@@ -67,6 +75,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     }
 
     private void deregister(String serviceId) {
+        ttlScheduler.remove(serviceId);
         client.agentServiceDeregister(serviceId);
     }
 

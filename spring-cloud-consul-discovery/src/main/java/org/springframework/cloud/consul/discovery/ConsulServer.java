@@ -9,9 +9,13 @@ import com.netflix.loadbalancer.Server;
 public class ConsulServer extends Server {
 
     private final MetaInfo metaInfo;
+    private final String address;
+    private final String node;
 
     public ConsulServer(final CatalogService service) {
         super(service.getNode(), service.getServicePort());
+        address = service.getAddress();
+        node = service.getNode();
         metaInfo = new MetaInfo() {
             @Override
             public String getAppName() {
@@ -38,5 +42,13 @@ public class ConsulServer extends Server {
     @Override
     public MetaInfo getMetaInfo() {
         return metaInfo;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getNode() {
+        return node;
     }
 }

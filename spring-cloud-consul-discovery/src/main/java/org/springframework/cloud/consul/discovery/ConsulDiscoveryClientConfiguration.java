@@ -13,6 +13,16 @@ public class ConsulDiscoveryClientConfiguration {
         return new ConsulLifecycle();
     }
 
+    @Bean
+    public TtlScheduler ttlScheduler() {
+        return new TtlScheduler();
+    }
+
+    @Bean
+    public TtlHeartbeatProperties ttlHeartbeatConfiguration() {
+        return new TtlHeartbeatProperties();
+    }
+
     /*@Bean
     public ConsulLoadBalancerClient consulLoadBalancerClient() {
         return new ConsulLoadBalancerClient();
