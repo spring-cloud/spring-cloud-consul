@@ -23,7 +23,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     private TtlScheduler ttlScheduler;
 
     @Autowired
-    private TtlHeartbeatConfiguration ttlConfig;
+    private TtlHeartbeatProperties ttlConfig;
 
     @Override
     protected void register() {

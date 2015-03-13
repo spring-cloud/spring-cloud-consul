@@ -12,7 +12,7 @@ import javax.validation.constraints.Min;
 
 @ConfigurationProperties(prefix = "consul.heartbeat")
 @Data
-public class TtlHeartbeatConfiguration {
+public class TtlHeartbeatProperties {
     @Min(1)
     @Max(10)
     private volatile int ttl = 3;

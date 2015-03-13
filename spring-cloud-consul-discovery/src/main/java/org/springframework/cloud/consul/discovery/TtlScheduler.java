@@ -22,7 +22,7 @@ public class TtlScheduler {
     private final AtomicBoolean heartbeatingNow = new AtomicBoolean();
 
     @Autowired
-    private TtlHeartbeatConfiguration configuration;
+    private TtlHeartbeatProperties configuration;
 
     @Autowired
     private ConsulClient client;

@@ -19,8 +19,8 @@ public class ConsulDiscoveryClientConfiguration {
     }
 
     @Bean
-    public TtlHeartbeatConfiguration ttlHeartbeatConfiguration() {
-        return new TtlHeartbeatConfiguration();
+    public TtlHeartbeatProperties ttlHeartbeatConfiguration() {
+        return new TtlHeartbeatProperties();
     }
 
     /*@Bean
