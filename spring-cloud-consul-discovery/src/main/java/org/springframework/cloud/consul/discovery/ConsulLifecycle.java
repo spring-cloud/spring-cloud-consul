@@ -22,6 +22,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     @Autowired
     private TtlScheduler ttlScheduler;
 
+    @Autowired
+    private TtlHeartbeatConfiguration ttlConfig;
+
     @Override
     protected void register() {
         NewService service = new NewService();
@@ -34,7 +37,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
         service.setPort(port);
         service.setTags(consulProperties.getTags());
         NewService.Check check = new NewService.Check();
-        check.setTtl(ttlScheduler.getTTL() + "s");
+        check.setTtl(ttlConfig.getTtlAsString());
         service.setCheck(check);
         register(service);
     }
