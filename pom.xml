@@ -25,6 +25,13 @@
         <tag>HEAD</tag>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>ecwid</id>
+            <url>http://nexus.ecwid.com/content/groups/public</url>
+        </repository>
+    </repositories>
+
     <modules>
         <module>spring-cloud-consul-core</module>
         <module>spring-cloud-consul-config</module>
@@ -118,6 +125,11 @@
                         <artifactId>servlet-api</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>2.3.1</version>
             </dependency>
             <!-- force httpclient version -->
             <dependency>
