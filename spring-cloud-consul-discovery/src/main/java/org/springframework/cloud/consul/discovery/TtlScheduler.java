@@ -29,8 +29,8 @@ public class TtlScheduler {
     @Value("${consul.ttl:3}")
 	private volatile int ttl;
 
-    @Value("${consul.heartbeatIntervalRatio:0.6}")
-    private volatile int heartbeatIntervalRatio;
+    @Value("${consul.heartbeatIntervalRatio:0.66}")
+    private volatile float heartbeatIntervalRatio;
 
 	private volatile int heartbeatInterval;
 
@@ -40,7 +40,7 @@ public class TtlScheduler {
 	@PostConstruct
     public void computeHeartbeatInterval() {
         // heartbeat rate at ratio * ttl, but no later than ttl -1s and, (under lesser priority), no sooner than 1s from now
-        heartbeatInterval = Math.max(ttl - 1, Math.min(ttl * heartbeatIntervalRatio, 1));
+        heartbeatInterval = Math.round(Math.max(ttl - 1, Math.min(ttl * heartbeatIntervalRatio, 1)));
     }
 
 	/**
