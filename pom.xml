@@ -118,7 +118,7 @@
             <dependency>
                 <groupId>com.ecwid.consul</groupId>
                 <artifactId>consul-api</artifactId>
-                <version>1.0</version>
+                <version>1.0.8</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
@@ -176,6 +176,11 @@
                 <groupId>com.netflix.ribbon</groupId>
                 <artifactId>ribbon-httpclient</artifactId>
                 <version>${ribbon.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.7</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>
