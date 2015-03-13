@@ -18,12 +18,12 @@
         <!-- lookup parent from repository -->
     </parent>
 
-    <scm>
-        <url>https://github.com/spring-cloud/spring-cloud-consul</url>
-        <connection>scm:git:git://github.com/spring-cloud/spring-cloud-consul.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/spring-cloud/spring-cloud-consul.git</developerConnection>
-        <tag>HEAD</tag>
-    </scm>
+	<scm>
+		<url>https://github.com/spring-cloud/spring-cloud-consul</url>
+		<connection>scm:git:git://github.com/spring-cloud/spring-cloud-consul.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/spring-cloud/spring-cloud-consul.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
 
     <repositories>
         <repository>
