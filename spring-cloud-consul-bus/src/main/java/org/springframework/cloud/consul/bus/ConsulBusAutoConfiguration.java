@@ -34,6 +34,11 @@ public class ConsulBusAutoConfiguration {
     ObjectMapper objectMapper;
 
     @Bean
+    public EventService eventService() {
+        return new EventService();
+    }
+
+    @Bean
     public ConsulOutboundEndpoint consulOutboundEndpoint() {
         return new ConsulOutboundEndpoint();
     }

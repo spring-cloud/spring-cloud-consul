@@ -1,8 +1,6 @@
 package org.springframework.cloud.consul.bus;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -66,7 +64,7 @@ public class ConsulBusIT {
         return context;
     }*/
 
-    protected static final String JSON_PAYLOAD = "{\"type\":\"simple\",\"timestamp\":1416349427372,\"originService\":\"testService\",\"destinationService\":null,\"headers\":{},\"message\":\"testMessage\"}";
+    protected static final String JSON_PAYLOAD = "{\"type\":\"simple\",\"timestamp\":1416349427372,\"originService\":\"testService\",\"destinationService\":null,\"message\":\"testMessage\"}";
 
     @Test
     public void test003JsonToObject() {
@@ -75,10 +73,12 @@ public class ConsulBusIT {
         JsonToObjectTransformer transformer = Transformers.fromJson(RemoteApplicationEvent.class, new Jackson2JsonObjectMapper(objectMapper));
         /*HashMap<String, Object> map = new HashMap<>();
         map.put(JsonHeaders.TYPE_ID, RemoteApplicationEvent.class);*/
-        Message<?> message = transformer.transform(new GenericMessage<String>(JSON_PAYLOAD/*, map*/));
+        Message<?> message = transformer.transform(new GenericMessage<>(JSON_PAYLOAD));
         Object payload = message.getPayload();
         assertTrue("payload is of wrong type", payload instanceof RemoteApplicationEvent);
         assertTrue("payload is of wrong type", payload instanceof SimpleRemoteEvent);
+        SimpleRemoteEvent event = (SimpleRemoteEvent) payload;
+        assertEquals("payload is wrong", "testMessage", event.getMessage());
     }
 
     @Configuration

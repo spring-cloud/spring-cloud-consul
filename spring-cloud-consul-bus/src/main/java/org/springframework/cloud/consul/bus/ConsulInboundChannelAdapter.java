@@ -1,14 +1,15 @@
 package org.springframework.cloud.consul.bus;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.springframework.util.Base64Utils.decodeFromString;
+
+import java.io.IOException;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.endpoint.MessageProducerSupport;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.ecwid.consul.v1.event.model.Event;
 
 /**
  * Adapter that receives Messages from Consul Events, converts them into
@@ -16,11 +17,8 @@ import java.util.Map;
  * @author Spencer Gibb
  */
 public class ConsulInboundChannelAdapter extends MessageProducerSupport {
-    //@Autowired
-    //private EventService eventService;
-
     @Autowired
-    private ObjectMapper objectMapper;
+    private EventService eventService;
 
     public ConsulInboundChannelAdapter() {
     }
@@ -45,16 +43,16 @@ public class ConsulInboundChannelAdapter extends MessageProducerSupport {
 
     @Scheduled(fixedDelayString = "10")
     public void getEvents() throws IOException {
-        /*FIXME: List<Event> events = eventService.watch();
+        List<Event> events = eventService.watch();
         for (Event event : events) {
-            Map<String, Object> headers = new HashMap<>();
+            //Map<String, Object> headers = new HashMap<>();
             //headers.put(MessageHeaders.REPLY_CHANNEL, outputChannel.)
+            String decoded = new String(decodeFromString(event.getPayload()));
             sendMessage(getMessageBuilderFactory()
-                    //TODO: deal with odd objectMapper thing
-                    .withPayload(objectMapper.readValue(event.getDecoded(), String.class))
-                            //TODO: support headers
+                    .withPayload(decoded)
+                    //TODO: support headers
                     .build());
-        }*/
+        }
     }
 
     @Override
