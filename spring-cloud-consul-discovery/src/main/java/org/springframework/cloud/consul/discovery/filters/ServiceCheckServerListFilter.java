@@ -1,11 +1,10 @@
-package org.springframework.cloud.consul.serverlistfilters;
+package org.springframework.cloud.consul.discovery.filters;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.consul.discovery.ConsulServer;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -18,8 +17,11 @@ import com.netflix.loadbalancer.ServerListFilter;
  */
 public class ServiceCheckServerListFilter implements ServerListFilter<ConsulServer> {
 
-	@Autowired
 	private ConsulClient client;
+
+	public ServiceCheckServerListFilter(ConsulClient client) {
+		this.client = client;
+	}
 
 	@Override
 	public List<ConsulServer> getFilteredListOfServers(List<ConsulServer> servers) {

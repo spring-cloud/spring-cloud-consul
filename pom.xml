@@ -39,7 +39,6 @@
         <module>spring-cloud-consul-bus</module>
         <module>spring-cloud-consul-sample</module>
         <module>spring-cloud-consul-tests</module>
-        <module>spring-cloud-consul-utils</module>
 		<module>docs</module>
     </modules>
 
@@ -127,6 +126,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+			<!-- required by com.ecwid.consul but not as a pom dependency -->
             <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>

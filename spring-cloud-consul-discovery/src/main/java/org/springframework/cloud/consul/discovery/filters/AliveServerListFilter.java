@@ -1,10 +1,9 @@
-package org.springframework.cloud.consul.serverlistfilters;
+package org.springframework.cloud.consul.discovery.filters;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.consul.discovery.ConsulServer;
 
 import com.netflix.loadbalancer.ServerListFilter;
@@ -20,7 +19,6 @@ import com.netflix.loadbalancer.ServerListFilter;
 public class AliveServerListFilter implements ServerListFilter<ConsulServer> {
 	private FilteringAgentClient filteringAgentClient;
 
-	@Autowired
 	public AliveServerListFilter(FilteringAgentClient filteringAgentClient) {
 		this.filteringAgentClient = filteringAgentClient;
 	}
