@@ -3,6 +3,7 @@ package org.springframework.cloud.consul.serverlistfilters;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ecwid.consul.v1.ConsulClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.consul.discovery.ConsulServer;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +32,17 @@ public class UsefulConsulServerListFiltersFilteringContext {
 		return adapter(new ServiceCheckServerListFilter());
 	}
 
-	private ServerListFilter<Server> adapter(
+    @Bean
+    public FilteringAgentClient filteringAgentClient(){
+        return new FilteringAgentClientImpl(consulClient());
+    }
+
+    @Bean
+    public ConsulClient consulClient() {
+        return new ConsulClient();
+    }
+
+    private ServerListFilter<Server> adapter(
 			final ServerListFilter<ConsulServer> consulServerList) {
 
 		return new ServerListFilter<Server>() {
