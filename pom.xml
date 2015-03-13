@@ -64,9 +64,9 @@
                 <version>1.0.0.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-consul-core</artifactId>
-                <version>1.0.0.BUILD-SNAPSHOT</version>
+              <groupId>org.springframework.cloud</groupId>
+              <artifactId>spring-cloud-consul-core</artifactId>
+              <version>1.0.0.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
@@ -118,7 +118,7 @@
             <dependency>
                 <groupId>com.ecwid.consul</groupId>
                 <artifactId>consul-api</artifactId>
-                <version>1.0.8</version>
+                <version>1.0</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
