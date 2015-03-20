@@ -16,3 +16,7 @@ endpoints:
     enabled: true
   shutdown:
     enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.consul: DEBUG

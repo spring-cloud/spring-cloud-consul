@@ -24,11 +24,13 @@ import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 
+import lombok.extern.apachecommons.CommonsLog;
 import org.joda.time.Period;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "consul.heartbeat")
 @Data
+@CommonsLog
 public class HeartbeatProperties {
 	@Min(1)
 	private int ttlValue = 30;
@@ -43,14 +45,22 @@ public class HeartbeatProperties {
 	private Period heartbeatInterval;
 
 	@PostConstruct
-	public void computeHeartbeatInterval() {
-		// heartbeat rate at ratio * ttl, but no later than ttl -1s and, (under lesser
-		// priority), no sooner than 1s from now
-		heartbeatInterval = new Period(Math.round(1000 * Math.max(ttlValue - 1,
-				Math.min(ttlValue * intervalRatio, 1))));
+	public void init() {
+        this.heartbeatInterval = computeHearbeatInterval();
+        log.debug("Computed heartbeatInterval: " + heartbeatInterval);
 	}
 
-	public String getTtl() {
+    protected Period computeHearbeatInterval() {
+        // heartbeat rate at ratio * ttl, but no later than ttl -1s and, (under lesser
+        // priority), no sooner than 1s from now
+        double interval = ttlValue * intervalRatio;
+        double max = Math.max(interval, 1);
+        int ttlMinus1 = ttlValue - 1;
+        double min = Math.min(ttlMinus1, max);
+        return new Period(Math.round(1000 * min));
+    }
+
+    public String getTtl() {
 		return ttlValue + ttlUnit;
 	}
 }

@@ -67,7 +67,7 @@ public class TtlScheduler {
 					checkId = "service:" + checkId;
 				}
 				client.agentCheckPass(checkId);
-				log.info("Sending consul heartbeat for: " + serviceId);
+				log.debug("Sending consul heartbeat for: " + serviceId);
 				serviceHeartbeats.put(serviceId, DateTime.now());
 			}
 		}
