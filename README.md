@@ -2,6 +2,19 @@
 
 Preview of Spring Cloud Consul implementation
 
+### Short consul overview
+
+consul does
+
+* distributed configuration
+* service registration and discovery
+* messaging
+* distributed locking and sessions
+* supports multiple data centers
+* has a slick ui
+
+See the [intro](https://consul.io/intro/index.html) for more information.
+
 ### Running the sample
 
 1. [Install consul](https://consul.io/downloads.html)

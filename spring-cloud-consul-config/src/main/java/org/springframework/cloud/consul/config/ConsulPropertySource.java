@@ -16,62 +16,64 @@
 
 package org.springframework.cloud.consul.config;
 
+import static org.springframework.util.Base64Utils.decodeFromString;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.core.env.EnumerablePropertySource;
+
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
-import org.springframework.core.env.EnumerablePropertySource;
-
-import java.util.*;
-
-import static org.springframework.util.Base64Utils.*;
 
 /**
  * @author Spencer Gibb
  */
 public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient> {
 
-    private String context;
+	private String context;
 
-    private Map<String, String> properties = new LinkedHashMap<>();
+	private Map<String, String> properties = new LinkedHashMap<>();
 
-    public ConsulPropertySource(String context, ConsulClient source) {
-        super(context, source);
-        this.context = context;
+	public ConsulPropertySource(String context, ConsulClient source) {
+		super(context, source);
+		this.context = context;
 
-        if (!this.context.endsWith("/")) {
-            this.context = this.context + "/";
-        }
-    }
+		if (!this.context.endsWith("/")) {
+			this.context = this.context + "/";
+		}
+	}
 
-    public void init() {
-		Response<List<GetValue>> response = source.getKVValues(context, QueryParams.DEFAULT);
+	public void init() {
+		Response<List<GetValue>> response = source.getKVValues(context,
+				QueryParams.DEFAULT);
 		List<GetValue> values = response.getValue();
 
-        if (values != null) {
-            for (GetValue getValue : values) {
-                String key = getValue.getKey()
-                        .replace(context, "")
-                        .replace('/', '.');
-                String value = getDecoded(getValue.getValue());
-                properties.put(key, value);
-            }
-        }
-    }
+		if (values != null) {
+			for (GetValue getValue : values) {
+				String key = getValue.getKey().replace(context, "").replace('/', '.');
+				String value = getDecoded(getValue.getValue());
+				properties.put(key, value);
+			}
+		}
+	}
 
-    public String getDecoded(String value) {
-        if (value == null)
-            return null;
+	public String getDecoded(String value) {
+		if (value == null)
+			return null;
 		return new String(decodeFromString(value));
-    }
+	}
 
-    @Override
-    public Object getProperty(String name) {
-        return properties.get(name);
-    }
+	@Override
+	public Object getProperty(String name) {
+		return properties.get(name);
+	}
 
-    @Override
-    public String[] getPropertyNames() {
-        return properties.keySet().toArray(new String[0]);
-    }
+	@Override
+	public String[] getPropertyNames() {
+		return properties.keySet().toArray(new String[0]);
+	}
 }

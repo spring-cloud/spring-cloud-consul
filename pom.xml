@@ -5,7 +5,7 @@
 
     <groupId>org.springframework.cloud</groupId>
     <artifactId>spring-cloud-consul</artifactId>
-    <version>1.0.0.BUILD-SNAPSHOT</version>
+    <version>1.0.1.BUILD-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Spring Cloud Consul</name>
     <description>Spring Cloud Consul</description>
@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-build</artifactId>
-        <version>1.0.0.BUILD-SNAPSHOT</version>
+        <version>1.0.1.BUILD-SNAPSHOT</version>
         <relativePath/>
         <!-- lookup parent from repository -->
     </parent>
@@ -61,32 +61,32 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-commons</artifactId>
-                <version>1.0.0.BUILD-SNAPSHOT</version>
+                <version>1.0.1.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
               <groupId>org.springframework.cloud</groupId>
               <artifactId>spring-cloud-consul-core</artifactId>
-              <version>1.0.0.BUILD-SNAPSHOT</version>
+              <version>1.0.1.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-consul-bus</artifactId>
-                <version>1.0.0.BUILD-SNAPSHOT</version>
+                <version>1.0.1.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-consul-config</artifactId>
-                <version>1.0.0.BUILD-SNAPSHOT</version>
+                <version>1.0.1.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-consul-discovery</artifactId>
-                <version>1.0.0.BUILD-SNAPSHOT</version>
+                <version>1.0.1.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-bus</artifactId>
-                <version>1.0.0.BUILD-SNAPSHOT</version>
+                <version>1.0.1.BUILD-SNAPSHOT</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.springframework.boot</groupId>
@@ -112,8 +112,8 @@
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-config-client</artifactId>
-                <version>1.0.0.BUILD-SNAPSHOT</version>
+                <artifactId>spring-cloud-context</artifactId>
+                <version>1.0.1.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.ecwid.consul</groupId>
@@ -141,12 +141,12 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-zuul</artifactId>
-                <version>1.0.0.BUILD-SNAPSHOT</version>
+                <version>1.0.1.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-netflix-sidecar</artifactId>
-                <version>1.0.0.BUILD-SNAPSHOT</version>
+                <version>1.0.1.BUILD-SNAPSHOT</version>
                 <exclusions>
                     <exclusion>
                         <groupId>com.netflix.eureka</groupId>
@@ -161,7 +161,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-netflix-core</artifactId>
-                <version>1.0.0.BUILD-SNAPSHOT</version>
+                <version>1.0.1.BUILD-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>com.netflix.ribbon</groupId>

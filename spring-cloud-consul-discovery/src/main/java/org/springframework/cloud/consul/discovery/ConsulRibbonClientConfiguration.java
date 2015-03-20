@@ -21,8 +21,6 @@ import static com.netflix.client.config.CommonClientConfigKey.EnableZoneAffinity
 
 import javax.annotation.PostConstruct;
 
-import com.netflix.loadbalancer.Server;
-import com.netflix.loadbalancer.ServerListFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -35,7 +33,9 @@ import com.netflix.client.config.IClientConfig;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.config.DynamicPropertyFactory;
 import com.netflix.config.DynamicStringProperty;
+import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerList;
+import com.netflix.loadbalancer.ServerListFilter;
 
 /**
  * Preprocessor that configures defaults for eureka-discovered ribbon clients. Such as:
@@ -72,10 +72,10 @@ public class ConsulRibbonClientConfiguration {
 		return serverList;
 	}
 
-    @Bean
-    public ServerListFilter<Server> ribbonServerListFilter() {
-        return new ServiceCheckServerListFilter(client);
-    }
+	@Bean
+	public ServerListFilter<Server> ribbonServerListFilter() {
+		return new ServiceCheckServerListFilter(client);
+	}
 
 	@PostConstruct
 	public void preprocess() {

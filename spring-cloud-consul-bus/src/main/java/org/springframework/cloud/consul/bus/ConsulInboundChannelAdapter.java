@@ -28,50 +28,51 @@ import org.springframework.scheduling.annotation.Scheduled;
 import com.ecwid.consul.v1.event.model.Event;
 
 /**
- * Adapter that receives Messages from Consul Events, converts them into
- * Spring Integration Messages, and sends the results to a Message Channel.
+ * Adapter that receives Messages from Consul Events, converts them into Spring
+ * Integration Messages, and sends the results to a Message Channel.
  * @author Spencer Gibb
  */
 public class ConsulInboundChannelAdapter extends MessageProducerSupport {
-    @Autowired
-    private EventService eventService;
+	@Autowired
+	private EventService eventService;
 
-    public ConsulInboundChannelAdapter() {
-    }
+	public ConsulInboundChannelAdapter() {
+	}
 
-    //link eventService to sendMessage
-        /*
-        Map<String, Object> headers = headerMapper.toHeadersFromRequest(message.getMessageProperties());
-        if (messageListenerContainer.getAcknowledgeMode() == AcknowledgeMode.MANUAL) {
-            headers.put(AmqpHeaders.DELIVERY_TAG, message.getMessageProperties().getDeliveryTag());
-            headers.put(AmqpHeaders.CHANNEL, channel);
-        }
-        sendMessage(AmqpInboundChannelAdapter.this.getMessageBuilderFactory().withPayload(payload).copyHeaders(headers).build());*/
+	// link eventService to sendMessage
+	/*
+	 * Map<String, Object> headers =
+	 * headerMapper.toHeadersFromRequest(message.getMessageProperties()); if
+	 * (messageListenerContainer.getAcknowledgeMode() == AcknowledgeMode.MANUAL) {
+	 * headers.put(AmqpHeaders.DELIVERY_TAG,
+	 * message.getMessageProperties().getDeliveryTag()); headers.put(AmqpHeaders.CHANNEL,
+	 * channel); }
+	 * sendMessage(AmqpInboundChannelAdapter.this.getMessageBuilderFactory().withPayload
+	 * (payload).copyHeaders(headers).build());
+	 */
 
-        //start thread
-        //make blocking calls
-        //foreach event -> send message
+	// start thread
+	// make blocking calls
+	// foreach event -> send message
 
+	@Override
+	protected void doStart() {
+	}
 
-    @Override
-    protected void doStart() {
-    }
+	@Scheduled(fixedDelayString = "10")
+	public void getEvents() throws IOException {
+		List<Event> events = eventService.watch();
+		for (Event event : events) {
+			// Map<String, Object> headers = new HashMap<>();
+			// headers.put(MessageHeaders.REPLY_CHANNEL, outputChannel.)
+			String decoded = new String(decodeFromString(event.getPayload()));
+			sendMessage(getMessageBuilderFactory().withPayload(decoded)
+			// TODO: support headers
+					.build());
+		}
+	}
 
-    @Scheduled(fixedDelayString = "10")
-    public void getEvents() throws IOException {
-        List<Event> events = eventService.watch();
-        for (Event event : events) {
-            //Map<String, Object> headers = new HashMap<>();
-            //headers.put(MessageHeaders.REPLY_CHANNEL, outputChannel.)
-            String decoded = new String(decodeFromString(event.getPayload()));
-            sendMessage(getMessageBuilderFactory()
-                    .withPayload(decoded)
-                    //TODO: support headers
-                    .build());
-        }
-    }
-
-    @Override
-    protected void doStop() {
-    }
+	@Override
+	protected void doStop() {
+	}
 }

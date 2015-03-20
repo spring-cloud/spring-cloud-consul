@@ -21,12 +21,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.netflix.loadbalancer.Server;
 import org.springframework.cloud.consul.discovery.ConsulServer;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.health.model.Check;
+import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerListFilter;
 
 /**
@@ -47,7 +47,7 @@ public class ServiceCheckServerListFilter implements ServerListFilter<Server> {
 		for (Server server : servers) {
 			String serviceId = server.getMetaInfo().getInstanceId();
 			if (passingServiceIds.contains(serviceId)) {
-                ConsulServer consulServer = ConsulServer.class.cast(server);
+				ConsulServer consulServer = ConsulServer.class.cast(server);
 				List<Check> nodeChecks = client.getHealthChecksForNode(
 						consulServer.getNode(), QueryParams.DEFAULT).getValue();
 				boolean passingNodeChecks = true;

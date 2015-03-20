@@ -16,9 +16,11 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.Map;
+
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,9 +36,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import java.util.Map;
-
-import static org.junit.Assert.*;
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.Service;
 
 /**
  * @author Spencer Gibb
@@ -44,7 +46,7 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SpringApplicationConfiguration(classes = TestConfig.class)
-@IntegrationTest({"server.port=0", "spring.application.name=myTestService"})
+@IntegrationTest({ "server.port=0", "spring.application.name=myTestService" })
 @WebAppConfiguration
 public class ConsulLifecycleTests {
 
@@ -70,7 +72,7 @@ public class ConsulLifecycleTests {
 
 @Configuration
 @EnableAutoConfiguration
-@Import({ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class})
+@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
 class TestConfig {
 
 }

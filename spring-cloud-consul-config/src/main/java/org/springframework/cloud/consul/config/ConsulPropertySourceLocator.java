@@ -16,65 +16,70 @@
 
 package org.springframework.cloud.consul.config;
 
-import com.ecwid.consul.v1.ConsulClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.config.client.PropertySourceLocator;
-import org.springframework.cloud.consul.ConsulProperties;
-import org.springframework.core.env.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
+import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.core.env.CompositePropertySource;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertySource;
+
+import com.ecwid.consul.v1.ConsulClient;
 
 /**
  * @author Spencer Gibb
  */
 public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
-    @Autowired
-    private ConsulClient consul;
+	@Autowired
+	private ConsulClient consul;
 
-    @Autowired
-    private ConsulProperties properties;
+	@Autowired
+	private ConsulProperties properties;
 
-    @Override
-    public PropertySource<?> locate(Environment environment) {
-        if (environment instanceof ConfigurableEnvironment) {
-            ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
-            String appName = env.getProperty("spring.application.name");
-            List<String> profiles = Arrays.asList(env.getActiveProfiles());
+	@Override
+	public PropertySource<?> locate(Environment environment) {
+		if (environment instanceof ConfigurableEnvironment) {
+			ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
+			String appName = env.getProperty("spring.application.name");
+			List<String> profiles = Arrays.asList(env.getActiveProfiles());
 
-            String prefix = properties.getPrefix();
-            List<String> contexts = new ArrayList<>();
+			String prefix = properties.getPrefix();
+			List<String> contexts = new ArrayList<>();
 
-            String defaultContext = prefix + "/application";
-            contexts.add(defaultContext + "/");
-            addProfiles(contexts, defaultContext, profiles);
+			String defaultContext = prefix + "/application";
+			contexts.add(defaultContext + "/");
+			addProfiles(contexts, defaultContext, profiles);
 
-            String baseContext = prefix + "/" + appName;
-            contexts.add(baseContext + "/");
-            addProfiles(contexts, baseContext, profiles);
+			String baseContext = prefix + "/" + appName;
+			contexts.add(baseContext + "/");
+			addProfiles(contexts, baseContext, profiles);
 
-            CompositePropertySource composite = new CompositePropertySource("consul");
+			CompositePropertySource composite = new CompositePropertySource("consul");
 
-            for (String propertySourceContext : contexts) {
-                ConsulPropertySource propertySource = create(propertySourceContext);
-                propertySource.init();
-                composite.addPropertySource(propertySource);
-            }
+			for (String propertySourceContext : contexts) {
+				ConsulPropertySource propertySource = create(propertySourceContext);
+				propertySource.init();
+				composite.addPropertySource(propertySource);
+			}
 
-            return composite;
-        }
-        return null;
-    }
+			return composite;
+		}
+		return null;
+	}
 
-    private ConsulPropertySource create(String context) {
-        return new ConsulPropertySource(context, consul);
-    }
+	private ConsulPropertySource create(String context) {
+		return new ConsulPropertySource(context, consul);
+	}
 
-    private void addProfiles(List<String> contexts, String baseContext, List<String> profiles) {
-        for (String profile : profiles) {
-            contexts.add(baseContext + "::" + profile + "/");
-        }
-    }
+	private void addProfiles(List<String> contexts, String baseContext,
+			List<String> profiles) {
+		for (String profile : profiles) {
+			contexts.add(baseContext + "::" + profile + "/");
+		}
+	}
 }

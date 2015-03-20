@@ -42,7 +42,6 @@ public class ZuulApplicationTests {
 	public void contextLoads() {
 	}
 
-
 	@SpringBootApplication
 	@EnableCircuitBreaker
 	@EnableDiscoveryClient

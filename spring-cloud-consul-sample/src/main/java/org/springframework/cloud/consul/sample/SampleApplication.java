@@ -17,6 +17,7 @@
 package org.springframework.cloud.consul.sample;
 
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -45,47 +46,47 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class SampleApplication implements ApplicationListener<SimpleRemoteEvent> {
 
-    public static final String CLIENT_NAME = "testConsulApp";
+	public static final String CLIENT_NAME = "testConsulApp";
 
-    @Autowired
-    LoadBalancerClient loadBalancer;
+	@Autowired
+	LoadBalancerClient loadBalancer;
 
-    @Autowired
-    DiscoveryClient discoveryClient;
+	@Autowired
+	DiscoveryClient discoveryClient;
 
-    @Autowired
-    Environment env;
+	@Autowired
+	Environment env;
 
-    @Autowired(required = false)
-    RelaxedPropertyResolver resolver;
+	@Autowired(required = false)
+	RelaxedPropertyResolver resolver;
 
-    @RequestMapping("/me")
-    public ServiceInstance me() {
-        return discoveryClient.getLocalServiceInstance();
-    }
+	@RequestMapping("/me")
+	public ServiceInstance me() {
+		return discoveryClient.getLocalServiceInstance();
+	}
 
-    @RequestMapping("/")
-    public ServiceInstance lb() {
-        return loadBalancer.choose(CLIENT_NAME);
-    }
+	@RequestMapping("/")
+	public ServiceInstance lb() {
+		return loadBalancer.choose(CLIENT_NAME);
+	}
 
-    @RequestMapping("/myenv")
-    public String env(@RequestParam("prop") String prop) {
-        String property = new RelaxedPropertyResolver(env).getProperty(prop, "Not Found");
-        return property;
-    }
+	@RequestMapping("/myenv")
+	public String env(@RequestParam("prop") String prop) {
+		String property = new RelaxedPropertyResolver(env).getProperty(prop, "Not Found");
+		return property;
+	}
 
-    @Bean
-    public SubtypeModule sampleSubtypeModule() {
-        return new SubtypeModule(SimpleRemoteEvent.class);
-    }
+	@Bean
+	public SubtypeModule sampleSubtypeModule() {
+		return new SubtypeModule(SimpleRemoteEvent.class);
+	}
 
-    public static void main(String[] args) {
-        SpringApplication.run(SampleApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(SampleApplication.class, args);
+	}
 
-    @Override
-    public void onApplicationEvent(SimpleRemoteEvent event) {
-        log.info("Received event: {}", event);
-    }
+	@Override
+	public void onApplicationEvent(SimpleRemoteEvent event) {
+		log.info("Received event: {}", event);
+	}
 }

@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.netflix.loadbalancer.Server;
 import org.springframework.cloud.consul.discovery.ConsulServer;
 
+import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerListFilter;
 
 /**
@@ -45,7 +45,7 @@ public class AliveServerListFilter implements ServerListFilter<Server> {
 		Set<String> liveNodes = filteringAgentClient.getAliveAgentsAddresses();
 		List<Server> filteredServers = new ArrayList<>();
 		for (Server server : servers) {
-            ConsulServer consulServer = ConsulServer.class.cast(server);
+			ConsulServer consulServer = ConsulServer.class.cast(server);
 			if (liveNodes.contains(consulServer.getAddress())) {
 				filteredServers.add(server);
 			}
