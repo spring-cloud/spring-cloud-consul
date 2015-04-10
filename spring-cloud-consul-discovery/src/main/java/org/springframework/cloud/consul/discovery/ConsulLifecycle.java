@@ -16,14 +16,16 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.agent.model.NewService;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
 import org.springframework.cloud.consul.ConsulProperties;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.agent.model.NewService;
+import javax.servlet.ServletContext;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author Spencer Gibb
@@ -43,7 +45,10 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	@Autowired
 	private HeartbeatProperties ttlConfig;
 
-	@Override
+    @Autowired(required = false)
+    private ServletContext servletContext;
+
+    @Override
 	protected void register() {
 		NewService service = new NewService();
 		String appName = getAppName();
@@ -53,14 +58,22 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		// TODO: support port = 0 random assignment
 		Integer port = new Integer(getEnvironment().getProperty("server.port", "8080"));
 		service.setPort(port);
-		service.setTags(consulProperties.getTags());
+		service.setTags(createTags());
 		NewService.Check check = new NewService.Check();
 		check.setTtl(ttlConfig.getTtl());
 		service.setCheck(check);
 		register(service);
 	}
 
-	@Override
+    private List<String> createTags() {
+        List<String> tags = new LinkedList<>(consulProperties.getTags());
+        if(servletContext != null) {
+            tags.add("contextPath=" + servletContext.getContextPath());
+        }
+        return tags;
+    }
+
+    @Override
 	protected void registerManagement() {
 		NewService management = new NewService();
 		management.setId(getManagementServiceId());
