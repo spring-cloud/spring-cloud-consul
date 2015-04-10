@@ -25,6 +25,10 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.NewService;
 import org.springframework.util.Assert;
 
+import javax.servlet.ServletContext;
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * @author Spencer Gibb
  */
@@ -43,6 +47,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	@Autowired
 	private HeartbeatProperties ttlConfig;
 
+	@Autowired(required = false)
+	private ServletContext servletContext;
+	
 	private NewService service = new NewService();
 
 	@Override
@@ -67,7 +74,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		}
 		service.setId(id);
 		service.setName(appName);
-		service.setTags(properties.getTags());
+		service.setTags(createTags());
 
 		NewService.Check check = new NewService.Check();
 		if (ttlConfig.isEnabled()) {
@@ -119,6 +126,14 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	@Override
 	protected void deregisterManagement() {
 		deregister(getManagementServiceName());
+	}
+
+	private List<String> createTags() {
+		List<String> tags = new LinkedList<>(properties.getTags());
+		if(servletContext != null) {
+			tags.add("contextPath=" + servletContext.getContextPath());
+		}
+		return tags;
 	}
 
 	private void deregister(String serviceId) {
