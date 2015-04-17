@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.payu.global.wallet</groupId>
 	<artifactId>spring-cloud-consul</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 	<packaging>pom</packaging>
 	<name>Spring Cloud Consul</name>
 	<description>Spring Cloud Consul</description>
@@ -21,7 +19,7 @@
         <url>https://stash.allegrogroup.com/projects/PRO/repos/spring-cloud-consul-payu</url>
         <connection>scm:git:ssh://git@stash.allegrogroup.com/pro/spring-cloud-consul-payu.git</connection>
         <developerConnection>scm:git:ssh://git@stash.allegrogroup.com/pro/spring-cloud-consul-payu.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>spring-cloud-consul-1.0.1</tag>
     </scm>
 
 	<repositories>
@@ -93,12 +91,12 @@
 			<dependency>
 				<groupId>com.payu.global.wallet</groupId>
 				<artifactId>spring-cloud-consul-core</artifactId>
-				<version>1.0.1-SNAPSHOT</version>
+				<version>1.0.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.payu.global.wallet</groupId>
 				<artifactId>spring-cloud-consul-bus</artifactId>
-				<version>1.0.1-SNAPSHOT</version>
+				<version>1.0.1</version>
 			</dependency>
 			<!--<dependency>
 				<groupId>org.springframework.cloud</groupId>
