@@ -10,7 +10,7 @@
 	<description>Spring Cloud Consul Config</description>
 
 	<parent>
-		<groupId>org.springframework.cloud</groupId>
+		<groupId>com.payu.global.wallet.spring.cloud.consul</groupId>
 		<artifactId>spring-cloud-consul</artifactId>
 		<version>1.0.1.BUILD-SNAPSHOT</version>
 		<relativePath>..</relativePath>
