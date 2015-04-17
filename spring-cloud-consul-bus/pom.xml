@@ -10,7 +10,7 @@
 	<description>Spring Cloud Consul Bus</description>
 
 	<parent>
-		<groupId>com.payu.global.wallet.spring.cloud.consul</groupId>
+		<groupId>com.payu.global.wallet</groupId>
 		<artifactId>spring-cloud-consul</artifactId>
 		<version>1.0.1.BUILD-SNAPSHOT</version>
 		<relativePath>..</relativePath>

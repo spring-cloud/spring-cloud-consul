@@ -4,7 +4,7 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.payu.global.wallet.spring.cloud.consul</groupId>
+	<groupId>com.payu.global.wallet</groupId>
 	<artifactId>spring-cloud-consul</artifactId>
 	<version>1.0.1.BUILD-SNAPSHOT</version>
 	<packaging>pom</packaging>
