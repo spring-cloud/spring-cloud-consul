@@ -17,6 +17,10 @@
 	</parent>
 
 	<dependencies>
+        <dependency>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-core</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>com.payu.global.wallet</groupId>
 			<artifactId>spring-cloud-consul-core</artifactId>
