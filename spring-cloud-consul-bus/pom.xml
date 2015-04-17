@@ -12,13 +12,13 @@
 	<parent>
 		<groupId>com.payu.global.wallet</groupId>
 		<artifactId>spring-cloud-consul</artifactId>
-		<version>1.0.1.BUILD-SNAPSHOT</version>
+		<version>1.0.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.cloud</groupId>
+			<groupId>com.payu.global.wallet</groupId>
 			<artifactId>spring-cloud-consul-core</artifactId>
 		</dependency>
 		<dependency>
