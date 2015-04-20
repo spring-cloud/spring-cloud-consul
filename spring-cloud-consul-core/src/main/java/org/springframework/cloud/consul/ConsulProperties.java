@@ -45,4 +45,7 @@ public class ConsulProperties {
 	private String prefix = "config";
 
 	private List<String> managementTags = Arrays.asList("management");
+
+	@NotNull
+	private String contextPathTagName = "contextPath";
 }
