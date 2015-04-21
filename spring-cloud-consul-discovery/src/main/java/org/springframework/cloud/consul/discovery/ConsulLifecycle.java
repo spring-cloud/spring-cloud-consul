@@ -68,7 +68,8 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
     private List<String> createTags() {
         List<String> tags = new LinkedList<>(consulProperties.getTags());
         if(servletContext != null) {
-            tags.add("contextPath=" + servletContext.getContextPath());
+            tags.add(consulProperties.getContextPathTagName() +
+					"=" + servletContext.getContextPath());
         }
         return tags;
     }
