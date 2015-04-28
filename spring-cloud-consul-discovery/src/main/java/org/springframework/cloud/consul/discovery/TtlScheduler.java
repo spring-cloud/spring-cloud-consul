@@ -17,11 +17,16 @@
 package org.springframework.cloud.consul.discovery;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.boot.actuate.health.Status;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -33,43 +38,60 @@ import com.ecwid.consul.v1.agent.model.NewService;
 @Slf4j
 public class TtlScheduler {
 
-	public static final DateTime EXPIRED_DATE = new DateTime(0);
-	private final Map<String, DateTime> serviceHeartbeats = new ConcurrentHashMap<>();
+    public static final DateTime EXPIRED_DATE = new DateTime(0);
+    private final Map<String, DateTime> serviceHeartbeats = new ConcurrentHashMap<>();
 
-	private HeartbeatProperties configuration;
+    private HeartbeatProperties configuration;
+    private ConsulClient client;
+    private HealthIndicator healthIndicator;
 
-	private ConsulClient client;
+    public TtlScheduler(HeartbeatProperties configuration, ConsulClient client, HealthIndicator healthIndicator) {
+        this.configuration = configuration;
+        this.client = client;
+        this.healthIndicator = healthIndicator;
+    }
 
-	public TtlScheduler(HeartbeatProperties configuration, ConsulClient client) {
-		this.configuration = configuration;
-		this.client = client;
-	}
+    /**
+     * Add a service to the checks loop.
+     */
+    public void add(final NewService service) {
+        serviceHeartbeats.put(service.getId(), EXPIRED_DATE);
+    }
 
-	/**
-	 * Add a service to the checks loop.
-	 */
-	public void add(final NewService service) {
-		serviceHeartbeats.put(service.getId(), EXPIRED_DATE);
-	}
+    public void remove(String serviceId) {
+        serviceHeartbeats.remove(serviceId);
+    }
 
-	public void remove(String serviceId) {
-		serviceHeartbeats.remove(serviceId);
-	}
+    @Scheduled(initialDelay = 0, fixedRateString = "${consul.heartbeat.fixedRate:15000}")
+    private void heartbeatServices() {
+        for (String serviceId : serviceHeartbeats.keySet()) {
+            DateTime latestHeartbeatDoneForService = serviceHeartbeats.get(serviceId);
+            if (latestHeartbeatDoneForService.plus(configuration.getHeartbeatInterval())
+                    .isBefore(DateTime.now())) {
+                String checkId = serviceId;
+                if (!checkId.startsWith("service:")) {
+                    checkId = "service:" + checkId;
+                }
 
-	@Scheduled(initialDelay = 0, fixedRateString = "${consul.heartbeat.fixedRate:15000}")
-	private void heartbeatServices() {
-		for (String serviceId : serviceHeartbeats.keySet()) {
-			DateTime latestHeartbeatDoneForService = serviceHeartbeats.get(serviceId);
-			if (latestHeartbeatDoneForService.plus(configuration.getHeartbeatInterval())
-					.isBefore(DateTime.now())) {
-				String checkId = serviceId;
-				if (!checkId.startsWith("service:")) {
-					checkId = "service:" + checkId;
-				}
-				client.agentCheckPass(checkId);
-				log.debug("Sending consul heartbeat for: " + serviceId);
-				serviceHeartbeats.put(serviceId, DateTime.now());
-			}
-		}
-	}
+                computeAndSendStatus(checkId);
+                log.debug("Sending consul heartbeat for: " + serviceId);
+                serviceHeartbeats.put(serviceId, DateTime.now());
+            }
+        }
+    }
+
+    private void computeAndSendStatus(String checkId) {
+        Health health = healthIndicator.health();
+        Status status = health.getStatus();
+        String note = health.getDetails().toString();
+        if (Status.UP.equals(status)) {
+            client.agentCheckPass(checkId, note);
+        } else {
+            if (Status.UNKNOWN.equals(status)) {
+                client.agentCheckWarn(checkId, note);
+            } else {
+                client.agentCheckFail(checkId, note);
+            }
+        }
+    }
 }

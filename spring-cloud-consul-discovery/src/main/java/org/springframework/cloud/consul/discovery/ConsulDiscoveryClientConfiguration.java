@@ -17,10 +17,15 @@
 package org.springframework.cloud.consul.discovery;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.ecwid.consul.v1.ConsulClient;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Spencer Gibb
@@ -36,12 +41,7 @@ public class ConsulDiscoveryClientConfiguration {
 		return new ConsulLifecycle();
 	}
 
-	@Bean
-	public TtlScheduler ttlScheduler() {
-		return new TtlScheduler(heartbeatProperties(), consulClient);
-	}
-
-	@Bean
+    @Bean
 	public HeartbeatProperties heartbeatProperties() {
 		return new HeartbeatProperties();
 	}
@@ -50,4 +50,30 @@ public class ConsulDiscoveryClientConfiguration {
 	public ConsulDiscoveryClient consulDiscoveryClient() {
 		return new ConsulDiscoveryClient();
 	}
+
+    @Bean
+    public TtlScheduler ttlScheduler(Map<String, HealthIndicator> healthIndicators) {
+        return new TtlScheduler(heartbeatProperties(), consulClient, summaryHealthIndicator(healthIndicators));
+    }
+
+    private static HealthIndicator summaryHealthIndicator(final Map<String, HealthIndicator> healthIndicators) {
+        return new HealthIndicator() {
+            @Override
+            public Health health() {
+                Map<String, Health> currentStatuses = new HashMap<>();
+                for (Map.Entry<String, HealthIndicator> indicatorEntry : healthIndicators.entrySet()) {
+                    currentStatuses.put(indicatorEntry.getKey(), indicatorEntry.getValue().health());
+                }
+                return summaryHealthAggregator().aggregate(currentStatuses);
+            }
+        };
+    }
+
+    private static HealthAggregator summaryHealthAggregator() {
+        OrderedHealthAggregator orderedHealthAggregator = new OrderedHealthAggregator();
+        //todo set these by configuring
+        orderedHealthAggregator.setStatusOrder(Status.DOWN, Status.OUT_OF_SERVICE, Status.UNKNOWN, Status.UP);
+        return orderedHealthAggregator;
+    }
+
 }
