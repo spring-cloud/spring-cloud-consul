@@ -24,6 +24,8 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cloud.consul.discovery.filters.AliveServerListFilter;
+import org.springframework.cloud.consul.discovery.filters.FilteringAgentClient;
 import org.springframework.cloud.consul.discovery.filters.ServiceCheckServerListFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -72,8 +74,13 @@ public class ConsulRibbonClientConfiguration {
 		return serverList;
 	}
 
+    @Bean
+    public ServerListFilter<Server> serfStatusServerListFilter() {
+        return new AliveServerListFilter(new FilteringAgentClient(client));
+    }
+
 	@Bean
-	public ServerListFilter<Server> ribbonServerListFilter() {
+	public ServerListFilter<Server> serviceStatusServerListFilter() {
 		return new ServiceCheckServerListFilter(client);
 	}
 
