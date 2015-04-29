@@ -39,6 +39,8 @@ import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerList;
 import com.netflix.loadbalancer.ServerListFilter;
 
+import java.util.List;
+
 /**
  * Preprocessor that configures defaults for eureka-discovered ribbon clients. Such as:
  * <code>@zone</code>, NIWSServerListClassName, DeploymentContextBasedVipAddresses,
@@ -75,14 +77,17 @@ public class ConsulRibbonClientConfiguration {
 	}
 
     @Bean
-    public ServerListFilter<Server> serfStatusServerListFilter() {
-        return new AliveServerListFilter(new FilteringAgentClient(client));
+    public ServerListFilter<Server> compositeServerListFilter() {
+        final ServerListFilter<Server> aliveServerListFilter = new AliveServerListFilter(new FilteringAgentClient(client));
+        final ServiceCheckServerListFilter serviceCheckServerListFilter = new ServiceCheckServerListFilter(client);
+        return new ServerListFilter<Server>() {
+            @Override
+            public List<Server> getFilteredListOfServers(List<Server> servers) {
+                return serviceCheckServerListFilter.getFilteredListOfServers(
+                        aliveServerListFilter.getFilteredListOfServers(servers));
+            }
+        };
     }
-
-	@Bean
-	public ServerListFilter<Server> serviceStatusServerListFilter() {
-		return new ServiceCheckServerListFilter(client);
-	}
 
 	@PostConstruct
 	public void preprocess() {
