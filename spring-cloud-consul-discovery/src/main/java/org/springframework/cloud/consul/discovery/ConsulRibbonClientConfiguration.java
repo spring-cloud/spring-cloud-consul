@@ -24,6 +24,8 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cloud.consul.discovery.filters.AliveServerListFilter;
+import org.springframework.cloud.consul.discovery.filters.FilteringAgentClient;
 import org.springframework.cloud.consul.discovery.filters.ServiceCheckServerListFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +38,8 @@ import com.netflix.config.DynamicStringProperty;
 import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerList;
 import com.netflix.loadbalancer.ServerListFilter;
+
+import java.util.List;
 
 /**
  * Preprocessor that configures defaults for eureka-discovered ribbon clients. Such as:
@@ -72,10 +76,18 @@ public class ConsulRibbonClientConfiguration {
 		return serverList;
 	}
 
-	@Bean
-	public ServerListFilter<Server> ribbonServerListFilter() {
-		return new ServiceCheckServerListFilter(client);
-	}
+    @Bean
+    public ServerListFilter<Server> compositeServerListFilter() {
+        final ServerListFilter<Server> aliveServerListFilter = new AliveServerListFilter(new FilteringAgentClient(client));
+        final ServiceCheckServerListFilter serviceCheckServerListFilter = new ServiceCheckServerListFilter(client);
+        return new ServerListFilter<Server>() {
+            @Override
+            public List<Server> getFilteredListOfServers(List<Server> servers) {
+                return serviceCheckServerListFilter.getFilteredListOfServers(
+                        aliveServerListFilter.getFilteredListOfServers(servers));
+            }
+        };
+    }
 
 	@PostConstruct
 	public void preprocess() {
