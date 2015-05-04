@@ -16,51 +16,44 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
 import lombok.Data;
-
-import lombok.extern.apachecommons.CommonsLog;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.Period;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import javax.validation.constraints.DecimalMax;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 @ConfigurationProperties(prefix = "consul.heartbeat")
 @Data
-@CommonsLog
+@Slf4j
 public class HeartbeatProperties {
-	@Min(1)
-	private int ttlValue = 30;
+    //ttlSeconds value in milli seconds
+    @Min(10)
+    @Max(60000)
+    private int ttlSeconds = 30;
 
-	@NotNull
-	private String ttlUnit = "s";
+    @DecimalMin("0.1")
+    @DecimalMax("0.9")
+    private double heartbeatScheduleIntervalRatio = 2.0 / 3.0;
 
-	@DecimalMin("0.1")
-	@DecimalMax("0.9")
-	private double intervalRatio = 2.0 / 3.0;
+    private final Period heartbeatExpirePeriod;
 
-	private Period heartbeatInterval;
-
-	@PostConstruct
-	public void init() {
-        this.heartbeatInterval = computeHearbeatInterval();
-        log.debug("Computed heartbeatInterval: " + heartbeatInterval);
-	}
-
-    protected Period computeHearbeatInterval() {
-        // heartbeat rate at ratio * ttl, but no later than ttl -1s and, (under lesser
-        // priority), no sooner than 1s from now
-        double interval = ttlValue * intervalRatio;
-        double max = Math.max(interval, 1);
-        int ttlMinus1 = ttlValue - 1;
-        double min = Math.min(ttlMinus1, max);
-        return new Period(Math.round(1000 * min));
+    public HeartbeatProperties() {
+        heartbeatExpirePeriod = hearbeatInterval();
+        log.debug("HeartbeatProperties = {}", this);
     }
 
-    public String getTtl() {
-		return ttlValue + ttlUnit;
-	}
+    public String getConsulTtl() {
+        return ttlSeconds + "s";
+    }
+
+    protected Period hearbeatInterval() {
+        // heartbeat expiration time at ratio * ttlSeconds, but no later than ttlSeconds -1s and, (under lesser
+        // priority), no sooner than 1s from now
+        return new Period((long)(ttlSeconds * 1000 * heartbeatScheduleIntervalRatio));
+    }
+
 }

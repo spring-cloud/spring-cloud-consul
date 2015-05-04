@@ -60,7 +60,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		service.setPort(port);
 		service.setTags(createTags());
 		NewService.Check check = new NewService.Check();
-		check.setTtl(ttlConfig.getTtl());
+		check.setTtl(ttlConfig.getConsulTtl());
 		service.setCheck(check);
 		register(service);
 	}
@@ -107,7 +107,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	}
 
 	private void deregister(String serviceId) {
-		ttlScheduler.remove(serviceId);
+		ttlScheduler.removeAll();
 		client.agentServiceDeregister(serviceId);
 	}
 

@@ -16,16 +16,16 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import com.ecwid.consul.v1.ConsulClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.ecwid.consul.v1.ConsulClient;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Spencer Gibb
@@ -36,10 +36,18 @@ public class ConsulDiscoveryClientConfiguration {
 	@Autowired
 	private ConsulClient consulClient;
 
-	@Bean
+    @Autowired
+    private TaskScheduler scheduler;
+
+    @Bean
 	public ConsulLifecycle consulLifecycle() {
 		return new ConsulLifecycle();
 	}
+
+    @Bean
+    public TaskScheduler taskScheduler(){
+        return new ConcurrentTaskScheduler();
+    }
 
     @Bean
 	public HeartbeatProperties heartbeatProperties() {
@@ -53,7 +61,7 @@ public class ConsulDiscoveryClientConfiguration {
 
     @Bean
     public TtlScheduler ttlScheduler(Map<String, HealthIndicator> healthIndicators) {
-        return new TtlScheduler(heartbeatProperties(), consulClient, summaryHealthIndicator(healthIndicators));
+        return new TtlScheduler(scheduler, heartbeatProperties(), consulClient, summaryHealthIndicator(healthIndicators));
     }
 
     private static HealthIndicator summaryHealthIndicator(final Map<String, HealthIndicator> healthIndicators) {

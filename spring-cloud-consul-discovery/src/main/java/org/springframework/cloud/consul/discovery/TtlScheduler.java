@@ -16,36 +16,42 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.agent.model.NewService;
 import lombok.extern.slf4j.Slf4j;
-
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.actuate.health.Status;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.TaskScheduler;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.agent.model.NewService;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.concurrent.*;
 
 /**
  * Created by nicu on 11.03.2015.
  */
 @Slf4j
 public class TtlScheduler {
+    private final SortedSet<ServiceHeartbeatRecord> serviceHeartbeats =
+            new ConcurrentSkipListSet<ServiceHeartbeatRecord>(new Comparator<ServiceHeartbeatRecord>() {
+                @Override
+                public int compare(ServiceHeartbeatRecord o1, ServiceHeartbeatRecord o2) {
+                    int diffTime = o1.lastSentTime.compareTo(o2.lastSentTime);
+                    return diffTime != 0 ? diffTime : o1.serviceId.compareTo(o2.serviceId);
+                }
+            });
 
-    public static final DateTime EXPIRED_DATE = new DateTime(0);
-    private final Map<String, DateTime> serviceHeartbeats = new ConcurrentHashMap<>();
-
+    private TaskScheduler scheduler;
     private HeartbeatProperties configuration;
     private ConsulClient client;
     private HealthIndicator healthIndicator;
 
-    public TtlScheduler(HeartbeatProperties configuration, ConsulClient client, HealthIndicator healthIndicator) {
+    public TtlScheduler(TaskScheduler scheduler, HeartbeatProperties configuration, ConsulClient client, HealthIndicator healthIndicator) {
+        this.scheduler = scheduler;
         this.configuration = configuration;
         this.client = client;
         this.healthIndicator = healthIndicator;
@@ -55,35 +61,57 @@ public class TtlScheduler {
      * Add a service to the checks loop.
      */
     public void add(final NewService service) {
-        serviceHeartbeats.put(service.getId(), EXPIRED_DATE);
+        serviceHeartbeats.add(new ServiceHeartbeatRecord(service.getId()));
+        scheduleNextHeartbeatRound();
     }
 
-    public void remove(String serviceId) {
-        serviceHeartbeats.remove(serviceId);
-    }
-
-    @Scheduled(initialDelay = 0, fixedRateString = "${consul.heartbeat.fixedRate:15000}")
-    private void heartbeatServices() {
-        for (String serviceId : serviceHeartbeats.keySet()) {
-            DateTime latestHeartbeatDoneForService = serviceHeartbeats.get(serviceId);
-            if (latestHeartbeatDoneForService.plus(configuration.getHeartbeatInterval())
-                    .isBefore(DateTime.now())) {
-                String checkId = serviceId;
+    private void doHeartbeatServices() {
+        for (ServiceHeartbeatRecord serviceRec : serviceHeartbeats) {
+            DateTime latestHeartbeatDoneForService = serviceRec.lastSentTime;
+            if (latestHeartbeatDoneForService.plus(configuration.getHeartbeatExpirePeriod())
+                    .isBefore(now())) {
+                String checkId = serviceRec.serviceId;
                 if (!checkId.startsWith("service:")) {
                     checkId = "service:" + checkId;
                 }
 
                 computeAndSendStatus(checkId);
-                log.debug("Sending consul heartbeat for: " + serviceId);
-                serviceHeartbeats.put(serviceId, DateTime.now());
+                log.debug("Sending consul heartbeat for: {}", serviceRec);
+                serviceHeartbeats.remove(serviceRec);
+                serviceHeartbeats.add(new ServiceHeartbeatRecord(serviceRec.serviceId));
             }
         }
+        scheduleNextHeartbeatRound();
+    }
+
+    private void scheduleNextHeartbeatRound() {
+        if (!serviceHeartbeats.isEmpty()) {
+            scheduler.schedule(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            doHeartbeatServices();
+                        }
+                    },
+                    nextSendTime().toDate());
+        }
+    }
+
+    private DateTime nextSendTime() {
+        return serviceHeartbeats.first().nextSendTime();
+    }
+
+    private DateTime now() {
+        return DateTime.now();
     }
 
     private void computeAndSendStatus(String checkId) {
         Health health = healthIndicator.health();
         Status status = health.getStatus();
-        String note = health.getDetails().toString();
+        Map<String, Object> details = new HashMap<>(health.getDetails());
+        details.put("overallStatus", status);
+        details.put("dateTime", now());
+        String note = details.toString();
         if (Status.UP.equals(status)) {
             client.agentCheckPass(checkId, note);
         } else {
@@ -92,6 +120,31 @@ public class TtlScheduler {
             } else {
                 client.agentCheckFail(checkId, note);
             }
+        }
+    }
+
+    public void removeAll() {
+        //todo see how we can cancel existing jobs & shutdown, or enforce shutdown ordering
+        serviceHeartbeats.removeAll(serviceHeartbeats);
+    }
+
+    private class ServiceHeartbeatRecord {
+        private String serviceId;
+        private DateTime lastSentTime;
+
+        public ServiceHeartbeatRecord(String serviceId, DateTime lastSentTime) {
+            this.serviceId = serviceId;
+            this.lastSentTime = lastSentTime;
+        }
+
+        public ServiceHeartbeatRecord(String serviceId) {
+            this(serviceId, now());
+        }
+
+        public DateTime nextSendTime() {
+            DateTime time = lastSentTime.plus(configuration.getHeartbeatExpirePeriod());
+            log.debug("Computed next send time = {}", time);
+            return time;
         }
     }
 }
