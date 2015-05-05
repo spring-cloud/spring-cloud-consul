@@ -17,6 +17,7 @@
 package org.springframework.cloud.consul.discovery;
 
 import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.OperationException;
 import com.ecwid.consul.v1.agent.model.NewService;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -36,6 +37,7 @@ import java.util.concurrent.*;
  */
 @Slf4j
 public class TtlScheduler {
+    private static final DateTime EXPIRED_DATE = new DateTime(0);
     private final SortedSet<ServiceHeartbeatRecord> serviceHeartbeats =
             new ConcurrentSkipListSet<ServiceHeartbeatRecord>(new Comparator<ServiceHeartbeatRecord>() {
                 @Override
@@ -61,24 +63,23 @@ public class TtlScheduler {
      * Add a service to the checks loop.
      */
     public void add(final NewService service) {
-        serviceHeartbeats.add(new ServiceHeartbeatRecord(service.getId()));
+        serviceHeartbeats.add(new ServiceHeartbeatRecord(service.getId(), EXPIRED_DATE));
         scheduleNextHeartbeatRound();
     }
 
     private void doHeartbeatServices() {
         for (ServiceHeartbeatRecord serviceRec : serviceHeartbeats) {
-            DateTime latestHeartbeatDoneForService = serviceRec.lastSentTime;
-            if (latestHeartbeatDoneForService.plus(configuration.getHeartbeatExpirePeriod())
-                    .isBefore(now())) {
-                String checkId = serviceRec.serviceId;
-                if (!checkId.startsWith("service:")) {
-                    checkId = "service:" + checkId;
+            if (!serviceRec.lastSentTime.plus(configuration.getHeartbeatExpirePeriod())
+                    .isAfterNow()) {
+                log.debug("Sending consul heartbeat for: {}", serviceRec.serviceId);
+                try {
+                    computeAndSendStatus(serviceRec.getCheckId());
+                    serviceHeartbeats.remove(serviceRec);
+                    serviceHeartbeats.add(new ServiceHeartbeatRecord(serviceRec.serviceId));
+                    log.debug("Successfully sent heartbeat for {}", serviceRec.serviceId);
+                } catch (OperationException e) {
+                    log.warn("Failed to send heartbeat to consul agent", e);
                 }
-
-                computeAndSendStatus(checkId);
-                log.debug("Sending consul heartbeat for: {}", serviceRec);
-                serviceHeartbeats.remove(serviceRec);
-                serviceHeartbeats.add(new ServiceHeartbeatRecord(serviceRec.serviceId));
             }
         }
         scheduleNextHeartbeatRound();
@@ -143,8 +144,18 @@ public class TtlScheduler {
 
         public DateTime nextSendTime() {
             DateTime time = lastSentTime.plus(configuration.getHeartbeatExpirePeriod());
+            DateTime minTime = now();
+            if (time.isBefore(minTime)) time = minTime;
             log.debug("Computed next send time = {}", time);
             return time;
+        }
+
+        private String getCheckId() {
+            String checkId = serviceId;
+            if (!checkId.startsWith("service:")) {
+                checkId = "service:" + checkId;
+            }
+            return checkId;
         }
     }
 }
