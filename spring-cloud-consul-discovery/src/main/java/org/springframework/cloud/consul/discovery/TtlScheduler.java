@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.discovery;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.OperationException;
 import com.ecwid.consul.v1.agent.model.NewService;
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 import org.springframework.boot.actuate.health.Health;
@@ -51,6 +52,7 @@ public class TtlScheduler {
     private HeartbeatProperties configuration;
     private ConsulClient client;
     private HealthIndicator healthIndicator;
+    private Gson jsonizer = new Gson();
 
     public TtlScheduler(TaskScheduler scheduler, HeartbeatProperties configuration, ConsulClient client, HealthIndicator healthIndicator) {
         this.scheduler = scheduler;
@@ -112,7 +114,7 @@ public class TtlScheduler {
         Map<String, Object> details = new HashMap<>(health.getDetails());
         details.put("overallStatus", status);
         details.put("dateTime", now());
-        String note = details.toString();
+        String note = jsonizer.toJson(details);
         if (Status.UP.equals(status)) {
             client.agentCheckPass(checkId, note);
         } else {
