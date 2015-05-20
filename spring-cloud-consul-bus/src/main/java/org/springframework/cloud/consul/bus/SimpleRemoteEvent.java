@@ -44,4 +44,8 @@ public class SimpleRemoteEvent extends RemoteApplicationEvent {
 		super(source, originService);
 		this.message = message;
 	}
+
+	public boolean canEqual(Object other) {
+		return other instanceof RemoteApplicationEvent;
+	}
 }

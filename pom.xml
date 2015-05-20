@@ -21,12 +21,8 @@
 
 	<scm>
 		<url>https://github.com/spring-cloud/spring-cloud-consul</url>
-		<connection>
-			scm:git:git://github.com/spring-cloud/spring-cloud-consul.git
-		</connection>
-		<developerConnection>
-			scm:git:ssh://git@github.com/spring-cloud/spring-cloud-consul.git
-		</developerConnection>
+		<connection>scm:git:git://github.com/spring-cloud/spring-cloud-consul.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/spring-cloud/spring-cloud-consul.git</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
@@ -61,13 +57,22 @@
 		</plugins>
 	</build>
 
+	<properties>
+		<spring-cloud-bus.version>1.0.2.BUILD-SNAPSHOT</spring-cloud-bus.version>
+		<spring-cloud-commons.version>1.0.2.BUILD-SNAPSHOT</spring-cloud-commons.version>
+		<spring-cloud-netflix.version>1.0.3.BUILD-SNAPSHOT</spring-cloud-netflix.version>
+		<archaius.version>0.6.6</archaius.version>
+		<consul-api.version>1.1.1</consul-api.version>
+		<feign.version>8.3.0</feign.version>
+		<gson.version>2.3.1</gson.version>
+		<httpclient.version>4.2.5</httpclient.version>
+		<joda-time.version>2.7</joda-time.version>
+		<lombok.version>1.16.4</lombok.version>
+		<ribbon.version>2.0.2</ribbon.version>
+	</properties>
+
 	<dependencyManagement>
 		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-commons</artifactId>
-				<version>1.0.1.BUILD-SNAPSHOT</version>
-			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-core</artifactId>
@@ -90,8 +95,13 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-commons</artifactId>
+				<version>${spring-cloud-commons.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-bus</artifactId>
-				<version>1.0.1.BUILD-SNAPSHOT</version>
+				<version>${spring-cloud-bus.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.springframework.boot</groupId>
@@ -121,12 +131,12 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-context</artifactId>
-				<version>1.0.1.BUILD-SNAPSHOT</version>
+				<version>${spring-cloud-commons.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.ecwid.consul</groupId>
 				<artifactId>consul-api</artifactId>
-				<version>1.0.8</version>
+				<version>${consul-api.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>javax.servlet</groupId>
@@ -138,23 +148,23 @@
 			<dependency>
 				<groupId>com.google.code.gson</groupId>
 				<artifactId>gson</artifactId>
-				<version>2.3.1</version>
+				<version>${gson.version}</version>
 			</dependency>
 			<!-- force httpclient version -->
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.2.5</version>
+				<version>${httpclient.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-starter-zuul</artifactId>
-				<version>1.0.1.BUILD-SNAPSHOT</version>
+				<version>${spring-cloud-netflix.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-netflix-sidecar</artifactId>
-				<version>1.0.1.BUILD-SNAPSHOT</version>
+				<version>${spring-cloud-netflix.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>com.netflix.eureka</groupId>
@@ -169,7 +179,18 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-netflix-core</artifactId>
-				<version>1.0.1.BUILD-SNAPSHOT</version>
+				<version>${spring-cloud-netflix.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.netflix.archaius</groupId>
+				<artifactId>archaius-core</artifactId>
+				<version>${archaius.version}</version>
+			</dependency>
+			<!-- archaius dep -->
+			<dependency>
+				<groupId>commons-configuration</groupId>
+				<artifactId>commons-configuration</artifactId>
+				<version>1.8</version>
 			</dependency>
 			<dependency>
 				<groupId>com.netflix.ribbon</groupId>
@@ -183,26 +204,26 @@
 			</dependency>
 			<dependency>
 				<groupId>com.netflix.ribbon</groupId>
+				<artifactId>ribbon-loadbalancer</artifactId>
+				<version>${ribbon.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.netflix.ribbon</groupId>
 				<artifactId>ribbon-httpclient</artifactId>
 				<version>${ribbon.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
-				<version>2.7</version>
+				<version>${joda-time.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
-				<version>1.12.6</version>
+				<version>${lombok.version}</version>
 				<scope>provided</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<properties>
-		<feign.version>7.1.0</feign.version>
-		<ribbon.version>2.0-RC13</ribbon.version>
-	</properties>
 
 </project>
