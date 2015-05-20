@@ -32,6 +32,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @CommonsLog
 public class HeartbeatProperties {
+
+	// TODO: change enabled to default to true when I stop seeing messages like
+	// [WARN] agent: Check 'service:testConsulApp:xtest:8080' missed TTL, is now critical
+	boolean enabled = false;
+
 	@Min(1)
 	private int ttlValue = 30;
 

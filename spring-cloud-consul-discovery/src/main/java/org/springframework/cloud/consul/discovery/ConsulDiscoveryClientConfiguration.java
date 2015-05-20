@@ -17,6 +17,8 @@
 package org.springframework.cloud.consul.discovery;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,6 +28,7 @@ import com.ecwid.consul.v1.ConsulClient;
  * @author Spencer Gibb
  */
 @Configuration
+@EnableConfigurationProperties
 public class ConsulDiscoveryClientConfiguration {
 
 	@Autowired
@@ -37,6 +40,7 @@ public class ConsulDiscoveryClientConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnProperty("consul.heartbeat.enabled")
 	public TtlScheduler ttlScheduler() {
 		return new TtlScheduler(heartbeatProperties(), consulClient);
 	}
@@ -44,6 +48,11 @@ public class ConsulDiscoveryClientConfiguration {
 	@Bean
 	public HeartbeatProperties heartbeatProperties() {
 		return new HeartbeatProperties();
+	}
+
+	@Bean
+	public ConsulDiscoveryProperties consulDiscoveryProperties() {
+		return new ConsulDiscoveryProperties();
 	}
 
 	@Bean

@@ -202,6 +202,12 @@
 				<artifactId>ribbon-core</artifactId>
 				<version>${ribbon.version}</version>
 			</dependency>
+			<!-- ribbon core dep -->
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>18.0</version>
+			</dependency>
 			<dependency>
 				<groupId>com.netflix.ribbon</groupId>
 				<artifactId>ribbon-loadbalancer</artifactId>

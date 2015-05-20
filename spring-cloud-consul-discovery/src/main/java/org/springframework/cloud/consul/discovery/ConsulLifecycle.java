@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
-import org.springframework.cloud.consul.ConsulProperties;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.NewService;
@@ -35,9 +34,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	private ConsulClient client;
 
 	@Autowired
-	private ConsulProperties consulProperties;
+	private ConsulDiscoveryProperties properties;
 
-	@Autowired
+	@Autowired(required = false)
 	private TtlScheduler ttlScheduler;
 
 	@Autowired
@@ -53,9 +52,19 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		// TODO: support port = 0 random assignment
 		Integer port = new Integer(getEnvironment().getProperty("server.port", "8080"));
 		service.setPort(port);
-		service.setTags(consulProperties.getTags());
+		service.setTags(properties.getTags());
 		NewService.Check check = new NewService.Check();
-		check.setTtl(ttlConfig.getTtl());
+		if (ttlConfig.isEnabled()) {
+			check.setTtl(ttlConfig.getTtl());
+		}
+		if (properties.getHealthCheckUrl() != null) {
+			check.setHttp(properties.getHealthCheckUrl());
+		} else {
+			check.setHttp(String.format("http://%s:%s%s", properties.getHostname(),
+					port, properties.getHealthCheckPath()));
+		}
+		check.setInterval(properties.getHealthCheckInterval());
+		//TODO support http check timeout
 		service.setCheck(check);
 		register(service);
 	}
@@ -66,7 +75,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		management.setId(getManagementServiceId());
 		management.setName(getManagementServiceName());
 		management.setPort(getManagementPort());
-		management.setTags(consulProperties.getManagementTags());
+		management.setTags(properties.getManagementTags());
 
 		register(management);
 	}
@@ -74,12 +83,14 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	protected void register(NewService service) {
 		log.info("Registering service with consul: {}", service.toString());
 		client.agentServiceRegister(service);
-		ttlScheduler.add(service);
+		if (ttlConfig.isEnabled() && ttlScheduler != null) {
+			ttlScheduler.add(service);
+		}
 	}
 
 	@Override
 	protected Object getConfiguration() {
-		return consulProperties;
+		return properties;
 	}
 
 	@Override
@@ -99,6 +110,6 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	@Override
 	protected boolean isEnabled() {
-		return consulProperties.isEnabled();
+		return properties.isEnabled();
 	}
 }
