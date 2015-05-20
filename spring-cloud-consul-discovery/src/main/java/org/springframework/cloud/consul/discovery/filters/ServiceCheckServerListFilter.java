@@ -17,11 +17,7 @@
 package org.springframework.cloud.consul.discovery.filters;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import org.springframework.cloud.consul.discovery.ConsulServer;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -42,44 +38,28 @@ public class ServiceCheckServerListFilter implements ServerListFilter<Server> {
 
 	@Override
 	public List<Server> getFilteredListOfServers(List<Server> servers) {
-		Set<String> passingServiceIds = getPassingServiceIds(servers);
 		List<Server> okServers = new ArrayList<>(servers.size());
-		for (Server server : servers) {
-			String serviceId = server.getMetaInfo().getInstanceId();
-			if (passingServiceIds.contains(serviceId)) {
-				ConsulServer consulServer = ConsulServer.class.cast(server);
-				List<Check> nodeChecks = client.getHealthChecksForNode(
-						consulServer.getNode(), QueryParams.DEFAULT).getValue();
-				boolean passingNodeChecks = true;
-				for (Check check : nodeChecks) {
-					if (check.getStatus() != Check.CheckStatus.PASSING) {
-						passingNodeChecks = false;
-						break;
-					}
-				}
-				if (passingNodeChecks) {
-					okServers.add(server);
-				}
-			}
-		}
-		return okServers;
-	}
 
-	private Set<String> getPassingServiceIds(List<Server> servers) {
-		Set<String> serviceIds = new HashSet<>(1);
 		for (Server server : servers) {
-			serviceIds.add(server.getMetaInfo().getInstanceId());
-		}
-		for (String serviceId : serviceIds) {
-			List<Check> serviceChecks = client.getHealthChecksForService(serviceId,
+			String appName = server.getMetaInfo().getAppName();
+			String instanceId = server.getMetaInfo().getInstanceId();
+			//TODO: cache getHealthChecks? this is hit often
+			List<Check> serviceChecks = client.getHealthChecksForService(appName,
 					QueryParams.DEFAULT).getValue();
+			boolean serviceOk = true;
 			for (Check check : serviceChecks) {
-				if (check.getStatus() != Check.CheckStatus.PASSING) {
-					serviceIds.remove(check.getServiceId());
+				if (check.getServiceId().equals(instanceId)
+						&& check.getStatus() != Check.CheckStatus.PASSING) {
+					serviceOk = false;
+					break; // just need one to fail
 				}
 			}
+			if (serviceOk) {
+				okServers.add(server);
+			}
 		}
-		return serviceIds;
+
+		return okServers;
 	}
 
 }
