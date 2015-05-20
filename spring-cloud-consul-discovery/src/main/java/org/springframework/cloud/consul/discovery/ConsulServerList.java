@@ -33,11 +33,13 @@ import com.netflix.loadbalancer.AbstractServerList;
 public class ConsulServerList extends AbstractServerList<ConsulServer> {
 
 	private final ConsulClient client;
+	private ConsulDiscoveryProperties properties;
 
 	private String serviceId;
 
-	public ConsulServerList(ConsulClient client) {
+	public ConsulServerList(ConsulClient client, ConsulDiscoveryProperties properties) {
 		this.client = client;
+		this.properties = properties;
 	}
 
 	@Override
@@ -66,7 +68,7 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		}
 		ArrayList<ConsulServer> servers = new ArrayList<>();
 		for (CatalogService service : response.getValue()) {
-			servers.add(new ConsulServer(service));
+			servers.add(new ConsulServer(service, properties.isPreferIpAddress()));
 		}
 		return servers;
 	}

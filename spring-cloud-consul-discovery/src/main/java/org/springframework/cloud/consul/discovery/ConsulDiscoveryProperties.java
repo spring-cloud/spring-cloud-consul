@@ -54,7 +54,15 @@ public class ConsulDiscoveryProperties {
 
 	private String healthCheckInterval = "10s";
 
+	private String ipAddress = this.hostInfo[0];
+
 	private String hostname = hostInfo[1];
+
+	private boolean preferIpAddress = false;
+
+	public String getHostname() {
+		return this.preferIpAddress ? this.ipAddress : this.hostname;
+	}
 
 	private String[] initHostInfo() {
 		String[] info = new String[2];
