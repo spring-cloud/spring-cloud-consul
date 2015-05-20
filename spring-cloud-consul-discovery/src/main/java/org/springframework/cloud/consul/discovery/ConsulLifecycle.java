@@ -104,7 +104,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	}
 
 	private void deregister(String serviceId) {
-		ttlScheduler.remove(serviceId);
+		if (ttlScheduler != null) {
+			ttlScheduler.remove(serviceId);
+		}
 		client.agentServiceDeregister(serviceId);
 	}
 
