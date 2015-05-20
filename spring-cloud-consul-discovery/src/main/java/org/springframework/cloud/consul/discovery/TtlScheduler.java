@@ -56,7 +56,7 @@ public class TtlScheduler {
 		serviceHeartbeats.remove(serviceId);
 	}
 
-	@Scheduled(initialDelay = 0, fixedRateString = "${consul.heartbeat.fixedRate:15000}")
+	@Scheduled(initialDelay = 0, fixedRateString = "${spring.cloud.consul.discovery.heartbeat.fixedRate:15000}")
 	private void heartbeatServices() {
 		for (String serviceId : serviceHeartbeats.keySet()) {
 			DateTime latestHeartbeatDoneForService = serviceHeartbeats.get(serviceId);

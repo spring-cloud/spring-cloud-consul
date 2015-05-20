@@ -33,7 +33,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @author Spencer Gibb
  */
-@ConfigurationProperties("consul.discovery")
+@ConfigurationProperties("spring.cloud.consul.discovery")
 @Data
 @CommonsLog
 public class ConsulDiscoveryProperties {

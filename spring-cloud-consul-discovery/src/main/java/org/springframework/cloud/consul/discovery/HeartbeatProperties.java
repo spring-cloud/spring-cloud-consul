@@ -28,7 +28,7 @@ import lombok.extern.apachecommons.CommonsLog;
 import org.joda.time.Period;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "consul.heartbeat")
+@ConfigurationProperties(prefix = "spring.cloud.consul.discovery.heartbeat")
 @Data
 @CommonsLog
 public class HeartbeatProperties {

@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableConfigurationProperties
 @ConditionalOnBean(SpringClientFactory.class)
-@ConditionalOnProperty(value = "ribbon.consul.enabled", matchIfMissing = true)
+@ConditionalOnProperty(value = "spring.cloud.consul.ribbon.enabled", matchIfMissing = true)
 @AutoConfigureAfter(RibbonAutoConfiguration.class)
 @RibbonClients(defaultConfiguration = ConsulRibbonClientConfiguration.class)
 public class RibbonConsulAutoConfiguration {

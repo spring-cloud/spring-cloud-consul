@@ -40,7 +40,7 @@ public class ConsulDiscoveryClientConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty("consul.heartbeat.enabled")
+	@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
 	public TtlScheduler ttlScheduler() {
 		return new TtlScheduler(heartbeatProperties(), consulClient);
 	}

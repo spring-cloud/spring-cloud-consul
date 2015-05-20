@@ -20,7 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.bus.BusAutoConfiguration;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
 import org.springframework.context.annotation.Bean;
@@ -40,7 +40,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @Configuration
 @ConditionalOnClass(ConsulClient.class)
-@ConditionalOnExpression("${bus.consul.enabled:true}")
+@ConditionalOnProperty(value = "spring.cloud.consul.bus.enabled", matchIfMissing = true)
 @AutoConfigureAfter(BusAutoConfiguration.class)
 @EnableScheduling
 public class ConsulBusAutoConfiguration {

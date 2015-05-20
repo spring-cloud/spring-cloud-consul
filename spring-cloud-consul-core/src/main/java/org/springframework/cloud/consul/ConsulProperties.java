@@ -29,7 +29,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @author Spencer Gibb
  */
-@ConfigurationProperties("consul")
+@ConfigurationProperties("spring.cloud.consul")
 @Data
 public class ConsulProperties {
 	@NotNull
