@@ -6,7 +6,7 @@
 
 	<groupId>org.springframework.cloud</groupId>
 	<artifactId>spring-cloud-consul</artifactId>
-	<version>1.0.1.BUILD-SNAPSHOT</version>
+	<version>1.0.0.BUILD-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Spring Cloud Consul</name>
 	<description>Spring Cloud Consul</description>
@@ -76,22 +76,22 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-core</artifactId>
-				<version>1.0.1.BUILD-SNAPSHOT</version>
+				<version>1.0.0.BUILD-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-bus</artifactId>
-				<version>1.0.1.BUILD-SNAPSHOT</version>
+				<version>1.0.0.BUILD-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-config</artifactId>
-				<version>1.0.1.BUILD-SNAPSHOT</version>
+				<version>1.0.0.BUILD-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-discovery</artifactId>
-				<version>1.0.1.BUILD-SNAPSHOT</version>
+				<version>1.0.0.BUILD-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
