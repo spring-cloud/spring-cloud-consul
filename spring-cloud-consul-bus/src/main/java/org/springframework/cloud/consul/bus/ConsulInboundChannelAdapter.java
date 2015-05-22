@@ -59,7 +59,7 @@ public class ConsulInboundChannelAdapter extends MessageProducerSupport {
 	protected void doStart() {
 	}
 
-	@Scheduled(fixedDelayString = "10")
+	@Scheduled(fixedDelayString = "${spring.cloud.consul.bus.eventDelay:10}")
 	public void getEvents() throws IOException {
 		List<Event> events = eventService.watch();
 		for (Event event : events) {

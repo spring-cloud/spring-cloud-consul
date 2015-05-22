@@ -37,6 +37,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class EventService {
 
 	@Autowired
+	protected ConsulBusProperties properties;
+
+	@Autowired
 	protected ConsulClient consul;
 
 	@Autowired(required = false)
@@ -108,7 +111,7 @@ public class EventService {
 		if (lastIndex != null) {
 			index = lastIndex.longValue();
 		}
-		Response<List<Event>> watch = consul.eventList(new QueryParams(2, index));
+		Response<List<Event>> watch = consul.eventList(new QueryParams(properties.eventTimeout, index));
 		return filterEvents(readEvents(watch), lastIndex);
 	}
 

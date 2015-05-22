@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.bus.BusAutoConfiguration;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +44,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ConditionalOnProperty(value = "spring.cloud.consul.bus.enabled", matchIfMissing = true)
 @AutoConfigureAfter(BusAutoConfiguration.class)
 @EnableScheduling
+@EnableConfigurationProperties
 public class ConsulBusAutoConfiguration {
 	@Autowired
 	@Qualifier("cloudBusInboundChannel")
@@ -50,6 +52,11 @@ public class ConsulBusAutoConfiguration {
 
 	@Autowired
 	ObjectMapper objectMapper;
+
+	@Bean
+	public ConsulBusProperties consulBusProperties() {
+		return new ConsulBusProperties();
+	}
 
 	@Bean
 	public EventService eventService() {
