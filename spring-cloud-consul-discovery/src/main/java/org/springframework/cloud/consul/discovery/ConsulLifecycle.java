@@ -42,17 +42,26 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	@Autowired
 	private HeartbeatProperties ttlConfig;
 
+	private NewService service = new NewService();
+
+	@Override
+	protected int getConfiguredPort() {
+		return service.getPort() == null? 0 : service.getPort();
+	}
+
+	@Override
+	protected void setConfiguredPort(int port) {
+		service.setPort(port);
+	}
+
 	@Override
 	protected void register() {
-		NewService service = new NewService();
 		String appName = getAppName();
 		// TODO: move id to properties with context ID as default
 		service.setId(getContext().getId());
 		service.setName(appName);
-		// TODO: support port = 0 random assignment
-		Integer port = new Integer(getEnvironment().getProperty("server.port", "8080"));
-		service.setPort(port);
 		service.setTags(properties.getTags());
+
 		NewService.Check check = new NewService.Check();
 		if (ttlConfig.isEnabled()) {
 			check.setTtl(ttlConfig.getTtl());
@@ -61,11 +70,12 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 			check.setHttp(properties.getHealthCheckUrl());
 		} else {
 			check.setHttp(String.format("http://%s:%s%s", properties.getHostname(),
-					port, properties.getHealthCheckPath()));
+					service.getPort(), properties.getHealthCheckPath()));
 		}
 		check.setInterval(properties.getHealthCheckInterval());
 		//TODO support http check timeout
 		service.setCheck(check);
+
 		register(service);
 	}
 
@@ -80,11 +90,11 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		register(management);
 	}
 
-	protected void register(NewService service) {
-		log.info("Registering service with consul: {}", service.toString());
-		client.agentServiceRegister(service);
+	protected void register(NewService newService) {
+		log.info("Registering service with consul: {}", newService.toString());
+		client.agentServiceRegister(newService);
 		if (ttlConfig.isEnabled() && ttlScheduler != null) {
-			ttlScheduler.add(service);
+			ttlScheduler.add(newService);
 		}
 	}
 
