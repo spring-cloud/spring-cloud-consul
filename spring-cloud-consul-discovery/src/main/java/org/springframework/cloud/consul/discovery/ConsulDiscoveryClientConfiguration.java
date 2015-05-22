@@ -59,4 +59,9 @@ public class ConsulDiscoveryClientConfiguration {
 	public ConsulDiscoveryClient consulDiscoveryClient() {
 		return new ConsulDiscoveryClient();
 	}
+
+	@Bean
+	public ConsulCatalogWatch consulCatalogWatch() {
+		return new ConsulCatalogWatch(consulDiscoveryProperties(), consulClient);
+	}
 }

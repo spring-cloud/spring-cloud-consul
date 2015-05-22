@@ -1,0 +1,72 @@
+package org.springframework.cloud.consul.discovery;/*
+ * Copyright 2013-2015 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.QueryParams;
+import com.ecwid.consul.v1.Response;
+
+/**
+ * @author Spencer Gibb
+ */
+@Slf4j
+public class ConsulCatalogWatch implements ApplicationEventPublisherAware {
+
+	private final ConsulDiscoveryProperties properties;
+	private final ConsulClient consul;
+	private final AtomicReference<BigInteger> catalogServicesIndex = new AtomicReference<>();
+	private ApplicationEventPublisher publisher;
+
+	public ConsulCatalogWatch(ConsulDiscoveryProperties properties, ConsulClient consul) {
+		this.properties = properties;
+		this.consul = consul;
+	}
+
+	@Override
+	public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
+		this.publisher = publisher;
+	}
+
+	@Scheduled(fixedDelayString = "${spring.cloud.consul.discovery.catalogServicesWatchDelay:10}")
+	public void catalogServicesWatch() {
+		long index = -1;
+		if (catalogServicesIndex.get() != null) {
+			index = catalogServicesIndex.get().longValue();
+		}
+
+		Response<Map<String, List<String>>> response = consul
+				.getCatalogServices(new QueryParams(properties
+						.getCatalogServicesWatchTimeout(), index));
+		Long consulIndex = response.getConsulIndex();
+		if (consulIndex != null) {
+			catalogServicesIndex.set(BigInteger.valueOf(consulIndex));
+		}
+
+		log.debug("Received services update from consul: {}", response.getValue());
+		publisher.publishEvent(new HeartbeatEvent(this, consulIndex));
+	}
+}

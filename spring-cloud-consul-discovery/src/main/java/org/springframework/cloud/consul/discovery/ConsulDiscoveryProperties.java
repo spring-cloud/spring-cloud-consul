@@ -60,6 +60,10 @@ public class ConsulDiscoveryProperties {
 
 	private boolean preferIpAddress = false;
 
+	private int catalogServicesWatchDelay = 10;
+
+	private int catalogServicesWatchTimeout = 2;
+
 	public String getHostname() {
 		return this.preferIpAddress ? this.ipAddress : this.hostname;
 	}
