@@ -28,6 +28,7 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.consul.bus.SimpleRemoteEvent;
+import org.springframework.cloud.ui.EnableConsulUi;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Configuration
 @EnableAutoConfiguration
 @EnableDiscoveryClient
+@EnableConsulUi
 @RestController
 @Slf4j
 public class SampleApplication implements ApplicationListener<SimpleRemoteEvent> {
