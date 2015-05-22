@@ -17,6 +17,7 @@
 package org.springframework.cloud.consul.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
  */
 @Configuration
 @Import(ConsulAutoConfiguration.class)
+@ConditionalOnProperty(name = "spring.cloud.consul.enabled", matchIfMissing = true)
 public class ConsulConfigBootstrapConfiguration {
 
 	@Autowired
