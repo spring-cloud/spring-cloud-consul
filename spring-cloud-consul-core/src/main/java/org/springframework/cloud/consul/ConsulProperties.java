@@ -38,8 +38,6 @@ public class ConsulProperties {
 	@NotNull
 	private int port = 8500;
 
-	private List<String> tags = new ArrayList<>();
-
 	private boolean enabled = true;
 
 	private String prefix = "config";
