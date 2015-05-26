@@ -6,5 +6,121 @@
 
 include::intro.adoc[]
 
-== TODO: Document Spring Cloud Consul
+[[spring-cloud-consul-install]]
+== Install Consul
+Please see the https://www.consul.io/intro/getting-started/install.html[installation documentation] for instructions on how to install Consul.
 
+[[spring-cloud-consul-agent]]
+== Consul Agent
+
+A Consul Agent client must be available to all Spring Cloud Consul applications.  By default, the Agent client is expected to be at `localhost:8500`.  See the https://consul.io/docs/agent/basics.html[Agent documentation] for specifics on how to start an Agent client and how to connect to a cluster of Consul Agent Servers.  For development, after you have installed consul, you may start a Consul Agent using the following command:
+
+----
+./src/main/bash/local_run_consul.sh
+----
+
+This will start an agent in server mode on port 8500, with the ui available at http://localhost:8500
+
+[[spring-cloud-consul-discovery]]
+== Service Discovery with Consul
+
+Service Discovery is one of the key tenets of a microservice based architecture. Trying to hand configure each client or some form of convention can be very difficult to do and can be very brittle.  Consul provides Service Discovery services via an https://www.consul.io/docs/agent/http.html[HTTP API] and https://www.consul.io/docs/agent/dns.html[DNS].  Spring Cloud Consul leverages the HTTP API for service registration and discovery.  This does not prevent non-Spring Cloud applications from leveraging the DNS interface.  Consul Agents servers are run in a https://www.consul.io/docs/internals/architecture.html[cluster] that communicates via a https://www.consul.io/docs/internals/gossip.html[gossip protocol] and uses the https://www.consul.io/docs/internals/consensus.html[Raft consensus protocol].
+
+=== Registering with Consul
+
+When a client regsiters with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An HTTP https://www.consul.io/docs/agent/checks.html[Check] is created by default that Consul hits the `/health` endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.
+
+Example Consul client:
+
+[source,java,indent=0]
+----
+@SpringBootApplication
+@EnableDiscoveryClient
+@RestController
+public class Application {
+
+    @RequestMapping("/")
+    public String home() {
+        return "Hello world";
+    }
+
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(Application.class).web(true).run(args);
+    }
+
+}
+----
+
+(i.e. utterly normal Spring Boot app).  If the Consul client is located somewhere other than `localhost:8500`, the configuration is required to locate the client. Example:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+----
+
+The default service name, instance id and port, taken from the `Environment`, are `${spring.application.name}`, the Spring Context ID and `${server.port}` respectively.
+
+`@EnableDiscoveryClient` make the app into both a Consul "service" (i.e. it registers itself) and a "client" (i.e. it can query Consul to locate other services).
+
+=== HTTP Health Check
+
+The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. `server.servletPath=/foo`) or management endpoint path (e.g. `management.contextPath=/admin`). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectivly.  Example:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        healthCheckPath: ${management.contextPath}/health
+        healthCheckInterval: 15s
+----
+
+
+==== Making the Consul Instance ID Unique
+
+By default a consul instance is registered with an ID that is equal to its Spring Application Context ID. By default, the Spring Application Context ID is `${spring.application.name}:comma,separated,profiles:${server.port}. For most cases, this will allow multiple instances of one service to run on one machine.  If further uniqueness is required, Using Spring Cloud you can override this by providing a unique identifier in `spring.cloud.consul.discovery.instanceId`. For example:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+----
+
+With this metadata, and multiple service instances deployed on localhost, the random value will kick in there to make the instance unique. In Cloudfoundry the `spring.application.instance_id` will be populated automatically in a Spring Boot Actuator application, so the random value will not be needed.
+
+=== Using the DiscoveryClient
+Spring Cloud has support for https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign[Feign] (a REST client builder) and also https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-ribbon[Spring `RestTemplate`] using the logical Consul servicec names instead of physical
+URLs.
+
+You can also use the `org.springframework.cloud.client.discovery.DiscoveryClient` which provides a simple API for discovery clients that is not specific to Netflix, e.g.
+
+----
+@Autowired
+private DiscoveryClient discoveryClient;
+
+public String serviceUrl() {
+    List<ServiceInstance> list = client.getInstances("STORES");
+    if (list != null && list.size() > 0 ) {
+        return list.get(0).getUri();
+    }
+    return null;
+}
+----
+
+[[spring-cloud-consul-config]]
+== Distributed Configuration with Consul
+
+TODO: document Spring Cloud Consul Config
+
+[[spring-cloud-consul-bus]]
+== Spring Cloud Bus with Consul
+
+TODO: document Spring Cloud Consul Bus
