@@ -66,7 +66,7 @@ public class ConsulCatalogWatch implements ApplicationEventPublisherAware {
 			catalogServicesIndex.set(BigInteger.valueOf(consulIndex));
 		}
 
-		log.debug("Received services update from consul: {}", response.getValue());
+		log.trace("Received services update from consul: {}, index: {}", response.getValue(), consulIndex);
 		publisher.publishEvent(new HeartbeatEvent(this, consulIndex));
 	}
 }
