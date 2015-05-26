@@ -26,13 +26,6 @@
 		<tag>HEAD</tag>
 	</scm>
 
-	<repositories>
-		<repository>
-			<id>ecwid</id>
-			<url>http://nexus.ecwid.com/content/groups/public</url>
-		</repository>
-	</repositories>
-
 	<modules>
 		<module>spring-cloud-consul-core</module>
 		<module>spring-cloud-consul-config</module>
@@ -63,7 +56,7 @@
 		<spring-cloud-commons.version>1.0.2.BUILD-SNAPSHOT</spring-cloud-commons.version>
 		<spring-cloud-netflix.version>1.0.3.BUILD-SNAPSHOT</spring-cloud-netflix.version>
 		<archaius.version>0.6.6</archaius.version>
-		<consul-api.version>1.1.1</consul-api.version>
+		<consul-api.version>1.1.2</consul-api.version>
 		<feign.version>8.3.0</feign.version>
 		<gson.version>2.3.1</gson.version>
 		<httpclient.version>4.2.5</httpclient.version>
