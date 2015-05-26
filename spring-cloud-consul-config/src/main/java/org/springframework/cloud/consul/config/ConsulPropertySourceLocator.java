@@ -18,11 +18,10 @@ package org.springframework.cloud.consul.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
-import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -35,11 +34,14 @@ import com.ecwid.consul.v1.ConsulClient;
  */
 public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
-	@Autowired
 	private ConsulClient consul;
 
-	@Autowired
-	private ConsulProperties properties;
+	private ConsulConfigProperties properties;
+
+	public ConsulPropertySourceLocator(ConsulClient consul, ConsulConfigProperties properties) {
+		this.consul = consul;
+		this.properties = properties;
+	}
 
 	@Override
 	public PropertySource<?> locate(Environment environment) {
@@ -48,10 +50,10 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 			String appName = env.getProperty("spring.application.name");
 			List<String> profiles = Arrays.asList(env.getActiveProfiles());
 
-			String prefix = properties.getPrefix();
+			String prefix = this.properties.getPrefix();
 			List<String> contexts = new ArrayList<>();
 
-			String defaultContext = prefix + "/application";
+			String defaultContext = prefix + "/" + this.properties.getDefaultContext();
 			contexts.add(defaultContext + "/");
 			addProfiles(contexts, defaultContext, profiles);
 
@@ -60,6 +62,8 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 			addProfiles(contexts, baseContext, profiles);
 
 			CompositePropertySource composite = new CompositePropertySource("consul");
+
+			Collections.reverse(contexts);
 
 			for (String propertySourceContext : contexts) {
 				ConsulPropertySource propertySource = create(propertySourceContext);
@@ -79,7 +83,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 	private void addProfiles(List<String> contexts, String baseContext,
 			List<String> profiles) {
 		for (String profile : profiles) {
-			contexts.add(baseContext + "::" + profile + "/");
+			contexts.add(baseContext + this.properties.getProfileSeparator() + profile + "/");
 		}
 	}
 }

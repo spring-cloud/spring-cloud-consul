@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.consul;
-
-import javax.validation.constraints.NotNull;
+package org.springframework.cloud.consul.config;
 
 import lombok.Data;
 
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Spencer Gibb
  */
-@ConfigurationProperties("spring.cloud.consul")
+@ConfigurationProperties("spring.cloud.consul.config")
 @Data
-public class ConsulProperties {
-	@NotNull
-	private String host = "localhost";
-
-	@NotNull
-	private int port = 8500;
-
+public class ConsulConfigProperties {
 	private boolean enabled = true;
 
+	@NotEmpty
 	private String prefix = "config";
+
+	@NotEmpty
+	private String defaultContext = "application";
+
+	@NotEmpty
+	private String profileSeparator = ",";
 }
