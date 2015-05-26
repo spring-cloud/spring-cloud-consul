@@ -57,8 +57,13 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	@Override
 	protected void register() {
 		String appName = getAppName();
-		// TODO: move id to properties with context ID as default
-		service.setId(getContext().getId());
+		String id;
+		if (properties.getInstanceId() == null) {
+			id = getContext().getId();
+		} else {
+			id = properties.getInstanceId();
+		}
+		service.setId(id);
 		service.setName(appName);
 		service.setTags(properties.getTags());
 

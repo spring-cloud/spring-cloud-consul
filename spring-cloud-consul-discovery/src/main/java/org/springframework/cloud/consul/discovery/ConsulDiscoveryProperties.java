@@ -64,6 +64,8 @@ public class ConsulDiscoveryProperties {
 
 	private int catalogServicesWatchTimeout = 2;
 
+	private String instanceId;
+
 	public String getHostname() {
 		return this.preferIpAddress ? this.ipAddress : this.hostname;
 	}
