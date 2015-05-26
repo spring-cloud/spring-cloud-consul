@@ -43,6 +43,4 @@ public class ConsulProperties {
 	private boolean enabled = true;
 
 	private String prefix = "config";
-
-	private List<String> managementTags = Arrays.asList("management");
 }
