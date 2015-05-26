@@ -118,7 +118,44 @@ public String serviceUrl() {
 [[spring-cloud-consul-config]]
 == Distributed Configuration with Consul
 
-TODO: document Spring Cloud Consul Config
+Consul provides a https://consul.io/docs/agent/http/kv.html[Key/Value Store] for storing configuration and other metadata.  Spring Cloud Consul Config is an alternative to the https://github.com/spring-cloud/spring-cloud-config[Config Server and Client].  Configuration is loaded into the Spring Environment during the special "bootstrap" phase.  Configuration is stored in the `/config` folder by default.  Multiple `PropertySource`s are created based on the application's name and the active profiles that mimicks the Spring Cloud Config order of resolving properties.  For example, an application with the name "testApp" and with the "dev" profile will have the following property sources created:
+
+----
+config/testApp,dev/
+config/testApp/
+config/application,dev/
+config/application/
+----
+
+The most specific property source is at the top, with the least specific at the bottom.  Properties is the `config/application` folder are applicable to all applications using consul for configuration.  Properties in the `config/testApp` folder are only available to the instances of the service named "testApp".
+
+Configuration is currently read on startup of the application.  Sending a HTTP POST to `/refresh` will cause the configuration to be reloaded.  Watching the key value store (which Consul supports) is not currently possible, but will be a future addition to this project.
+
+=== How to activate
+
+Including a dependency on `org.springframework.cloud:spring-cloud-consul-config` will enable auto-configuration that will setup Spring Cloud Consul Config.
+
+=== Customizing
+
+Consul Config my be customized using the following properties:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      config:
+        enabled: true
+        prefix: configuration
+        defaultContext: apps
+        profileSeparator: '::'
+----
+
+* `enabled` setting this value to "false" disables Consul Config
+* `prefix` sets the base folder for configuration values
+* `defaultContext` sets the folder name used by all applications
+* `profileSeparator` sets the value of the separator used to separate the profile name in property sources with profiles
+
 
 [[spring-cloud-consul-bus]]
 == Spring Cloud Bus with Consul
