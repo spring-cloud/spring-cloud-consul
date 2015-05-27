@@ -41,6 +41,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import reactor.function.Function;
+
 /**
  * @author Spencer Gibb
  */
@@ -82,7 +84,9 @@ public class SampleApplication implements ApplicationListener<SimpleRemoteEvent>
 
 	@RequestMapping("/")
 	public ServiceInstance lb() {
-		return loadBalancer.choose(appName);
+		Function<String, ServiceInstance> f = loadBalancer::choose;
+		return f.apply(appName);
+		// return loadBalancer.choose(appName);
 	}
 
 	@RequestMapping("/myenv")
