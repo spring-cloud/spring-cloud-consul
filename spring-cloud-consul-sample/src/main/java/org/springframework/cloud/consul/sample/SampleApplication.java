@@ -16,9 +16,12 @@
 
 package org.springframework.cloud.consul.sample;
 
+import javax.annotation.PostConstruct;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
@@ -50,19 +53,27 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class SampleApplication implements ApplicationListener<SimpleRemoteEvent> {
 
-	public static final String CLIENT_NAME = "testConsulApp";
+	@Autowired
+	private LoadBalancerClient loadBalancer;
 
 	@Autowired
-	LoadBalancerClient loadBalancer;
+	private DiscoveryClient discoveryClient;
 
 	@Autowired
-	DiscoveryClient discoveryClient;
-
-	@Autowired
-	Environment env;
+	private Environment env;
 
 	@Autowired(required = false)
-	RelaxedPropertyResolver resolver;
+	private RelaxedPropertyResolver resolver;
+
+	@Value("${spring.application.name:testConsulApp}")
+	private String appName;
+
+	@PostConstruct
+	public void init() {
+		if (resolver == null) {
+			resolver = new RelaxedPropertyResolver(env);
+		}
+	}
 
 	@RequestMapping("/me")
 	public ServiceInstance me() {
@@ -71,13 +82,12 @@ public class SampleApplication implements ApplicationListener<SimpleRemoteEvent>
 
 	@RequestMapping("/")
 	public ServiceInstance lb() {
-		return loadBalancer.choose(CLIENT_NAME);
+		return loadBalancer.choose(appName);
 	}
 
 	@RequestMapping("/myenv")
 	public String env(@RequestParam("prop") String prop) {
-		String property = new RelaxedPropertyResolver(env).getProperty(prop, "Not Found");
-		return property;
+		return resolver.getProperty(prop, "Not Found");
 	}
 
 	@RequestMapping("/prop")
