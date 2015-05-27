@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.bus.jackson.SubtypeModule;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -45,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableDiscoveryClient
 @EnableConsulUi
 @RestController
+@EnableConfigurationProperties
 @Slf4j
 public class SampleApplication implements ApplicationListener<SimpleRemoteEvent> {
 
@@ -78,9 +80,19 @@ public class SampleApplication implements ApplicationListener<SimpleRemoteEvent>
 		return property;
 	}
 
+	@RequestMapping("/prop")
+	public String prop() {
+		return sampleProperties().getProp();
+	}
+
 	@Bean
 	public SubtypeModule sampleSubtypeModule() {
 		return new SubtypeModule(SimpleRemoteEvent.class);
+	}
+
+	@Bean
+	public SampleProperties sampleProperties() {
+		return new SampleProperties();
 	}
 
 	public static void main(String[] args) {
