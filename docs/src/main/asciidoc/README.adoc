@@ -2,10 +2,6 @@ image::https://travis-ci.org/spring-cloud/spring-cloud-consul.svg?branch=master[
 
 include::intro.adoc[]
 
-== This is a Developer Preview
-
-We plan on releasing a milestone shortly.
-
 == Consul overview
 
 Features of Consul
