@@ -11,20 +11,16 @@ Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon) are provided 
 integration with Spring Cloud Netflix.
 
 
-== This is a Developer Preview
-
-We plan on releasing a milestone shortly.
-
 == Consul overview
 
 Features of Consul
 
 * Distributed configuration
 * Service registration and discovery
-* Messaging
+* Distributed events
 * Distributed locking and sessions
 * Supports multiple data centers
-* has a slick ui
+* Built in, user-friendly user interface
 
 See the https://consul.io/intro/index.html[intro] for more information.
 
@@ -38,7 +34,7 @@ See the https://consul.io/intro/index.html[intro] for more information.
 == Running the sample
 
 1. https://consul.io/downloads.html[Install consul]
-2. Run `./run_consul.sh` found in the root of this project
+2. Run `./src/main/bash/local_run_consul.sh`
 3. verify consul is running by visiting http://localhost:8500
 4. run `mvn --settings .settings.xml package` this will bring in the required spring cloud maven repositories and build
 5. run `java -jar spring-cloud-consul-sample/target/spring-cloud-consul-sample-1.0.0.BUILD-SNAPSHOT.jar`
