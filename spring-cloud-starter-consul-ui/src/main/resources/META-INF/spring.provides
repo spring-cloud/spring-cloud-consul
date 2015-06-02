@@ -1,1 +1,1 @@
-provides: spring-cloud-consul-core, consul-api, spring-cloud-consul-ui
+provides: spring-cloud-consul-ui

@@ -33,11 +33,12 @@
 		<module>spring-cloud-consul-bus</module>
 		<module>spring-cloud-consul-ui</module>
 		<module>spring-cloud-consul-sample</module>
+		<module>spring-cloud-starter-consul</module>
 		<module>spring-cloud-starter-consul-bus</module>
 		<module>spring-cloud-starter-consul-config</module>
 		<module>spring-cloud-starter-consul-discovery</module>
 		<module>spring-cloud-starter-consul-ui</module>
-		<module>spring-cloud-starter-consul</module>
+		<module>spring-cloud-starter-consul-all</module>
 		<module>docs</module>
 	</modules>
 
@@ -119,6 +120,11 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-starter-consul-ui</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-starter-consul-all</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>

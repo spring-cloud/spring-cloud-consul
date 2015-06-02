@@ -8,9 +8,9 @@
 		<version>1.0.0.BUILD-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
-	<artifactId>spring-cloud-starter-consul-config</artifactId>
-	<name>Spring Cloud Starter Consul Config</name>
-	<description>Spring Cloud Starter Consul Config</description>
+	<artifactId>spring-cloud-starter-consul-all</artifactId>
+	<name>Spring Cloud Starter Consul All</name>
+	<description>Spring Cloud Starter Consul All</description>
 	<url>http://projects.spring.io/spring-cloud</url>
 	<organization>
 		<name>Pivotal Software, Inc.</name>
@@ -22,15 +22,19 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-consul</artifactId>
+			<artifactId>spring-cloud-starter-consul-bus</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-consul-config</artifactId>
+			<artifactId>spring-cloud-starter-consul-config</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-context</artifactId>
+			<artifactId>spring-cloud-starter-consul-discovery</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-consul-ui</artifactId>
 		</dependency>
 	</dependencies>
 </project>
