@@ -16,19 +16,15 @@
 
 package org.springframework.cloud.ui;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import lombok.Data;
+
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Spencer Gibb
  */
-@Controller
-@RequestMapping("${spring.cloud.consul.ui.path:/ui}")
-public class ConsulUiController {
-
-	@RequestMapping(method = RequestMethod.GET)
-	public String index() {
-		return "forward:index.html";
-	}
+@ConfigurationProperties("spring.cloud.consul.ui")
+@Data
+public class ConsulUiProperties {
+	private String path = "/consul/**";
 }

@@ -24,10 +24,12 @@ import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.cloud.netflix.zuul.web.ZuulHandlerMapping;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Spencer Gibb
  */
+@Configuration
 @EnableZuulProxy
 public class ConsulUiConfiguration {
 
@@ -44,15 +46,20 @@ public class ConsulUiConfiguration {
 	public void init() {
 		String url = String.format("http://%s:%s", consulProperties.getHost(),
 				consulProperties.getPort());
-		ZuulProperties.ZuulRoute route = new ZuulProperties.ZuulRoute("consulUi",
+
+		ZuulProperties.ZuulRoute route = new ZuulProperties.ZuulRoute("consulApi",
 				"/v1/**", null, url, false, false);
+		zuulProperties.getRoutes().put("consulApi", route);
+
+		route = new ZuulProperties.ZuulRoute("consulUi",
+				"/consul/**", null, url, true, false);
 		zuulProperties.getRoutes().put("consulUi", route);
 
 		zuulHandlerMapping.registerHandlers();
 	}
 
 	@Bean
-	public ConsulUiController consulUiController() {
-		return new ConsulUiController();
+	public ConsulUiProperties consulUiProperties() {
+		return new ConsulUiProperties();
 	}
 }

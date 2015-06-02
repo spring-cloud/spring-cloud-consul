@@ -161,3 +161,27 @@ spring:
 == Spring Cloud Bus with Consul
 
 TODO: document Spring Cloud Consul Bus
+
+
+[[spring-cloud-consul-ui]]
+== Proxy Consul UI through Spring Cloud Application
+
+To enable the Consul Web UI please read https://www.consul.io/intro/getting-started/ui.html[the documentation] under the "Self-hosted Dashboard" section.
+
+After you have enabled the Consul Web UI in the Agent, place the `@EnableConsulUi` annotation on a `@Configuration` class. `@EnableConsulUi` enables a zuul proxy configured to proxy to the Consul UI running on the Consul Agent. The UI will be available by default at `/consul/ui/`.  To change the prefix the UI will be available under, set the `spring.cloud.consul.ui.path` property.
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      ui:
+        path: /admin/**
+----
+
+This will make the Web UI available under `/admin/ui/`.
+
+By exposing the Consul Web UI via a Spring Boot application, you can secure access to it via the same Spring Security tools that you use to secure the rest of the application.
+
+[CAUTION]
+The Consul Admin UI expects the Consul HTTP API to be available at `/v1`.  If the `server.contextPath` is not `/` or your application has a route at `/v1`, then the Consul Web UI will fail to proxy.

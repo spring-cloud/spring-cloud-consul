@@ -40,6 +40,11 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.ecwid.consul</groupId>
+			<artifactId>consul-api</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 
