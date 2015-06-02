@@ -10,7 +10,7 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>spring-cloud-starter-consul-discovery</artifactId>
-	<name>spring-cloud-starter-consul-discovery</name>
+	<name>Spring Cloud Starter Consul Discovery</name>
 	<description>Spring Cloud Starter Consul Discovery</description>
 	<url>http://projects.spring.io/spring-cloud</url>
 	<organization>
