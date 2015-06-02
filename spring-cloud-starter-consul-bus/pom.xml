@@ -40,5 +40,18 @@
 			<groupId>com.ecwid.consul</groupId>
 			<artifactId>consul-api</artifactId>
 		</dependency>
+		<!-- required by com.ecwid.consul but not as a pom dependency -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+		</dependency>
 	</dependencies>
 </project>
