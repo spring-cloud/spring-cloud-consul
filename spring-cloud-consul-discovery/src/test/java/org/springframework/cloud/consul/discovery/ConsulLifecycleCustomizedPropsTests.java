@@ -46,7 +46,8 @@ import com.ecwid.consul.v1.agent.model.Service;
 @RunWith(SpringJUnit4ClassRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SpringApplicationConfiguration(classes = TestPropsConfig.class)
-@WebIntegrationTest(value = {"spring.application.name=myTestService", "spring.cloud.consul.discovery.instanceId=myTestService1"}, randomPort = true)
+@WebIntegrationTest(value = { "spring.application.name=myTestService",
+		"spring.cloud.consul.discovery.instanceId=myTestService1" }, randomPort = true)
 public class ConsulLifecycleCustomizedPropsTests {
 
 	@Autowired

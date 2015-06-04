@@ -23,6 +23,7 @@ import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.NewService;
+import org.springframework.util.Assert;
 
 /**
  * @author Spencer Gibb
@@ -56,6 +57,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	@Override
 	protected void register() {
+		Assert.notNull(service.getPort(), "service.port has not been set");
 		String appName = getAppName();
 		String id;
 		if (properties.getInstanceId() == null) {
@@ -74,8 +76,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		if (properties.getHealthCheckUrl() != null) {
 			check.setHttp(properties.getHealthCheckUrl());
 		} else {
-			check.setHttp(String.format("http://%s:%s%s", properties.getHostname(),
-					service.getPort(), properties.getHealthCheckPath()));
+			check.setHttp(String.format("%s://%s:%s%s", properties.getScheme(),
+					properties.getHostname(), service.getPort(),
+					properties.getHealthCheckPath()));
 		}
 		check.setInterval(properties.getHealthCheckInterval());
 		//TODO support http check timeout
