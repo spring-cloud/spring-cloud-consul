@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeansException;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -33,17 +33,29 @@ import com.ecwid.consul.v1.agent.model.Member;
 import com.ecwid.consul.v1.agent.model.Self;
 import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.catalog.model.CatalogService;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Spencer Gibb
  */
-public class ConsulDiscoveryClient implements DiscoveryClient {
+public class ConsulDiscoveryClient implements DiscoveryClient, ApplicationContextAware {
 
-	@Autowired
-	ApplicationContext context;
+	private ApplicationContext context;
 
-	@Autowired
-	ConsulClient client;
+	private ConsulClient client;
+
+	private ConsulDiscoveryProperties properties;
+
+	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties) {
+		this.client = client;
+		this.properties = properties;
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext context) throws BeansException {
+		this.context = context;
+	}
 
 	@Override
 	public String description() {
@@ -62,7 +74,9 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		Response<Self> agentSelf = client.getAgentSelf();
 		Member member = agentSelf.getValue().getMember();
 		if (member != null) {
-			if (member.getName() != null) {
+			if (properties.isPreferIpAddress()) {
+				host = member.getAddress();
+			} else if (StringUtils.hasText(member.getName())) {
 				host = member.getName();
 			}
 		}
@@ -82,7 +96,13 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		Response<List<CatalogService>> services = client.getCatalogService(serviceId,
 				QueryParams.DEFAULT);
 		for (CatalogService service : services.getValue()) {
-			instances.add(new DefaultServiceInstance(serviceId, service.getNode(),
+			String host;
+			if (this.properties.isPreferIpAddress()) {
+				host = service.getAddress();
+			} else {
+				host = service.getNode();
+			}
+			instances.add(new DefaultServiceInstance(serviceId, host,
 					service.getServicePort(), false));
 		}
 	}
