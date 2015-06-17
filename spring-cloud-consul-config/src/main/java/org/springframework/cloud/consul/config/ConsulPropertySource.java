@@ -28,6 +28,7 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Spencer Gibb
@@ -56,7 +57,9 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 			for (GetValue getValue : values) {
 				String key = getValue.getKey().replace(context, "").replace('/', '.');
 				String value = getDecoded(getValue.getValue());
-				properties.put(key, value);
+				if (StringUtils.hasText(key)) {
+					properties.put(key, value);
+				}
 			}
 		}
 	}
