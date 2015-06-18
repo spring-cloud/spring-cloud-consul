@@ -16,14 +16,13 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.catalog.model.CatalogService;
+import com.ecwid.consul.v1.health.model.Check;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.AbstractServerList;
 
@@ -35,16 +34,22 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	private final ConsulClient client;
 	private ConsulDiscoveryProperties properties;
 
-	private String serviceId;
+	private String serviceName;
 
 	public ConsulServerList(ConsulClient client, ConsulDiscoveryProperties properties) {
 		this.client = client;
 		this.properties = properties;
 	}
 
+	ConsulServerList(ConsulClient client, String serviceName) {
+		this.client = client;
+		this.properties = new ConsulDiscoveryProperties();
+		this.serviceName = serviceName;
+	}
+
 	@Override
 	public void initWithNiwsConfig(IClientConfig clientConfig) {
-		this.serviceId = clientConfig.getClientName();
+		this.serviceName = clientConfig.getClientName();
 	}
 
 	@Override
@@ -62,7 +67,7 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 			return Collections.emptyList();
 		}
 		Response<List<CatalogService>> response = client.getCatalogService(
-				this.serviceId, QueryParams.DEFAULT);
+				this.serviceName, QueryParams.DEFAULT);
 		if (response.getValue() == null || response.getValue().isEmpty()) {
 			return Collections.EMPTY_LIST;
 		}
@@ -72,4 +77,5 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		}
 		return servers;
 	}
+
 }
