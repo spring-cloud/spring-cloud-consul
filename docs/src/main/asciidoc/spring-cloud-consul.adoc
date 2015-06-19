@@ -62,6 +62,8 @@ spring:
       port: 8500
 ----
 
+CAUTION: If you use <<spring-cloud-consul-config,Spring Cloud Consul Config>>, the above values will need to be placed in `bootstrap.yml` instead of `application.yml`.
+
 The default service name, instance id and port, taken from the `Environment`, are `${spring.application.name}`, the Spring Context ID and `${server.port}` respectively.
 
 `@EnableDiscoveryClient` make the app into both a Consul "service" (i.e. it registers itself) and a "client" (i.e. it can query Consul to locate other services).
@@ -139,7 +141,7 @@ Including a dependency on `org.springframework.cloud:spring-cloud-consul-config`
 
 Consul Config my be customized using the following properties:
 
-.application.yml
+.bootstrap.yml
 ----
 spring:
   cloud:
