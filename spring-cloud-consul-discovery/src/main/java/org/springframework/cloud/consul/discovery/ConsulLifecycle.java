@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.discovery;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
 
@@ -130,7 +131,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	private List<String> createTags() {
 		List<String> tags = new LinkedList<>(properties.getTags());
-		if(servletContext != null) {
+		if(servletContext != null
+				&& StringUtils.isNotBlank(servletContext.getContextPath())
+				&& StringUtils.isNotBlank(servletContext.getContextPath().replaceAll("/", ""))) {
 			tags.add("contextPath=" + servletContext.getContextPath());
 		}
 		return tags;
