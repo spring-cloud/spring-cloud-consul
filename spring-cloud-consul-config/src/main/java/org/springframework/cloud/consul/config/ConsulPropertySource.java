@@ -55,9 +55,10 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 		if (values != null) {
 			for (GetValue getValue : values) {
-				String key = getValue.getKey().replace(context, "").replace('/', '.');
-				String value = getDecoded(getValue.getValue());
-				if (StringUtils.hasText(key)) {
+                String key = getValue.getKey();
+                if (!StringUtils.endsWithIgnoreCase(key, "/")) {
+	    			key = key.replace(context, "").replace('/', '.');
+    				String value = getDecoded(getValue.getValue());
 					properties.put(key, value);
 				}
 			}
