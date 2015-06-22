@@ -22,12 +22,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.core.env.EnumerablePropertySource;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
+import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.util.StringUtils;
 
 /**
@@ -55,10 +54,10 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 		if (values != null) {
 			for (GetValue getValue : values) {
-                String key = getValue.getKey();
-                if (!StringUtils.endsWithIgnoreCase(key, "/")) {
-	    			key = key.replace(context, "").replace('/', '.');
-    				String value = getDecoded(getValue.getValue());
+				String key = getValue.getKey();
+				if (!StringUtils.endsWithIgnoreCase(key, "/")) {
+					key = key.replace(context, "").replace('/', '.');
+					String value = getDecoded(getValue.getValue());
 					properties.put(key, value);
 				}
 			}
