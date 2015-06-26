@@ -1,0 +1,87 @@
+---
+# The name of your project
+title: Spring Cloud Consul
+
+badges:
+
+  # Customize your project's badges. Delete any entries that do not apply.
+  custom:
+    - name: Source (GitHub)
+      url:  https://github.com/spring-cloud/spring-cloud-consul
+      icon: github
+
+    - name: StackOverflow
+      url:  http://stackoverflow.com/questions/tagged/spring-cloud
+      icon: stackoverflow
+
+---
+<!DOCTYPE HTML>
+<html lang="en-US">
+
+<!-- Specify the parent of this project (or delete if none) to influence the rendering of the breadcrumb -->
+{% capture parent_link %}
+[Spring Cloud]({{ site.projects_site_url }}/spring-cloud)
+{% endcapture %}
+
+
+{% capture billboard_description %}
+
+Spring Cloud Consul provides [Consul](http://consul.io) integrations for Spring Boot apps through autoconfiguration and binding to the Spring Environment and other Spring programming model idioms. With a few simple annotations you can quickly enable and configure the common patterns inside your application and build large distributed systems with Hashicorp's Consul. The patterns provided include Service Discovery, Distributed Configuration and Control Bus..
+
+{% endcapture %}
+
+{% capture main_content %}
+
+## Features
+
+Spring Cloud Consul features:
+
+* Service Discovery: instances can be registered with the Consul agent and clients can discover the instances using Spring-managed beans
+** Supports Ribbon, the client side load-balancer via Spring Cloud Netflix
+** Supports Zuul, a dynamic router and filter via Spring Cloud Netflix
+* Distributed Configuration: using the Consul Key/Value store
+* Control Bus: Distributed control events using Consul Events
+
+<span id="quick-start"></span>
+## Quick Start
+
+{% include download_widget.md %}
+
+As long as Spring Cloud Consul and the Consul API are on the
+classpath any Spring Boot application with `@EnableDiscoveryClient` will try to contact a Consul
+agent on `localhost:8500` (the default values of
+`spring.cloud.consul.host` and `spring.cloud.consul.port` respectively):
+
+```java
+@Configuration
+@EnableAutoConfiguration
+@EnableDiscoveryClient
+@RestController
+public class Application {
+
+  @RequestMapping("/")
+  public String home() {
+    return "Hello World";
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(Application.class, args);
+  }
+
+}
+```
+
+A local Consul agent must be running.  See the [Consul agent documentation](https://consul.io/docs/agent/basics.html) on how to run an agent.
+
+{% endcapture %}
+
+{% capture related_resources %}
+
+### Sample Projects
+
+* [Consul Sample](https://github.com/spring-cloud/spring-cloud-consul/tree/master/spring-cloud-consul-sample)
+
+{% endcapture %}
+
+{% include project_page.html %}
+</html>
