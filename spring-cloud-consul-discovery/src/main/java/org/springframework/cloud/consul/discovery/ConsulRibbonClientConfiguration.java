@@ -26,7 +26,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.consul.discovery.filters.AliveServerListFilter;
 import org.springframework.cloud.consul.discovery.filters.FilteringAgentClient;
-import org.springframework.cloud.consul.discovery.filters.ServiceCheckServerListFilter;
+import org.springframework.cloud.consul.discovery.filters.NonCriticalServerListFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -79,7 +79,9 @@ public class ConsulRibbonClientConfiguration {
 
 	@Bean
 	public ServerListFilter<Server> ribbonServerListFilter() {
-		return new AliveServerListFilter(new FilteringAgentClient(client));
+		return new MultipleServerListFilter(
+				new AliveServerListFilter(new FilteringAgentClient(client)),
+				new NonCriticalServerListFilter());
 	}
 
 	@PostConstruct

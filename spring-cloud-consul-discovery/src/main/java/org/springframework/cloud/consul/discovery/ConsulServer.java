@@ -16,28 +16,40 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.List;
+import java.util.*;
 
 import com.ecwid.consul.v1.health.model.Check;
 import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.loadbalancer.Server;
+import lombok.extern.slf4j.Slf4j;
+
+import static com.ecwid.consul.v1.health.model.Check.CheckStatus.WARNING;
 
 /**
  * @author Spencer Gibb
  */
+@Slf4j
 public class ConsulServer extends Server {
 
 	private final MetaInfo metaInfo;
 	private final String address;
 	private final String node;
-	private final List<Check> checks;
+	//order of r/w head: critical, warn, green
+	private final PriorityQueue<Check> checks;
 
 	public ConsulServer(final HealthService service, boolean preferAddress) {
 		super((preferAddress)? service.getNode().getAddress() : service.getNode().getNode(),
 				service.getService().getPort());
 		address = service.getNode().getAddress();
 		node = service.getNode().getNode();
-		checks = service.getChecks();
+		checks = new PriorityQueue<>(service.getChecks().size()+1,
+				new Comparator<Check>() {
+					@Override
+					public int compare(Check o1, Check o2) {
+						return - o1.getStatus().compareTo(o2.getStatus());
+					}
+				});
+		checks.addAll(service.getChecks());
 		metaInfo = new MetaInfo() {
 			@Override
 			public String getAppName() {
@@ -74,7 +86,14 @@ public class ConsulServer extends Server {
 		return node;
 	}
 
-	public List<Check> getChecks() {
+	private PriorityQueue<Check> getChecks() {
 		return checks;
+	}
+
+	public Check.CheckStatus getLowestCheckStatus() {
+		Check instanceHealth = getChecks().peek();
+		log.debug("Instance lowest-health {} for serviceInstanceId {}", instanceHealth, getMetaInfo()
+				.getInstanceId());
+		return instanceHealth == null ? WARNING : instanceHealth.getStatus();
 	}
 }

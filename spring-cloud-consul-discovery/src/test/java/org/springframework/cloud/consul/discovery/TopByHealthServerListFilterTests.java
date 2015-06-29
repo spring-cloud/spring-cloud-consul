@@ -33,9 +33,7 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.cloud.consul.discovery.filters.FilteringAgentClient;
-import org.springframework.cloud.consul.discovery.filters.ServiceCheckServerListFilter;
-import org.springframework.context.ApplicationContext;
+import org.springframework.cloud.consul.discovery.filters.TopByHealthServerListFilter;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -54,18 +52,18 @@ import com.netflix.loadbalancer.ServerListFilter;
 @IntegrationTest({ "server.port=0", "spring.application.name=myTestService" })
 @WebAppConfiguration
 @Slf4j
-public class ServiceCheckServerListFilterTests {
+public class TopByHealthServerListFilterTests {
 	@Autowired
 	ConsulClient consul;
 
 	String serviceName;
 	ServerList serverList;
-	ServiceCheckServerListFilter filter;
+	ServerListFilter filter;
 
 	@Before
 	public void setUp() throws Exception {
 		serviceName = "serviceName3_" + UUID.randomUUID().toString();
-		filter = new ServiceCheckServerListFilter(consul);
+		filter = new TopByHealthServerListFilter(consul);
 		serverList = getConsulServerList(serviceName);
 	}
 
@@ -75,6 +73,11 @@ public class ServiceCheckServerListFilterTests {
 		clientConfig.setClientName(serviceName);
 		consulServerList.initWithNiwsConfig (clientConfig);
 		return consulServerList;
+	}
+
+	@Test
+	public void noInstanceAllGood() {
+		assertEquals(0, listOfServers(filter).size());
 	}
 
 	@Test
@@ -97,7 +100,7 @@ public class ServiceCheckServerListFilterTests {
 		NewService serviceInstance = createInstance();
         setExpiredAlready(serviceInstance);
         register(serviceInstance);
-		assertEquals(0, listOfServers(filter).size());
+		assertEquals(1, listOfServers(filter).size());
 	}
 
 	@Test
@@ -105,7 +108,7 @@ public class ServiceCheckServerListFilterTests {
 		NewService serviceInstance = createInstance();
 		register(serviceInstance);
 		markCritical(serviceInstance);
-		assertEquals(0, listOfServers(filter).size());
+		assertEquals(1, listOfServers(filter).size());
 	}
 
 	@Test
