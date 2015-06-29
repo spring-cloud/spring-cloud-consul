@@ -23,6 +23,7 @@ import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.catalog.model.CatalogService;
 import com.ecwid.consul.v1.health.model.Check;
+import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.AbstractServerList;
 
@@ -39,12 +40,6 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	public ConsulServerList(ConsulClient client, ConsulDiscoveryProperties properties) {
 		this.client = client;
 		this.properties = properties;
-	}
-
-	ConsulServerList(ConsulClient client, String serviceName) {
-		this.client = client;
-		this.properties = new ConsulDiscoveryProperties();
-		this.serviceName = serviceName;
 	}
 
 	@Override
@@ -66,13 +61,13 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		if (client == null) {
 			return Collections.emptyList();
 		}
-		Response<List<CatalogService>> response = client.getCatalogService(
-				this.serviceName, QueryParams.DEFAULT);
-		if (response.getValue() == null || response.getValue().isEmpty()) {
+		List<HealthService> services = client.getHealthServices(
+				this.serviceName, properties.isOnlyPassingInstances(), QueryParams.DEFAULT).getValue();
+		if (services == null || services.isEmpty()) {
 			return Collections.EMPTY_LIST;
 		}
 		ArrayList<ConsulServer> servers = new ArrayList<>();
-		for (CatalogService service : response.getValue()) {
+		for (HealthService service : services) {
 			servers.add(new ConsulServer(service, properties.isPreferIpAddress()));
 		}
 		return servers;

@@ -40,22 +40,10 @@ import com.netflix.loadbalancer.ServerListFilter;
 public class ServiceCheckServerListFilter implements ServerListFilter<Server> {
     private ConsulClient client;
 
-    private FilteringAgentClient filteringAgentClient;
-
-    public ServiceCheckServerListFilter(ConsulClient client) {
-        this.client = client;
-        this.filteringAgentClient = new FilteringAgentClient(client);
-    }
-
     /**
-     * - get health checks (for service instances) - queried by service name & filtered by
-     * nodes' health - make sure serf status is also filtered by - extract service
-     * instances which do not have any critical checks, and, by config, do not have any
-     * warn/unknown, have at least one check defined, etc; most filtering: all checks
-     * passing & at least 1 check - cache them
-     *
-     * @param servers
-     * @return
+     * Keep green service instances.
+     * If empty, keep yellow instances (any non critical).
+     * If empty, return empty.
      */
 
     @Override
@@ -64,10 +52,8 @@ public class ServiceCheckServerListFilter implements ServerListFilter<Server> {
         if (servers.isEmpty())
             return servers;
 
-        final Map<String, HealthLevel> nodesHealth = nodesByHealth(extractNodes(servers));
-        final Map<String, HealthLevel> instancesHealth = serviceInstancesByHealth(cast(
-                servers.get(0)).getMetaInfo().getAppName());
-        log.debug("nodesHealth={},instancesHealth={}", nodesHealth, instancesHealth);
+        final Map<String, HealthLevel> instancesHealth = serviceInstancesByHealth(servers);
+        log.debug("instancesHealth={}", instancesHealth);
 
         @ToString
         @AllArgsConstructor
@@ -83,9 +69,8 @@ public class ServiceCheckServerListFilter implements ServerListFilter<Server> {
         class InstancesUtil {
             private HealthLevel health(Server server) {
                 HealthLevel instanceHealth = instancesHealth.get(server.getMetaInfo().getInstanceId());
-                HealthLevel nodeHealth = nodesHealth.get(cast(server).getNode());
-                log.debug("Instance health {} and node health {} for {}", instanceHealth, nodeHealth, server.getMetaInfo().getInstanceId());
-                return min(instanceHealth, nodeHealth);
+                log.debug("Instance health {} for {}", instanceHealth, server.getMetaInfo().getInstanceId());
+                return instanceHealth;
             }
 
             private Collection<Instance> toInstances(List<Server> servers) {
@@ -135,42 +120,18 @@ public class ServiceCheckServerListFilter implements ServerListFilter<Server> {
      *
      * @return a map from service instance to the health level which is the minimum health
      * level for all defined service checks for the instance.
+     * @param instances
      */
-    private Map<String, HealthLevel> serviceInstancesByHealth(String serviceName) {
-        List<Check> checks = client.getHealthChecksForService(serviceName,
-                consistencyMode()).getValue();
+    private Map<String, HealthLevel> serviceInstancesByHealth(List<Server> instances) {
+        List<Check> checks = new ArrayList<>();
+        for (Server instance : instances) {
+             checks.addAll(cast(instance).getChecks());
+        }
         return new Indexer() {
             String id(Check check) {
                 return check.getServiceId();
             }
         }.indexByMinHealth(checks);
-    }
-
-    /**
-     * Given a list of nodes (servers) (like, servers hosting a service), query/compute
-     * the health of each node (server). The aggregation is composed of 2 phases: 1.
-     * filter the nodes (servers) by serf status. Since we are only interested in live
-     * nodes. 2. Index the health level of each server. That is the health level which is
-     * the minimum health level for all defined node' checks.
-     */
-    private Map<String, HealthLevel> nodesByHealth(List<String> nodes) {
-        List<String> liveNodes = getLiveNodes(nodes);
-        List<Check> checks = new ArrayList<>();
-        for (String liveNode : liveNodes) {
-            checks.addAll(systemNodeChecks(liveNode));
-        }
-        return new Indexer() {
-            String id(Check check) {
-                return check.getNode();
-            }
-        }.indexByMinHealth(checks);
-    }
-
-    // yes, in fact nodes is mutated, an ugly optimization
-    private List<String> getLiveNodes(List<String> nodes) {
-        List<String> liveNodes = nodes;
-        liveNodes.retainAll(filteringAgentClient.getAliveAgentsNodes());
-        return liveNodes;
     }
 
     private abstract class Indexer {

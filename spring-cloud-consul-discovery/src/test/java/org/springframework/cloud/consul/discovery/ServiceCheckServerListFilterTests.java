@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotEquals;
 import java.util.List;
 import java.util.UUID;
 
+import com.netflix.client.config.DefaultClientConfigImpl;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.Before;
@@ -55,28 +56,25 @@ import com.netflix.loadbalancer.ServerListFilter;
 @Slf4j
 public class ServiceCheckServerListFilterTests {
 	@Autowired
-	ConsulLifecycle lifecycle;
-
-	@Autowired
 	ConsulClient consul;
 
-	@Autowired
-	ApplicationContext context;
-
-	// @Autowired
+	String serviceName;
 	ServerList serverList;
-
 	ServiceCheckServerListFilter filter;
-	private String serviceName;
-
-	private FilteringAgentClient filteringAgent;
 
 	@Before
 	public void setUp() throws Exception {
 		serviceName = "serviceName3_" + UUID.randomUUID().toString();
-		filteringAgent = new FilteringAgentClient(consul);
-		filter = new ServiceCheckServerListFilter(consul, filteringAgent);
-		serverList = new ConsulServerList(consul, serviceName);
+		filter = new ServiceCheckServerListFilter(consul);
+		serverList = getConsulServerList(serviceName);
+	}
+
+	private ConsulServerList getConsulServerList(String serviceName) {
+		ConsulServerList consulServerList = new ConsulServerList(consul, new ConsulDiscoveryProperties());
+		DefaultClientConfigImpl clientConfig = new DefaultClientConfigImpl();
+		clientConfig.setClientName(serviceName);
+		consulServerList.initWithNiwsConfig (clientConfig);
+		return consulServerList;
 	}
 
 	@Test
