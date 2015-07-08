@@ -28,7 +28,7 @@ Service Discovery is one of the key tenets of a microservice based architecture.
 
 === Registering with Consul
 
-When a client regsiters with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An HTTP https://www.consul.io/docs/agent/checks.html[Check] is created by default that Consul hits the `/health` endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.
+When a client registers with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An HTTP https://www.consul.io/docs/agent/checks.html[Check] is created by default that Consul hits the `/health` endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.
 
 Example Consul client:
 
@@ -70,7 +70,7 @@ The default service name, instance id and port, taken from the `Environment`, ar
 
 === HTTP Health Check
 
-The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. `server.servletPath=/foo`) or management endpoint path (e.g. `management.contextPath=/admin`). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectivly.  Example:
+The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. `server.servletPath=/foo`) or management endpoint path (e.g. `management.contextPath=/admin`). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectively.  Example:
 
 .application.yml
 ----
@@ -85,7 +85,7 @@ spring:
 
 ==== Making the Consul Instance ID Unique
 
-By default a consul instance is registered with an ID that is equal to its Spring Application Context ID. By default, the Spring Application Context ID is `${spring.application.name}:comma,separated,profiles:${server.port}. For most cases, this will allow multiple instances of one service to run on one machine.  If further uniqueness is required, Using Spring Cloud you can override this by providing a unique identifier in `spring.cloud.consul.discovery.instanceId`. For example:
+By default a consul instance is registered with an ID that is equal to its Spring Application Context ID. By default, the Spring Application Context ID is `${spring.application.name}:comma,separated,profiles:${server.port}`. For most cases, this will allow multiple instances of one service to run on one machine.  If further uniqueness is required, Using Spring Cloud you can override this by providing a unique identifier in `spring.cloud.consul.discovery.instanceId`. For example:
 
 .application.yml
 ----
@@ -120,7 +120,7 @@ public String serviceUrl() {
 [[spring-cloud-consul-config]]
 == Distributed Configuration with Consul
 
-Consul provides a https://consul.io/docs/agent/http/kv.html[Key/Value Store] for storing configuration and other metadata.  Spring Cloud Consul Config is an alternative to the https://github.com/spring-cloud/spring-cloud-config[Config Server and Client].  Configuration is loaded into the Spring Environment during the special "bootstrap" phase.  Configuration is stored in the `/config` folder by default.  Multiple `PropertySource`s are created based on the application's name and the active profiles that mimicks the Spring Cloud Config order of resolving properties.  For example, an application with the name "testApp" and with the "dev" profile will have the following property sources created:
+Consul provides a https://consul.io/docs/agent/http/kv.html[Key/Value Store] for storing configuration and other metadata.  Spring Cloud Consul Config is an alternative to the https://github.com/spring-cloud/spring-cloud-config[Config Server and Client].  Configuration is loaded into the Spring Environment during the special "bootstrap" phase.  Configuration is stored in the `/config` folder by default.  Multiple `PropertySource` instances are created based on the application's name and the active profiles that mimicks the Spring Cloud Config order of resolving properties.  For example, an application with the name "testApp" and with the "dev" profile will have the following property sources created:
 
 ----
 config/testApp,dev/
@@ -139,7 +139,7 @@ Including a dependency on `org.springframework.cloud:spring-cloud-consul-config`
 
 === Customizing
 
-Consul Config my be customized using the following properties:
+Consul Config may be customized using the following properties:
 
 .bootstrap.yml
 ----
