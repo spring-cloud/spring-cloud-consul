@@ -16,27 +16,44 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import com.ecwid.consul.v1.catalog.model.CatalogService;
+import java.util.*;
+
+import com.ecwid.consul.v1.health.model.Check;
+import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.loadbalancer.Server;
+import lombok.extern.slf4j.Slf4j;
+
+import static com.ecwid.consul.v1.health.model.Check.CheckStatus.WARNING;
 
 /**
  * @author Spencer Gibb
  */
+@Slf4j
 public class ConsulServer extends Server {
 
 	private final MetaInfo metaInfo;
 	private final String address;
 	private final String node;
+	//order of r/w head: critical, warn, green
+	private final PriorityQueue<Check> checks;
 
-	public ConsulServer(final CatalogService service, boolean preferAddress) {
-		super((preferAddress)? service.getAddress() : service.getNode(),
-				service.getServicePort());
-		address = service.getAddress();
-		node = service.getNode();
+	public ConsulServer(final HealthService service, boolean preferAddress) {
+		super((preferAddress)? service.getNode().getAddress() : service.getNode().getNode(),
+				service.getService().getPort());
+		address = service.getNode().getAddress();
+		node = service.getNode().getNode();
+		checks = new PriorityQueue<>(service.getChecks().size()+1,
+				new Comparator<Check>() {
+					@Override
+					public int compare(Check o1, Check o2) {
+						return - o1.getStatus().compareTo(o2.getStatus());
+					}
+				});
+		checks.addAll(service.getChecks());
 		metaInfo = new MetaInfo() {
 			@Override
 			public String getAppName() {
-				return service.getServiceName();
+				return service.getService().getService();
 			}
 
 			@Override
@@ -51,7 +68,7 @@ public class ConsulServer extends Server {
 
 			@Override
 			public String getInstanceId() {
-				return service.getServiceId();
+				return service.getService().getId();
 			}
 		};
 	}
@@ -67,5 +84,16 @@ public class ConsulServer extends Server {
 
 	public String getNode() {
 		return node;
+	}
+
+	private PriorityQueue<Check> getChecks() {
+		return checks;
+	}
+
+	public Check.CheckStatus getLowestCheckStatus() {
+		Check instanceHealth = getChecks().peek();
+		log.debug("Instance lowest-health {} for serviceInstanceId {}", instanceHealth, getMetaInfo()
+				.getInstanceId());
+		return instanceHealth == null ? WARNING : instanceHealth.getStatus();
 	}
 }

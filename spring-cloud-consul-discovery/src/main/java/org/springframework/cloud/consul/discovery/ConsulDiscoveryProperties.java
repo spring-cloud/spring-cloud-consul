@@ -68,6 +68,8 @@ public class ConsulDiscoveryProperties {
 
 	private String scheme = "http";
 
+	private boolean onlyPassingInstances;
+
 	public String getHostname() {
 		return this.preferIpAddress ? this.ipAddress : this.hostname;
 	}

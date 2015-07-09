@@ -54,4 +54,12 @@ public class FilteringAgentClient {
 		}
 		return addresses;
 	}
+
+	public Set<String> getAliveAgentsNodes() {
+		Set<String> addresses = new HashSet<>();
+		for (Member server : getAliveAgents()) {
+			addresses.add(server.getName());
+		}
+		return addresses;
+	}
 }

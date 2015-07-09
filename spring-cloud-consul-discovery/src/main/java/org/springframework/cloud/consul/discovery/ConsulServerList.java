@@ -16,14 +16,14 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.catalog.model.CatalogService;
+import com.ecwid.consul.v1.health.model.Check;
+import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.AbstractServerList;
 
@@ -35,7 +35,7 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	private final ConsulClient client;
 	private ConsulDiscoveryProperties properties;
 
-	private String serviceId;
+	private String serviceName;
 
 	public ConsulServerList(ConsulClient client, ConsulDiscoveryProperties properties) {
 		this.client = client;
@@ -44,7 +44,7 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 
 	@Override
 	public void initWithNiwsConfig(IClientConfig clientConfig) {
-		this.serviceId = clientConfig.getClientName();
+		this.serviceName = clientConfig.getClientName();
 	}
 
 	@Override
@@ -61,15 +61,16 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		if (client == null) {
 			return Collections.emptyList();
 		}
-		Response<List<CatalogService>> response = client.getCatalogService(
-				this.serviceId, QueryParams.DEFAULT);
-		if (response.getValue() == null || response.getValue().isEmpty()) {
+		List<HealthService> services = client.getHealthServices(
+				this.serviceName, properties.isOnlyPassingInstances(), QueryParams.DEFAULT).getValue();
+		if (services == null || services.isEmpty()) {
 			return Collections.EMPTY_LIST;
 		}
 		ArrayList<ConsulServer> servers = new ArrayList<>();
-		for (CatalogService service : response.getValue()) {
+		for (HealthService service : services) {
 			servers.add(new ConsulServer(service, properties.isPreferIpAddress()));
 		}
 		return servers;
 	}
+
 }
