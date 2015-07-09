@@ -64,9 +64,9 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		Response<List<CatalogService>> response = client.getCatalogService(
 				this.serviceId, QueryParams.DEFAULT);
 		if (response.getValue() == null || response.getValue().isEmpty()) {
-			return Collections.EMPTY_LIST;
+			return Collections.emptyList();
 		}
-		ArrayList<ConsulServer> servers = new ArrayList<>();
+		List<ConsulServer> servers = new ArrayList<>();
 		for (CatalogService service : response.getValue()) {
 			servers.add(new ConsulServer(service, properties.isPreferIpAddress()));
 		}
