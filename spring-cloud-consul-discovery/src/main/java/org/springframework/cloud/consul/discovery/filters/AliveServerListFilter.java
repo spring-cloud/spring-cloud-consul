@@ -30,7 +30,7 @@ import com.netflix.loadbalancer.ServerListFilter;
  * a member of the serf gossip pool. The serf status (alive/failed/etc) is reflected in 2
  * consul APIs: in the agent API and in the catalog API. We prefer the agent API because
  * it is most up to date (or perhaps we should intersect them and pick members that are
- * liv in both).
+ * live in both).
  * @author nicu marasoiu on 10.03.2015.
  */
 public class AliveServerListFilter implements ServerListFilter<Server> {
