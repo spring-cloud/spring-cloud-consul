@@ -38,7 +38,7 @@ import com.netflix.loadbalancer.ServerList;
 import com.netflix.loadbalancer.ServerListFilter;
 
 /**
- * Preprocessor that configures defaults for eureka-discovered ribbon clients. Such as:
+ * Preprocessor that configures defaults for Consul-discovered ribbon clients. Such as:
  * <code>@zone</code>, NIWSServerListClassName, DeploymentContextBasedVipAddresses,
  * NFLoadBalancerRuleClassName, NIWSServerListFilterClassName and more
  *
