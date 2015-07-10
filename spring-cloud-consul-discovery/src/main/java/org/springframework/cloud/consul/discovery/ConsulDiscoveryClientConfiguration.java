@@ -16,11 +16,16 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import com.ecwid.consul.v1.ConsulClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
-import com.ecwid.consul.v1.ConsulClient;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Spencer Gibb
@@ -28,26 +33,55 @@ import com.ecwid.consul.v1.ConsulClient;
 @Configuration
 public class ConsulDiscoveryClientConfiguration {
 
-	@Autowired
-	private ConsulClient consulClient;
+    @Autowired
+    private ConsulClient consulClient;
 
-	@Bean
-	public ConsulLifecycle consulLifecycle() {
-		return new ConsulLifecycle();
-	}
+    @Autowired
+    private TaskScheduler scheduler;
 
-	@Bean
-	public TtlScheduler ttlScheduler() {
-		return new TtlScheduler(heartbeatProperties(), consulClient);
-	}
+    @Bean
+    public ConsulLifecycle consulLifecycle() {
+        return new ConsulLifecycle();
+    }
 
-	@Bean
-	public HeartbeatProperties heartbeatProperties() {
-		return new HeartbeatProperties();
-	}
+    @Bean
+    public TaskScheduler taskScheduler(){
+        return new ConcurrentTaskScheduler();
+    }
 
-	@Bean
-	public ConsulDiscoveryClient consulDiscoveryClient() {
-		return new ConsulDiscoveryClient();
-	}
+    @Bean
+    public HeartbeatProperties heartbeatProperties() {
+        return new HeartbeatProperties();
+    }
+
+    @Bean
+    public ConsulDiscoveryClient consulDiscoveryClient() {
+        return new ConsulDiscoveryClient();
+    }
+
+    @Bean
+    public TtlScheduler ttlScheduler(Map<String, HealthIndicator> healthIndicators) {
+        return new TtlScheduler(scheduler, heartbeatProperties(), consulClient, summaryHealthIndicator(healthIndicators));
+    }
+
+    private static HealthIndicator summaryHealthIndicator(final Map<String, HealthIndicator> healthIndicators) {
+        return new HealthIndicator() {
+            @Override
+            public Health health() {
+                Map<String, Health> currentStatuses = new HashMap<>();
+                for (Map.Entry<String, HealthIndicator> indicatorEntry : healthIndicators.entrySet()) {
+                    currentStatuses.put(indicatorEntry.getKey(), indicatorEntry.getValue().health());
+                }
+                return summaryHealthAggregator().aggregate(currentStatuses);
+            }
+        };
+    }
+
+    private static HealthAggregator summaryHealthAggregator() {
+        OrderedHealthAggregator orderedHealthAggregator = new OrderedHealthAggregator();
+        //todo set these by configuring
+        orderedHealthAggregator.setStatusOrder(Status.DOWN, Status.OUT_OF_SERVICE, Status.UNKNOWN, Status.UP);
+        return orderedHealthAggregator;
+    }
+
 }
