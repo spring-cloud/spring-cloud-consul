@@ -16,13 +16,18 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import com.ecwid.consul.v1.ConsulClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.health.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
-import com.ecwid.consul.v1.ConsulClient;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Spencer Gibb
@@ -40,12 +45,11 @@ public class ConsulDiscoveryClientConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
-	public TtlScheduler ttlScheduler() {
-		return new TtlScheduler(heartbeatProperties(), consulClient);
-	}
+    public TaskScheduler taskScheduler(){
+        return new ConcurrentTaskScheduler();
+    }
 
-	@Bean
+    @Bean
 	public HeartbeatProperties heartbeatProperties() {
 		return new HeartbeatProperties();
 	}
@@ -64,4 +68,31 @@ public class ConsulDiscoveryClientConfiguration {
 	public ConsulCatalogWatch consulCatalogWatch() {
 		return new ConsulCatalogWatch(consulDiscoveryProperties(), consulClient);
 	}
+
+    @Bean
+	@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
+	public TtlScheduler ttlScheduler(Map<String, HealthIndicator> healthIndicators) {
+        return new TtlScheduler(taskScheduler(), heartbeatProperties(), consulClient, summaryHealthIndicator(healthIndicators));
+    }
+
+    private static HealthIndicator summaryHealthIndicator(final Map<String, HealthIndicator> healthIndicators) {
+        return new HealthIndicator() {
+            @Override
+            public Health health() {
+                Map<String, Health> currentStatuses = new HashMap<>();
+                for (Map.Entry<String, HealthIndicator> indicatorEntry : healthIndicators.entrySet()) {
+                    currentStatuses.put(indicatorEntry.getKey(), indicatorEntry.getValue().health());
+                }
+                return summaryHealthAggregator().aggregate(currentStatuses);
+            }
+        };
+    }
+
+    private static HealthAggregator summaryHealthAggregator() {
+        OrderedHealthAggregator orderedHealthAggregator = new OrderedHealthAggregator();
+        //todo set these by configuring
+        orderedHealthAggregator.setStatusOrder(Status.DOWN, Status.OUT_OF_SERVICE, Status.UNKNOWN, Status.UP);
+        return orderedHealthAggregator;
+    }
+
 }

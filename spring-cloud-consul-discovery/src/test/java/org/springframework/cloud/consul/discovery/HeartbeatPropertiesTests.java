@@ -30,17 +30,21 @@ public class HeartbeatPropertiesTests {
     @Test
     public void computeHeartbeatIntervalWorks() {
         HeartbeatProperties properties = new HeartbeatProperties();
-        Period period = properties.computeHearbeatInterval();
+        properties.computeScheduleInterval();
+        Period period = properties.getHeartbeatExpirePeriod();
 
         assertThat(period, is(notNullValue()));
         assertThat(period.getSeconds(), is(20));
+
+        assertThat(properties.getConsulTtl(), is(30 + "s"));
     }
 
     @Test
     public void computeShortHeartbeat() {
         HeartbeatProperties properties = new HeartbeatProperties();
-        properties.setTtlValue(2);
-        Period period = properties.computeHearbeatInterval();
+        properties.setTtlSeconds(2);
+        properties.computeScheduleInterval();
+        Period period = properties.getHeartbeatExpirePeriod();
 
         assertThat(period, is(notNullValue()));
         assertThat(period.getSeconds(), is(1));
