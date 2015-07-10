@@ -93,8 +93,7 @@ public class EventService {
 		String upper = eventId.substring(19, 23) + eventId.substring(24, 36);
 		BigInteger lowVal = new BigInteger(lower, 16);
 		BigInteger highVal = new BigInteger(upper, 16);
-		BigInteger index = lowVal.xor(highVal);
-		return index;
+        return lowVal.xor(highVal);
 	}
 
 	public List<Event> getEvents(BigInteger lastIndex) {

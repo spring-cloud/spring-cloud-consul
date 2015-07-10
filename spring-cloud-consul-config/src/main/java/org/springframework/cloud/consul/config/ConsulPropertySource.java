@@ -21,6 +21,7 @@ import static org.springframework.util.Base64Utils.decodeFromString;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -77,6 +78,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 	@Override
 	public String[] getPropertyNames() {
-		return properties.keySet().toArray(new String[0]);
+        Set<String> strings = properties.keySet();
+        return strings.toArray(new String[strings.size()]);
 	}
 }
