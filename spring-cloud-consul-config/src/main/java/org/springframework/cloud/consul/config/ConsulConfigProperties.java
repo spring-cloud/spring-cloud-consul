@@ -16,10 +16,10 @@
 
 package org.springframework.cloud.consul.config;
 
-import lombok.Data;
-
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import lombok.Data;
 
 /**
  * @author Spencer Gibb
@@ -37,4 +37,8 @@ public class ConsulConfigProperties {
 
 	@NotEmpty
 	private String profileSeparator = ",";
+	
+	private int kvWatchDelay = 10;
+	
+	private long kvWatchTimeout = 2;
 }
