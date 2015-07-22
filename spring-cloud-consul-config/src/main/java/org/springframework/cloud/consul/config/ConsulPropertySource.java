@@ -36,55 +36,54 @@ import com.ecwid.consul.v1.kv.model.GetValue;
  */
 public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient> {
 
-    private String context;
+	private String context;
 
-    private Map<String, String> properties = new LinkedHashMap<>();
-    
-    public ConsulPropertySource(String context, ConsulClient source) {
-        super(context, source);
-        this.context = context;
+	private Map<String, String> properties = new LinkedHashMap<>();
 
-        if (!this.context.endsWith("/")) {
-            this.context = this.context + "/";
-        }
-    }
+	public ConsulPropertySource(String context, ConsulClient source) {
+		super(context, source);
+		this.context = context;
 
-    public void init() {
-        Response<List<GetValue>> response = source.getKVValues(context,
-                QueryParams.DEFAULT);
-        List<GetValue> values = response.getValue();
+		if (!this.context.endsWith("/")) {
+			this.context = this.context + "/";
+		}
+	}
 
-        if (values != null) {
-            for (GetValue getValue : values) {
-                String key = getValue.getKey();
-                if (!StringUtils.endsWithIgnoreCase(key, "/")) {
-                    key = key.replace(context, "").replace('/', '.');
-                    String value = getDecoded(getValue.getValue());
-                    properties.put(key, value);
-                }
-            }
-        }
-    }
-    
-    public String getDecoded(String value) {
-        if (value == null)
-            return null;
-        return new String(decodeFromString(value));
-    }
+	public void init() {
+		Response<List<GetValue>> response = source.getKVValues(context, QueryParams.DEFAULT);
+		List<GetValue> values = response.getValue();
 
-    @SuppressWarnings("hiding")
-    @Override
-    public Object getProperty(String name) {
-        return properties.get(name);
-    }
+		if (values != null) {
+			for (GetValue getValue : values) {
+				String key = getValue.getKey();
+				if (!StringUtils.endsWithIgnoreCase(key, "/")) {
+					key = key.replace(context, "").replace('/', '.');
+					String value = getDecoded(getValue.getValue());
+					properties.put(key, value);
+				}
+			}
+		}
+	}
 
-    @Override
-    public String[] getPropertyNames() {
-        Set<String> strings = properties.keySet();
-        return strings.toArray(new String[strings.size()]);
-    }
-    
-    public String getContext(){
-        return context;
-    }
+	public String getDecoded(String value) {
+		if (value == null)
+			return null;
+		return new String(decodeFromString(value));
+	}
+
+	@SuppressWarnings("hiding")
+	@Override
+	public Object getProperty(String name) {
+		return properties.get(name);
+	}
+
+	@Override
+	public String[] getPropertyNames() {
+		Set<String> strings = properties.keySet();
+		return strings.toArray(new String[strings.size()]);
+	}
+
+	public String getContext() {
+		return context;
+	}
 }

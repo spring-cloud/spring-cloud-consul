@@ -38,55 +38,58 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Separated the remove test from the others as the keys conflicted since the environment does not actually update in these tests
+ * 
  * @author Andrew DePompa
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {ConsulConfigWatchTestRemove.MyTestConfig.class, org.springframework.cloud.consul.config.util.ConsulConfigTestUtil.EnvironmentChangeEventHandler.class})
-@WebIntegrationTest(value = {"spring.application.name=testConsulConfigWatchRemove", "spring.cloud.consul.config.watch=true"}, randomPort = true)
+@SpringApplicationConfiguration(classes = { ConsulConfigWatchTestRemove.MyTestConfig.class,
+		org.springframework.cloud.consul.config.util.ConsulConfigTestUtil.EnvironmentChangeEventHandler.class })
+@WebIntegrationTest(value = { "spring.application.name=testConsulConfigWatchRemove",
+		"spring.cloud.consul.config.watch=true" }, randomPort = true)
 @Slf4j
 public class ConsulConfigWatchTestRemove {
-    @Autowired
-    private ConsulClient client;
-    
-    @Before
-    public void setup() {
-        System.setProperty("spring.cloud.consul.config.watch", "true");
-        
-        failMessage = DEFAULT_FAIL_MESSAGE;
-        client.setKVValue(TEST_DELETE_VALUE, "default value");
-        
-        testing = true;
-    }
-    
-    @After
-    public void cleanup(){
-        testing = false;
-        client.deleteKVValue(TEST_DELETE_VALUE);
-    }
-    
-    private void deleteValue(String value) throws InterruptedException {
-        expectedValue = value;
-        Thread.sleep(2000);
-        log.info("Changing value...");
-        client.deleteKVValue(value);
-        Thread.sleep(2000);
-        
-        if(failMessage != null){
-            Assert.fail(failMessage);
-        }
-    }
-    
-    @Test
-    public void removeValueTest() throws InterruptedException {
-        deleteValue(TEST_DELETE_VALUE);
-    }
-    
-    @Configuration
-    @EnableAutoConfiguration
-    @ComponentScan
-    @EnableScheduling
-    @Import({ ConsulConfigBootstrapConfiguration.class })
-    public static class MyTestConfig {
-        // ignore
-    }
+	@Autowired
+	private ConsulClient client;
+
+	@Before
+	public void setup() {
+		System.setProperty("spring.cloud.consul.config.watch", "true");
+
+		failMessage = DEFAULT_FAIL_MESSAGE;
+		client.setKVValue(TEST_DELETE_VALUE, "default value");
+
+		testing = true;
+	}
+
+	@After
+	public void cleanup() {
+		testing = false;
+		client.deleteKVValue(TEST_DELETE_VALUE);
+	}
+
+	private void deleteValue(String value) throws InterruptedException {
+		expectedValue = value;
+		Thread.sleep(2000);
+		log.info("Changing value...");
+		client.deleteKVValue(value);
+		Thread.sleep(2000);
+
+		if (failMessage != null) {
+			Assert.fail(failMessage);
+		}
+	}
+
+	@Test
+	public void removeValueTest() throws InterruptedException {
+		deleteValue(TEST_DELETE_VALUE);
+	}
+
+	@Configuration
+	@EnableAutoConfiguration
+	@ComponentScan
+	@EnableScheduling
+	@Import({ ConsulConfigBootstrapConfiguration.class })
+	public static class MyTestConfig {
+		// ignore
+	}
 }
