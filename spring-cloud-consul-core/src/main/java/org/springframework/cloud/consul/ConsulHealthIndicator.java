@@ -49,7 +49,9 @@ public class ConsulHealthIndicator extends AbstractHealthIndicator {
 					.withDetail("advertiseAddress", config.getDomain())
 					.withDetail("datacenter", config.getDatacenter())
 					.withDetail("domain", config.getDomain())
-					.withDetail("nodeName", config.getNodeName());
+					.withDetail("nodeName", config.getNodeName())
+					.withDetail("bindAddress", config.getBindAddress())
+					.withDetail("clientAddress", config.getClientAddress());
 		}
 		catch (Exception e) {
 			builder.down(e);
