@@ -47,10 +47,4 @@ public class ConsulConfigBootstrapConfiguration {
 	public ConsulPropertySourceLocator consulPropertySourceLocator() {
 		return new ConsulPropertySourceLocator(consul, consulConfigProperties());
 	}
-	
-	@Bean
-	@ConditionalOnProperty(name="spring.cloud.consul.config.watch", matchIfMissing = false)
-	public ConsulConfigWatch consulConfigWatch() {
-	    return new ConsulConfigWatch(consulConfigProperties());
-	}
 }
