@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.bootstrap.BootstrapApplicationListener;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -105,17 +104,20 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 	private void getConsulPropertySources() {
 		if (consulPropertySources == null) {
 			consulPropertySources = new HashSet<ConsulPropertySource>();
-			CompositePropertySource bootstrapPropertySource = ((CompositePropertySource) environment.getPropertySources()
-					.get(BootstrapApplicationListener.BOOTSTRAP_PROPERTY_SOURCE_NAME));
-			if (bootstrapPropertySource != null) {
-				Collection<PropertySource<?>> sources = bootstrapPropertySource.getPropertySources();
-				for (PropertySource<?> source : sources) {
-					if (source.getName().equals("consul")) {
-						CompositePropertySource consulPropertySource = (CompositePropertySource) source;
-						for (PropertySource<?> consulSource : consulPropertySource.getPropertySources()) {
-							consulPropertySources.add((ConsulPropertySource) consulSource);
+			if (environment.getPropertySources()
+					.get(BootstrapApplicationListener.BOOTSTRAP_PROPERTY_SOURCE_NAME) instanceof CompositePropertySource) {
+				CompositePropertySource bootstrapPropertySource = ((CompositePropertySource) environment.getPropertySources()
+						.get(BootstrapApplicationListener.BOOTSTRAP_PROPERTY_SOURCE_NAME));
+				if (bootstrapPropertySource != null) {
+					Collection<PropertySource<?>> sources = bootstrapPropertySource.getPropertySources();
+					for (PropertySource<?> source : sources) {
+						if (source.getName().equals("consul")) {
+							CompositePropertySource consulPropertySource = (CompositePropertySource) source;
+							for (PropertySource<?> consulSource : consulPropertySource.getPropertySources()) {
+								consulPropertySources.add((ConsulPropertySource) consulSource);
+							}
+							break;
 						}
-						break;
 					}
 				}
 			}

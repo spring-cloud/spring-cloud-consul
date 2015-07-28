@@ -15,6 +15,8 @@
  */
 package org.springframework.cloud.consul.config;
 
+import static org.springframework.cloud.consul.config.util.ConsulConfigTestUtil.*;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,11 +28,7 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.springframework.cloud.consul.config.util.ConsulConfigTestUtil.*;
 
 import com.ecwid.consul.v1.ConsulClient;
 
@@ -53,8 +51,6 @@ public class ConsulConfigWatchTestRemove {
 
 	@Before
 	public void setup() {
-		System.setProperty("spring.cloud.consul.config.watch", "true");
-
 		failMessage = DEFAULT_FAIL_MESSAGE;
 		client.setKVValue(TEST_DELETE_VALUE, "default value");
 
@@ -87,8 +83,6 @@ public class ConsulConfigWatchTestRemove {
 	@Configuration
 	@EnableAutoConfiguration
 	@ComponentScan
-	@EnableScheduling
-	@Import({ ConsulConfigBootstrapConfiguration.class })
 	public static class MyTestConfig {
 		// ignore
 	}
