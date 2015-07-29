@@ -6,9 +6,9 @@ This project provides Consul integrations for Spring Boot apps through autoconfi
 and binding to the Spring Environment and other Spring programming model idioms. With a few
 simple annotations you can quickly enable and configure the common patterns inside your
 application and build large distributed systems with Consul based components. The
-patterns provided include Service Discovery, Circuit Breaker and Configuration.
-Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon) are provided by
-integration with Spring Cloud Netflix.
+patterns provided include Service Discovery, Control Bus and Configuration.
+Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon), Circuit Breaker
+(Hystrix) are provided by integration with Spring Cloud Netflix.
 
 
 == Consul overview
@@ -35,9 +35,9 @@ See the https://consul.io/intro/index.html[intro] for more information.
 
 1. https://consul.io/downloads.html[Install consul]
 2. Run `./src/main/bash/local_run_consul.sh`
-3. verify consul is running by visiting http://localhost:8500
-4. run `mvn --settings .settings.xml package` this will bring in the required spring cloud maven repositories and build
-5. run `java -jar spring-cloud-consul-sample/target/spring-cloud-consul-sample-1.0.0.BUILD-SNAPSHOT.jar`
+3. Verify consul is running by visiting http://localhost:8500
+4. Run `mvn --settings .settings.xml package` this will bring in the required spring cloud maven repositories and build
+5. Run `java -jar spring-cloud-consul-sample/target/spring-cloud-consul-sample-1.0.0.BUILD-SNAPSHOT.jar`
 6. visit http://localhost:8080, verify that `{"serviceId":"<yourhost>:8080","host":"<yourhost>","port":8080}` results
 7. run `java -jar spring-cloud-consul-sample/target/spring-cloud-consul-sample-1.0.0.BUILD-SNAPSHOT.jar --server.port=8081`
 8. visit http://localhost:8080 again, verify that `{"serviceId":"<yourhost>:8081","host":"<yourhost>","port":8081}` eventually shows up in the results in a round robbin fashion (may take a minute or so).
@@ -89,46 +89,6 @@ parsing or rendering it, just copying it to `${main.basedir}`
 any changes in the README it will then show up after a Maven build as
 a modified file in the correct place. Just commit it and push the change.
 
-=== Pull Requests
-
-Spring Cloud is released under the non-restrictive Apache 2.0 license,
-and follows a very standard Github development process, using Github
-tracker for issues and merging pull requests into master. If you want
-to contribute even something trivial please do not hesitate, but
-follow the guidelines below.
-
-==== Sign the Contributor License Agreement
-Before we accept a non-trivial patch or pull request we will need you
-to sign the
-https://support.springsource.com/spring_committer_signup[contributor's
-agreement].  Signing the contributor's agreement does not grant anyone
-commit rights to the main repository, but it does mean that we can
-accept your contributions, and you will get an author credit if we do.
-Active contributors might be asked to join the core team, and given
-the ability to merge pull requests.
-
-==== Code Conventions and Housekeeping
-None of these is essential for a pull request, but they will all help.  They can also be
-added after the original pull request but before a merge.
-
-* Use the Spring Framework code format conventions. If you use Eclipse and you follow
-  the ``Importing into eclipse'' instructions below you should get project specific
-  formatting automatically. You can also import formatter settings using the
-  `eclipse-code-formatter.xml` file from the `eclipse` folder. If using IntelliJ, you can
-  use the http://plugins.jetbrains.com/plugin/6546[Eclipse Code Formatter Plugin]
-  to import the same file.
-* Make sure all new `.java` files to have a simple Javadoc class comment with at least an
-  `@author` tag identifying you, and preferably at least a paragraph on what the class is
-  for.
-* Add the ASF license header comment to all new `.java` files (copy from existing files
-  in the project)
-* Add yourself as an `@author` to the .java files that you modify substantially (more
-  than cosmetic changes).
-* Add some Javadocs and, if you change the namespace, some XSD doc elements.
-* A few unit tests would help a lot as well -- someone has to do it.
-* If no-one else is using your branch, please rebase it against the current master (or
-  other target branch in the main project).
-
 === Working with the code
 If you don't have an IDE preference we would recommend that you use
 http://www.springsource.com/developer/sts[Spring Tools Suite] or
@@ -140,6 +100,14 @@ should also work without issue.
 We recommend the http://eclipse.org/m2e/[m2eclipe] eclipse plugin when working with
 eclipse. If you don't already have m2eclipse installed it is available from the "eclipse
 marketplace".
+
+Once the projects are imported into Eclipse you will also need to tell m2eclipse
+to use the `.settings.xml` file for the projects.  If you do not do this you may
+see errors many different errors related to the POMs in the projects.
+Open your Eclipse preferences, expand the Maven preferences, and select User Settings.
+In the User Settings field click Browse and navigate to the Spring Cloud project you
+imported selecting the `.settings.xml` file in that project.  Click Apply and then OK to
+save the preference changes.
 
 ==== Importing into eclipse without m2eclipse
 If you prefer not to use m2eclipse you can generate eclipse project metadata using the
@@ -179,9 +147,11 @@ Maven is well supported by most Java IDEs. Refer to you vendor documentation.
 
 == Contributing
 
-Spring Cloud is released under the non-restrictive Apache 2.0 license. If you would like
-to contribute something, or simply want to hack on the code this document should help
-you get started.
+Spring Cloud is released under the non-restrictive Apache 2.0 license,
+and follows a very standard Github development process, using Github
+tracker for issues and merging pull requests into master. If you want
+to contribute even something trivial please do not hesitate, but
+follow the guidelines below.
 
 === Sign the Contributor License Agreement
 Before we accept a non-trivial patch or pull request we will need you to sign the
