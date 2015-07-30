@@ -54,8 +54,8 @@ public class ConsulConfigTestUtil {
 				Set<String> keys = event.getKeys();
 				if (keys.size() != 1) {
 					failMessage = "EnvironmentChangeEvent should have 1 key but had: " + keys.size();
-				} else if (!keys.contains(expectedValue)) {
-					failMessage = "Event does not contain key = " + expectedValue;
+				} else if (!keys.contains(expectedValue) && !keys.iterator().next().contains(expectedValue.substring(expectedValue.lastIndexOf('/')+1))) {
+					failMessage = "Event does not contain key = " + expectedValue + ": actual = " + keys.toString();
 				} else {
 					failMessage = null;
 				}
