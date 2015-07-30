@@ -50,13 +50,13 @@ import com.ecwid.consul.v1.agent.model.Service;
 public class ConsulLifecycleTests {
 
 	@Autowired
-	ConsulLifecycle lifecycle;
+	private ConsulLifecycle lifecycle;
 
 	@Autowired
-	ConsulClient consul;
+	private ConsulClient consul;
 
 	@Autowired
-	ApplicationContext context;
+	private ApplicationContext context;
 
 	@Test
 	public void contextLoads() {
