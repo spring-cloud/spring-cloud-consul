@@ -57,17 +57,18 @@
 	</build>
 
 	<properties>
-		<spring-cloud-bus.version>1.0.2.BUILD-SNAPSHOT</spring-cloud-bus.version>
-		<spring-cloud-commons.version>1.0.2.BUILD-SNAPSHOT</spring-cloud-commons.version>
-		<spring-cloud-netflix.version>1.0.3.BUILD-SNAPSHOT</spring-cloud-netflix.version>
-		<archaius.version>0.6.6</archaius.version>
+		<spring-cloud-bus.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-bus.version>
+		<spring-cloud-commons.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-commons.version>
+		<spring-cloud-netflix.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
+		<archaius.version>0.7.1</archaius.version>
 		<consul-api.version>1.1.4</consul-api.version>
-		<feign.version>8.3.0</feign.version>
+		<feign.version>8.6.0</feign.version>
 		<gson.version>2.3.1</gson.version>
-		<httpclient.version>4.2.5</httpclient.version>
+		<httpclient.version>4.5</httpclient.version>
+		<httpcore.version>4.4.1</httpcore.version>
 		<joda-time.version>2.7</joda-time.version>
 		<lombok.version>1.16.4</lombok.version>
-		<ribbon.version>2.0.2</ribbon.version>
+		<ribbon.version>2.1.0</ribbon.version>
 	</properties>
 
 	<dependencyManagement>
