@@ -18,13 +18,13 @@ package org.springframework.cloud.consul.config;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.collections4.map.AbstractReferenceMap.ReferenceStrength;
+import org.apache.commons.collections4.map.ReferenceMap;
 import org.springframework.cloud.bootstrap.BootstrapApplicationListener;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -58,9 +58,7 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 
 	private ConsulConfigProperties properties;
 	
-	private final Map<String, AtomicReference<BigInteger>> kvIndexes = new HashMap<String, AtomicReference<BigInteger>>();
-
-	//private final AtomicReference<BigInteger> kvIndex = new AtomicReference<>();
+	private Map<String, BigInteger> kvIndexes = new ReferenceMap<String, BigInteger>(ReferenceStrength.SOFT, ReferenceStrength.SOFT);
 
 	public ConsulConfigWatch(ConsulConfigProperties properties) {
 		this.properties = properties;
@@ -69,23 +67,18 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 	@SuppressWarnings("boxing")
 	@Scheduled(fixedDelayString = "${spring.cloud.consul.config.kvWatchDelay:10}")
 	public void kvWatch() {
-		/*long index = -1;
-		if (kvIndex.get() != null) {
-			index = kvIndex.get().longValue();
-		}*/
-
 		getConsulPropertySources();
 		Set<String> changedValues = new HashSet<String>();
 		for (ConsulPropertySource source : consulPropertySources) {
 			long index = -1;
 			if(kvIndexes.get(source.getName()) != null) {
-				index = kvIndexes.get(source.getName()).get().longValue();
+				index = kvIndexes.get(source.getName()).longValue();
 			}
 			Response<List<GetValue>> response = source.getSource().getKVValues(source.getContext(),
 					new QueryParams(properties.getKvWatchTimeout(), index));
 			Long consulIndex = response.getConsulIndex();
 			if (consulIndex != null) {
-				kvIndexes.put(source.getName(), new AtomicReference<BigInteger>(BigInteger.valueOf(consulIndex)));
+				kvIndexes.put(source.getName(), BigInteger.valueOf(consulIndex));
 				if (index != consulIndex) {
 					if (response.getValue() != null) {
 						Set<String> existingProps = new HashSet<String>(Arrays.asList(source.getPropertyNames()));
