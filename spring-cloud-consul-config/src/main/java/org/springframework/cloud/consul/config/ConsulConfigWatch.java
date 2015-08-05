@@ -18,8 +18,10 @@ package org.springframework.cloud.consul.config;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -55,8 +57,10 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 	private Set<ConsulPropertySource> consulPropertySources = null;
 
 	private ConsulConfigProperties properties;
+	
+	private final Map<String, AtomicReference<BigInteger>> kvIndexes = new HashMap<String, AtomicReference<BigInteger>>();
 
-	private final AtomicReference<BigInteger> kvIndex = new AtomicReference<>();
+	//private final AtomicReference<BigInteger> kvIndex = new AtomicReference<>();
 
 	public ConsulConfigWatch(ConsulConfigProperties properties) {
 		this.properties = properties;
@@ -65,19 +69,23 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 	@SuppressWarnings("boxing")
 	@Scheduled(fixedDelayString = "${spring.cloud.consul.config.kvWatchDelay:10}")
 	public void kvWatch() {
-		long index = -1;
+		/*long index = -1;
 		if (kvIndex.get() != null) {
 			index = kvIndex.get().longValue();
-		}
+		}*/
 
 		getConsulPropertySources();
 		Set<String> changedValues = new HashSet<String>();
 		for (ConsulPropertySource source : consulPropertySources) {
+			long index = -1;
+			if(kvIndexes.get(source.getName()) != null) {
+				index = kvIndexes.get(source.getName()).get().longValue();
+			}
 			Response<List<GetValue>> response = source.getSource().getKVValues(source.getContext(),
 					new QueryParams(properties.getKvWatchTimeout(), index));
 			Long consulIndex = response.getConsulIndex();
 			if (consulIndex != null) {
-				kvIndex.set(BigInteger.valueOf(consulIndex));
+				kvIndexes.put(source.getName(), new AtomicReference<BigInteger>(BigInteger.valueOf(consulIndex)));
 				if (index != consulIndex) {
 					if (response.getValue() != null) {
 						Set<String> existingProps = new HashSet<String>(Arrays.asList(source.getPropertyNames()));
@@ -94,7 +102,7 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 				}
 
 				if (changedValues.size() > 0) {
-					log.trace("Received kv update from consul: {}, index: {}", changedValues.toString(), kvIndex.get());
+					log.trace("Received kv update from consul: {}", changedValues.toString());
 					publisher.publishEvent(new EnvironmentChangeEvent(changedValues));
 				}
 			}
