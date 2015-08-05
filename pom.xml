@@ -268,12 +268,12 @@
 			<optional>true</optional>
 		</dependency>
 	</dependencies>
-	
+
 	<distributionManagement>
-			<snapshotRepository>
-				<id>svcartifact.unx.sas.com</id>
-				<name>svcartifact.unx.sas.com-snapshots</name>
-				<url>http://svcartifact.unx.sas.com:8081/artifactory/ext-snapshot-local</url>
-			</snapshotRepository>
-		</distributionManagement>
+		<snapshotRepository>
+			<id>svcartifact.unx.sas.com</id>
+			<name>svcartifact.unx.sas.com-snapshots</name>
+			<url>http://svcartifact.unx.sas.com:8081/artifactory/ext-snapshot-local</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
