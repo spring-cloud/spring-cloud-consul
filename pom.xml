@@ -6,7 +6,11 @@
 
 	<groupId>org.springframework.cloud</groupId>
 	<artifactId>spring-cloud-consul</artifactId>
+<<<<<<< HEAD
 	<version>2.0.0.SAS-SNAPSHOT</version>
+=======
+	<version>1.0.0.SAS-SNAPSHOT</version>
+>>>>>>> sas/sas-build
 	<packaging>pom</packaging>
 	<name>Spring Cloud Consul</name>
 	<description>Spring Cloud Consul</description>
@@ -75,21 +79,34 @@
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-core</artifactId>
+<<<<<<< HEAD
 				<version>${project.version}</version>
+=======
+				<version>1.0.0.SAS-SNAPSHOT</version>
+>>>>>>> sas/sas-build
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-bus</artifactId>
+<<<<<<< HEAD
 				<version>${project.version}</version>
+=======
+				<version>1.0.0.SAS-SNAPSHOT</version>
+>>>>>>> sas/sas-build
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-config</artifactId>
+<<<<<<< HEAD
 				<version>${project.version}</version>
+=======
+				<version>1.0.0.SAS-SNAPSHOT</version>
+>>>>>>> sas/sas-build
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-discovery</artifactId>
+<<<<<<< HEAD
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -126,6 +143,9 @@
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-starter-consul-all</artifactId>
 				<version>${project.version}</version>
+=======
+				<version>1.0.0.SAS-SNAPSHOT</version>
+>>>>>>> sas/sas-build
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
@@ -261,6 +281,7 @@
 		</dependencies>
 	</dependencyManagement>
 
+<<<<<<< HEAD
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -276,4 +297,13 @@
             		<url>http://svcartifact.unx.sas.com:8081/artifactory/ext-snapshot-local</url>
         	</snapshotRepository>
     	</distributionManagement>
+=======
+    <distributionManagement>
+        <snapshotRepository>
+            <id>svcartifact.unx.sas.com</id>
+            <name>svcartifact.unx.sas.com-snapshots</name>
+            <url>http://svcartifact.unx.sas.com:8081/artifactory/ext-snapshot-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+>>>>>>> sas/sas-build
 </project>
