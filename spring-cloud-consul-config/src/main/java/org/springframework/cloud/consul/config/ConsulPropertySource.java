@@ -10,6 +10,11 @@ import java.util.Set;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.util.StringUtils;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.QueryParams;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.kv.model.GetValue;
+
 import java.util.*;
 
 /**
