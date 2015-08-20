@@ -17,8 +17,12 @@
 package org.springframework.cloud.consul.discovery;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.BeansException;
 import org.springframework.cloud.client.DefaultServiceInstance;
@@ -33,6 +37,7 @@ import com.ecwid.consul.v1.agent.model.Member;
 import com.ecwid.consul.v1.agent.model.Self;
 import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.catalog.model.CatalogService;
+
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.StringUtils;
 
@@ -40,6 +45,32 @@ import org.springframework.util.StringUtils;
  * @author Spencer Gibb
  */
 public class ConsulDiscoveryClient implements DiscoveryClient, ApplicationContextAware {
+	private static class ConsulServiceInstance extends DefaultServiceInstance {
+		private final Set<String> tags;
+
+		private ConsulServiceInstance(String serviceId, String host, int port,
+				boolean secure, Collection<String> tags) {
+			super(serviceId, host, port, secure);
+			this.tags = tags == null || tags.isEmpty() ? Collections.<String> emptySet()
+					: new LinkedHashSet<>(tags);
+		}
+
+		@Override
+		public boolean supports(Capability serviceCapability) {
+			return serviceCapability == Capability.TAGS
+					|| super.supports(serviceCapability);
+		}
+
+		@Override
+		public <T> T getValue(Capability serviceCapability) {
+			if (serviceCapability == Capability.TAGS) {
+				@SuppressWarnings("unchecked")
+				final T result = (T) tags;
+				return result;
+			}
+			return super.getValue(serviceCapability);
+		}
+	}
 
 	private ApplicationContext context;
 
@@ -80,7 +111,8 @@ public class ConsulDiscoveryClient implements DiscoveryClient, ApplicationContex
 				host = member.getName();
 			}
 		}
-		return new DefaultServiceInstance(service.getId(), host, service.getPort(), false);
+		return new ConsulServiceInstance(service.getId(), host, service.getPort(), false,
+				service.getTags());
 	}
 
 	@Override
@@ -102,8 +134,8 @@ public class ConsulDiscoveryClient implements DiscoveryClient, ApplicationContex
 			} else {
 				host = service.getNode();
 			}
-			instances.add(new DefaultServiceInstance(serviceId, host,
-					service.getServicePort(), false));
+			instances.add(new ConsulServiceInstance(serviceId, host, service
+					.getServicePort(), false, service.getServiceTags()));
 		}
 	}
 
