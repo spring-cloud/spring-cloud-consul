@@ -79,7 +79,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 		NewService.Check check = new NewService.Check();
 		if (ttlConfig.isEnabled()) {
-			check.setTtl(ttlConfig.getTtl());
+			check.setTtl(ttlConfig.getConsulTtl());
 		}
 		if (properties.getHealthCheckUrl() != null) {
 			check.setHttp(properties.getHealthCheckUrl());
@@ -141,7 +141,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	private void deregister(String serviceId) {
 		if (ttlScheduler != null) {
-			ttlScheduler.remove(serviceId);
+			ttlScheduler.removeAll();
 		}
 		client.agentServiceDeregister(serviceId);
 	}
