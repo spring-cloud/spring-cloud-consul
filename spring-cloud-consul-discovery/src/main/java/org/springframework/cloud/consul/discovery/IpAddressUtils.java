@@ -16,13 +16,24 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import com.ecwid.consul.v1.catalog.model.CatalogService;
+import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
+
+import lombok.SneakyThrows;
+import lombok.extern.apachecommons.CommonsLog;
+
 import org.springframework.util.StringUtils;
+
+import com.ecwid.consul.v1.catalog.model.CatalogService;
 
 /**
  * @author Spencer Gibb
  */
-public class Utils {
+@CommonsLog
+public class IpAddressUtils {
 
 	public static String getCatalogServiceHost(CatalogService service, boolean preferAddress) {
 		if (preferAddress) {
@@ -35,4 +46,26 @@ public class Utils {
 		return service.getNode();
 	}
 
+	@SneakyThrows
+	public static InetAddress getFirstNonLoopbackAddress() {
+		try {
+			for (Enumeration<NetworkInterface> enumNic = NetworkInterface.getNetworkInterfaces();
+				 enumNic.hasMoreElements(); ) {
+				NetworkInterface ifc = enumNic.nextElement();
+				if (ifc.isUp()) {
+					for (Enumeration<InetAddress> enumAddr = ifc.getInetAddresses();
+						 enumAddr.hasMoreElements(); ) {
+						InetAddress address = enumAddr.nextElement();
+						if (address instanceof Inet4Address && !address.isLoopbackAddress()) {
+							return address;
+						}
+					}
+				}
+			}
+		}
+		catch (IOException ex) {
+			log.error("Cannot get host info", ex);
+		}
+		return InetAddress.getLocalHost();
+	}
 }

@@ -16,18 +16,19 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import static org.springframework.cloud.consul.discovery.IpAddressUtils.getFirstNonLoopbackAddress;
+
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import lombok.AccessLevel;
 import lombok.Data;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.apachecommons.CommonsLog;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -78,13 +79,9 @@ public class ConsulDiscoveryProperties {
 
 	private String[] initHostInfo() {
 		String[] info = new String[2];
-		try {
-			info[0] = InetAddress.getLocalHost().getHostAddress();
-			info[1] = InetAddress.getLocalHost().getHostName();
-		}
-		catch (UnknownHostException ex) {
-			log.error("Cannot get host info", ex);
-		}
+		InetAddress address = getFirstNonLoopbackAddress();
+		info[0] = address.getHostAddress();
+		info[1] = address.getHostName();
 		return info;
 	}
 }

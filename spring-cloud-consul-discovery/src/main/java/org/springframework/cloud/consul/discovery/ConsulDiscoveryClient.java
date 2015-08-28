@@ -16,7 +16,7 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.springframework.cloud.consul.discovery.Utils.getCatalogServiceHost;
+import static org.springframework.cloud.consul.discovery.IpAddressUtils.getCatalogServiceHost;
 
 import java.util.ArrayList;
 import java.util.List;

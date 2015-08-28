@@ -16,7 +16,7 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.springframework.cloud.consul.discovery.Utils.getCatalogServiceHost;
+import static org.springframework.cloud.consul.discovery.IpAddressUtils.getCatalogServiceHost;
 
 import com.ecwid.consul.v1.catalog.model.CatalogService;
 import com.netflix.loadbalancer.Server;
