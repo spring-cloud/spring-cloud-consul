@@ -79,22 +79,34 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		service.setName(normalizeForDns(appName));
 		service.setTags(createTags());
 
+		Integer port;
+		if (shouldRegisterManagement()) {
+			port = getManagementPort();
+		} else {
+			port = service.getPort();
+		}
+		service.setCheck(createCheck(port));
+
+		register(service);
+	}
+
+	private NewService.Check createCheck(Integer port) {
 		NewService.Check check = new NewService.Check();
 		if (ttlConfig.isEnabled()) {
 			check.setTtl(ttlConfig.getTtl());
+			return check;
 		}
+
 		if (properties.getHealthCheckUrl() != null) {
 			check.setHttp(properties.getHealthCheckUrl());
 		} else {
 			check.setHttp(String.format("%s://%s:%s%s", properties.getScheme(),
-					properties.getHostname(), service.getPort(),
+					properties.getHostname(), port,
 					properties.getHealthCheckPath()));
 		}
 		check.setInterval(properties.getHealthCheckInterval());
 		//TODO support http check timeout
-		service.setCheck(check);
-
-		register(service);
+		return check;
 	}
 
 	public String getServiceId() {
@@ -108,6 +120,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		management.setName(getManagementServiceName());
 		management.setPort(getManagementPort());
 		management.setTags(properties.getManagementTags());
+		management.setCheck(createCheck(getManagementPort()));
 
 		register(management);
 	}
