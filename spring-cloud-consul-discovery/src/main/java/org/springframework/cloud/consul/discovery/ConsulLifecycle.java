@@ -145,7 +145,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	@Override
 	protected void deregisterManagement() {
-		deregister(getManagementServiceName());
+		deregister(getManagementServiceId());
 	}
 
 	private List<String> createTags() {
