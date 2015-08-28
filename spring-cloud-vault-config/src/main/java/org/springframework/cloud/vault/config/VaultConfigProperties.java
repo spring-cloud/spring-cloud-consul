@@ -25,7 +25,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @author Spencer Gibb
  */
-@ConfigurationProperties("spring.cloud.vault.config")
+@ConfigurationProperties("spring.cloud.vault")
 @Data
 public class VaultConfigProperties {
 	private boolean enabled = true;

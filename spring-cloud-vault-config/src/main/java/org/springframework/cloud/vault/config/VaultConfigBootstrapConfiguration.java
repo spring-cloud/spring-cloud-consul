@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @EnableConfigurationProperties
-@ConditionalOnProperty(name = "spring.cloud.vault.config.enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = "spring.cloud.vault.enabled", matchIfMissing = true)
 public class VaultConfigBootstrapConfiguration {
 
 	@Bean
