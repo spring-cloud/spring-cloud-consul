@@ -51,7 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @EnableConfigurationProperties
 @Slf4j
-public class SampleApplication implements ApplicationListener<SimpleRemoteEvent> {
+public class SampleConsulApplication implements ApplicationListener<SimpleRemoteEvent> {
 
 	@Autowired
 	private LoadBalancerClient loadBalancer;
@@ -106,7 +106,7 @@ public class SampleApplication implements ApplicationListener<SimpleRemoteEvent>
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(SampleApplication.class, args);
+		SpringApplication.run(SampleConsulApplication.class, args);
 	}
 
 	@Override
