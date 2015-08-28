@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import static org.springframework.cloud.consul.discovery.Utils.getCatalogServiceHost;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -90,12 +92,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		Response<List<CatalogService>> services = client.getCatalogService(serviceId,
 				QueryParams.DEFAULT);
 		for (CatalogService service : services.getValue()) {
-			String host;
-			if (this.properties.isPreferIpAddress()) {
-				host = service.getAddress();
-			} else {
-				host = service.getNode();
-			}
+			String host = getCatalogServiceHost(service, properties.isPreferIpAddress());
 			instances.add(new DefaultServiceInstance(serviceId, host,
 					service.getServicePort(), false));
 		}

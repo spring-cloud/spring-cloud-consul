@@ -41,6 +41,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
  * @author Spencer Gibb
  */
@@ -51,7 +53,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @EnableConfigurationProperties
 @Slf4j
-public class SampleApplication implements ApplicationListener<SimpleRemoteEvent> {
+public class SampleConsulApplication implements ApplicationListener<SimpleRemoteEvent> {
 
 	@Autowired
 	private LoadBalancerClient loadBalancer;
@@ -95,6 +97,11 @@ public class SampleApplication implements ApplicationListener<SimpleRemoteEvent>
 		return sampleProperties().getProp();
 	}
 
+	@RequestMapping("/instances")
+	public List<ServiceInstance> instances() {
+		return discoveryClient.getInstances(appName);
+	}
+
 	@Bean
 	public SubtypeModule sampleSubtypeModule() {
 		return new SubtypeModule(SimpleRemoteEvent.class);
@@ -106,7 +113,7 @@ public class SampleApplication implements ApplicationListener<SimpleRemoteEvent>
 	}
 
 	public static void main(String[] args) {
-		SpringApplication.run(SampleApplication.class, args);
+		SpringApplication.run(SampleConsulApplication.class, args);
 	}
 
 	@Override

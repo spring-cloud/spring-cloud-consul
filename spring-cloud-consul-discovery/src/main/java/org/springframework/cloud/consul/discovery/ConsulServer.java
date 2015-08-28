@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import static org.springframework.cloud.consul.discovery.Utils.getCatalogServiceHost;
+
 import com.ecwid.consul.v1.catalog.model.CatalogService;
 import com.netflix.loadbalancer.Server;
 
@@ -29,8 +31,7 @@ public class ConsulServer extends Server {
 	private final String node;
 
 	public ConsulServer(final CatalogService service, boolean preferAddress) {
-		super((preferAddress)? service.getAddress() : service.getNode(),
-				service.getServicePort());
+		super(getCatalogServiceHost(service, preferAddress), service.getServicePort());
 		address = service.getAddress();
 		node = service.getNode();
 		metaInfo = new MetaInfo() {
