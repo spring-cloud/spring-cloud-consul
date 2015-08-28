@@ -20,11 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.BeansException;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.context.ApplicationContext;
+import org.springframework.util.StringUtils;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -33,28 +32,23 @@ import com.ecwid.consul.v1.agent.model.Member;
 import com.ecwid.consul.v1.agent.model.Self;
 import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.catalog.model.CatalogService;
-import org.springframework.context.ApplicationContextAware;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Spencer Gibb
  */
-public class ConsulDiscoveryClient implements DiscoveryClient, ApplicationContextAware {
+public class ConsulDiscoveryClient implements DiscoveryClient {
 
-	private ApplicationContext context;
+	private ConsulLifecycle lifecycle;
 
 	private ConsulClient client;
 
 	private ConsulDiscoveryProperties properties;
 
-	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties) {
+	public ConsulDiscoveryClient(ConsulClient client, ConsulLifecycle lifecycle,
+								 ConsulDiscoveryProperties properties) {
 		this.client = client;
+		this.lifecycle = lifecycle;
 		this.properties = properties;
-	}
-
-	@Override
-	public void setApplicationContext(ApplicationContext context) throws BeansException {
-		this.context = context;
 	}
 
 	@Override
@@ -65,10 +59,10 @@ public class ConsulDiscoveryClient implements DiscoveryClient, ApplicationContex
 	@Override
 	public ServiceInstance getLocalServiceInstance() {
 		Response<Map<String, Service>> agentServices = client.getAgentServices();
-		Service service = agentServices.getValue().get(context.getId());
+		Service service = agentServices.getValue().get(lifecycle.getServiceId());
 		if (service == null) {
 			throw new IllegalStateException("Unable to locate service in consul agent: "
-					+ context.getId());
+					+ lifecycle.getServiceId());
 		}
 		String host = "localhost";
 		Response<Self> agentSelf = client.getAgentSelf();

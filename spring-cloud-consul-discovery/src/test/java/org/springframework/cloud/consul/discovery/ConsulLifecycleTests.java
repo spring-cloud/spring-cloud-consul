@@ -17,6 +17,7 @@
 package org.springframework.cloud.consul.discovery;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -46,7 +47,7 @@ import com.ecwid.consul.v1.agent.model.Service;
 @RunWith(SpringJUnit4ClassRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SpringApplicationConfiguration(classes = TestConfig.class)
-@WebIntegrationTest(value = "spring.application.name=myTestService", randomPort = true)
+@WebIntegrationTest(value = "spring.application.name=myTestService1::something", randomPort = true)
 public class ConsulLifecycleTests {
 
 	@Autowired
@@ -62,11 +63,34 @@ public class ConsulLifecycleTests {
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
-		Service service = services.get(context.getId());
+		Service service = services.get(lifecycle.getServiceId());
 		assertNotNull("service was null", service);
 		assertNotEquals("service port is 0", 0, service.getPort().intValue());
-		assertEquals("service id was wrong", context.getId(), service.getId());
-		assertEquals("service name was wrong", "myTestService", service.getService());
+		assertFalse("service id contained invalid character: " + service.getId(), service.getId().contains(":"));
+		assertEquals("service id was wrong", lifecycle.getServiceId(), service.getId());
+		assertEquals("service name was wrong", "myTestService1-something", service.getService());
+	}
+
+	@Test
+	public void normalizeForDnsWorks() {
+		assertEquals("abc1", ConsulLifecycle.normalizeForDns("abc1"));
+		assertEquals("ab-c1", ConsulLifecycle.normalizeForDns("ab:c1"));
+		assertEquals("ab-c1", ConsulLifecycle.normalizeForDns("ab::c1"));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void normalizedFailsIfFirstCharIsNumber() {
+		ConsulLifecycle.normalizeForDns("9abc");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void normalizedFailsIfFirstCharIsNotAlpha() {
+		ConsulLifecycle.normalizeForDns(":abc");
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void normalizedFailsIfLastCharIsNotAlphaNumeric() {
+		ConsulLifecycle.normalizeForDns("abc:");
 	}
 }
 

@@ -36,6 +36,8 @@ import java.util.List;
 @Slf4j
 public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
+	public static final char SEPARATOR = '-';
+
 	@Autowired
 	private ConsulClient client;
 
@@ -69,12 +71,12 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		String appName = getAppName();
 		String id;
 		if (properties.getInstanceId() == null) {
-			id = getContext().getId();
+			id = getServiceId();
 		} else {
-			id = properties.getInstanceId();
+			id = normalizeForDns(properties.getInstanceId());
 		}
 		service.setId(id);
-		service.setName(appName);
+		service.setName(normalizeForDns(appName));
 		service.setTags(createTags());
 
 		NewService.Check check = new NewService.Check();
@@ -93,6 +95,10 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		service.setCheck(check);
 
 		register(service);
+	}
+
+	public String getServiceId() {
+		return normalizeForDns(getContext().getId());
 	}
 
 	@Override
@@ -121,7 +127,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	@Override
 	protected void deregister() {
-		deregister(getContext().getId());
+		deregister(getServiceId());
 	}
 
 	@Override
@@ -149,5 +155,43 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	@Override
 	protected boolean isEnabled() {
 		return properties.isEnabled();
+	}
+
+	/**
+	 * @return the serviceId of the Management Service
+	 */
+	public String getManagementServiceId() {
+		return normalizeForDns(getContext().getId()) + SEPARATOR + properties.getManagementSuffix();
+	}
+
+	/**
+	 * @return the service name of the Management Service
+	 */
+	public String getManagementServiceName() {
+		return normalizeForDns(getAppName()) + SEPARATOR + properties.getManagementSuffix();
+	}
+
+	public static String normalizeForDns(String s) {
+		if (!Character.isLetter(s.charAt(0))
+				|| !Character.isLetterOrDigit(s.charAt(s.length()-1))) {
+			throw new IllegalArgumentException("Consul service ids must start with a letter, end with a letter or digit, and have as interior characters only letters, digits, and hyphen");
+		}
+
+		StringBuilder normalized = new StringBuilder();
+		Character prev = null;
+		for (char curr : s.toCharArray()) {
+			Character toAppend = null;
+			if (Character.isLetterOrDigit(curr)) {
+				toAppend = curr;
+			} else if (prev == null || !(prev == SEPARATOR)) {
+				toAppend = SEPARATOR;
+			}
+			if (toAppend != null) {
+				normalized.append(toAppend);
+				prev = toAppend;
+			}
+		}
+
+		return normalized.toString();
 	}
 }

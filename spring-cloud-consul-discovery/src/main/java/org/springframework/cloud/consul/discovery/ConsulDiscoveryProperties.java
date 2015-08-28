@@ -38,6 +38,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @CommonsLog
 public class ConsulDiscoveryProperties {
 
+	protected static final String MANAGEMENT = "management";
+
 	@Getter(AccessLevel.PRIVATE)
 	@Setter(AccessLevel.PRIVATE)
 	private String[] hostInfo = initHostInfo();
@@ -46,7 +48,7 @@ public class ConsulDiscoveryProperties {
 
 	private boolean enabled = true;
 
-	private List<String> managementTags = Arrays.asList("management");
+	private List<String> managementTags = Arrays.asList(MANAGEMENT);
 
 	private String healthCheckPath = "/health";
 
@@ -67,6 +69,8 @@ public class ConsulDiscoveryProperties {
 	private String instanceId;
 
 	private String scheme = "http";
+
+	private String managementSuffix = MANAGEMENT;
 
 	public String getHostname() {
 		return this.preferIpAddress ? this.ipAddress : this.hostname;
