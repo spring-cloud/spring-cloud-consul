@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.sample;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,16 +34,17 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.consul.bus.SimpleRemoteEvent;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
+import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.cloud.ui.EnableConsulUi;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * @author Spencer Gibb
@@ -52,6 +55,7 @@ import java.util.List;
 @EnableConsulUi
 @RestController
 @EnableConfigurationProperties
+@EnableFeignClients
 @Slf4j
 public class SampleConsulApplication implements ApplicationListener<SimpleRemoteEvent> {
 
@@ -66,6 +70,9 @@ public class SampleConsulApplication implements ApplicationListener<SimpleRemote
 
 	@Autowired(required = false)
 	private RelaxedPropertyResolver resolver;
+
+	@Autowired
+	private SampleClient sampleClient;
 
 	@Value("${spring.application.name:testConsulApp}")
 	private String appName;
@@ -87,6 +94,11 @@ public class SampleConsulApplication implements ApplicationListener<SimpleRemote
 		return loadBalancer.choose(appName);
 	}
 
+	@RequestMapping("/choose")
+	public String choose() {
+		return loadBalancer.choose(appName).getUri().toString();
+	}
+
 	@RequestMapping("/myenv")
 	public String env(@RequestParam("prop") String prop) {
 		return resolver.getProperty(prop, "Not Found");
@@ -100,6 +112,11 @@ public class SampleConsulApplication implements ApplicationListener<SimpleRemote
 	@RequestMapping("/instances")
 	public List<ServiceInstance> instances() {
 		return discoveryClient.getInstances(appName);
+	}
+
+	@RequestMapping("/feign")
+	public String feign() {
+		return sampleClient.choose();
 	}
 
 	@Bean
@@ -119,5 +136,12 @@ public class SampleConsulApplication implements ApplicationListener<SimpleRemote
 	@Override
 	public void onApplicationEvent(SimpleRemoteEvent event) {
 		log.info("Received event: {}", event);
+	}
+
+	@FeignClient("testConsulApp")
+	public interface SampleClient {
+
+		@RequestMapping(value = "/choose", method = RequestMethod.GET)
+		String choose();
 	}
 }
