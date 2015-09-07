@@ -1,0 +1,12 @@
+{
+  "ID": "2d2e6b3b-1c82-40ab-8171-54609d8ad304",
+  "Name": "discover_client_test_acl",
+  "Type": "client",
+  "Rules": "{
+    \"service\": {
+      \"testConsulDiscoveryAcl\": {
+        \"policy\": \"write\"
+      }
+    }
+  }"
+}

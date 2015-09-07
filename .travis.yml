@@ -14,9 +14,9 @@ install:
 - ./mvnw --settings .settings.xml install -P docs -q -U -DskipTests=true -Dmaven.test.redirectTestOutputToFile=true
 - ./docs/src/main/asciidoc/ghpages.sh
 script:
-- ./consul agent -server -advertise 127.0.0.1 -bootstrap-expect 1 -data-dir /tmp/consul -ui-dir ./src/test/resources/consul_ui &
-- '[ "${TRAVIS_PULL_REQUEST}" != "false" ] || ./mvnw --settings .settings.xml deploy -nsu -Dmaven.test.redirectTestOutputToFile=true'
-- '[ "${TRAVIS_PULL_REQUEST}" = "false" ] || ./mvnw --settings .settings.xml install -nsu -Dmaven.test.redirectTestOutputToFile=true'
+- ./src/test/bash/travis_run_consul.sh
+- '[ "${TRAVIS_PULL_REQUEST}" != "false" ] || ./mvnw -P ci --settings .settings.xml deploy -nsu -Dmaven.test.redirectTestOutputToFile=true'
+- '[ "${TRAVIS_PULL_REQUEST}" = "false" ] || ./mvnw -P ci --settings .settings.xml install -nsu -Dmaven.test.redirectTestOutputToFile=true'
 env:
   global:
   - GIT_NAME="Spencer Gibb"
