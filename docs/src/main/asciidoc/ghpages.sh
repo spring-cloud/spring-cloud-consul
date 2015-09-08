@@ -2,6 +2,11 @@
 
 git remote set-url --push origin `git config remote.origin.url | sed -e 's/^git:/https:/'`
 
+if [ "${TRAVIS_PULL_REQUEST}" = "true" ]; then
+    echo "Not updating gh-pages, since this is a pull request"
+    exit 0
+fi
+
 if ! (git remote set-branches --add origin gh-pages && git fetch -q); then
     echo "No gh-pages, so not syncing"
     exit 0
