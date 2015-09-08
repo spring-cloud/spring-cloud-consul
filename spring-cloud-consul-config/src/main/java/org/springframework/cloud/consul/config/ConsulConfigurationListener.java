@@ -20,5 +20,4 @@ public class ConsulConfigurationListener implements ApplicationListener<Environm
 		log.trace("Received EnvironmentChangeEvent. Refreshing...");
 		refreshEndpoint.refresh();
 	}
-
 }

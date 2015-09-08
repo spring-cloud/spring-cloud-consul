@@ -93,12 +93,11 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 						}
 					}
 				}
-
-				if (changedValues.size() > 0) {
-					log.trace("Received kv update from consul: {}", changedValues.toString());
-					publisher.publishEvent(new EnvironmentChangeEvent(changedValues));
-				}
 			}
+		}
+		if (changedValues.size() > 0) {
+			log.trace("Received kv update from consul: {}", changedValues.toString());
+			publisher.publishEvent(new EnvironmentChangeEvent(changedValues));
 		}
 	}
 
