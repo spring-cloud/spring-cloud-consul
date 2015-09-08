@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONSUL_VER="0.5.0_linux_amd64"
+CONSUL_VER="0.5.2_linux_amd64"
 # cleanup
 rm "${CONSUL_VER}.*"
 rm "consul"
