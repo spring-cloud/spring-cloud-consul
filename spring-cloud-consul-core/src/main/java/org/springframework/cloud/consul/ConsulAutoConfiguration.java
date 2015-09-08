@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul;
 
+import org.springframework.boot.actuate.endpoint.Endpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -45,15 +47,19 @@ public class ConsulAutoConfiguration {
 				.getPort());
 	}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public ConsulEndpoint consulEndpoint() {
-		return new ConsulEndpoint();
-	}
+	@Configuration
+	@ConditionalOnClass(Endpoint.class)
+	protected static class ConsulHealthConfig {
+		@Bean
+		@ConditionalOnMissingBean
+		public ConsulEndpoint consulEndpoint() {
+			return new ConsulEndpoint();
+		}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public ConsulHealthIndicator consulHealthIndicator() {
-		return new ConsulHealthIndicator();
+		@Bean
+		@ConditionalOnMissingBean
+		public ConsulHealthIndicator consulHealthIndicator() {
+			return new ConsulHealthIndicator();
+		}
 	}
 }
