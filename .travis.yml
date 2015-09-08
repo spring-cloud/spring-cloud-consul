@@ -19,7 +19,7 @@ script:
 - curl -X PUT -d @./src/test/resources/consul_acl/consul_discovery_client_acl.json http://localhost:8500/v1/acl/create?token=2ee647bd-bd69-4118-9f34-b9a6e9e60746
 #- '[ "${TRAVIS_PULL_REQUEST}" != "false" ] || ./mvnw --settings .settings.xml deploy -nsu -Dmaven.test.redirectTestOutputToFile=true'
 #- '[ "${TRAVIS_PULL_REQUEST}" = "false" ] || ./mvnw --settings .settings.xml install -nsu -Dmaven.test.redirectTestOutputToFile=true'
-./mvnw --settings .settings.xml install -nsu -Dmaven.test.redirectTestOutputToFile=true
+- ./mvnw --settings .settings.xml install -nsu -Dmaven.test.redirectTestOutputToFile=true
 env:
   global:
   - GIT_NAME="Spencer Gibb"
