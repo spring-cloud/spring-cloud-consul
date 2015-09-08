@@ -3,7 +3,7 @@ package org.springframework.cloud.consul.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.bootstrap.config.RefreshEndpoint;
+import org.springframework.cloud.endpoint.RefreshEndpoint;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,8 +28,8 @@ public class ConsulConfigApplicationConfiguration {
 		return new ConsulConfigWatch(consulConfigProperties);
 	}
 	
-    @Bean
-    public ConsulConfigurationListener consulConfigurationListener() {
-        return new ConsulConfigurationListener(refreshEndpoint);
-    }
+	@Bean
+	public ConsulConfigurationListener consulConfigurationListener() {
+		return new ConsulConfigurationListener(refreshEndpoint);
+	}
 }
