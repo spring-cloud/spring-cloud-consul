@@ -45,6 +45,8 @@ public class ConsulDiscoveryProperties {
 	@Setter(AccessLevel.PRIVATE)
 	private String[] hostInfo = initHostInfo();
 
+	private String aclToken;
+
 	private List<String> tags = new ArrayList<>();
 
 	private boolean enabled = true;

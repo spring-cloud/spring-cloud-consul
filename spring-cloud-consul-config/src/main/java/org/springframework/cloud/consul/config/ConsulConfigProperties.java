@@ -37,4 +37,6 @@ public class ConsulConfigProperties {
 
 	@NotEmpty
 	private String profileSeparator = ",";
+
+	private String aclToken;
 }

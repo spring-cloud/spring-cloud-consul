@@ -77,7 +77,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 	}
 
 	private ConsulPropertySource create(String context) {
-		return new ConsulPropertySource(context, consul);
+		return new ConsulPropertySource(context, consul, properties.getAclToken());
 	}
 
 	private void addProfiles(List<String> contexts, String baseContext,
