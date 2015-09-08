@@ -2,7 +2,8 @@
 
 git remote set-url --push origin `git config remote.origin.url | sed -e 's/^git:/https:/'`
 
-if [ "${TRAVIS_PULL_REQUEST}" = "true" ]; then
+# Don't execute this script for travis pull requests
+if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
     echo "Not updating gh-pages, since this is a pull request"
     exit 0
 fi
