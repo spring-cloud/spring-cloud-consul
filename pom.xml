@@ -60,6 +60,7 @@
 		<spring-cloud-bus.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-bus.version>
 		<spring-cloud-commons.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-commons.version>
 		<spring-cloud-netflix.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
+		<spring-integration-dsl.version>1.0.2.RELEASE</spring-integration-dsl.version>
 		<archaius.version>0.7.1</archaius.version>
 		<consul-api.version>1.1.6</consul-api.version>
 		<feign.version>8.8.1</feign.version>
@@ -178,6 +179,11 @@
 						<artifactId>servlet-api</artifactId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.integration</groupId>
+				<artifactId>spring-integration-java-dsl</artifactId>
+				<version>${spring-integration-dsl.version}</version>
 			</dependency>
 			<!-- required by com.ecwid.consul but not as a pom dependency -->
 			<dependency>
