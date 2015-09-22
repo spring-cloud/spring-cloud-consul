@@ -16,19 +16,20 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.servlet.ServletContext;
+
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.NewService;
-import org.springframework.util.Assert;
-
-import javax.servlet.ServletContext;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * @author Spencer Gibb
@@ -69,13 +70,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	protected void register() {
 		Assert.notNull(service.getPort(), "service.port has not been set");
 		String appName = getAppName();
-		String id;
-		if (properties.getInstanceId() == null) {
-			id = getServiceId();
-		} else {
-			id = normalizeForDns(properties.getInstanceId());
-		}
-		service.setId(id);
+		service.setId(getServiceId());
 		service.setName(normalizeForDns(appName));
 		service.setTags(createTags());
 
@@ -110,7 +105,11 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	}
 
 	public String getServiceId() {
-		return normalizeForDns(getContext().getId());
+		if (!StringUtils.hasText(properties.getInstanceId())) {
+			return normalizeForDns(getContext().getId());
+		} else {
+			return normalizeForDns(properties.getInstanceId());
+		}
 	}
 
 	@Override
@@ -155,8 +154,8 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	private List<String> createTags() {
 		List<String> tags = new LinkedList<>(properties.getTags());
 		if(servletContext != null
-				&& StringUtils.isNotBlank(servletContext.getContextPath())
-				&& StringUtils.isNotBlank(servletContext.getContextPath().replaceAll("/", ""))) {
+				&& StringUtils.hasText(servletContext.getContextPath())
+				&& StringUtils.hasText(servletContext.getContextPath().replaceAll("/", ""))) {
 			tags.add("contextPath=" + servletContext.getContextPath());
 		}
 		return tags;
