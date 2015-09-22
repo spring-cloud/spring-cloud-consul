@@ -46,7 +46,7 @@ public class ConsulHealthIndicator extends AbstractHealthIndicator {
 					.getCatalogServices(QueryParams.DEFAULT);
 			builder.up()
 					.withDetail("services", services.getValue())
-					.withDetail("advertiseAddress", config.getDomain())
+					.withDetail("advertiseAddress", config.getAdvertiseAddress())
 					.withDetail("datacenter", config.getDatacenter())
 					.withDetail("domain", config.getDomain())
 					.withDetail("nodeName", config.getNodeName())
