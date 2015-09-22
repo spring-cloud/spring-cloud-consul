@@ -28,15 +28,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.bus.jackson.SubtypeModule;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
-import org.springframework.cloud.consul.bus.SimpleRemoteEvent;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.feign.FeignClient;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -55,7 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableConfigurationProperties
 @EnableFeignClients
 @Slf4j
-public class SampleConsulApplication implements ApplicationListener<SimpleRemoteEvent> {
+public class SampleConsulApplication /*implements ApplicationListener<SimpleRemoteEvent>*/ {
 
 	@Autowired
 	private LoadBalancerClient loadBalancer;
@@ -117,10 +114,10 @@ public class SampleConsulApplication implements ApplicationListener<SimpleRemote
 		return sampleClient.choose();
 	}
 
-	@Bean
+	/*@Bean
 	public SubtypeModule sampleSubtypeModule() {
 		return new SubtypeModule(SimpleRemoteEvent.class);
-	}
+	}*/
 
 	@Bean
 	public SampleProperties sampleProperties() {
@@ -131,10 +128,10 @@ public class SampleConsulApplication implements ApplicationListener<SimpleRemote
 		SpringApplication.run(SampleConsulApplication.class, args);
 	}
 
-	@Override
+	/*@Override
 	public void onApplicationEvent(SimpleRemoteEvent event) {
 		log.info("Received event: {}", event);
-	}
+	}*/
 
 	@FeignClient("testConsulApp")
 	public interface SampleClient {
