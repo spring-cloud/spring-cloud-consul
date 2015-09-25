@@ -17,6 +17,7 @@
 package org.springframework.cloud.consul.discovery;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -29,6 +30,7 @@ import com.ecwid.consul.v1.ConsulClient;
  */
 @Configuration
 @EnableConfigurationProperties
+@ConditionalOnBean(ConsulClient.class)
 public class ConsulDiscoveryClientConfiguration {
 
 	@Autowired

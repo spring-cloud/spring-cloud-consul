@@ -41,6 +41,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @Configuration
 @ConditionalOnClass(ConsulClient.class)
+@ConditionalOnBean(ConsulClient.class)
 @ConditionalOnProperty(value = "spring.cloud.consul.bus.enabled", matchIfMissing = true)
 @AutoConfigureAfter(BusAutoConfiguration.class)
 @EnableScheduling
