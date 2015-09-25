@@ -18,15 +18,12 @@ package org.springframework.cloud.consul.sample;
 
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -63,21 +60,11 @@ public class SampleConsulApplication /*implements ApplicationListener<SimpleRemo
 	@Autowired
 	private Environment env;
 
-	@Autowired(required = false)
-	private RelaxedPropertyResolver resolver;
-
 	@Autowired
 	private SampleClient sampleClient;
 
 	@Value("${spring.application.name:testConsulApp}")
 	private String appName;
-
-	@PostConstruct
-	public void init() {
-		if (resolver == null) {
-			resolver = new RelaxedPropertyResolver(env);
-		}
-	}
 
 	@RequestMapping("/me")
 	public ServiceInstance me() {
@@ -96,7 +83,7 @@ public class SampleConsulApplication /*implements ApplicationListener<SimpleRemo
 
 	@RequestMapping("/myenv")
 	public String env(@RequestParam("prop") String prop) {
-		return resolver.getProperty(prop, "Not Found");
+		return env.getProperty(prop, "Not Found");
 	}
 
 	@RequestMapping("/prop")
