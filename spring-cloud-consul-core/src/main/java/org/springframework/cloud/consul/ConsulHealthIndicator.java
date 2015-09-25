@@ -19,7 +19,6 @@ package org.springframework.cloud.consul;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 
@@ -34,8 +33,11 @@ import com.ecwid.consul.v1.agent.model.Self.Config;
  */
 public class ConsulHealthIndicator extends AbstractHealthIndicator {
 
-	@Autowired
 	private ConsulClient consul;
+
+	public ConsulHealthIndicator(ConsulClient consul) {
+		this.consul = consul;
+	}
 
 	@Override
 	protected void doHealthCheck(Health.Builder builder) throws Exception {

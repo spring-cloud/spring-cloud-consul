@@ -19,7 +19,6 @@ package org.springframework.cloud.consul.bus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.bus.BusAutoConfiguration;
@@ -33,15 +32,13 @@ import org.springframework.integration.support.json.Jackson2JsonObjectMapper;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Spencer Gibb
  */
 @Configuration
-@ConditionalOnClass(ConsulClient.class)
-@ConditionalOnBean(ConsulClient.class)
+@ConditionalOnConsulEnabled
 @ConditionalOnProperty(value = "spring.cloud.consul.bus.enabled", matchIfMissing = true)
 @AutoConfigureAfter(BusAutoConfiguration.class)
 @EnableScheduling

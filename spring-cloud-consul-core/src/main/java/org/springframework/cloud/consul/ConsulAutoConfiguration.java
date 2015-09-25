@@ -16,10 +16,11 @@
 
 package org.springframework.cloud.consul;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.Endpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +32,7 @@ import com.ecwid.consul.v1.ConsulClient;
  */
 @Configuration
 @EnableConfigurationProperties
-@ConditionalOnProperty(name = "spring.cloud.consul.enabled", matchIfMissing = true)
+@ConditionalOnConsulEnabled
 public class ConsulAutoConfiguration {
 
 	@Bean
@@ -49,17 +50,22 @@ public class ConsulAutoConfiguration {
 
 	@Configuration
 	@ConditionalOnClass(Endpoint.class)
+	@ConditionalOnBean(ConsulClient.class)
 	protected static class ConsulHealthConfig {
+
+		@Autowired
+		private ConsulClient consulClient;
+
 		@Bean
 		@ConditionalOnMissingBean
 		public ConsulEndpoint consulEndpoint() {
-			return new ConsulEndpoint();
+			return new ConsulEndpoint(consulClient);
 		}
 
 		@Bean
 		@ConditionalOnMissingBean
 		public ConsulHealthIndicator consulHealthIndicator() {
-			return new ConsulHealthIndicator();
+			return new ConsulHealthIndicator(consulClient);
 		}
 	}
 }

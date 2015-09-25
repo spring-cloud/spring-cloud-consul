@@ -22,7 +22,6 @@ import java.util.Map;
 
 import lombok.Data;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.AbstractEndpoint;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -39,12 +38,11 @@ import com.ecwid.consul.v1.catalog.model.Node;
 @ConfigurationProperties(prefix = "endpoints.consul", ignoreUnknownFields = false)
 public class ConsulEndpoint extends AbstractEndpoint<ConsulEndpoint.ConsulData> {
 
-	@Autowired
 	private ConsulClient consul;
 
-	@Autowired
-	public ConsulEndpoint() {
+	public ConsulEndpoint(ConsulClient consul) {
 		super("consul", false, true);
+		this.consul = consul;
 	}
 
 	@Override

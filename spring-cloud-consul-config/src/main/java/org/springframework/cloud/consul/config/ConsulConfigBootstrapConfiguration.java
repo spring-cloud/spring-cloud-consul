@@ -20,6 +20,7 @@ import com.ecwid.consul.v1.ConsulClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,21 +30,25 @@ import org.springframework.context.annotation.Import;
  * @author Spencer Gibb
  */
 @Configuration
-@Import(ConsulAutoConfiguration.class)
-@EnableConfigurationProperties
-@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled", matchIfMissing = true)
+@ConditionalOnConsulEnabled
 public class ConsulConfigBootstrapConfiguration {
 
-	@Autowired
-	private ConsulClient consul;
+	@Configuration
+	@EnableConfigurationProperties
+	@Import(ConsulAutoConfiguration.class)
+	@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled", matchIfMissing = true)
+	protected static class ConsulPropertySourceConfiguration {
+		@Autowired
+		private ConsulClient consul;
 
-	@Bean
-	public ConsulConfigProperties consulConfigProperties() {
-		return new ConsulConfigProperties();
-	}
+		@Bean
+		public ConsulConfigProperties consulConfigProperties() {
+			return new ConsulConfigProperties();
+		}
 
-	@Bean
-	public ConsulPropertySourceLocator consulPropertySourceLocator() {
-		return new ConsulPropertySourceLocator(consul, consulConfigProperties());
+		@Bean
+		public ConsulPropertySourceLocator consulPropertySourceLocator() {
+			return new ConsulPropertySourceLocator(consul, consulConfigProperties());
+		}
 	}
 }
