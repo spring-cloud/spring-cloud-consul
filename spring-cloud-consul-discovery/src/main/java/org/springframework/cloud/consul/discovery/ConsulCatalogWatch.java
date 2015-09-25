@@ -51,7 +51,7 @@ public class ConsulCatalogWatch implements ApplicationEventPublisherAware {
 		this.publisher = publisher;
 	}
 
-	@Scheduled(fixedDelayString = "${spring.cloud.consul.discovery.catalogServicesWatchDelay:10}")
+	@Scheduled(fixedDelayString = "${spring.cloud.consul.discovery.catalogServicesWatchDelay:30000}")
 	public void catalogServicesWatch() {
 		long index = -1;
 		if (catalogServicesIndex.get() != null) {
