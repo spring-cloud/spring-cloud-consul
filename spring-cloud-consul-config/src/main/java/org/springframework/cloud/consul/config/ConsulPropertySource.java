@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.cloud.consul.config;
 
 import static org.springframework.util.Base64Utils.decodeFromString;
@@ -31,9 +30,12 @@ import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
 
+import java.util.*;
+
 /**
  * @author Spencer Gibb
  */
+
 public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient> {
 
 	private String context;
@@ -59,7 +61,6 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 			response = source.getKVValues(context, aclToken, QueryParams.DEFAULT);
 		}
 		List<GetValue> values = response.getValue();
-
 		if (values != null) {
 			for (GetValue getValue : values) {
 				String key = getValue.getKey();
@@ -78,6 +79,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		return new String(decodeFromString(value));
 	}
 
+	@SuppressWarnings("hiding")
 	@Override
 	public Object getProperty(String name) {
 		return properties.get(name);
@@ -87,5 +89,9 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 	public String[] getPropertyNames() {
 		Set<String> strings = properties.keySet();
 		return strings.toArray(new String[strings.size()]);
+	}
+
+	public String getContext() {
+		return context;
 	}
 }
