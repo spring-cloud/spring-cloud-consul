@@ -23,6 +23,11 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
 			<groupId>com.ecwid.consul</groupId>
 			<artifactId>consul-api</artifactId>
 			<optional>true</optional>
@@ -30,6 +35,11 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-consul-core</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>

@@ -167,4 +167,8 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		Set<String> strings = properties.keySet();
 		return strings.toArray(new String[strings.size()]);
 	}
+	
+	public String getContext() {
+		return context;
+	}
 }
