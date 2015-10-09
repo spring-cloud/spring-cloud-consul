@@ -22,7 +22,11 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 
 /**
+<<<<<<< HEAD
  *
+=======
+ *
+>>>>>>> Adds configurable kv watch and listener
  * @author Andrew DePompa
  *
  */

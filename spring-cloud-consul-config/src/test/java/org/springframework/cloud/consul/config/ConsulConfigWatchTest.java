@@ -109,7 +109,6 @@ public class ConsulConfigWatchTest {
 		alterProperty(TEST_ADD_KEY, "new value");
 	}
 
-
 	@Test
 	public void addEmptyValue() throws InterruptedException{
 		alterProperty(TEST_ADD_KEY, "");

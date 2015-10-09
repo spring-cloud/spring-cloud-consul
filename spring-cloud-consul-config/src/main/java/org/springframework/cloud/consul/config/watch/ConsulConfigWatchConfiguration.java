@@ -23,7 +23,7 @@ public class ConsulConfigWatchConfiguration {
 
 	@Autowired
 	ConsulConfigProperties consulConfigProperties;
-	
+
 	@Autowired
 	private RefreshEndpoint refreshEndpoint;
 
@@ -31,7 +31,7 @@ public class ConsulConfigWatchConfiguration {
 	public ConsulConfigWatch consulConfigWatch() {
 		return new ConsulConfigWatch(consulConfigProperties);
 	}
-	
+
 	@Bean
 	public ConsulConfigurationListener consulConfigurationListener() {
 		return new ConsulConfigurationListener(refreshEndpoint);
