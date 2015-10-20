@@ -45,6 +45,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	@Autowired
 	private ConsulDiscoveryProperties properties;
 
+	@Autowired
+	private LifecycleProperties lifecycleProperties;
+
 	@Autowired(required = false)
 	private TtlScheduler ttlScheduler;
 
@@ -170,7 +173,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	@Override
 	protected boolean isEnabled() {
-		return properties.isEnabled();
+		return lifecycleProperties.isEnabled();
 	}
 
 	/**

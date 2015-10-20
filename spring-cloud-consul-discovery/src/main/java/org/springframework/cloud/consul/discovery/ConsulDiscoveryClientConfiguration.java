@@ -56,6 +56,11 @@ public class ConsulDiscoveryClientConfiguration {
 	}
 
 	@Bean
+	public LifecycleProperties lifecycleProperties() {
+		return new LifecycleProperties();
+	}
+
+	@Bean
 	public ConsulDiscoveryProperties consulDiscoveryProperties() {
 		return new ConsulDiscoveryProperties();
 	}
