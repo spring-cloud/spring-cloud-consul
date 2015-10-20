@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @author Aleksandr Tarasov (aatarasoff)
  */
-@ConfigurationProperties(prefix = "spring.cloud.consul.discovery.heartbeat")
+@ConfigurationProperties(prefix = "spring.cloud.consul.discovery.lifecycle")
 @Data
 @CommonsLog
 public class LifecycleProperties {
