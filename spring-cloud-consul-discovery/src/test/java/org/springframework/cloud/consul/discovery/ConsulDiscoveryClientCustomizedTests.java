@@ -22,6 +22,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import org.apache.http.conn.util.InetAddressUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class ConsulDiscoveryClientCustomizedTests {
 	}
 
 	private void assertNotIpAddress(ServiceInstance instance) {
-		assertFalse("host is an ip address", Character.isDigit(instance.getHost().charAt(0)));
+		assertFalse("host is an ip address", InetAddressUtils.isIPv4Address(instance.getHost()));
 	}
 
 	@Test
