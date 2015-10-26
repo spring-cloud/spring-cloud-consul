@@ -9,7 +9,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = "spring.cloud.consul.discovery.lifecycle")
 @Data
-@CommonsLog
 public class LifecycleProperties {
-    private boolean enabled = true;
+	private boolean enabled = true;
 }
