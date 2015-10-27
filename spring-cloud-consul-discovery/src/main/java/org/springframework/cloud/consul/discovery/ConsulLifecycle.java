@@ -74,6 +74,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		Assert.notNull(service.getPort(), "service.port has not been set");
 		String appName = getAppName();
 		service.setId(getServiceId());
+		service.setAddress(properties.getHostname());
 		service.setName(normalizeForDns(appName));
 		service.setTags(createTags());
 
@@ -119,6 +120,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	protected void registerManagement() {
 		NewService management = new NewService();
 		management.setId(getManagementServiceId());
+		management.setAddress(properties.getHostname());
 		management.setName(getManagementServiceName());
 		management.setPort(getManagementPort());
 		management.setTags(properties.getManagementTags());
