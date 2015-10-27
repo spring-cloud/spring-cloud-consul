@@ -36,6 +36,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.StringUtils;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
@@ -57,6 +58,9 @@ public class ConsulLifecycleTests {
 	private ConsulClient consul;
 
 	@Autowired
+	private ConsulDiscoveryProperties discoveryProperties;
+
+	@Autowired
 	private ApplicationContext context;
 
 	@Test
@@ -69,6 +73,8 @@ public class ConsulLifecycleTests {
 		assertFalse("service id contained invalid character: " + service.getId(), service.getId().contains(":"));
 		assertEquals("service id was wrong", lifecycle.getServiceId(), service.getId());
 		assertEquals("service name was wrong", "myTestService1-something", service.getService());
+		assertFalse("service address must not be empty", StringUtils.isEmpty(service.getAddress()));
+		assertEquals("service address must equals hostname from discovery properties", discoveryProperties.getHostname(), service.getAddress());
 	}
 
 	@Test
