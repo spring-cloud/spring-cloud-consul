@@ -55,9 +55,9 @@
 	</build>
 
 	<properties>
-		<spring-cloud-bus.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-bus.version>
-		<spring-cloud-commons.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-commons.version>
-		<spring-cloud-netflix.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
+		<spring-cloud-bus.version>1.1.0.M2</spring-cloud-bus.version>
+		<spring-cloud-commons.version>1.1.0.M2</spring-cloud-commons.version>
+		<spring-cloud-netflix.version>1.1.0.M2</spring-cloud-netflix.version>
 		<spring-integration-dsl.version>1.0.2.RELEASE</spring-integration-dsl.version>
 		<archaius.version>0.7.1</archaius.version>
 		<consul-api.version>1.1.6</consul-api.version>
@@ -77,11 +77,11 @@
 				<artifactId>spring-cloud-consul-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
+			<!--<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-bus</artifactId>
 				<version>${project.version}</version>
-			</dependency>
+			</dependency>-->
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-config</artifactId>
@@ -97,11 +97,11 @@
 				<artifactId>spring-cloud-starter-consul</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
+			<!--<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-starter-consul-bus</artifactId>
 				<version>${project.version}</version>
-			</dependency>
+			</dependency>-->
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-starter-consul-config</artifactId>
@@ -122,7 +122,7 @@
 				<artifactId>spring-cloud-commons</artifactId>
 				<version>${spring-cloud-commons.version}</version>
 			</dependency>
-			<dependency>
+			<!--<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-bus</artifactId>
 				<version>${spring-cloud-bus.version}</version>
@@ -151,7 +151,7 @@
 						</artifactId>
 					</exclusion>
 				</exclusions>
-			</dependency>
+			</dependency>-->
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-context</artifactId>
