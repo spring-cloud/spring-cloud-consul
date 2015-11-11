@@ -39,25 +39,28 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	public static final char SEPARATOR = '-';
 
-	@Autowired
 	private ConsulClient client;
 
-	@Autowired
 	private ConsulDiscoveryProperties properties;
 
-	@Autowired
 	private LifecycleProperties lifecycleProperties;
+
+	private HeartbeatProperties ttlConfig;
 
 	@Autowired(required = false)
 	private TtlScheduler ttlScheduler;
-
-	@Autowired
-	private HeartbeatProperties ttlConfig;
 
 	@Autowired(required = false)
 	private ServletContext servletContext;
 	
 	private NewService service = new NewService();
+
+	public ConsulLifecycle(ConsulClient client, LifecycleProperties lifecycleProperties, ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
+		this.client = client;
+		this.lifecycleProperties = lifecycleProperties;
+		this.properties = properties;
+		this.ttlConfig = ttlConfig;
+	}
 
 	@Override
 	protected int getConfiguredPort() {

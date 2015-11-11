@@ -16,15 +16,14 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import com.ecwid.consul.v1.ConsulClient;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.ecwid.consul.v1.ConsulClient;
 
 /**
  * @author Spencer Gibb
@@ -33,7 +32,6 @@ import com.ecwid.consul.v1.ConsulClient;
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty(value = "spring.cloud.consul.discovery.enabled", matchIfMissing = true)
 @EnableConfigurationProperties
-@ConditionalOnBean(ConsulClient.class)
 public class ConsulDiscoveryClientConfiguration {
 
 	@Autowired
@@ -41,7 +39,7 @@ public class ConsulDiscoveryClientConfiguration {
 
 	@Bean
 	public ConsulLifecycle consulLifecycle() {
-		return new ConsulLifecycle();
+		return new ConsulLifecycle(consulClient, lifecycleProperties(), consulDiscoveryProperties(), heartbeatProperties());
 	}
 
 	@Bean
