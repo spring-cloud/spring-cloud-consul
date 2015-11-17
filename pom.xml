@@ -6,7 +6,7 @@
 
 	<groupId>org.springframework.cloud</groupId>
 	<artifactId>spring-cloud-consul</artifactId>
-	<version>1.0.0.BUILD-SNAPSHOT</version>
+	<version>1.0.0.M4</version>
 	<packaging>pom</packaging>
 	<name>Spring Cloud Consul</name>
 	<description>Spring Cloud Consul</description>
@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
 		<artifactId>spring-cloud-build</artifactId>
-		<version>1.1.0.BUILD-SNAPSHOT</version>
+		<version>1.1.0.M3</version>
 		<relativePath/>
 		<!-- lookup parent from repository -->
 	</parent>
@@ -55,9 +55,9 @@
 	</build>
 
 	<properties>
-		<spring-cloud-bus.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-bus.version>
-		<spring-cloud-commons.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-commons.version>
-		<spring-cloud-netflix.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
+		<spring-cloud-bus.version>1.1.0.M3</spring-cloud-bus.version>
+		<spring-cloud-commons.version>1.1.0.M3</spring-cloud-commons.version>
+		<spring-cloud-netflix.version>1.1.0.M3</spring-cloud-netflix.version>
 		<spring-integration-dsl.version>1.0.2.RELEASE</spring-integration-dsl.version>
 		<archaius.version>0.7.1</archaius.version>
 		<consul-api.version>1.1.6</consul-api.version>
