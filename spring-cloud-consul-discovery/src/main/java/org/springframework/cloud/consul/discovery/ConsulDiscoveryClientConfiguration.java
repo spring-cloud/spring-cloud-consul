@@ -20,6 +20,7 @@ import com.ecwid.consul.v1.ConsulClient;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.context.annotation.Bean;
@@ -64,8 +65,8 @@ public class ConsulDiscoveryClientConfiguration {
 	}
 
 	@Bean
-	public ConsulDiscoveryClient consulDiscoveryClient() {
-		return new ConsulDiscoveryClient(consulClient, consulLifecycle(), consulDiscoveryProperties());
+	public ConsulDiscoveryClient consulDiscoveryClient(ServerProperties serverProperties) {
+		return new ConsulDiscoveryClient(consulClient, consulLifecycle(), consulDiscoveryProperties(), serverProperties);
 	}
 
 	@Bean
