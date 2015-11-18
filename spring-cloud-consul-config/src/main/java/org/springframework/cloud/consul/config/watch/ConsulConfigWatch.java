@@ -15,6 +15,8 @@
  */
 package org.springframework.cloud.consul.config.watch;
 
+import static org.springframework.util.Base64Utils.decodeFromString;
+
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections4.map.AbstractReferenceMap.ReferenceStrength;
-import org.apache.commons.collections4.map.ReferenceMap;
 import org.springframework.cloud.bootstrap.BootstrapApplicationListener;
 import org.springframework.cloud.consul.config.ConsulConfigProperties;
 import org.springframework.cloud.consul.config.ConsulPropertySource;
@@ -37,14 +37,14 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.util.ConcurrentReferenceHashMap;
+import org.springframework.util.ConcurrentReferenceHashMap.ReferenceType;
 
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
 
 import lombok.extern.slf4j.Slf4j;
-
-import static org.springframework.util.Base64Utils.decodeFromString;
 
 /**
  * A kv store watch that publishes an EnvironmentChangeEvent whenever a value under one of the property sources is changed
@@ -62,7 +62,7 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 
 	private ConsulConfigProperties properties;
 	
-	private Map<String, BigInteger> kvIndexes = new ReferenceMap<String, BigInteger>(ReferenceStrength.SOFT, ReferenceStrength.SOFT);
+	private Map<String, BigInteger> kvIndexes = new ConcurrentReferenceHashMap<String, BigInteger>();
 
 	public ConsulConfigWatch(ConsulConfigProperties properties) {
 		this.properties = properties;
@@ -71,7 +71,7 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 	@SuppressWarnings("boxing")
 	@Scheduled(fixedDelayString = "${spring.cloud.consul.config.kvWatchDelay:10}")
 	public void kvWatch() {
-		getConsulPropertySources();
+		findConsulPropertySources();
 		Map<String, String> changedProps = new HashMap<>();
 		for (ConsulPropertySource source : consulPropertySources) {
 			long index = -1;
@@ -105,7 +105,7 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 		}
 	}
 
-	private void getConsulPropertySources() {
+	private void findConsulPropertySources() {
 		if (consulPropertySources == null) {
 			consulPropertySources = new HashSet<ConsulPropertySource>();
 			if (environment.getPropertySources()
