@@ -67,69 +67,69 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		}
 
 		final List<GetValue> values = response.getValue();
-      final ConsulConfigFormat consulConfigFormat =
-         ConsulConfigFormat.fromString(consulConfigProperties.getConsulConfigFormat());
-      if (consulConfigFormat == ConsulConfigFormat.KEY_VALUE) {
-         parsePropertiesInKeyValueFormat(values);
-      } else if (consulConfigFormat == ConsulConfigFormat.PROPERTIES) {
-         parsePropertiesInPropertiesFormat(values);
-      }
+		final ConsulConfigFormat consulConfigFormat =
+			ConsulConfigFormat.fromString(consulConfigProperties.getConsulConfigFormat());
+		if (consulConfigFormat == ConsulConfigFormat.KEY_VALUE) {
+			parsePropertiesInKeyValueFormat(values);
+		} else if (consulConfigFormat == ConsulConfigFormat.PROPERTIES) {
+			parsePropertiesInPropertiesFormat(values);
+		}
 	}
 
-   /**
-    * Parses the properties in key value style i.e., values are expected to be either a sub key or a
-    * constant
-    *
-    * @param values
-    */
-   private void parsePropertiesInKeyValueFormat(List<GetValue> values) {
-      if (values == null) {
-         return;
-      }
+	/**
+	 * Parses the properties in key value style i.e., values are expected to be either a sub key or a
+	 * constant
+	 *
+	 * @param values
+	 */
+	private void parsePropertiesInKeyValueFormat(List<GetValue> values) {
+		if (values == null) {
+			return;
+		}
 
-      for (GetValue getValue : values) {
-         String key = getValue.getKey();
-         if (!StringUtils.endsWithIgnoreCase(key, "/")) {
-            key = key.replace(context, "").replace('/', '.');
-            String value = getDecoded(getValue.getValue());
-            properties.put(key, value);
-         }
-      }
-   }
+		for (GetValue getValue : values) {
+			String key = getValue.getKey();
+			if (!StringUtils.endsWithIgnoreCase(key, "/")) {
+				key = key.replace(context, "").replace('/', '.');
+				String value = getDecoded(getValue.getValue());
+				properties.put(key, value);
+			}
+		}
+	}
 
-   /**
-    * Parses the properties in key value style i.e., values are expected to be either a sub key or a
-    * constant
-    *
-    * @param values
-    */
-   private void parsePropertiesInPropertiesFormat(List<GetValue> values) {
-      if (values == null) {
-         return;
-      }
+	/**
+	 * Parses the properties in key value style i.e., values are expected to be either a sub key or a
+	 * constant
+	 *
+	 * @param values
+	 */
+	private void parsePropertiesInPropertiesFormat(List<GetValue> values) {
+		if (values == null) {
+			return;
+		}
 
-      for (GetValue getValue : values) {
-         String key = getValue.getKey().replace(context, "");
-         if (!consulConfigProperties.getConsulConfigPropertiesKey().equals(key)) {
-            continue;
-         }
+		for (GetValue getValue : values) {
+			String key = getValue.getKey().replace(context, "");
+			if (!consulConfigProperties.getConsulConfigPropertiesKey().equals(key)) {
+				continue;
+			}
 
-         final String value = getDecoded(getValue.getValue());
-         final Properties props = new Properties();
+			final String value = getDecoded(getValue.getValue());
+			final Properties props = new Properties();
 
-         try {
-            // Must use the ISO-8859-1 encoding because Properties.load(stream) expects it.
-            props.load(new ByteArrayInputStream(value.getBytes("ISO-8859-1")));
+			try {
+				// Must use the ISO-8859-1 encoding because Properties.load(stream) expects it.
+				props.load(new ByteArrayInputStream(value.getBytes("ISO-8859-1")));
 
-            for (String propKey: props.stringPropertyNames()) {
-               properties.put(propKey, props.getProperty(propKey));
-            }
+				for (String propKey: props.stringPropertyNames()) {
+					properties.put(propKey, props.getProperty(propKey));
+				}
 
-         } catch (IOException e) {
-            throw new IllegalArgumentException(value + " can't be encoded using ISO-8859-1");
-         }
-      }
-   }
+			} catch (IOException e) {
+				throw new IllegalArgumentException(value + " can't be encoded using ISO-8859-1");
+			}
+		}
+	}
 
 	public String getDecoded(String value) {
 		if (value == null)
