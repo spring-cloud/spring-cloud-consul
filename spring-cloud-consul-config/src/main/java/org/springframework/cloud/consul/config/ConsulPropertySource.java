@@ -114,7 +114,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 		for (GetValue getValue : values) {
 			String key = getValue.getKey().replace(context, "");
-			if (!consulConfigProperties.getConsulConfigPropertiesKey().equals(key)) {
+			if (!consulConfigProperties.getConsulConfigDataKey().equals(key)) {
 				continue;
 			}
 

@@ -46,7 +46,7 @@ public class ConsulConfigProperties {
 	 * then the following field is used as key to look up consul for configuration.
 	 */
 	@NotEmpty
-	private String consulConfigPropertiesKey = "properties";
+	private String consulConfigDataKey = "data";
 
 	private String aclToken;
 }
