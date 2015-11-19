@@ -18,9 +18,12 @@ package org.springframework.cloud.consul.config;
 
 import static org.springframework.util.Base64Utils.decodeFromString;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.core.env.EnumerablePropertySource;
@@ -110,32 +113,20 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
          if (!consulConfigProperties.getConsulConfigPropertiesKey().equals(key)) {
             continue;
          }
+
          final String value = getDecoded(getValue.getValue());
-         // values should be key=value\nkey1=value....
-         final String[] propertyLines = value.split("\n");
+         final Properties props = new Properties();
 
-         for (String propertyLine : propertyLines) {
+         try {
+            // Must use the ISO-8859-1 encoding because Properties.load(stream) expects it.
+            props.load(new ByteArrayInputStream(value.getBytes("ISO-8859-1")));
 
-            if (StringUtils.isEmpty(propertyLine)
-                || propertyLine.trim().length() == 0
-                || propertyLine.trim().startsWith("#")) {
-               continue;
+            for (String propKey: props.stringPropertyNames()) {
+               properties.put(propKey, props.getProperty(propKey));
             }
 
-            propertyLine = propertyLine.trim();
-
-            // property line should be of format key=value
-            String[] keyValuePair = propertyLine.split("=");
-
-            if (keyValuePair.length != 2
-                || StringUtils.isEmpty(keyValuePair[0])
-                || keyValuePair[0].trim().length() == 0
-               ) {
-               // property line is not of format key=value so ignoring it
-               continue;
-            }
-
-            properties.put(keyValuePair[0], keyValuePair[1]);
+         } catch (IOException e) {
+            throw new IllegalArgumentException(value + " can't be encoded using ISO-8859-1");
          }
       }
    }
