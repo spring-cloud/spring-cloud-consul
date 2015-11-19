@@ -37,14 +37,16 @@ import com.ecwid.consul.v1.kv.model.GetValue;
 public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient> {
 
 	private String context;
-	private String aclToken;
+	private ConsulConfigProperties consulConfigProperties;
 
-	private Map<String, String> properties = new LinkedHashMap<>();
+	private final Map<String, String> properties = new LinkedHashMap<>();
 
-	public ConsulPropertySource(String context, ConsulClient source, String aclToken) {
+	public ConsulPropertySource(String context,
+										 ConsulClient source,
+										 ConsulConfigProperties consulConfigProperties) {
 		super(context, source);
 		this.context = context;
-		this.aclToken = aclToken;
+		this.consulConfigProperties = consulConfigProperties;
 
 		if (!this.context.endsWith("/")) {
 			this.context = this.context + "/";
@@ -53,24 +55,90 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 	public void init() {
 		Response<List<GetValue>> response;
-		if (aclToken == null) {
+		if (consulConfigProperties.getAclToken() == null) {
 			response = source.getKVValues(context, QueryParams.DEFAULT);
 		} else {
-			response = source.getKVValues(context, aclToken, QueryParams.DEFAULT);
+			response = source.getKVValues(context,
+													consulConfigProperties.getAclToken(),
+													QueryParams.DEFAULT);
 		}
-		List<GetValue> values = response.getValue();
 
-		if (values != null) {
-			for (GetValue getValue : values) {
-				String key = getValue.getKey();
-				if (!StringUtils.endsWithIgnoreCase(key, "/")) {
-					key = key.replace(context, "").replace('/', '.');
-					String value = getDecoded(getValue.getValue());
-					properties.put(key, value);
-				}
-			}
-		}
+		final List<GetValue> values = response.getValue();
+      final ConsulConfigFormat consulConfigFormat =
+         ConsulConfigFormat.fromString(consulConfigProperties.getConsulConfigFormat());
+      if (consulConfigFormat == ConsulConfigFormat.KEY_VALUE) {
+         parsePropertiesInKeyValueFormat(values);
+      } else if (consulConfigFormat == ConsulConfigFormat.PROPERTIES) {
+         parsePropertiesInPropertiesFormat(values);
+      }
 	}
+
+   /**
+    * Parses the properties in key value style i.e., values are expected to be either a sub key or a
+    * constant
+    *
+    * @param values
+    */
+   private void parsePropertiesInKeyValueFormat(List<GetValue> values) {
+      if (values == null) {
+         return;
+      }
+
+      for (GetValue getValue : values) {
+         String key = getValue.getKey();
+         if (!StringUtils.endsWithIgnoreCase(key, "/")) {
+            key = key.replace(context, "").replace('/', '.');
+            String value = getDecoded(getValue.getValue());
+            properties.put(key, value);
+         }
+      }
+   }
+
+   /**
+    * Parses the properties in key value style i.e., values are expected to be either a sub key or a
+    * constant
+    *
+    * @param values
+    */
+   private void parsePropertiesInPropertiesFormat(List<GetValue> values) {
+      if (values == null) {
+         return;
+      }
+
+      for (GetValue getValue : values) {
+         String key = getValue.getKey().replace(context, "");
+         if (!consulConfigProperties.getConsulConfigPropertiesKey().equals(key)) {
+            continue;
+         }
+         final String value = getDecoded(getValue.getValue());
+         // values should be key=value\nkey1=value....
+         final String[] propertyLines = value.split("\n");
+
+         for (String propertyLine : propertyLines) {
+
+            if (StringUtils.isEmpty(propertyLine)
+                || propertyLine.trim().length() == 0
+                || propertyLine.trim().startsWith("#")) {
+               continue;
+            }
+
+            propertyLine = propertyLine.trim();
+
+            // property line should be of format key=value
+            String[] keyValuePair = propertyLine.split("=");
+
+            if (keyValuePair.length != 2
+                || StringUtils.isEmpty(keyValuePair[0])
+                || keyValuePair[0].trim().length() == 0
+               ) {
+               // property line is not of format key=value so ignoring it
+               continue;
+            }
+
+            properties.put(keyValuePair[0], keyValuePair[1]);
+         }
+      }
+   }
 
 	public String getDecoded(String value) {
 		if (value == null)
