@@ -46,7 +46,13 @@ public enum ConsulConfigFormat {
 	 * Indicates that the configuration specified in consul is of property style i.e.,
 	 * value of the consul key would be a list of key=value pairs separated by new lines.
 	 */
-	PROPERTIES;
+	PROPERTIES,
+
+	/**
+	 * Indicates that the configuration specified in consul is of YAML style i.e.,
+	 * value of the consul key would be YAML format
+	 */
+	YAML;
 
 	public static ConsulConfigFormat fromString(String value) {
 		if (value == null) {
@@ -55,6 +61,8 @@ public enum ConsulConfigFormat {
 			return ConsulConfigFormat.KEY_VALUE;
 		} else if (PROPERTIES.name().equals(value)) {
 			return ConsulConfigFormat.PROPERTIES;
+		} else if(YAML.name().equals(value)) {
+			return ConsulConfigFormat.YAML;
 		} else {
 			throw new IllegalArgumentException(
 				value + " cannot be decoded to any ConsulConfigFormat value");
