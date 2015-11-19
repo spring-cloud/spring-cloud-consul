@@ -18,12 +18,17 @@ package org.springframework.cloud.consul.config;
 
 import static org.springframework.util.Base64Utils.decodeFromString;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.StringUtils;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -37,14 +42,16 @@ import com.ecwid.consul.v1.kv.model.GetValue;
 public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient> {
 
 	private String context;
-	private String aclToken;
+	private ConsulConfigProperties consulConfigProperties;
 
-	private Map<String, String> properties = new LinkedHashMap<>();
+	private final Map<String, String> properties = new LinkedHashMap<>();
 
-	public ConsulPropertySource(String context, ConsulClient source, String aclToken) {
+	public ConsulPropertySource(String context,
+										 ConsulClient source,
+										 ConsulConfigProperties consulConfigProperties) {
 		super(context, source);
 		this.context = context;
-		this.aclToken = aclToken;
+		this.consulConfigProperties = consulConfigProperties;
 
 		if (!this.context.endsWith("/")) {
 			this.context = this.context + "/";
@@ -53,23 +60,93 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 	public void init() {
 		Response<List<GetValue>> response;
-		if (aclToken == null) {
+		if (consulConfigProperties.getAclToken() == null) {
 			response = source.getKVValues(context, QueryParams.DEFAULT);
 		} else {
-			response = source.getKVValues(context, aclToken, QueryParams.DEFAULT);
+			response = source.getKVValues(context,
+													consulConfigProperties.getAclToken(),
+													QueryParams.DEFAULT);
 		}
-		List<GetValue> values = response.getValue();
 
-		if (values != null) {
-			for (GetValue getValue : values) {
-				String key = getValue.getKey();
-				if (!StringUtils.endsWithIgnoreCase(key, "/")) {
-					key = key.replace(context, "").replace('/', '.');
-					String value = getDecoded(getValue.getValue());
-					properties.put(key, value);
-				}
+		final List<GetValue> values = response.getValue();
+		final ConsulConfigFormat consulConfigFormat =
+			ConsulConfigFormat.fromString(consulConfigProperties.getConsulConfigFormat());
+		if (consulConfigFormat == ConsulConfigFormat.KEY_VALUE) {
+			parsePropertiesInKeyValueFormat(values);
+		} else if (consulConfigFormat == ConsulConfigFormat.PROPERTIES
+					  || consulConfigFormat == ConsulConfigFormat.YAML) {
+			parsePropertiesWithNonKeyValueFormat(values, consulConfigFormat);
+		}
+	}
+
+	/**
+	 * Parses the properties in key value style i.e., values are expected to be either a sub key or
+	 * a constant
+	 *
+	 * @param values
+	 */
+	private void parsePropertiesInKeyValueFormat(List<GetValue> values) {
+		if (values == null) {
+			return;
+		}
+
+		for (GetValue getValue : values) {
+			String key = getValue.getKey();
+			if (!StringUtils.endsWithIgnoreCase(key, "/")) {
+				key = key.replace(context, "").replace('/', '.');
+				String value = getDecoded(getValue.getValue());
+				properties.put(key, value);
 			}
 		}
+	}
+
+	/**
+	 * Parses the properties using the format which is not a key value style i.e., either java
+	 * properties style or YAML style
+	 *
+	 * @param values
+	 */
+	private void parsePropertiesWithNonKeyValueFormat(List<GetValue> values,
+																	  ConsulConfigFormat format) {
+		if (values == null) {
+			return;
+		}
+
+		for (GetValue getValue : values) {
+			String key = getValue.getKey().replace(context, "");
+			if (!consulConfigProperties.getConsulConfigDataKey().equals(key)) {
+				continue;
+			}
+
+			final String value = getDecoded(getValue.getValue());
+			final Properties props = generateProperties(value, format);
+
+			for (String propKey : props.stringPropertyNames()) {
+				properties.put(propKey, props.getProperty(propKey));
+			}
+		}
+	}
+
+	private Properties generateProperties(String value, ConsulConfigFormat format) {
+		final Properties props = new Properties();
+
+		if (format == ConsulConfigFormat.PROPERTIES) {
+			try {
+				// Must use the ISO-8859-1 encoding because Properties.load(stream) expects it.
+				props.load(new ByteArrayInputStream(value.getBytes("ISO-8859-1")));
+			} catch (IOException e) {
+				throw new IllegalArgumentException(value + " can't be encoded using ISO-8859-1");
+			}
+
+			return props;
+		} else if (format == ConsulConfigFormat.YAML) {
+			final YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
+			yaml.setResources(new ByteArrayResource(value.getBytes()));
+
+			return yaml.getObject();
+		}
+
+		return props;
 	}
 
 	public String getDecoded(String value) {

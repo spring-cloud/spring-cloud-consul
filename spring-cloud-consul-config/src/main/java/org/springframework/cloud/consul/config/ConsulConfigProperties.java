@@ -38,5 +38,15 @@ public class ConsulConfigProperties {
 	@NotEmpty
 	private String profileSeparator = ",";
 
+	@NotEmpty
+	private String consulConfigFormat = ConsulConfigFormat.KEY_VALUE.name();
+
+	/**
+	 * If consulConfigFormat is ConsulConfigFormat.PROPERTIES or ConsulConfigFormat.YAML
+	 * then the following field is used as key to look up consul for configuration.
+	 */
+	@NotEmpty
+	private String consulConfigDataKey = "data";
+
 	private String aclToken;
 }
