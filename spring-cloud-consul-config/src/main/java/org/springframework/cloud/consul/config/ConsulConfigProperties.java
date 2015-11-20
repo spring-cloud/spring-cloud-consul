@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.config;
 
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -38,7 +40,7 @@ public class ConsulConfigProperties {
 	@NotEmpty
 	private String profileSeparator = ",";
 
-	@NotEmpty
+	@NotNull
 	private Format format = Format.KEY_VALUE;
 
 	/**
