@@ -50,9 +50,6 @@ public class ConsulRibbonClientConfiguration {
 	@Autowired
 	private ConsulClient client;
 
-	@Autowired
-	private ConsulDiscoveryProperties properties;
-
 	@Value("${ribbon.client.name}")
 	private String serviceId = "client";
 
@@ -70,7 +67,7 @@ public class ConsulRibbonClientConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ServerList<?> ribbonServerList(IClientConfig config) {
-		ConsulServerList serverList = new ConsulServerList(client, properties);
+		ConsulServerList serverList = new ConsulServerList(client);
 		serverList.initWithNiwsConfig(config);
 		return serverList;
 	}

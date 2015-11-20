@@ -111,7 +111,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		Response<List<CatalogService>> services = client.getCatalogService(serviceId,
 				QueryParams.DEFAULT);
 		for (CatalogService service : services.getValue()) {
-			String host = getCatalogServiceHost(service, properties.isPreferIpAddress());
+			String host = getCatalogServiceHost(service);
 			instances.add(new DefaultServiceInstance(serviceId, host,
 					service.getServicePort(), false));
 		}

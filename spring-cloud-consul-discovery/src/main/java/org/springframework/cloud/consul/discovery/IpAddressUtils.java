@@ -35,13 +35,11 @@ import com.ecwid.consul.v1.catalog.model.CatalogService;
 @CommonsLog
 public class IpAddressUtils {
 
-	public static String getCatalogServiceHost(CatalogService service, boolean preferAddress) {
-		if (preferAddress) {
-			if (StringUtils.hasText(service.getServiceAddress())) {
-				return service.getServiceAddress();
-			} else {
-				return service.getAddress();
-			}
+	public static String getCatalogServiceHost(CatalogService service) {
+		if (StringUtils.hasText(service.getServiceAddress())) {
+			return service.getServiceAddress();
+		} else if (StringUtils.hasText(service.getAddress())) {
+			return service.getAddress();
 		}
 		return service.getNode();
 	}

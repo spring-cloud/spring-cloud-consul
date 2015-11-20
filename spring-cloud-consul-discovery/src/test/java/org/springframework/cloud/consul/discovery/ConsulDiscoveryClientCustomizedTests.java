@@ -52,9 +52,6 @@ public class ConsulDiscoveryClientCustomizedTests {
 		List<ServiceInstance> instances = discoveryClient.getInstances("consul");
 		assertNotNull("instances was null", instances);
 		assertFalse("instances was empty", instances.isEmpty());
-
-		ServiceInstance instance = instances.get(0);
-		assertNotIpAddress(instance);
 	}
 
 	private void assertNotIpAddress(ServiceInstance instance) {

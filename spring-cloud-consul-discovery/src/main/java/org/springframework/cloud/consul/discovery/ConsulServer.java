@@ -30,8 +30,8 @@ public class ConsulServer extends Server {
 	private final String address;
 	private final String node;
 
-	public ConsulServer(final CatalogService service, boolean preferAddress) {
-		super(getCatalogServiceHost(service, preferAddress), service.getServicePort());
+	public ConsulServer(final CatalogService service) {
+		super(getCatalogServiceHost(service), service.getServicePort());
 		address = service.getAddress();
 		node = service.getNode();
 		metaInfo = new MetaInfo() {

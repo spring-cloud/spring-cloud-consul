@@ -63,6 +63,9 @@ public class ConsulDiscoveryProperties {
 
 	private String hostname = hostInfo[1];
 
+	/**
+	 * Use ip address rather than hostname during registration
+	 */
 	private boolean preferIpAddress = false;
 
 	private int catalogServicesWatchDelay = 10;
