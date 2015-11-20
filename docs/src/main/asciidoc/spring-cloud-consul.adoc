@@ -158,6 +158,33 @@ spring:
 * `profileSeparator` sets the value of the separator used to separate the profile name in property sources with profiles
 
 
+[[spring-cloud-consul-config-format]]
+== YAML or Properties with Config
+
+It may be more convenient to store a blob of properties in YAML or Properties format as opposed to individual key/value pairs.  Set the `spring.cloud.consul.config.format` property to `YAML` or `PROPERTIES`. For example to use YAML:
+
+.bootstrap.yml
+----
+spring:
+  cloud:
+    consul:
+      config:
+        format: YAML
+----
+
+YAML must be set in the appropriate `data` key in consul. Using the defaults above the keys would look like:
+
+----
+config/testApp,dev/data
+config/testApp/data
+config/application,dev/data
+config/application/data
+----
+
+You could store a YAML document in any of the keys listed above.
+
+You can change the data key using `spring.cloud.consul.config.data-key`.
+
 [[spring-cloud-consul-bus]]
 == Spring Cloud Bus with Consul
 
