@@ -1,6 +1,8 @@
 package org.springframework.cloud.consul.config.watch;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.endpoint.Endpoint;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.config.ConsulConfigBootstrapConfiguration;
@@ -16,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableConfigurationProperties
 @EnableScheduling
 @ConditionalOnProperty(name = "spring.cloud.consul.config.watch", matchIfMissing = false)
+@ConditionalOnClass(Endpoint.class)
 public class ConsulConfigWatchConfiguration {
 
 	@Autowired
