@@ -17,6 +17,7 @@
 package org.springframework.cloud.consul.config;
 
 import com.ecwid.consul.v1.ConsulClient;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -47,8 +48,9 @@ public class ConsulConfigBootstrapConfiguration {
 		}
 
 		@Bean
-		public ConsulPropertySourceLocator consulPropertySourceLocator() {
-			return new ConsulPropertySourceLocator(consul, consulConfigProperties());
+		public ConsulPropertySourceLocator consulPropertySourceLocator(
+				ConsulConfigProperties consulConfigProperties) {
+			return new ConsulPropertySourceLocator(consul, consulConfigProperties);
 		}
 	}
 }
