@@ -34,21 +34,18 @@ import org.springframework.context.annotation.Import;
 public class ConsulConfigBootstrapConfiguration {
 
 	@Configuration
-	@EnableConfigurationProperties
+	@EnableConfigurationProperties(ConsulConfigProperties.class)
 	@Import(ConsulAutoConfiguration.class)
 	@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled", matchIfMissing = true)
 	protected static class ConsulPropertySourceConfiguration {
 		@Autowired
 		private ConsulClient consul;
-
-		@Bean
-		public ConsulConfigProperties consulConfigProperties() {
-			return new ConsulConfigProperties();
-		}
+		@Autowired
+		private ConsulConfigProperties consulConfigProperties;
 
 		@Bean
 		public ConsulPropertySourceLocator consulPropertySourceLocator() {
-			return new ConsulPropertySourceLocator(consul, consulConfigProperties());
+			return new ConsulPropertySourceLocator(consul, consulConfigProperties);
 		}
 	}
 }

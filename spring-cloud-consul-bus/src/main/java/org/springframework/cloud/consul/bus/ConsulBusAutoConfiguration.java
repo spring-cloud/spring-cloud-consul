@@ -68,16 +68,17 @@ public class ConsulBusAutoConfiguration {
 
 	@Bean
 	public IntegrationFlow cloudBusConsulOutboundFlow(
-			@Qualifier("cloudBusOutboundChannel") MessageChannel cloudBusOutboundChannel) {
+			@Qualifier("cloudBusOutboundChannel") MessageChannel cloudBusOutboundChannel,
+			ConsulOutboundEndpoint outboundEndpoint) {
 		return IntegrationFlows.from(cloudBusOutboundChannel)
 		// TODO: put the json headers as part of the message, here?
-				.transform(Transformers.toJson()).handle(consulOutboundEndpoint()).get();
+				.transform(Transformers.toJson()).handle(outboundEndpoint).get();
 	}
 
 	@Bean
-	public IntegrationFlow cloudBusConsulInboundFlow() {
+	public IntegrationFlow cloudBusConsulInboundFlow(ConsulInboundChannelAdapter inboundChannelAdapter) {
 		return IntegrationFlows
-				.from(consulInboundChannelAdapter())
+				.from(inboundChannelAdapter)
 				.transform(
                         Transformers.fromJson(RemoteApplicationEvent.class,
                                 new Jackson2JsonObjectMapper(objectMapper)))
