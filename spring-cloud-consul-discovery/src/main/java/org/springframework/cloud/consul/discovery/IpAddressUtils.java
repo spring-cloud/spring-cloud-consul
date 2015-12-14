@@ -51,6 +51,12 @@ public class IpAddressUtils {
 				 enumNic.hasMoreElements(); ) {
 				NetworkInterface ifc = enumNic.nextElement();
 				if (ifc.isUp()) {
+					final String displayName = ifc.getDisplayName();
+
+					if (displayName.matches("docker.*") || displayName.matches("veth.*")) {
+						continue;
+					}
+
 					for (Enumeration<InetAddress> enumAddr = ifc.getInetAddresses();
 						 enumAddr.hasMoreElements(); ) {
 						InetAddress address = enumAddr.nextElement();
