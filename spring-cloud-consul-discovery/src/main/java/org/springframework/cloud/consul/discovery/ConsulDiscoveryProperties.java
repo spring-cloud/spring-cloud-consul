@@ -16,7 +16,7 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.springframework.cloud.consul.discovery.IpAddressUtils.getFirstNonLoopbackAddress;
+import static org.springframework.cloud.util.InetUtils.getFirstNonLoopbackAddress;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
