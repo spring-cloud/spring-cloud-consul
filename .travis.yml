@@ -26,3 +26,4 @@ env:
   - GIT_EMAIL=sgibb@pivotal.io
   - CI_DEPLOY_USERNAME=sgibb
   - secure: jU7Ikae5BPc812SWqe8sc1y9xVWPuAlHm9faEHEFAo/7EuAt9/WrUddRtxEUJ37hzRh4RcmadhZiPpGrraMR/KEMvE7grNFAQ8ywWvRDzkFb07jqkxIH7j9uU73e+TQ93qtW51AvTwWX0vfAw1G3qK0ULMWZ7P5JsXNpt/1YMrs=
+  - TERM=dumb
