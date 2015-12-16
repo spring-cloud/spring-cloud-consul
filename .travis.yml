@@ -17,6 +17,7 @@ script:
 - ./consul agent -server -bootstrap-expect 1 -data-dir /tmp/consul -ui-dir ./src/test/resources/consul_ui &
 - '[ "${TRAVIS_PULL_REQUEST}" != "false" ] || ./mvnw --settings .settings.xml deploy -nsu -Dmaven.test.redirectTestOutputToFile=true'
 - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] || ./mvnw --settings .settings.xml install -nsu -Dmaven.test.redirectTestOutputToFile=true'
+- jdk_switcher use oraclejdk8 && sh -e scripts/runAcceptanceTests.sh
 env:
   global:
   - GIT_NAME="Spencer Gibb"
