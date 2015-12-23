@@ -30,6 +30,7 @@ import lombok.Setter;
 import lombok.extern.apachecommons.CommonsLog;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.util.InetUtils;
 
 /**
  * @author Spencer Gibb
@@ -43,7 +44,7 @@ public class ConsulDiscoveryProperties {
 
 	@Getter(AccessLevel.PRIVATE)
 	@Setter(AccessLevel.PRIVATE)
-	private String[] hostInfo = initHostInfo();
+	private InetUtils.HostInfo hostInfo;
 
 	private String aclToken;
 
@@ -59,9 +60,9 @@ public class ConsulDiscoveryProperties {
 
 	private String healthCheckInterval = "10s";
 
-	private String ipAddress = this.hostInfo[0];
+	private String ipAddress;
 
-	private String hostname = hostInfo[1];
+	private String hostname;
 
 	/**
 	 * Use ip address rather than hostname during registration
@@ -78,15 +79,15 @@ public class ConsulDiscoveryProperties {
 
 	private String managementSuffix = MANAGEMENT;
 
-	public String getHostname() {
-		return this.preferIpAddress ? this.ipAddress : this.hostname;
+	private ConsulDiscoveryProperties() {}
+
+	public ConsulDiscoveryProperties(InetUtils inetUtils) {
+		this.hostInfo = inetUtils.findFirstNonLoopbackHostInfo();
+		this.ipAddress = this.hostInfo.getIpAddress();
+		this.hostname = this.hostInfo.getHostname();
 	}
 
-	private String[] initHostInfo() {
-		String[] info = new String[2];
-		InetAddress address = getFirstNonLoopbackAddress();
-		info[0] = address.getHostAddress();
-		info[1] = address.getHostName();
-		return info;
+	public String getHostname() {
+		return this.preferIpAddress ? this.ipAddress : this.hostname;
 	}
 }

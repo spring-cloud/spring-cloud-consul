@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
+import org.springframework.cloud.util.InetUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -39,8 +40,8 @@ public class ConsulDiscoveryClientConfiguration {
 	private ConsulClient consulClient;
 
 	@Bean
-	public ConsulLifecycle consulLifecycle() {
-		return new ConsulLifecycle(consulClient, lifecycleProperties(), consulDiscoveryProperties(), heartbeatProperties());
+	public ConsulLifecycle consulLifecycle(ConsulDiscoveryProperties discoveryProperties) {
+		return new ConsulLifecycle(consulClient, lifecycleProperties(), discoveryProperties, heartbeatProperties());
 	}
 
 	@Bean
@@ -60,17 +61,17 @@ public class ConsulDiscoveryClientConfiguration {
 	}
 
 	@Bean
-	public ConsulDiscoveryProperties consulDiscoveryProperties() {
-		return new ConsulDiscoveryProperties();
+	public ConsulDiscoveryProperties consulDiscoveryProperties(InetUtils inetUtils) {
+		return new ConsulDiscoveryProperties(inetUtils);
 	}
 
 	@Bean
-	public ConsulDiscoveryClient consulDiscoveryClient(ServerProperties serverProperties) {
-		return new ConsulDiscoveryClient(consulClient, consulLifecycle(), consulDiscoveryProperties(), serverProperties);
+	public ConsulDiscoveryClient consulDiscoveryClient(ServerProperties serverProperties, ConsulDiscoveryProperties discoveryProperties) {
+		return new ConsulDiscoveryClient(consulClient, consulLifecycle(discoveryProperties), discoveryProperties, serverProperties);
 	}
 
 	@Bean
-	public ConsulCatalogWatch consulCatalogWatch() {
-		return new ConsulCatalogWatch(consulDiscoveryProperties(), consulClient);
+	public ConsulCatalogWatch consulCatalogWatch(ConsulDiscoveryProperties discoveryProperties) {
+		return new ConsulCatalogWatch(discoveryProperties, consulClient);
 	}
 }
