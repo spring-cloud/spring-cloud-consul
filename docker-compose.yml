@@ -1,0 +1,12 @@
+# Work in Progress
+consul:
+  image: progrium/consul
+  volumes:
+    - /data
+    - /config
+    - ./src/test/resources/consul_ui:/ui
+  ports:
+    - "8400:8400"
+    - "8500:8500"
+    - "8600:53/udp"
+  command:  agent -server -bootstrap -data-dir /data -ui-dir /ui
