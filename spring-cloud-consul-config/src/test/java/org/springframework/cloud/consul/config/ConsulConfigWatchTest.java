@@ -15,7 +15,11 @@
  */
 package org.springframework.cloud.consul.config;
 
-import static org.springframework.cloud.consul.config.util.ConsulConfigTestUtil.*;
+import static org.springframework.cloud.consul.config.util.ConsulConfigTestUtil.DEFAULT_FAIL_MESSAGE;
+import static org.springframework.cloud.consul.config.util.ConsulConfigTestUtil.expectedKey;
+import static org.springframework.cloud.consul.config.util.ConsulConfigTestUtil.expectedValue;
+import static org.springframework.cloud.consul.config.util.ConsulConfigTestUtil.failMessage;
+import static org.springframework.cloud.consul.config.util.ConsulConfigTestUtil.testing;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -46,7 +50,7 @@ public class ConsulConfigWatchTest {
 	public final String TEST_CHANGE_KEY = "config/application/testChangeValue";
 	public final String TEST_ADD_KEY = "config/application/testAddValue";
 	public final String TEST_DOT_KEY = "config/application/test.add.value";
-	
+
 	@Autowired
 	private ConsulClient client;
 
@@ -77,10 +81,23 @@ public class ConsulConfigWatchTest {
 	private void alterProperty(String key, String value) throws InterruptedException {
 		expectedKey = key;
 		expectedValue = value;
-		Thread.sleep(2000);
+		Thread.sleep(3000);
 		log.info("Changing value...");
 		client.setKVValue(key, value);
-		Thread.sleep(2000);
+		Thread.sleep(3000);
+
+		if (failMessage != null) {
+			Assert.fail(failMessage);
+		}
+	}
+
+	private void deleteProperty(String key) throws InterruptedException {
+		expectedKey = key;
+		expectedValue = "default value";
+		Thread.sleep(3000);
+		log.info("Deleting key...");
+		client.deleteKVValue(key);
+		Thread.sleep(3000);
 
 		if (failMessage != null) {
 			Assert.fail(failMessage);
@@ -91,18 +108,24 @@ public class ConsulConfigWatchTest {
 	public void addPropertyTest() throws InterruptedException {
 		alterProperty(TEST_ADD_KEY, "new value");
 	}
-	
 
-	@Test 
+
+	@Test
 	public void addEmptyValue() throws InterruptedException{
 		alterProperty(TEST_ADD_KEY, "");
 	}
-	
+
 	@Test
 	public void addPropertyWithDotInKey() throws InterruptedException {
 		alterProperty(TEST_DOT_KEY, "value");
 	}
-	
+
+	@Test
+	public void addRemoveValueTest() throws InterruptedException {
+		alterProperty(TEST_ADD_KEY, "some value");
+		failMessage = DEFAULT_FAIL_MESSAGE;
+		deleteProperty(TEST_ADD_KEY);
+	}
 
 	@Configuration
 	@EnableAutoConfiguration

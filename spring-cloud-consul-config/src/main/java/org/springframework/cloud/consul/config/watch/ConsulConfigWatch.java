@@ -38,7 +38,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.ConcurrentReferenceHashMap;
-import org.springframework.util.ConcurrentReferenceHashMap.ReferenceType;
 
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
@@ -48,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * A kv store watch that publishes an EnvironmentChangeEvent whenever a value under one of the property sources is changed
- * 
+ *
  * @author Andrew DePompa
  */
 @Slf4j
@@ -61,8 +60,11 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 	private Set<ConsulPropertySource> consulPropertySources = null;
 
 	private ConsulConfigProperties properties;
-	
+
 	private Map<String, BigInteger> kvIndexes = new ConcurrentReferenceHashMap<String, BigInteger>();
+
+	// used to keep track of existing props in case one is deleted
+	private Set<String> existingProps;
 
 	public ConsulConfigWatch(ConsulConfigProperties properties) {
 		this.properties = properties;
@@ -82,18 +84,20 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 					new QueryParams(properties.getKvWatchTimeout(), index));
 			Long consulIndex = response.getConsulIndex();
 			if (consulIndex != null) {
+				Set<String> deletedProps = new HashSet<String>(existingProps);
 				kvIndexes.put(source.getName(), BigInteger.valueOf(consulIndex));
 				if (index != consulIndex) {
 					if (response.getValue() != null) {
-						Set<String> existingProps = new HashSet<String>(Arrays.asList(source.getPropertyNames()));
 						for (GetValue getValue : response.getValue()) {
 							if (getValue.getModifyIndex() > index) {
 								changedProps.put(getValue.getKey(), getValue.getValue() == null ? "" : new String(decodeFromString(getValue.getValue())));
+								existingProps.add(getValue.getKey().replace(source.getContext(), "").replace("/", "."));
 							}
-							existingProps.remove(getValue.getKey().replace(source.getContext(), "").replace("/", "."));
+							deletedProps.remove(getValue.getKey().replace(source.getContext(), "").replace("/", "."));
 						}
-						for(String key : existingProps){
+						for(String key : deletedProps){
 							changedProps.put(key, null);
+							existingProps.remove(key.replace(source.getContext(), "").replace("/", "."));
 						}
 					}
 				}
@@ -107,6 +111,9 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 
 	private void findConsulPropertySources() {
 		if (consulPropertySources == null) {
+			if(existingProps == null) {
+				existingProps = new HashSet<String>();
+			}
 			consulPropertySources = new HashSet<ConsulPropertySource>();
 			if (environment.getPropertySources()
 					.get(BootstrapApplicationListener.BOOTSTRAP_PROPERTY_SOURCE_NAME) instanceof CompositePropertySource) {
@@ -119,6 +126,7 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 							CompositePropertySource consulPropertySource = (CompositePropertySource) source;
 							for (PropertySource<?> consulSource : consulPropertySource.getPropertySources()) {
 								consulPropertySources.add((ConsulPropertySource) consulSource);
+								existingProps.addAll(Arrays.asList(((ConsulPropertySource) consulSource).getPropertyNames()));
 							}
 							break;
 						}

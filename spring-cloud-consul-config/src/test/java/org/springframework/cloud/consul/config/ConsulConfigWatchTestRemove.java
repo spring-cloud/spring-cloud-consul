@@ -40,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Separated the remove test from the others as the keys conflicted since the environment does not actually update in these tests
- * 
+ *
  * @author Andrew DePompa
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -50,8 +50,9 @@ import lombok.extern.slf4j.Slf4j;
 		"spring.cloud.consul.config.watch=true" }, randomPort = true)
 @Slf4j
 public class ConsulConfigWatchTestRemove {
+	public final String TEST_ADD_KEY = "config/application/testAddValue";
 	public final String TEST_DELETE_KEY = "config/application/testDeleteValue";
-	
+
 	@Autowired
 	private ConsulClient client;
 

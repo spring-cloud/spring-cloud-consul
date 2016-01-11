@@ -22,7 +22,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 
 /**
- * 
+ *
  * @author Andrew DePompa
  *
  */
@@ -50,10 +50,9 @@ public class ConsulConfigTestUtil {
 					failMessage = "ConsulKeyValueChangeEvent should have 1 key but had: " + properties.size() + " = " + properties.toString();
 				} else if (!properties.containsKey(expectedKey) && !properties.keySet().iterator().next().contains(expectedKey.substring(expectedKey.lastIndexOf('/')+1))) {
 					failMessage = "Event does not contain key = " + expectedKey + ": actual = " + properties.toString();
-				} else if(!properties.get(expectedKey).equals(expectedValue)) {
-					failMessage = "Event does not contain value = " + expectedValue + ": actual = " + properties.get(expectedKey); 
-				}
-				else {
+				} else if(properties.get(expectedKey) != null && !properties.get(expectedKey).equals(expectedValue)) {
+					failMessage = "Event does not contain value = " + expectedValue + ": actual = " + properties.get(expectedKey);
+				} else {
 					failMessage = null;
 				}
 			}
