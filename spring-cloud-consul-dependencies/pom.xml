@@ -17,7 +17,6 @@
 		<spring-cloud-bus.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-bus.version>
 		<spring-cloud-commons.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-commons.version>
 		<spring-cloud-netflix.version>1.1.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
-		<spring-integration-dsl.version>1.0.2.RELEASE</spring-integration-dsl.version>
 		<archaius.version>0.7.1</archaius.version>
 		<consul-api.version>1.1.6</consul-api.version>
 		<gson.version>2.3.1</gson.version>
@@ -39,11 +38,12 @@
 				<artifactId>spring-cloud-consul-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
+			<!-- TODO: add this back when consul-bus is implemented -->
+			<!--<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-bus</artifactId>
 				<version>${project.version}</version>
-			</dependency>
+			</dependency>-->
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-config</artifactId>
@@ -59,11 +59,12 @@
 				<artifactId>spring-cloud-starter-consul</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
+			<!-- TODO: add this back when consul-bus is implemented -->
+			<!--<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-starter-consul-bus</artifactId>
 				<version>${project.version}</version>
-			</dependency>
+			</dependency>-->
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-starter-consul-config</artifactId>
@@ -81,38 +82,8 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-commons</artifactId>
-				<version>${spring-cloud-commons.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-bus</artifactId>
 				<version>${spring-cloud-bus.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-starter-amqp</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework.integration</groupId>
-						<artifactId>spring-integration-amqp</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework.cloud</groupId>
-						<artifactId>spring-cloud-spring-service-connector
-						</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework.cloud</groupId>
-						<artifactId>spring-cloud-localconfig-connector
-						</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.springframework.cloud</groupId>
-						<artifactId>spring-cloud-cloudfoundry-connector
-						</artifactId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
@@ -129,11 +100,6 @@
 						<artifactId>servlet-api</artifactId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.integration</groupId>
-				<artifactId>spring-integration-java-dsl</artifactId>
-				<version>${spring-integration-dsl.version}</version>
 			</dependency>
 			<!-- required by com.ecwid.consul but not as a pom dependency -->
 			<dependency>
@@ -177,11 +143,6 @@
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
 				<version>${joda-time.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok</artifactId>
-				<optional>true</optional>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
