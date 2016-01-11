@@ -41,7 +41,7 @@ public class ConsulDiscoveryClientConfiguration {
 
 	@Bean
 	public ConsulLifecycle consulLifecycle(ConsulDiscoveryProperties discoveryProperties) {
-		return new ConsulLifecycle(consulClient, lifecycleProperties(), discoveryProperties, heartbeatProperties());
+		return new ConsulLifecycle(consulClient, discoveryProperties, heartbeatProperties());
 	}
 
 	@Bean
@@ -53,11 +53,6 @@ public class ConsulDiscoveryClientConfiguration {
 	@Bean
 	public HeartbeatProperties heartbeatProperties() {
 		return new HeartbeatProperties();
-	}
-
-	@Bean
-	public LifecycleProperties lifecycleProperties() {
-		return new LifecycleProperties();
 	}
 
 	@Bean

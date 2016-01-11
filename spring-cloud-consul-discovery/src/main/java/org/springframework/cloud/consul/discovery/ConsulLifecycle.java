@@ -43,8 +43,6 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	private ConsulDiscoveryProperties properties;
 
-	private LifecycleProperties lifecycleProperties;
-
 	private HeartbeatProperties ttlConfig;
 
 	@Autowired(required = false)
@@ -55,9 +53,8 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	
 	private NewService service = new NewService();
 
-	public ConsulLifecycle(ConsulClient client, LifecycleProperties lifecycleProperties, ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
+	public ConsulLifecycle(ConsulClient client, ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
 		this.client = client;
-		this.lifecycleProperties = lifecycleProperties;
 		this.properties = properties;
 		this.ttlConfig = ttlConfig;
 	}
@@ -107,7 +104,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 					properties.getHealthCheckPath()));
 		}
 		check.setInterval(properties.getHealthCheckInterval());
-		//TODO support http check timeout
+		check.setTimeout(properties.getHealthCheckTimeout());
 		return check;
 	}
 
@@ -178,7 +175,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	@Override
 	protected boolean isEnabled() {
-		return lifecycleProperties.isEnabled();
+		return this.properties.getLifecycle().isEnabled();
 	}
 
 	/**

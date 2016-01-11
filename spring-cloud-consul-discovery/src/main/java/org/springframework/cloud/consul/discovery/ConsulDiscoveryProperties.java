@@ -16,9 +16,6 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.springframework.cloud.util.InetUtils.getFirstNonLoopbackAddress;
-
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,9 +57,13 @@ public class ConsulDiscoveryProperties {
 
 	private String healthCheckInterval = "10s";
 
+	private String healthCheckTimeout;
+
 	private String ipAddress;
 
 	private String hostname;
+
+	private Lifecycle lifecycle = new Lifecycle();
 
 	/**
 	 * Use ip address rather than hostname during registration
@@ -89,5 +90,10 @@ public class ConsulDiscoveryProperties {
 
 	public String getHostname() {
 		return this.preferIpAddress ? this.ipAddress : this.hostname;
+	}
+
+	@Data
+	public class Lifecycle {
+		private boolean enabled = true;
 	}
 }
