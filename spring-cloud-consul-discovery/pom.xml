@@ -58,8 +58,8 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>com.netflix.archaius</groupId>
-			<artifactId>archaius-core</artifactId>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-archaius</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>

@@ -34,8 +34,8 @@
 			<artifactId>spring-cloud-netflix-core</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.netflix.archaius</groupId>
-			<artifactId>archaius-core</artifactId>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-archaius</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.netflix.ribbon</groupId>
