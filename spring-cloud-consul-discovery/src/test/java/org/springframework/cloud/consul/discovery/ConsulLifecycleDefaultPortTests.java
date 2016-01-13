@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,40 +16,31 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.Map;
-
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+
 /**
  * @author Spencer Gibb
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SpringApplicationConfiguration(classes = TestPropsConfig.class)
-@WebIntegrationTest(value = { "spring.application.name=myTestService",
-		"spring.cloud.consul.discovery.instanceId=myTestService1",
-		"spring.cloud.consul.discovery.port=4452"}, randomPort = true)
-public class ConsulLifecycleCustomizedPropsTests {
+@WebIntegrationTest(value = { "spring.application.name=myTestService2",
+		"spring.cloud.consul.discovery.instanceId=myTestService2", }, randomPort = true)
+public class ConsulLifecycleDefaultPortTests {
 
 	@Autowired
 	ConsulLifecycle lifecycle;
@@ -64,17 +55,9 @@ public class ConsulLifecycleCustomizedPropsTests {
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
-		Service service = services.get("myTestService1");
+		Service service = services.get("myTestService2");
 		assertNotNull("service was null", service);
-		assertEquals("service port is discovery port", 4452, service.getPort().intValue());
-		assertEquals("service id was wrong", "myTestService1", service.getId());
-		assertEquals("service name was wrong", "myTestService", service.getService());
+		assertNotEquals("service port is 0", 0, service.getPort().intValue());
 	}
 }
 
-@Configuration
-@EnableAutoConfiguration
-@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
-class TestPropsConfig {
-
-}
