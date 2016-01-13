@@ -74,6 +74,8 @@ public class ConsulDiscoveryProperties {
 
 	private int catalogServicesWatchTimeout = 2;
 
+	private String service;
+	
 	private String instanceId;
 
 	private String scheme = "http";
