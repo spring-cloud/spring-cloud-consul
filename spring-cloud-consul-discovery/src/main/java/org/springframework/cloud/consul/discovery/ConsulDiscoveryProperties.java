@@ -63,6 +63,8 @@ public class ConsulDiscoveryProperties {
 
 	private String hostname;
 
+	private Integer externalPort;
+
 	private Lifecycle lifecycle = new Lifecycle();
 
 	/**

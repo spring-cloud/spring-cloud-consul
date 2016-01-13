@@ -47,7 +47,8 @@ import com.ecwid.consul.v1.agent.model.Service;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SpringApplicationConfiguration(classes = TestPropsConfig.class)
 @WebIntegrationTest(value = { "spring.application.name=myTestService",
-		"spring.cloud.consul.discovery.instanceId=myTestService1" }, randomPort = true)
+		"spring.cloud.consul.discovery.instanceId=myTestService1",
+		"spring.cloud.consul.discovery.externalPort=4452"}, randomPort = true)
 public class ConsulLifecycleCustomizedPropsTests {
 
 	@Autowired
@@ -65,7 +66,7 @@ public class ConsulLifecycleCustomizedPropsTests {
 		Map<String, Service> services = response.getValue();
 		Service service = services.get("myTestService1");
 		assertNotNull("service was null", service);
-		assertNotEquals("service port is 0", 0, service.getPort().intValue());
+		assertEquals("service port is external port", 4452, service.getPort().intValue());
 		assertEquals("service id was wrong", "myTestService1", service.getId());
 		assertEquals("service name was wrong", "myTestService", service.getService());
 	}
