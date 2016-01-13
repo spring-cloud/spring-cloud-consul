@@ -50,7 +50,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	@Autowired(required = false)
 	private ServletContext servletContext;
-	
+
 	private NewService service = new NewService();
 
 	public ConsulLifecycle(ConsulClient client, ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
@@ -78,13 +78,18 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		service.setName(normalizeForDns(appName));
 		service.setTags(createTags());
 
-		Integer port;
-		if (shouldRegisterManagement()) {
-			port = getManagementPort();
-		} else {
-			port = service.getPort();
+		// If an alternate external port is specified, register using it instead
+		if (properties.getPort() != null) {
+			service.setPort(properties.getPort());
 		}
-		service.setCheck(createCheck(port));
+
+		Integer checkPort;
+		if (shouldRegisterManagement()) {
+			checkPort = getManagementPort();
+		} else {
+			checkPort = service.getPort();
+		}
+		service.setCheck(createCheck(checkPort));
 
 		register(service);
 	}

@@ -30,6 +30,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.util.InetUtils;
 
 /**
+ * Defines configuration for service discovery and registration.
+ *
  * @author Spencer Gibb
  */
 @ConfigurationProperties("spring.cloud.consul.discovery")
@@ -45,23 +47,36 @@ public class ConsulDiscoveryProperties {
 
 	private String aclToken;
 
+	/** Tags to use when registering service */
 	private List<String> tags = new ArrayList<>();
 
+	/** Is service discovery enabled? */
 	private boolean enabled = true;
 
+	/** Tags to use when registering management service */
 	private List<String> managementTags = Arrays.asList(MANAGEMENT);
 
+	/** Alternate server path to invoke for health checking */
 	private String healthCheckPath = "/health";
 
+	/** Custom health check url to override default */
 	private String healthCheckUrl;
 
+	/** How often to perform the health check (e.g. 10s) */
 	private String healthCheckInterval = "10s";
 
+	/** Timeout for health check (e.g. 10s) */
 	private String healthCheckTimeout;
 
+	/** IP address to use when accessing service (must also set preferIpAddress
+			to use) */
 	private String ipAddress;
 
+	/** Hostname to use when accessing server */
 	private String hostname;
+
+	/** Port to register the service under (defaults to listening port) */
+	private Integer port;
 
 	private Lifecycle lifecycle = new Lifecycle();
 
@@ -74,10 +89,13 @@ public class ConsulDiscoveryProperties {
 
 	private int catalogServicesWatchTimeout = 2;
 
+	/** Unique service instance id */
 	private String instanceId;
 
+	/** Whether to register an http or https service */
 	private String scheme = "http";
 
+	/** Suffix to use when registering management service */
 	private String managementSuffix = MANAGEMENT;
 
 	private ConsulDiscoveryProperties() {}
