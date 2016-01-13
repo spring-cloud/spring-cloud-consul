@@ -31,15 +31,19 @@ import com.ecwid.consul.v1.ConsulClient;
  * @author Spencer Gibb
  */
 @Configuration
-@EnableConfigurationProperties(ConsulProperties.class)
+@EnableConfigurationProperties
 @ConditionalOnConsulEnabled
 public class ConsulAutoConfiguration {
-	@Autowired
-	private ConsulProperties consulProperties;
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulClient consulClient() {
+	public ConsulProperties consulProperties() {
+		return new ConsulProperties();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public ConsulClient consulClient(ConsulProperties consulProperties) {
 		return new ConsulClient(consulProperties.getHost(), consulProperties.getPort());
 	}
 
