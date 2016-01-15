@@ -2,11 +2,11 @@
 
 set -o errexit
 
-SCRIPT_URL="https://raw.githubusercontent.com/spring-cloud-samples/brewery/master/acceptance-tests/scripts/runDockerAcceptanceTests.sh"
+SCRIPT_URL="https://raw.githubusercontent.com/spring-cloud-samples/brewery/master/runAcceptanceTests.sh"
 AT_WHAT_TO_TEST="CONSUL"
 
-curl "${SCRIPT_URL}" --output runDockerAcceptanceTests.sh
+curl "${SCRIPT_URL}" --output runAcceptanceTests.sh
 
-chmod +x runDockerAcceptanceTests.sh
+chmod +x runAcceptanceTests.sh
 
-./runDockerAcceptanceTests.sh -t "${AT_WHAT_TO_TEST}" -k 1
+./runAcceptanceTests.sh -t "${AT_WHAT_TO_TEST}" -k 1
