@@ -32,6 +32,7 @@ import com.ecwid.consul.v1.kv.model.GetValue;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import static org.springframework.util.Base64Utils.decodeFromString;
@@ -114,7 +115,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 		for (GetValue getValue : values) {
 			String key = getValue.getKey().replace(context, "");
-			if (configProperties.getDataKey().equals(key)) {
+			if (ObjectUtils.containsElement(configProperties.getDataKey(), key)) {
 				final String value = getDecoded(getValue.getValue());
 				final Properties props = generateProperties(value, format);
 
