@@ -57,11 +57,11 @@ public class ConsulPropertySourceTests {
 		// key value properties
 		kvContext = prefix + "/kv";
 		client.setKVValue(kvContext + "/fooprop", "fookvval");
-		client.setKVValue(prefix+"/kv"+"/bar/prop", "barkvval");
+		client.setKVValue(prefix+"/kv"+"/bar/prop", "8080");
 
 		ConsulPropertySource source = getConsulPropertySource(new ConsulConfigProperties(), kvContext);
 
-		assertProperties(source, "fookvval", "barkvval");
+		assertProperties(source, "fookvval", "8080");
 	}
 
 	private void assertProperties(ConsulPropertySource source, String fooval, String barval) {
@@ -73,26 +73,26 @@ public class ConsulPropertySourceTests {
 	public void testProperties() {
 		// properties file property
 		propertiesContext = prefix + "/properties";
-		client.setKVValue(propertiesContext+"/data", "fooprop=foopropval\nbar.prop=barpropval");
+		client.setKVValue(propertiesContext+"/data", "fooprop=foopropval\nbar.prop=8080");
 
 		ConsulConfigProperties configProperties = new ConsulConfigProperties();
 		configProperties.setFormat(ConsulConfigProperties.Format.PROPERTIES);
 		ConsulPropertySource source = getConsulPropertySource(configProperties, propertiesContext);
 
-		assertProperties(source, "foopropval", "barpropval");
+		assertProperties(source, "foopropval", "8080");
 	}
 
 	@Test
 	public void testYaml() {
 		// yaml file property
 		String yamlContext = prefix + "/yaml";
-		client.setKVValue(yamlContext+"/data", "fooprop: fooymlval\nbar:\n  prop: barymlval");
+		client.setKVValue(yamlContext+"/data", "fooprop: fooymlval\nbar:\n  prop: 8080");
 
 		ConsulConfigProperties configProperties = new ConsulConfigProperties();
 		configProperties.setFormat(ConsulConfigProperties.Format.YAML);
 		ConsulPropertySource source = getConsulPropertySource(configProperties, yamlContext);
 
-		assertProperties(source, "fooymlval", "barymlval");
+		assertProperties(source, "fooymlval", "8080");
 	}
 
 	private ConsulPropertySource getConsulPropertySource(ConsulConfigProperties configProperties, String context) {

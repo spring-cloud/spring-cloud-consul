@@ -118,8 +118,8 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 				final String value = getDecoded(getValue.getValue());
 				final Properties props = generateProperties(value, format);
 
-				for (String propKey : props.stringPropertyNames()) {
-					properties.put(propKey, props.getProperty(propKey));
+				for (Map.Entry entry : props.entrySet()) {
+					properties.put(entry.getKey().toString(), entry.getValue().toString());
 				}
 			}
 		}
