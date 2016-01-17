@@ -23,7 +23,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.bus.BusAutoConfiguration;
 import org.springframework.cloud.bus.event.RemoteApplicationEvent;
-import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
@@ -69,17 +68,16 @@ public class ConsulBusAutoConfiguration {
 
 	@Bean
 	public IntegrationFlow cloudBusConsulOutboundFlow(
-			@Qualifier("cloudBusOutboundChannel") MessageChannel cloudBusOutboundChannel,
-			ConsulOutboundEndpoint outboundEndpoint) {
+			@Qualifier("cloudBusOutboundChannel") MessageChannel cloudBusOutboundChannel) {
 		return IntegrationFlows.from(cloudBusOutboundChannel)
 		// TODO: put the json headers as part of the message, here?
-				.transform(Transformers.toJson()).handle(outboundEndpoint).get();
+				.transform(Transformers.toJson()).handle(consulOutboundEndpoint()).get();
 	}
 
 	@Bean
-	public IntegrationFlow cloudBusConsulInboundFlow(ConsulInboundChannelAdapter inboundChannelAdapter) {
+	public IntegrationFlow cloudBusConsulInboundFlow() {
 		return IntegrationFlows
-				.from(inboundChannelAdapter)
+				.from(consulInboundChannelAdapter())
 				.transform(
                         Transformers.fromJson(RemoteApplicationEvent.class,
                                 new Jackson2JsonObjectMapper(objectMapper)))
