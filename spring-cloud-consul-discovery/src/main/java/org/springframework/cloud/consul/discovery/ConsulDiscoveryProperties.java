@@ -18,7 +18,9 @@ package org.springframework.cloud.consul.discovery;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -100,6 +102,12 @@ public class ConsulDiscoveryProperties {
 
 	/** Suffix to use when registering management service */
 	private String managementSuffix = MANAGEMENT;
+
+	/**
+	 * Map of serviceId's -> tag to query for in server list.
+	 * This allows filtering services by a single tag.
+	 */
+	private Map<String, String> serverListQueryTags = new HashMap<>();
 
 	private ConsulDiscoveryProperties() {}
 

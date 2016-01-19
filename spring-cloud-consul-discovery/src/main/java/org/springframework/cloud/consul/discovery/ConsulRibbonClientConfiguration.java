@@ -66,8 +66,8 @@ public class ConsulRibbonClientConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ServerList<?> ribbonServerList(IClientConfig config) {
-		ConsulServerList serverList = new ConsulServerList(client);
+	public ServerList<?> ribbonServerList(IClientConfig config, ConsulDiscoveryProperties properties) {
+		ConsulServerList serverList = new ConsulServerList(client, properties);
 		serverList.initWithNiwsConfig(config);
 		return serverList;
 	}
