@@ -185,7 +185,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	
 	@Override
 	protected String getAppName() {
-		String appName = properties.getServiceId();
+		String appName = properties.getServiceName();
 		return StringUtils.isEmpty(appName) ? super.getAppName() : appName;
 	}
 

@@ -91,8 +91,8 @@ public class ConsulDiscoveryProperties {
 
 	private int catalogServicesWatchTimeout = 2;
 
-	/** Unique service id */
-	private String serviceId;
+	/** Service name */
+	private String serviceName;
 
 	/** Unique service instance id */
 	private String instanceId;
