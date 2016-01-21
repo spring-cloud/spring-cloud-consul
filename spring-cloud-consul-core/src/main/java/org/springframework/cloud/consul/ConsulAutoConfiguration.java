@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul;
 
+import com.ecwid.consul.v1.ConsulClient;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.endpoint.Endpoint;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -24,8 +26,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.ecwid.consul.v1.ConsulClient;
 
 /**
  * @author Spencer Gibb
@@ -43,9 +43,8 @@ public class ConsulAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulClient consulClient() {
-		return new ConsulClient(consulProperties().getHost(), consulProperties()
-				.getPort());
+	public ConsulClient consulClient(ConsulProperties consulProperties) {
+		return new ConsulClient(consulProperties.getHost(), consulProperties.getPort());
 	}
 
 	@Configuration
