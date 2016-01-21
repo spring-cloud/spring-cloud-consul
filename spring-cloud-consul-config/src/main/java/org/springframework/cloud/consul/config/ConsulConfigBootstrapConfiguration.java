@@ -47,8 +47,9 @@ public class ConsulConfigBootstrapConfiguration {
 		}
 
 		@Bean
-		public ConsulPropertySourceLocator consulPropertySourceLocator() {
-			return new ConsulPropertySourceLocator(consul, consulConfigProperties());
+		public ConsulPropertySourceLocator consulPropertySourceLocator(
+		        ConsulConfigProperties consulConfigProperties) {
+			return new ConsulPropertySourceLocator(consul, consulConfigProperties);
 		}
 	}
 }

@@ -43,9 +43,8 @@ public class ConsulAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulClient consulClient() {
-		return new ConsulClient(consulProperties().getHost(), consulProperties()
-				.getPort());
+	public ConsulClient consulClient(ConsulProperties consulProperties) {
+		return new ConsulClient(consulProperties.getHost(), consulProperties.getPort());
 	}
 
 	@Configuration
