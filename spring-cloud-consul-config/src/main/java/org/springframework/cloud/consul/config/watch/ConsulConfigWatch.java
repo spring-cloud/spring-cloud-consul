@@ -76,6 +76,7 @@ public class ConsulConfigWatch implements ApplicationEventPublisherAware, Enviro
 		findConsulPropertySources();
 		Map<String, String> changedProps = new HashMap<>();
 		for (ConsulPropertySource source : consulPropertySources) {
+			source.init();
 			long index = -1;
 			if(kvIndexes.get(source.getName()) != null) {
 				index = kvIndexes.get(source.getName()).longValue();
