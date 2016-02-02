@@ -95,4 +95,8 @@ public class ConsulConfigProperties {
 		YAML;
 
 	}
+
+	private int kvWatchDelay = 10;
+
+	private long kvWatchTimeout = 2;
 }
