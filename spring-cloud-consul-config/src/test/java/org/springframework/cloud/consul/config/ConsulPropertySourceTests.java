@@ -43,7 +43,6 @@ public class ConsulPropertySourceTests {
 	public void setup() {
 		properties = new ConsulProperties();
 		prefix = "consulPropertySourceTests" + new Random().nextInt(Integer.MAX_VALUE);
-		properties.setPrefix(prefix);
 		client = new ConsulClient(properties.getHost(), properties.getPort());
 	}
 

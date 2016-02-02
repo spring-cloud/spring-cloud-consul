@@ -38,6 +38,4 @@ public class ConsulProperties {
 
 	/** Is spring cloud consul enabled */
 	private boolean enabled = true;
-
-	private String prefix = "config";
 }
