@@ -22,16 +22,19 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
+import org.springframework.retry.annotation.Retryable;
 
 import com.ecwid.consul.v1.ConsulClient;
 
 /**
  * @author Spencer Gibb
  */
+@Order(0)
 public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
 	private ConsulClient consul;
@@ -44,6 +47,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 	}
 
 	@Override
+	@Retryable(interceptor = "consulRetryInterceptor")
 	public PropertySource<?> locate(Environment environment) {
 		if (environment instanceof ConfigurableEnvironment) {
 			ConfigurableEnvironment env = (ConfigurableEnvironment) environment;

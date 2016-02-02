@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -67,6 +68,12 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	@Override
 	protected void setConfiguredPort(int port) {
 		service.setPort(port);
+	}
+
+	@Override
+	@Retryable(interceptor = "consulRetryInterceptor")
+	public void start() {
+		super.start();
 	}
 
 	@Override

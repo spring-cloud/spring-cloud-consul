@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,28 +16,26 @@
 
 package org.springframework.cloud.consul;
 
-import javax.validation.constraints.NotNull;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Data;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * @author Spencer Gibb
  */
-@ConfigurationProperties("spring.cloud.consul")
+@ConfigurationProperties("spring.cloud.consul.retry")
 @Data
-public class ConsulProperties {
-	/** Consul agent hostname. Defaults to 'localhost'. */
-	@NotNull
-	private String host = "localhost";
+public class RetryProperties {
 
-	/** Consul agent port. Defaults to '8500'. */
-	@NotNull
-	private int port = 8500;
+	/** Initial retry interval in milliseconds. */
+	private long initialInterval = 1000;
 
-	/** Is spring cloud consul enabled */
-	private boolean enabled = true;
+	/** Multiplier for next interval. */
+	private double multiplier = 1.1;
 
-	private String prefix = "config";
+	/** Maximum interval for backoff. */
+	private long maxInterval = 2000;
+
+	/** Maximum number of attempts. */
+	private int maxAttempts = 6;
 }
