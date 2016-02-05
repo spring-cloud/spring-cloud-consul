@@ -9,4 +9,4 @@ consul:
     - "8400:8400"
     - "8500:8500"
     - "8600:53/udp"
-  command:  agent -server -bootstrap -data-dir /data -ui-dir /ui
+  command:  -server -bootstrap -data-dir /data -ui-dir /ui
