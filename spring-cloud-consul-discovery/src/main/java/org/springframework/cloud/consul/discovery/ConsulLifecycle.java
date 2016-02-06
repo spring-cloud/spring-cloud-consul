@@ -81,7 +81,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		Assert.notNull(service.getPort(), "service.port has not been set");
 		String appName = getAppName();
 		service.setId(getServiceId());
-		service.setAddress(properties.getHostname());
+		if(!properties.isPreferAgentAddress()) {
+			service.setAddress(properties.getHostname());
+		}
 		service.setName(normalizeForDns(appName));
 		service.setTags(createTags());
 
