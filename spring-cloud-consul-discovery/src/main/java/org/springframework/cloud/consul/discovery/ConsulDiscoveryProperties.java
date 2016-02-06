@@ -25,8 +25,8 @@ import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.apachecommons.CommonsLog;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.util.InetUtils;
@@ -38,7 +38,7 @@ import org.springframework.cloud.util.InetUtils;
  */
 @ConfigurationProperties("spring.cloud.consul.discovery")
 @Data
-@CommonsLog
+@NoArgsConstructor(access=AccessLevel.PRIVATE)
 public class ConsulDiscoveryProperties {
 
 	protected static final String MANAGEMENT = "management";
@@ -86,7 +86,12 @@ public class ConsulDiscoveryProperties {
 	 * Use ip address rather than hostname during registration
 	 */
 	private boolean preferIpAddress = false;
-
+	
+	/**
+	 * Source of how we will determine the address to use
+	 */
+	private boolean preferAgentAddress = false;
+	
 	private int catalogServicesWatchDelay = 10;
 
 	private int catalogServicesWatchTimeout = 2;
@@ -108,8 +113,6 @@ public class ConsulDiscoveryProperties {
 	 * This allows filtering services by a single tag.
 	 */
 	private Map<String, String> serverListQueryTags = new HashMap<>();
-
-	private ConsulDiscoveryProperties() {}
 
 	public ConsulDiscoveryProperties(InetUtils inetUtils) {
 		this.hostInfo = inetUtils.findFirstNonLoopbackHostInfo();
