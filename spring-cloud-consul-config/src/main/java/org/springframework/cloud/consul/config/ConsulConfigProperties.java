@@ -52,6 +52,16 @@ public class ConsulConfigProperties {
 
 	private String aclToken;
 
+	private Watch watch = new Watch();
+
+	@Data
+	public class Watch {
+		private int waitTime = 2;
+		private boolean enabled = true;
+		private int delay = 10;
+
+	}
+
 	/**
 	 * There are many ways in which we can specify configuration in consul i.e.,
 	 *
@@ -76,7 +86,7 @@ public class ConsulConfigProperties {
 	 *
 	 * @author srikalyan.swayampakula
 	 */
-	public static enum Format {
+	public enum Format {
 		/**
 		 * Indicates that the configuration specified in consul is of type native key values.
 		 */

@@ -41,9 +41,15 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
 	private ConsulConfigProperties properties;
 
+	private List<String> contexts = new ArrayList<>();
+
 	public ConsulPropertySourceLocator(ConsulClient consul, ConsulConfigProperties properties) {
 		this.consul = consul;
 		this.properties = properties;
+	}
+
+	public List<String> getContexts() {
+		return contexts;
 	}
 
 	@Override
@@ -55,21 +61,20 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 			List<String> profiles = Arrays.asList(env.getActiveProfiles());
 
 			String prefix = this.properties.getPrefix();
-			List<String> contexts = new ArrayList<>();
 
 			String defaultContext = prefix + "/" + this.properties.getDefaultContext();
-			contexts.add(defaultContext + "/");
-			addProfiles(contexts, defaultContext, profiles);
+			this.contexts.add(defaultContext + "/");
+			addProfiles(this.contexts, defaultContext, profiles);
 
 			String baseContext = prefix + "/" + appName;
-			contexts.add(baseContext + "/");
-			addProfiles(contexts, baseContext, profiles);
+			this.contexts.add(baseContext + "/");
+			addProfiles(this.contexts, baseContext, profiles);
 
 			CompositePropertySource composite = new CompositePropertySource("consul");
 
-			Collections.reverse(contexts);
+			Collections.reverse(this.contexts);
 
-			for (String propertySourceContext : contexts) {
+			for (String propertySourceContext : this.contexts) {
 				ConsulPropertySource propertySource = create(propertySourceContext);
 				propertySource.init();
 				composite.addPropertySource(propertySource);
