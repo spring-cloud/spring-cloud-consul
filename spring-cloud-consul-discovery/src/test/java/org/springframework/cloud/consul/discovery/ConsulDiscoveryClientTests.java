@@ -38,7 +38,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ConsulDiscoveryClientTests.MyTestConfig.class)
-@WebIntegrationTest(value = {"spring.application.name=testConsulDiscovery", "spring.cloud.consul.discovery.preferIpAddress=true"}, randomPort = true)
+@WebIntegrationTest(value = {"spring.application.name=testConsulDiscovery",
+		"spring.cloud.consul.discovery.preferIpAddress=true",
+		"spring.cloud.consul.discovery.aclToken=2d2e6b3b-1c82-40ab-8171-54609d8ad304"}, randomPort = true)
 public class ConsulDiscoveryClientTests {
 
 	@Autowired
@@ -47,6 +49,16 @@ public class ConsulDiscoveryClientTests {
 	@Test
 	public void getInstancesForServiceWorks() {
 		List<ServiceInstance> instances = discoveryClient.getInstances("consul");
+		assertNotNull("instances was null", instances);
+		assertFalse("instances was empty", instances.isEmpty());
+
+		ServiceInstance instance = instances.get(0);
+		assertIpAddress(instance);
+	}
+
+	@Test
+	public void getInstancesForThisServiceWorks() {
+		List<ServiceInstance> instances = discoveryClient.getInstances("testConsulDiscovery");
 		assertNotNull("instances was null", instances);
 		assertFalse("instances was empty", instances.isEmpty());
 
