@@ -1,11 +1,13 @@
 #!/bin/bash
 
-CONSUL_VER="0.5.0_linux_amd64"
+CONSUL_VER="0.6.3"
+CONSUL_ZIP="consul_${CONSUL_VER}_linux_amd64.zip"
 # cleanup
-rm "${CONSUL_VER}.*"
+rm "consul_*"
 rm "consul"
 # install consul
-wget "https://dl.bintray.com/mitchellh/consul/${CONSUL_VER}.zip"
-unzip "${CONSUL_VER}.zip"
+wget "https://releases.hashicorp.com/consul/${CONSUL_VER}/${CONSUL_ZIP}
+https://dl.bintray.com/mitchellh/consul/${CONSUL_ZIP}"
+unzip ${CONSUL_ZIP}
 # check
 ./consul --version
