@@ -7,7 +7,6 @@ rm "consul_*"
 rm "consul"
 # install consul
 wget "https://releases.hashicorp.com/consul/${CONSUL_VER}/${CONSUL_ZIP}
-https://dl.bintray.com/mitchellh/consul/${CONSUL_ZIP}"
 unzip ${CONSUL_ZIP}
 # check
 ./consul --version
