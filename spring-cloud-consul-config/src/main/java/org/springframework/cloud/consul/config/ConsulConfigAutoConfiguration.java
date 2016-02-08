@@ -36,7 +36,7 @@ public class ConsulConfigAutoConfiguration {
 	protected static class ConsulRefreshConfiguration {
 		@Bean
 		@ConditionalOnBean(RefreshEndpoint.class)
-		public ConsulConfigRefreshListener zookeeperConfigRefreshListener(
+		public ConsulConfigRefreshListener consulConfigRefreshListener(
 				RefreshEndpoint refreshEndpoint) {
 			return new ConsulConfigRefreshListener(refreshEndpoint);
 		}
