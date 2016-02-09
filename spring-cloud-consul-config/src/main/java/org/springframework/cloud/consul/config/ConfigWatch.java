@@ -27,6 +27,7 @@ import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
 
+import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -81,7 +82,8 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 					if (newIndex != null && !newIndex.equals(currentIndex)) {
 						// don't publish the same index again, don't publish the first time (-1) so index can be primed
 						if (!this.consulIndexes.containsValue(newIndex) && !currentIndex.equals(-1L)) {
-							this.publisher.publishEvent(new ConsulConfigRefreshEvent(this, new RefreshEventData(context, currentIndex, newIndex)));
+							RefreshEventData data = new RefreshEventData(context, currentIndex, newIndex);
+							this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
 						}
 						this.consulIndexes.put(context, newIndex);
 					}

@@ -18,7 +18,6 @@ package org.springframework.cloud.consul.config;
 
 import com.ecwid.consul.v1.ConsulClient;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.endpoint.RefreshEndpoint;
@@ -34,13 +33,6 @@ public class ConsulConfigAutoConfiguration {
 	@Configuration
 	@ConditionalOnClass(RefreshEndpoint.class)
 	protected static class ConsulRefreshConfiguration {
-		@Bean
-		@ConditionalOnBean(RefreshEndpoint.class)
-		public ConsulConfigRefreshListener consulConfigRefreshListener(
-				RefreshEndpoint refreshEndpoint) {
-			return new ConsulConfigRefreshListener(refreshEndpoint);
-		}
-
 		@Bean
 		@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled", matchIfMissing = true)
 		public ConfigWatch configWatch(ConsulPropertySourceLocator locator,
