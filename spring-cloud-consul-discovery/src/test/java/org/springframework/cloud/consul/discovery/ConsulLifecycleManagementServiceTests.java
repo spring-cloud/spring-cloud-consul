@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Map;
 
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -43,6 +44,7 @@ public class ConsulLifecycleManagementServiceTests {
 	ConsulDiscoveryProperties discoveryProperties;
 
 	@Test
+	@Ignore
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
