@@ -22,14 +22,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.util.InetUtils;
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.apachecommons.CommonsLog;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.util.InetUtils;
 
 /**
  * Defines configuration for service discovery and registration.
@@ -38,7 +37,6 @@ import org.springframework.cloud.util.InetUtils;
  */
 @ConfigurationProperties("spring.cloud.consul.discovery")
 @Data
-@CommonsLog
 public class ConsulDiscoveryProperties {
 
 	protected static final String MANAGEMENT = "management";
@@ -86,7 +84,12 @@ public class ConsulDiscoveryProperties {
 	 * Use ip address rather than hostname during registration
 	 */
 	private boolean preferIpAddress = false;
-
+	
+	/**
+	 * Source of how we will determine the address to use
+	 */
+	private boolean preferAgentAddress = false;
+	
 	private int catalogServicesWatchDelay = 10;
 
 	private int catalogServicesWatchTimeout = 2;
@@ -109,6 +112,7 @@ public class ConsulDiscoveryProperties {
 	 */
 	private Map<String, String> serverListQueryTags = new HashMap<>();
 
+	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {}
 
 	public ConsulDiscoveryProperties(InetUtils inetUtils) {
