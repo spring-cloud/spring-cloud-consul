@@ -49,7 +49,7 @@ public class ConsulDiscoveryClientAclTests {
 
 	@Test
 	public void getInstancesForThisServiceWorks() {
-		List<ServiceInstance> instances = discoveryClient.getInstances("testConsulDiscovery");
+		List<ServiceInstance> instances = discoveryClient.getInstances("testConsulDiscoveryAcl");
 		assertNotNull("instances was null", instances);
 		assertFalse("instances was empty", instances.isEmpty());
 	}
