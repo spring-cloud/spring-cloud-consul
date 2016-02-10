@@ -1,0 +1,6 @@
+{
+  "datacenter": "local",
+  "acl_datacenter": "local",
+  "acl_master_token": "2ee647bd-bd69-4118-9f34-b9a6e9e60746",
+  "acl_default_policy": "deny"
+}

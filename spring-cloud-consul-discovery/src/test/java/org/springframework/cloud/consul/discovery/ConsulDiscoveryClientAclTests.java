@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.junit.Assert.*;
-
 import java.util.List;
 
 import org.junit.Test;
@@ -33,37 +31,27 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 /**
  * @author Spencer Gibb
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = ConsulDiscoveryClientTests.MyTestConfig.class)
-@WebIntegrationTest(value = {"spring.application.name=testConsulDiscovery",
-		"spring.cloud.consul.discovery.preferIpAddress=true"}, randomPort = true)
-public class ConsulDiscoveryClientTests {
+@SpringApplicationConfiguration(classes = ConsulDiscoveryClientAclTests.MyTestConfig.class)
+@WebIntegrationTest(value = {"spring.application.name=testConsulDiscoveryAcl",
+		"spring.cloud.consul.discovery.preferIpAddress=true",
+		"spring.cloud.consul.discovery.aclToken=2d2e6b3b-1c82-40ab-8171-54609d8ad304"}, randomPort = true)
+public class ConsulDiscoveryClientAclTests {
 
 	@Autowired
 	private ConsulDiscoveryClient discoveryClient;
 
 	@Test
-	public void getInstancesForServiceWorks() {
-		List<ServiceInstance> instances = discoveryClient.getInstances("consul");
+	public void getInstancesForThisServiceWorks() {
+		List<ServiceInstance> instances = discoveryClient.getInstances("testConsulDiscovery");
 		assertNotNull("instances was null", instances);
 		assertFalse("instances was empty", instances.isEmpty());
-
-		ServiceInstance instance = instances.get(0);
-		assertIpAddress(instance);
-	}
-
-	private void assertIpAddress(ServiceInstance instance) {
-		assertTrue("host isn't an ip address", Character.isDigit(instance.getHost().charAt(0)));
-	}
-
-	@Test
-	public void getLocalInstance() {
-		ServiceInstance instance = discoveryClient.getLocalServiceInstance();
-		assertNotNull("instance was null", instance);
-		assertIpAddress(instance);
 	}
 
 	@Configuration
