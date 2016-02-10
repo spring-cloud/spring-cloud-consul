@@ -117,7 +117,7 @@ public class ConsulPropertySourceLocatorTests {
 		this.client.setKVValue(KEY, "testPropValUpdate");
 
 		TestRefreshEndpoint endpoint = this.context.getBean(TestRefreshEndpoint.class);
-		boolean receivedEvent = endpoint.successLatch.await(60, TimeUnit.SECONDS);
+		boolean receivedEvent = endpoint.successLatch.await(3, TimeUnit.MINUTES);
 		assertThat("listener didn't receive event", receivedEvent, is(true));
 
 		testProp = this.environment.getProperty("testProp");
