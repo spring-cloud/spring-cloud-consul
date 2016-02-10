@@ -1,0 +1,20 @@
+{
+  "ID": "anonymous",
+  "Name": "anonymous",
+  "Type": "client",
+  "Rules": "{
+    \"key\": {
+      \"\": {
+        \"policy\": \"write\"
+      }
+    },
+    \"service\": {
+      \"\": {
+        \"policy\": \"write\"
+      },
+      \"testConsulDiscoveryAcl\": {
+        \"policy\": \"read\"
+      }
+    }
+  }"
+}
