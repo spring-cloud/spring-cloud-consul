@@ -15,7 +15,7 @@ install:
 - ./docs/src/main/asciidoc/ghpages.sh
 script:
 - ./src/test/bash/travis_run_consul.sh
-- if [ "${TRAVIS_REPO_SLUG} == "spring-cloud/spring-cloud-consul" ]; then
+- if [ "${TRAVIS_REPO_SLUG}" == "spring-cloud/spring-cloud-consul" ]; then
     '[ "${TRAVIS_PULL_REQUEST}" != "false" ] || ./mvnw --settings .settings.xml deploy -nsu -Dmaven.test.redirectTestOutputToFile=true';
     '[ "${TRAVIS_PULL_REQUEST}" = "false" ]  || ./mvnw --settings .settings.xml install -nsu -Dmaven.test.redirectTestOutputToFile=true';
   fi
