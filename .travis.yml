@@ -18,8 +18,9 @@ script:
 - if [ "${TRAVIS_REPO_SLUG}" == "spring-cloud/spring-cloud-consul" ]; then
     '[ "${TRAVIS_PULL_REQUEST}" != "false" ] || ./mvnw --settings .settings.xml deploy -nsu -Dmaven.test.redirectTestOutputToFile=true';
     '[ "${TRAVIS_PULL_REQUEST}" = "false" ]  || ./mvnw --settings .settings.xml install -nsu -Dmaven.test.redirectTestOutputToFile=true';
+  else
+    ./mvnw --settings .settings.xml test -nsu -Dmaven.test.redirectTestOutputToFile=true
   fi
-- ./mvnw --settings .settings.xml test -nsu -Dmaven.test.redirectTestOutputToFile=true
 env:
   global:
   - GIT_NAME="Spencer Gibb"
