@@ -15,8 +15,12 @@ install:
 - ./docs/src/main/asciidoc/ghpages.sh
 script:
 - ./src/test/bash/travis_run_consul.sh
-- '[ "${TRAVIS_PULL_REQUEST}" != "false" ] || ./mvnw --settings .settings.xml deploy -nsu -Dmaven.test.redirectTestOutputToFile=true'
-- '[ "${TRAVIS_PULL_REQUEST}" = "false" ]  || ./mvnw --settings .settings.xml install -nsu -Dmaven.test.redirectTestOutputToFile=true'
+- if [ "${TRAVIS_REPO_SLUG}" == "spring-cloud/spring-cloud-consul" ]; then
+    '[ "${TRAVIS_PULL_REQUEST}" != "false" ] || ./mvnw --settings .settings.xml deploy -nsu -Dmaven.test.redirectTestOutputToFile=true';
+    '[ "${TRAVIS_PULL_REQUEST}" = "false" ]  || ./mvnw --settings .settings.xml install -nsu -Dmaven.test.redirectTestOutputToFile=true';
+  else
+    ./mvnw --settings .settings.xml test -nsu -Dmaven.test.redirectTestOutputToFile=true;
+  fi
 env:
   global:
   - GIT_NAME="Spencer Gibb"
