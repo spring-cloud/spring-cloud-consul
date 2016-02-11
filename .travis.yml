@@ -19,7 +19,7 @@ script:
     '[ "${TRAVIS_PULL_REQUEST}" != "false" ] || ./mvnw --settings .settings.xml deploy -nsu -Dmaven.test.redirectTestOutputToFile=true';
     '[ "${TRAVIS_PULL_REQUEST}" = "false" ]  || ./mvnw --settings .settings.xml install -nsu -Dmaven.test.redirectTestOutputToFile=true';
   else
-    ./mvnw --settings .settings.xml test -nsu -Dmaven.test.redirectTestOutputToFile=true
+    ./mvnw --settings .settings.xml test -nsu -Dmaven.test.redirectTestOutputToFile=true;
   fi
 env:
   global:
