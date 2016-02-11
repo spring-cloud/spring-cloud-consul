@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.config;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Data;
@@ -50,6 +51,7 @@ public class ConsulConfigProperties {
 	@NotEmpty
 	private String dataKey = "data";
 
+	@Value("${consul.token:${CONSUL_TOKEN:${spring.cloud.consul.token:${SPRING_CLOUD_CONSUL_TOKEN:}}}}")
 	private String aclToken;
 
 	private Watch watch = new Watch();

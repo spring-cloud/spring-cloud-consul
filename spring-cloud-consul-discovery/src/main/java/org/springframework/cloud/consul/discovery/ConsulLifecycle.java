@@ -145,11 +145,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	protected void register(NewService newService) {
 		log.info("Registering service with consul: {}", newService.toString());
-		if (properties.getAclToken() == null) {
-			client.agentServiceRegister(newService);
-		} else {
-			client.agentServiceRegister(newService, properties.getAclToken());
-		}
+		client.agentServiceRegister(newService, properties.getAclToken());
 		if (ttlConfig.isEnabled() && ttlScheduler != null) {
 			ttlScheduler.add(newService);
 		}

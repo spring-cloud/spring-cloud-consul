@@ -58,24 +58,18 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 	}
 
 	public void init() {
-		Response<List<GetValue>> response;
-		if (configProperties.getAclToken() == null) {
-			response = source.getKVValues(context, QueryParams.DEFAULT);
-		}
-		else {
-			response = source.getKVValues(context, configProperties.getAclToken(),
-					QueryParams.DEFAULT);
-		}
+		Response<List<GetValue>> response = source.getKVValues(context,
+				configProperties.getAclToken(), QueryParams.DEFAULT);
 
 		final List<GetValue> values = response.getValue();
 		ConsulConfigProperties.Format format = configProperties.getFormat();
 		switch (format) {
-			case KEY_VALUE:
-				parsePropertiesInKeyValueFormat(values);
-				break;
-			case PROPERTIES:
-			case YAML:
-				parsePropertiesWithNonKeyValueFormat(values, format);
+		case KEY_VALUE:
+			parsePropertiesInKeyValueFormat(values);
+			break;
+		case PROPERTIES:
+		case YAML:
+			parsePropertiesWithNonKeyValueFormat(values, format);
 		}
 	}
 
@@ -119,13 +113,15 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 				final Properties props = generateProperties(value, format);
 
 				for (Map.Entry entry : props.entrySet()) {
-					properties.put(entry.getKey().toString(), entry.getValue().toString());
+					properties
+							.put(entry.getKey().toString(), entry.getValue().toString());
 				}
 			}
 		}
 	}
 
-	private Properties generateProperties(String value, ConsulConfigProperties.Format format) {
+	private Properties generateProperties(String value,
+			ConsulConfigProperties.Format format) {
 		final Properties props = new Properties();
 
 		if (format == ConsulConfigProperties.Format.PROPERTIES) {

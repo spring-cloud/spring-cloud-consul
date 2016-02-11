@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.util.InetUtils;
 
@@ -45,6 +46,7 @@ public class ConsulDiscoveryProperties {
 	@Setter(AccessLevel.PRIVATE)
 	private InetUtils.HostInfo hostInfo;
 
+	@Value("${consul.token:${CONSUL_TOKEN:${spring.cloud.consul.token:${SPRING_CLOUD_CONSUL_TOKEN:}}}}")
 	private String aclToken;
 
 	/** Tags to use when registering service */

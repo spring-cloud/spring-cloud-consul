@@ -41,7 +41,7 @@ import static org.junit.Assert.assertNotNull;
 @SpringApplicationConfiguration(classes = ConsulDiscoveryClientAclTests.MyTestConfig.class)
 @WebIntegrationTest(value = {"spring.application.name=testConsulDiscoveryAcl",
 		"spring.cloud.consul.discovery.preferIpAddress=true",
-		"spring.cloud.consul.discovery.aclToken=2d2e6b3b-1c82-40ab-8171-54609d8ad304"}, randomPort = true)
+		"consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304"}, randomPort = true)
 public class ConsulDiscoveryClientAclTests {
 
 	@Autowired
