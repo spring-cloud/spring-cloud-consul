@@ -114,6 +114,12 @@ public class ConsulDiscoveryProperties {
 	 */
 	private Map<String, String> serverListQueryTags = new HashMap<>();
 
+	/**
+	 * Add the 'passing` parameter to /v1/health/service/serviceName.
+	 * This pushes health check passing to the server.
+	 */
+	private boolean queryPassing = false;
+
 	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {}
 

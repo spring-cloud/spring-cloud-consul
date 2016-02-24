@@ -58,12 +58,13 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	}
 
 	private List<ConsulServer> getServers() {
-		if (client == null) {
+		if (this.client == null) {
 			return Collections.emptyList();
 		}
 		String tag = getTag(); // null is ok
-		Response<List<HealthService>> response = client.getHealthServices(
-				this.serviceId, tag, false, QueryParams.DEFAULT);
+		Response<List<HealthService>> response = this.client.getHealthServices(
+				this.serviceId, tag, this.properties.isQueryPassing(),
+				QueryParams.DEFAULT);
 		if (response.getValue() == null || response.getValue().isEmpty()) {
 			return Collections.emptyList();
 		}
