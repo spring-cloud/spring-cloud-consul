@@ -28,6 +28,7 @@ import com.netflix.loadbalancer.ServerListFilter;
 /**
  * Created by nicu on 12.03.2015.
  */
+@Deprecated
 public class ServiceCheckServerListFilter implements ServerListFilter<Server> {
 
 	private ConsulClient client;

@@ -16,17 +16,9 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.springframework.cloud.consul.discovery.IpAddressUtils.getCatalogServiceHost;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.cloud.client.DefaultServiceInstance;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.util.StringUtils;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -34,9 +26,17 @@ import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Member;
 import com.ecwid.consul.v1.agent.model.Self;
 import com.ecwid.consul.v1.agent.model.Service;
-import com.ecwid.consul.v1.catalog.model.CatalogService;
+import com.ecwid.consul.v1.health.model.HealthService;
+
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.cloud.client.DefaultServiceInstance;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.util.StringUtils;
 
 import lombok.extern.apachecommons.CommonsLog;
+
+import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
 
 /**
  * @author Spencer Gibb
@@ -52,8 +52,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	private ServerProperties serverProperties;
 
 	public ConsulDiscoveryClient(ConsulClient client, ConsulLifecycle lifecycle,
-								 ConsulDiscoveryProperties properties,
-								 ServerProperties serverProperties) {
+			ConsulDiscoveryProperties properties, ServerProperties serverProperties) {
 		this.client = client;
 		this.lifecycle = lifecycle;
 		this.properties = properties;
@@ -72,7 +71,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		String serviceId;
 		Integer port;
 		if (service == null) {
-			//possibly called before registration
+			// possibly called before registration
 			log.warn("Unable to locate service in consul agent: "
 					+ lifecycle.getServiceId());
 
@@ -81,7 +80,8 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 			if (port == 0 && serverProperties.getPort() != null) {
 				port = serverProperties.getPort();
 			}
-		} else {
+		}
+		else {
 			serviceId = service.getId();
 			port = service.getPort();
 		}
@@ -91,7 +91,8 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		if (member != null) {
 			if (properties.isPreferIpAddress()) {
 				host = member.getAddress();
-			} else if (StringUtils.hasText(member.getName())) {
+			}
+			else if (StringUtils.hasText(member.getName())) {
 				host = member.getName();
 			}
 		}
@@ -108,12 +109,12 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	private void addInstancesToList(List<ServiceInstance> instances, String serviceId) {
-		Response<List<CatalogService>> services = client.getCatalogService(serviceId,
-				QueryParams.DEFAULT);
-		for (CatalogService service : services.getValue()) {
-			String host = getCatalogServiceHost(service);
-			instances.add(new DefaultServiceInstance(serviceId, host,
-					service.getServicePort(), false));
+		Response<List<HealthService>> services = client.getHealthServices(serviceId,
+				false, QueryParams.DEFAULT);
+		for (HealthService service : services.getValue()) {
+			String host = findHost(service);
+			instances.add(new DefaultServiceInstance(serviceId, host, service
+					.getService().getPort(), false));
 		}
 	}
 

@@ -33,6 +33,7 @@ import com.netflix.loadbalancer.ServerListFilter;
  * live in both).
  * @author nicu marasoiu on 10.03.2015.
  */
+@Deprecated
 public class AliveServerListFilter implements ServerListFilter<Server> {
 	private FilteringAgentClient filteringAgentClient;
 
@@ -46,7 +47,7 @@ public class AliveServerListFilter implements ServerListFilter<Server> {
 		List<Server> filteredServers = new ArrayList<>();
 		for (Server server : servers) {
 			ConsulServer consulServer = ConsulServer.class.cast(server);
-			if (liveNodes.contains(consulServer.getAddress())) {
+			if (liveNodes.contains(consulServer.getHealthService().getService().getAddress())) {
 				filteredServers.add(server);
 			}
 		}

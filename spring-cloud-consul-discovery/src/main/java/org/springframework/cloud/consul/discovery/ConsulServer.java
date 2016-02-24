@@ -16,9 +16,10 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.springframework.cloud.consul.discovery.IpAddressUtils.getCatalogServiceHost;
+import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
 
-import com.ecwid.consul.v1.catalog.model.CatalogService;
+import com.ecwid.consul.v1.health.model.Check;
+import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.loadbalancer.Server;
 
 /**
@@ -27,17 +28,15 @@ import com.netflix.loadbalancer.Server;
 public class ConsulServer extends Server {
 
 	private final MetaInfo metaInfo;
-	private final String address;
-	private final String node;
+	private final HealthService service;
 
-	public ConsulServer(final CatalogService service) {
-		super(getCatalogServiceHost(service), service.getServicePort());
-		address = service.getAddress();
-		node = service.getNode();
+	public ConsulServer(final HealthService healthService) {
+		super(findHost(healthService), healthService.getService().getPort());
+		this.service = healthService;
 		metaInfo = new MetaInfo() {
 			@Override
 			public String getAppName() {
-				return service.getServiceName();
+				return service.getService().getService();
 			}
 
 			@Override
@@ -52,9 +51,11 @@ public class ConsulServer extends Server {
 
 			@Override
 			public String getInstanceId() {
-				return service.getServiceId();
+				return service.getService().getId();
 			}
 		};
+
+		setAlive(isPassingChecks());
 	}
 
 	@Override
@@ -62,11 +63,16 @@ public class ConsulServer extends Server {
 		return metaInfo;
 	}
 
-	public String getAddress() {
-		return address;
+	public HealthService getHealthService() {
+		return this.service;
 	}
 
-	public String getNode() {
-		return node;
+	public boolean isPassingChecks() {
+		for (Check check : this.service.getChecks()) {
+			if (check.getStatus() != Check.CheckStatus.PASSING) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

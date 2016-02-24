@@ -16,26 +16,26 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static com.netflix.client.config.CommonClientConfigKey.DeploymentContextBasedVipAddresses;
-import static com.netflix.client.config.CommonClientConfigKey.EnableZoneAffinity;
-
 import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.cloud.consul.discovery.filters.ServiceCheckServerListFilter;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.config.ConfigurationManager;
 import com.netflix.config.DynamicPropertyFactory;
 import com.netflix.config.DynamicStringProperty;
+import com.netflix.loadbalancer.IPing;
 import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerList;
 import com.netflix.loadbalancer.ServerListFilter;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import static com.netflix.client.config.CommonClientConfigKey.DeploymentContextBasedVipAddresses;
+import static com.netflix.client.config.CommonClientConfigKey.EnableZoneAffinity;
 
 /**
  * Preprocessor that configures defaults for Consul-discovered ribbon clients. Such as:
@@ -74,7 +74,13 @@ public class ConsulRibbonClientConfiguration {
 
 	@Bean
 	public ServerListFilter<Server> ribbonServerListFilter() {
-		return new ServiceCheckServerListFilter(client);
+		return new HealthServiceServerListFilter();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public IPing ribbonPing() {
+		return new ConsulPing();
 	}
 
 	@PostConstruct

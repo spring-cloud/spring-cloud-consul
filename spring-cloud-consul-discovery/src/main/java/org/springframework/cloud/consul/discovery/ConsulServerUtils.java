@@ -16,31 +16,27 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.util.Enumeration;
-
-import lombok.SneakyThrows;
-import lombok.extern.apachecommons.CommonsLog;
+import com.ecwid.consul.v1.health.model.HealthService;
 
 import org.springframework.util.StringUtils;
 
-import com.ecwid.consul.v1.catalog.model.CatalogService;
+import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * @author Spencer Gibb
  */
 @CommonsLog
-public class IpAddressUtils {
+public class ConsulServerUtils {
 
-	public static String getCatalogServiceHost(CatalogService service) {
-		if (StringUtils.hasText(service.getServiceAddress())) {
-			return service.getServiceAddress();
-		} else if (StringUtils.hasText(service.getAddress())) {
+	public static String findHost(HealthService healthService) {
+		HealthService.Service service = healthService.getService();
+		HealthService.Node node = healthService.getNode();
+
+		if (StringUtils.hasText(service.getAddress())) {
 			return service.getAddress();
+		} else if (StringUtils.hasText(node.getAddress())) {
+			return node.getAddress();
 		}
-		return service.getNode();
+		return node.getNode();
 	}
 }

@@ -23,7 +23,7 @@ import java.util.List;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.catalog.model.CatalogService;
+import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.AbstractServerList;
 
@@ -61,16 +61,29 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		if (client == null) {
 			return Collections.emptyList();
 		}
-		String tag = this.properties.getServerListQueryTags().get(this.serviceId); // null is ok
-		Response<List<CatalogService>> response = client.getCatalogService(
-				this.serviceId, tag, QueryParams.DEFAULT);
+		String tag = getTag(); // null is ok
+		Response<List<HealthService>> response = client.getHealthServices(
+				this.serviceId, tag, false, QueryParams.DEFAULT);
 		if (response.getValue() == null || response.getValue().isEmpty()) {
 			return Collections.emptyList();
 		}
 		List<ConsulServer> servers = new ArrayList<>();
-		for (CatalogService service : response.getValue()) {
+		for (HealthService service : response.getValue()) {
 			servers.add(new ConsulServer(service));
 		}
 		return servers;
+	}
+
+	private String getTag() {
+		return this.properties.getServerListQueryTags().get(this.serviceId);
+	}
+
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer("ConsulServerList{");
+		sb.append("serviceId='").append(serviceId).append('\'');
+		sb.append(", tag=").append(getTag());
+		sb.append('}');
+		return sb.toString();
 	}
 }

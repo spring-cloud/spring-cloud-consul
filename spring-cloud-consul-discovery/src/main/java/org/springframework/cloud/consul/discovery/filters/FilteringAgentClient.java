@@ -26,6 +26,7 @@ import org.springframework.cloud.consul.model.SerfStatusEnum;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.Member;
 
+@Deprecated
 public class FilteringAgentClient {
 
 	private static final int ALIVE_STATUS = SerfStatusEnum.StatusAlive.getCode();
