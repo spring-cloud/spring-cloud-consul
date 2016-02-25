@@ -56,6 +56,11 @@ public class ConsulConfigProperties {
 
 	private Watch watch = new Watch();
 
+	/**
+	 * Throw exceptions during config lookup if true, otherwise, log warnings.
+	 */
+	private boolean failFast = true;
+
 	@Data
 	public class Watch {
 		private int waitTime = 2;

@@ -28,13 +28,17 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.util.ReflectionUtils;
 
 import com.ecwid.consul.v1.ConsulClient;
+
+import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * @author Spencer Gibb
  */
 @Order(0)
+@CommonsLog
 public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
 	private ConsulClient consul;
@@ -75,9 +79,17 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 			Collections.reverse(this.contexts);
 
 			for (String propertySourceContext : this.contexts) {
-				ConsulPropertySource propertySource = create(propertySourceContext);
-				propertySource.init();
-				composite.addPropertySource(propertySource);
+				try {
+					ConsulPropertySource propertySource = create(propertySourceContext);
+					propertySource.init();
+					composite.addPropertySource(propertySource);
+				} catch (Exception e) {
+					if (this.properties.isFailFast()) {
+						ReflectionUtils.rethrowRuntimeException(e);
+					} else {
+						log.warn("Unable to load consul config from "+ propertySourceContext, e);
+					}
+				}
 			}
 
 			return composite;
