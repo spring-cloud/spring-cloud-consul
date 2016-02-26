@@ -59,7 +59,7 @@ public class ConsulConfigProperties {
 	/**
 	 * Throw exceptions during config lookup if true, otherwise, log warnings.
 	 */
-	private boolean failFast = true;
+	private boolean failFast = false;
 
 	@Data
 	public class Watch {
