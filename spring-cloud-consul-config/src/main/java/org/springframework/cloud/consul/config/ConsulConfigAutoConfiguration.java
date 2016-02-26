@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.endpoint.RefreshEndpoint;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -35,6 +36,7 @@ public class ConsulConfigAutoConfiguration {
 	protected static class ConsulRefreshConfiguration {
 		@Bean
 		@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled", matchIfMissing = true)
+		@Conditional(ConsulConnectionChecker.class)
 		public ConfigWatch configWatch(ConsulPropertySourceLocator locator,
 										   ConsulClient consul) {
 			return new ConfigWatch(locator.getContexts(), consul);
