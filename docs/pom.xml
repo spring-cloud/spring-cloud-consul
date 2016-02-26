@@ -13,7 +13,7 @@
 	<packaging>pom</packaging>
 	<name>Spring Cloud Consul Docs</name>
 	<description>Spring Cloud Docs</description>
-	<version>1.0.0.BUILD-SNAPSHOT</version>
+	<version>1.0.0.M6-v2</version>
 	<properties>
 		<docs.main>spring-cloud-consul</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
