@@ -188,7 +188,7 @@ You can change the data key using `spring.cloud.consul.config.data-key`.
 [[spring-cloud-consul-failfast]]
 == Fail Fast
 
-It may be convenient in certain circumstances (like local development or certain test scenarios) to not fail if consul isn't available for configuration. Setting `spring.cloud.consul.config.failFast=false` will cause the configuration module to log a warning rather than throw an exception. This will allow the application to continue startup normally.
+It may be convenient in certain circumstances (like local development or certain test scenarios) to not fail if consul isn't available for configuration. Setting `spring.cloud.consul.config.failFast=false` in `bootstrap.yml` will cause the configuration module to log a warning rather than throw an exception. This will allow the application to continue startup normally.
 
 [[spring-cloud-consul-retry]]
 == Consul Retry
