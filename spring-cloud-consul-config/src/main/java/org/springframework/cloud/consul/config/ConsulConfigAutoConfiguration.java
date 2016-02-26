@@ -35,9 +35,9 @@ public class ConsulConfigAutoConfiguration {
 	protected static class ConsulRefreshConfiguration {
 		@Bean
 		@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled", matchIfMissing = true)
-		public ConfigWatch configWatch(ConsulPropertySourceLocator locator,
-										   ConsulClient consul) {
-			return new ConfigWatch(locator.getContexts(), consul);
+		public ConfigWatch configWatch(ConsulConfigProperties properties,
+				ConsulPropertySourceLocator locator, ConsulClient consul) {
+			return new ConfigWatch(properties, locator.getContexts(), consul);
 		}
 	}
 }

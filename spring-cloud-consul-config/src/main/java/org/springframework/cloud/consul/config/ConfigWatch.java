@@ -40,13 +40,16 @@ import lombok.extern.apachecommons.CommonsLog;
  */
 @CommonsLog
 public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
+
+	private final ConsulConfigProperties properties;
 	private final List<String> contexts;
 	private final ConsulClient consul;
 	private AtomicBoolean running = new AtomicBoolean(false);
 	private ApplicationEventPublisher publisher;
 	private HashMap<String, Long> consulIndexes = new HashMap<>();
 
-	public ConfigWatch(List<String> contexts, ConsulClient consul) {
+	public ConfigWatch(ConsulConfigProperties properties, List<String> contexts, ConsulClient consul) {
+		this.properties = properties;
 		this.contexts = contexts;
 		this.consul = consul;
 	}
@@ -61,7 +64,7 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 		this.running.compareAndSet(false, true);
 	}
 
-	@Scheduled(fixedDelayString = "${spring.cloud.consul.config.watch.delay:10}")
+	@Scheduled(fixedDelayString = "${spring.cloud.consul.config.watch.delay:100}")
 	public void watchConfigKeyValues() {
 		if (this.running.get()) {
 			for (String context : this.contexts) {
@@ -89,7 +92,11 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 					}
 
 				} catch (Exception e) {
-					log.error("Error initializing listener for context " + context, e);
+					if (this.properties.isFailFast()) {
+						log.error("Error initializing listener for context " + context, e);
+					} else if (log.isTraceEnabled()) {
+						log.trace("Failfast is true. Error initializing listener for context " + context, e);
+					}
 				}
 			}
 		}
