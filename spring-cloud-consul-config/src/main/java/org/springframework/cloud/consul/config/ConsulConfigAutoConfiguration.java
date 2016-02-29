@@ -20,6 +20,7 @@ import com.ecwid.consul.v1.ConsulClient;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.endpoint.RefreshEndpoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,8 @@ import org.springframework.context.annotation.Configuration;
  * @author Spencer Gibb
  */
 @Configuration
+@ConditionalOnConsulEnabled
+@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled", matchIfMissing = true)
 public class ConsulConfigAutoConfiguration {
 
 	@Configuration
