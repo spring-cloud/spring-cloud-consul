@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.util.InetUtils;
+import org.springframework.cloud.commons.util.InetUtils;
 
 import lombok.AccessLevel;
 import lombok.Data;

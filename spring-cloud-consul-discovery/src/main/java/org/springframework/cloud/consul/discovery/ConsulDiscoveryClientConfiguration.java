@@ -16,17 +16,17 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import com.ecwid.consul.v1.ConsulClient;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
-import org.springframework.cloud.util.InetUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.ecwid.consul.v1.ConsulClient;
 
 /**
  * @author Spencer Gibb
