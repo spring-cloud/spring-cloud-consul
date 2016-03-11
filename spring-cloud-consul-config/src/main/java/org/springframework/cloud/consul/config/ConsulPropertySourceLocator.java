@@ -75,6 +75,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 				suffixes.add("/");
 			} else {
 				suffixes.add(".yml");
+				suffixes.add(".yaml");
 				suffixes.add(".properties");
 			}
 

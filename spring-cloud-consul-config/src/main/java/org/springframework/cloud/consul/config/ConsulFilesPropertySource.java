@@ -36,7 +36,7 @@ public class ConsulFilesPropertySource extends ConsulPropertySource {
 	}
 
 	public void init(GetValue value) {
-		if (this.getContext().endsWith(".yml")) {
+		if (this.getContext().endsWith(".yml") || this.getContext().endsWith(".yaml")) {
 			parseValue(value, YAML);
 		} else if (this.getContext().endsWith(".properties")) {
 			parseValue(value, PROPERTIES);

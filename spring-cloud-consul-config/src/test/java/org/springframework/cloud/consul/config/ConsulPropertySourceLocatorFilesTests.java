@@ -53,7 +53,7 @@ public class ConsulPropertySourceLocatorFilesTests {
 	public static final String ROOT = PREFIX + UUID.randomUUID();
 	public static final String APP_NAME = "testFilesFormat";
 	public static final String APPLICATION_YML = "/application.yml";
-	public static final String APPLICATION_DEV_YML = "/application-dev.yml";
+	public static final String APPLICATION_DEV_YML = "/application-dev.yaml";
 	public static final String APP_NAME_PROPS = "/"+APP_NAME+".properties";
 	public static final String APP_NAME_DEV_PROPS = "/"+APP_NAME+"-dev.properties";
 
