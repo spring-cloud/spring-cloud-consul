@@ -185,6 +185,42 @@ You could store a YAML document in any of the keys listed above.
 
 You can change the data key using `spring.cloud.consul.config.data-key`.
 
+[[spring-cloud-consul-config-git2consul]]
+== git2consul with Config
+git2consul is a Consul community project that loads files from a git repository to individual keys into Consul. By default the names of the keys are names of the files. YAML and Properties files are supported with file extensions of `.yml` and `.properties` respectively.  Set the `spring.cloud.consul.config.format` property to `FILES`. For example:
+
+.bootstrap.yml
+----
+spring:
+  cloud:
+    consul:
+      config:
+        format: FILES
+----
+
+Given the following keys in `/config`, the `development` profile and an application name of `foo`:
+
+----
+.gitignore
+application.yml
+bar.properties
+foo-development.properties
+foo-production.yml
+foo.properties
+master.ref
+----
+
+the following property sources would be created:
+
+----
+config/foo-development.properties
+config/foo.properties
+config/application.yml
+----
+
+The value of each key needs to be a properly formatted YAML or Properties file.
+
+
 [[spring-cloud-consul-failfast]]
 == Fail Fast
 

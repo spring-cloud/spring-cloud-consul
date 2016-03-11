@@ -24,16 +24,18 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.kv.model.GetValue;
-
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.StringUtils;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.QueryParams;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.kv.model.GetValue;
+
+import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.PROPERTIES;
+import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.YAML;
 import static org.springframework.util.Base64Utils.decodeFromString;
 
 /**
@@ -52,12 +54,13 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		this.context = context;
 		this.configProperties = configProperties;
 
-		if (!this.context.endsWith("/")) {
-			this.context = this.context + "/";
-		}
 	}
 
 	public void init() {
+		if (!this.context.endsWith("/")) {
+			this.context = this.context + "/";
+		}
+
 		Response<List<GetValue>> response = source.getKVValues(context,
 				configProperties.getAclToken(), QueryParams.DEFAULT);
 
@@ -79,7 +82,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 	 *
 	 * @param values
 	 */
-	private void parsePropertiesInKeyValueFormat(List<GetValue> values) {
+	protected void parsePropertiesInKeyValueFormat(List<GetValue> values) {
 		if (values == null) {
 			return;
 		}
@@ -100,7 +103,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 	 *
 	 * @param values
 	 */
-	private void parsePropertiesWithNonKeyValueFormat(List<GetValue> values,
+	protected void parsePropertiesWithNonKeyValueFormat(List<GetValue> values,
 			ConsulConfigProperties.Format format) {
 		if (values == null) {
 			return;
@@ -109,22 +112,26 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		for (GetValue getValue : values) {
 			String key = getValue.getKey().replace(context, "");
 			if (configProperties.getDataKey().equals(key)) {
-				final String value = getDecoded(getValue.getValue());
-				final Properties props = generateProperties(value, format);
-
-				for (Map.Entry entry : props.entrySet()) {
-					properties
-							.put(entry.getKey().toString(), entry.getValue().toString());
-				}
+				parseValue(getValue, format);
 			}
 		}
 	}
 
-	private Properties generateProperties(String value,
+	protected void parseValue(GetValue getValue, ConsulConfigProperties.Format format) {
+		String value = getDecoded(getValue.getValue());
+		Properties props = generateProperties(value, format);
+
+		for (Map.Entry entry : props.entrySet()) {
+			properties
+					.put(entry.getKey().toString(), entry.getValue().toString());
+		}
+	}
+
+	protected Properties generateProperties(String value,
 			ConsulConfigProperties.Format format) {
 		final Properties props = new Properties();
 
-		if (format == ConsulConfigProperties.Format.PROPERTIES) {
+		if (format == PROPERTIES) {
 			try {
 				// Must use the ISO-8859-1 encoding because Properties.load(stream)
 				// expects it.
@@ -137,7 +144,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 			return props;
 		}
-		else if (format == ConsulConfigProperties.Format.YAML) {
+		else if (format == YAML) {
 			final YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
 			yaml.setResources(new ByteArrayResource(value.getBytes()));
 
@@ -151,6 +158,18 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		if (value == null)
 			return null;
 		return new String(decodeFromString(value));
+	}
+
+	protected Map<String, String> getProperties() {
+		return properties;
+	}
+
+	protected ConsulConfigProperties getConfigProperties() {
+		return configProperties;
+	}
+
+	protected String getContext() {
+		return context;
 	}
 
 	@Override

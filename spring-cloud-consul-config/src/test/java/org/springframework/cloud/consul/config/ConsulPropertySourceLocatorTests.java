@@ -36,6 +36,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -44,11 +45,18 @@ import static org.junit.Assert.assertThat;
 /**
  * @author Spencer Gibb
  */
+@DirtiesContext
 public class ConsulPropertySourceLocatorTests {
 	public static final String PREFIX = "_propertySourceLocatorTests_config__";
 	public static final String ROOT = PREFIX + UUID.randomUUID();
+	public static final String VALUE1 = "testPropVal";
+	public static final String TEST_PROP = "testProp";
+	public static final String KEY1 = ROOT + "/application/"+ TEST_PROP;
+	public static final String VALUE2 = "testPropVal2";
+	public static final String TEST_PROP2 = "testProp2";
+	public static final String KEY2 = ROOT + "/application/"+ TEST_PROP2;
+
 	private ConfigurableApplicationContext context;
-	public static final String KEY = ROOT + "/application/testProp";
 
 	@Configuration
 	@EnableAutoConfiguration
@@ -91,12 +99,13 @@ public class ConsulPropertySourceLocatorTests {
 		this.properties = new ConsulProperties();
 		this.client = new ConsulClient(properties.getHost(), properties.getPort());
 		this.client.deleteKVValues(PREFIX);
-		this.client.setKVValue(KEY, "testPropVal");
+		this.client.setKVValue(KEY1, VALUE1);
+		this.client.setKVValue(KEY2, VALUE2);
 
 
 		this.context = new SpringApplicationBuilder(Config.class)
 				.web(false)
-				.run("--spring.spring.application.name=testConsulPropertySourceLocator",
+				.run("--spring.application.name=testConsulPropertySourceLocator",
 						"--spring.cloud.consul.config.prefix="+ROOT,
 						"spring.cloud.consul.config.watch.delay=1");
 
@@ -108,21 +117,28 @@ public class ConsulPropertySourceLocatorTests {
 	@After
 	public void teardown() {
 		this.client.deleteKVValues(PREFIX);
+		this.context.close();
 	}
 
 	@Test
-	@Ignore // failing on travis
-	public void propertyLoadedAndUpdated() throws Exception {
-		String testProp = this.environment.getProperty("testProp");
-		assertThat("testProp was wrong", testProp, is(equalTo("testPropVal")));
+	public void propertyLoaded() throws Exception {
+		String testProp = this.environment.getProperty(TEST_PROP2);
+		assertThat("testProp was wrong", testProp, is(equalTo(VALUE2)));
+	}
 
-		this.client.setKVValue(KEY, "testPropValUpdate");
+	@Test
+	@Ignore("failing on travis")
+	public void propertyLoadedAndUpdated() throws Exception {
+		String testProp = this.environment.getProperty(TEST_PROP);
+		assertThat("testProp was wrong", testProp, is(equalTo(VALUE1)));
+
+		this.client.setKVValue(KEY1, "testPropValUpdate");
 
 		TestRefreshEndpoint endpoint = this.context.getBean(TestRefreshEndpoint.class);
 		boolean receivedEvent = endpoint.successLatch.await(3, TimeUnit.MINUTES);
 		assertThat("listener didn't receive event", receivedEvent, is(true));
 
-		testProp = this.environment.getProperty("testProp");
+		testProp = this.environment.getProperty(TEST_PROP);
 		assertThat("testProp was wrong after update", testProp, is(equalTo("testPropValUpdate")));
 
 		boolean receivedExtraEvent = endpoint.toManyLatch.await(15, TimeUnit.SECONDS);

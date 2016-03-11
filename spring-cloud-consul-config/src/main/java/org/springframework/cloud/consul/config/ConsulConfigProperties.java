@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.consul.config;
 
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -61,12 +62,18 @@ public class ConsulConfigProperties {
 	 */
 	private boolean failFast = true;
 
+	@PostConstruct
+	public void init() {
+		if (this.format == Format.FILES) {
+			this.profileSeparator = "-";
+		}
+	}
+
 	@Data
 	public class Watch {
 		private int waitTime = 2;
 		private boolean enabled = true;
 		private int delay = 10;
-
 	}
 
 	/**
@@ -109,7 +116,13 @@ public class ConsulConfigProperties {
 		 * Indicates that the configuration specified in consul is of YAML style i.e., value
 		 * of the consul key would be YAML format
 		 */
-		YAML;
+		YAML,
+
+		/**
+		 * Indicates that the configuration specified in consul uses keys as files.
+		 * This is useful for tools like git2consul.
+		 */
+		FILES,
 
 	}
 }

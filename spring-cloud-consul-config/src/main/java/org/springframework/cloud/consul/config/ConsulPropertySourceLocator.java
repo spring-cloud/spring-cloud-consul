@@ -31,8 +31,12 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.ReflectionUtils;
 
 import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.kv.model.GetValue;
 
 import lombok.extern.apachecommons.CommonsLog;
+
+import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
 
 /**
  * @author Spencer Gibb
@@ -66,23 +70,50 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
 			String prefix = this.properties.getPrefix();
 
+			List<String> suffixes = new ArrayList<>();
+			if (this.properties.getFormat() != FILES) {
+				suffixes.add("/");
+			} else {
+				suffixes.add(".yml");
+				suffixes.add(".properties");
+			}
+
 			String defaultContext = prefix + "/" + this.properties.getDefaultContext();
-			this.contexts.add(defaultContext + "/");
-			addProfiles(this.contexts, defaultContext, profiles);
+			for (String suffix : suffixes) {
+				this.contexts.add(defaultContext + suffix);
+			}
+			for (String suffix : suffixes) {
+				addProfiles(this.contexts, defaultContext, profiles, suffix);
+			}
 
 			String baseContext = prefix + "/" + appName;
-			this.contexts.add(baseContext + "/");
-			addProfiles(this.contexts, baseContext, profiles);
-
-			CompositePropertySource composite = new CompositePropertySource("consul");
+			for (String suffix : suffixes) {
+				this.contexts.add(baseContext + suffix);
+			}
+			for (String suffix : suffixes) {
+				addProfiles(this.contexts, baseContext, profiles, suffix);
+			}
 
 			Collections.reverse(this.contexts);
 
+			CompositePropertySource composite = new CompositePropertySource("consul");
+
 			for (String propertySourceContext : this.contexts) {
 				try {
-					ConsulPropertySource propertySource = create(propertySourceContext);
-					propertySource.init();
-					composite.addPropertySource(propertySource);
+					ConsulPropertySource propertySource = null;
+					if (this.properties.getFormat() == FILES) {
+						Response<GetValue> response = this.consul.getKVValue(propertySourceContext, this.properties.getAclToken());
+						if (response.getValue() != null) {
+							ConsulFilesPropertySource filesPropertySource = new ConsulFilesPropertySource(propertySourceContext, this.consul, this.properties);
+							filesPropertySource.init(response.getValue());
+							propertySource = filesPropertySource;
+						}
+					} else {
+						propertySource = create(propertySourceContext);
+					}
+					if (propertySource != null) {
+						composite.addPropertySource(propertySource);
+					}
 				} catch (Exception e) {
 					if (this.properties.isFailFast()) {
 						ReflectionUtils.rethrowRuntimeException(e);
@@ -98,13 +129,15 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 	}
 
 	private ConsulPropertySource create(String context) {
-		return new ConsulPropertySource(context, consul, properties);
+		ConsulPropertySource propertySource = new ConsulPropertySource(context, this.consul, this.properties);
+		propertySource.init();
+		return propertySource;
 	}
 
 	private void addProfiles(List<String> contexts, String baseContext,
-			List<String> profiles) {
+							 List<String> profiles, String suffix) {
 		for (String profile : profiles) {
-			contexts.add(baseContext + this.properties.getProfileSeparator() + profile + "/");
+			contexts.add(baseContext + this.properties.getProfileSeparator() + profile + suffix);
 		}
 	}
 }
