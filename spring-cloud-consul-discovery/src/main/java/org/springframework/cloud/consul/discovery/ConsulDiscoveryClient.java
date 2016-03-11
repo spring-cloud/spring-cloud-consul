@@ -44,18 +44,22 @@ import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findH
 @CommonsLog
 public class ConsulDiscoveryClient implements DiscoveryClient {
 
-	private ConsulLifecycle lifecycle;
+	private final ConsulLifecycle lifecycle;
 
-	private ConsulClient client;
+	private final ConsulClient client;
 
-	private ConsulDiscoveryProperties properties;
+	private final ConsulDiscoveryProperties properties;
+
 	private ServerProperties serverProperties;
 
 	public ConsulDiscoveryClient(ConsulClient client, ConsulLifecycle lifecycle,
-			ConsulDiscoveryProperties properties, ServerProperties serverProperties) {
+			ConsulDiscoveryProperties properties) {
 		this.client = client;
 		this.lifecycle = lifecycle;
 		this.properties = properties;
+	}
+
+	public void setServerProperties(ServerProperties serverProperties) {
 		this.serverProperties = serverProperties;
 	}
 
@@ -77,7 +81,8 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 			serviceId = lifecycle.getServiceId();
 			port = lifecycle.getConfiguredPort();
-			if (port == 0 && serverProperties.getPort() != null) {
+			if (port == 0 && serverProperties != null
+					&& serverProperties.getPort() != null) {
 				port = serverProperties.getPort();
 			}
 		}

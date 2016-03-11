@@ -40,6 +40,9 @@ public class ConsulDiscoveryClientConfiguration {
 	@Autowired
 	private ConsulClient consulClient;
 
+	@Autowired(required = false)
+	private ServerProperties serverProperties;
+
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulLifecycle consulLifecycle(ConsulDiscoveryProperties discoveryProperties,
@@ -67,10 +70,11 @@ public class ConsulDiscoveryClientConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulDiscoveryClient consulDiscoveryClient(ConsulLifecycle consulLifecycle,
-			ServerProperties serverProperties,
 			ConsulDiscoveryProperties discoveryProperties) {
-		return new ConsulDiscoveryClient(consulClient, consulLifecycle,
-				discoveryProperties, serverProperties);
+		ConsulDiscoveryClient discoveryClient = new ConsulDiscoveryClient(consulClient,
+				consulLifecycle, discoveryProperties);
+		discoveryClient.setServerProperties(serverProperties); //null ok
+		return discoveryClient;
 	}
 
 	@Bean
