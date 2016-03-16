@@ -120,6 +120,11 @@ public class ConsulDiscoveryProperties {
 	 */
 	private boolean queryPassing = false;
 
+	/**
+	 * Register as a service in consul.
+	 */
+	private boolean register = true;
+
 	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {}
 

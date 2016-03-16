@@ -78,6 +78,10 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	@Override
 	protected void register() {
+		if (!this.properties.isRegister()) {
+			log.debug("Registration disabled.");
+			return;
+		}
 		Assert.notNull(service.getPort(), "service.port has not been set");
 		String appName = getAppName();
 		service.setId(getServiceId());
@@ -132,6 +136,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	@Override
 	protected void registerManagement() {
+		if (!this.properties.isRegister()) {
+			return;
+		}
 		NewService management = new NewService();
 		management.setId(getManagementServiceId());
 		management.setAddress(properties.getHostname());
@@ -177,6 +184,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	}
 
 	private void deregister(String serviceId) {
+		if (!this.properties.isRegister()) {
+			return;
+		}
 		if (ttlScheduler != null) {
 			ttlScheduler.remove(serviceId);
 		}
