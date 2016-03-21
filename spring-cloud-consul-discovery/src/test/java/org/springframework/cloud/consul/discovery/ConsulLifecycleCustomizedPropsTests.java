@@ -16,10 +16,6 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.Map;
 
 import org.junit.FixMethodOrder;
@@ -40,6 +36,9 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
 
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.*;
+
 /**
  * @author Spencer Gibb
  */
@@ -48,7 +47,9 @@ import com.ecwid.consul.v1.agent.model.Service;
 @SpringApplicationConfiguration(classes = TestPropsConfig.class)
 @WebIntegrationTest(value = { "spring.application.name=myTestService",
 		"spring.cloud.consul.discovery.instanceId=myTestService1",
-		"spring.cloud.consul.discovery.port=4452"}, randomPort = true)
+		"spring.cloud.consul.discovery.port=4452",
+		"spring.cloud.consul.discovery.hostname=myhost",
+		"spring.cloud.consul.discovery.ipAddress=10.0.0.1"}, randomPort = true)
 public class ConsulLifecycleCustomizedPropsTests {
 
 	@Autowired
@@ -60,15 +61,21 @@ public class ConsulLifecycleCustomizedPropsTests {
 	@Autowired
 	ApplicationContext context;
 
+	@Autowired
+	ConsulDiscoveryProperties properties;
+
 	@Test
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
 		Service service = services.get("myTestService1");
-		assertNotNull("service was null", service);
-		assertEquals("service port is discovery port", 4452, service.getPort().intValue());
-		assertEquals("service id was wrong", "myTestService1", service.getId());
-		assertEquals("service name was wrong", "myTestService", service.getService());
+		assertThat("service was null", service, is(notNullValue()));
+		assertThat("service port is discovery port", 4452, equalTo(service.getPort()));
+		assertThat("service id was wrong", "myTestService1", equalTo(service.getId()));
+		assertThat("service name was wrong", "myTestService", equalTo(service.getService()));
+		assertThat("property hostname was wrong", "myhost", equalTo(this.properties.getHostname()));
+		assertThat("property ipAddress was wrong", "10.0.0.1", equalTo(this.properties.getIpAddress()));
+		assertThat("service address was wrong", "myhost", equalTo(service.getAddress()));
 	}
 }
 

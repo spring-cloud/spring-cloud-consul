@@ -138,6 +138,16 @@ public class ConsulDiscoveryProperties {
 		return this.preferIpAddress ? this.ipAddress : this.hostname;
 	}
 
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
+		this.hostInfo.override = true;
+	}
+
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
+		this.hostInfo.override = true;
+	}
+
 	@Data
 	public class Lifecycle {
 		private boolean enabled = true;
