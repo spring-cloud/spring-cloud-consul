@@ -125,6 +125,11 @@ public class ConsulDiscoveryProperties {
 	 */
 	private boolean register = true;
 
+	/**
+	 * Register health check in consul. Useful during development of a service.
+	 */
+	private boolean registerHealthCheck = true;
+
 	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {}
 

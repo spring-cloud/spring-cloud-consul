@@ -96,13 +96,15 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 			service.setPort(properties.getPort());
 		}
 
-		Integer checkPort;
-		if (shouldRegisterManagement()) {
-			checkPort = getManagementPort();
-		} else {
-			checkPort = service.getPort();
+		if (this.properties.isRegisterHealthCheck()) {
+			Integer checkPort;
+			if (shouldRegisterManagement()) {
+				checkPort = getManagementPort();
+			} else {
+				checkPort = service.getPort();
+			}
+			service.setCheck(createCheck(checkPort));
 		}
-		service.setCheck(createCheck(checkPort));
 
 		register(service);
 	}
