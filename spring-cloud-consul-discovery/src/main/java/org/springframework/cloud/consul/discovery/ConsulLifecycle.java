@@ -221,9 +221,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	}
 
 	public static String normalizeForDns(String s) {
-		if (!Character.isLetter(s.charAt(0))
+		if (s == null || !Character.isLetter(s.charAt(0))
 				|| !Character.isLetterOrDigit(s.charAt(s.length()-1))) {
-			throw new IllegalArgumentException("Consul service ids must start with a letter, end with a letter or digit, and have as interior characters only letters, digits, and hyphen");
+			throw new IllegalArgumentException("Consul service ids must not be empty, must start with a letter, end with a letter or digit, and have as interior characters only letters, digits, and hyphen");
 		}
 
 		StringBuilder normalized = new StringBuilder();
