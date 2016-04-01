@@ -20,6 +20,9 @@ import static org.junit.Assert.*;
 
 import java.util.List;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.QueryParams;
+import com.ecwid.consul.v1.Response;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +38,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * @author Spencer Gibb
+ * @author Joe Athman
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ConsulDiscoveryClientTests.MyTestConfig.class)
@@ -44,11 +48,26 @@ public class ConsulDiscoveryClientTests {
 
 	@Autowired
 	private ConsulDiscoveryClient discoveryClient;
+	@Autowired
+	private ConsulClient consulClient;
 
 	@Test
 	public void getInstancesForServiceWorks() {
 		List<ServiceInstance> instances = discoveryClient.getInstances("consul");
 		assertNotNull("instances was null", instances);
+		assertFalse("instances was empty", instances.isEmpty());
+
+		ServiceInstance instance = instances.get(0);
+		assertIpAddress(instance);
+	}
+
+	@Test
+	public void getInstancesForServiceRespectsQueryParams() {
+		Response<List<String>> catalogDatacenters = consulClient.getCatalogDatacenters();
+
+		List<String> dataCenterList = catalogDatacenters.getValue();
+		assertFalse("no data centers found", dataCenterList.isEmpty());
+		List<ServiceInstance> instances = discoveryClient.getInstances("consul", new QueryParams(dataCenterList.get(0)));
 		assertFalse("instances was empty", instances.isEmpty());
 
 		ServiceInstance instance = instances.get(0);
