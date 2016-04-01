@@ -1,3 +1,10 @@
 dependencies {
-    compile '{@= groupId @}:spring-cloud-starter-consul-all:{@= version @}'
+    compile('{@= groupId @}:spring-cloud-starter-consul-all')
 }
+
+dependencyManagement {
+    imports { 
+        mavenBom "{@= groupId @}:spring-cloud-dependencies:{@= version @}" 
+    }
+}
+

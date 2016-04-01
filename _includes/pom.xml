@@ -2,6 +2,17 @@
     <dependency>
         <groupId>{@= groupId @}</groupId>
         <artifactId>spring-cloud-starter-consul-all</artifactId>
-        <version>{@= version @}</version>
     </dependency>
 </dependencies>
+	
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>{@= groupId @}</groupId>
+            <artifactId>spring-cloud-dependencies</artifactId>
+            <version>{@= version @}</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
