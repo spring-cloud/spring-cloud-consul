@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.context.refresh.ContextRefresher;
 import org.springframework.cloud.context.scope.refresh.RefreshScope;
 import org.springframework.cloud.endpoint.RefreshEndpoint;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -75,7 +76,7 @@ public class ConsulPropertySourceLocatorTests {
 		private AtomicInteger count = new AtomicInteger();
 
 		public TestRefreshEndpoint( ConfigurableApplicationContext context, RefreshScope scope) {
-			super(context, scope);
+			super(new ContextRefresher(context, scope));
 		}
 
 		@Override
