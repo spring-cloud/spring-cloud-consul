@@ -115,6 +115,11 @@ public class ConsulDiscoveryProperties {
 	private Map<String, String> serverListQueryTags = new HashMap<>();
 
 	/**
+	 * Tag to query for in service list if one is not listed in serverListQueryTags.
+	 */
+	private String defaultQueryTag;
+
+	/**
 	 * Add the 'passing` parameter to /v1/health/service/serviceName.
 	 * This pushes health check passing to the server.
 	 */
@@ -137,6 +142,16 @@ public class ConsulDiscoveryProperties {
 		this.hostInfo = inetUtils.findFirstNonLoopbackHostInfo();
 		this.ipAddress = this.hostInfo.getIpAddress();
 		this.hostname = this.hostInfo.getHostname();
+	}
+
+	/**
+	 *
+	 * @param serviceId The service who's filtering tag is being looked up
+	 * @return The tag the given service id should be filtered by, or null.
+     */
+	public String getQueryTagForService(String serviceId){
+		String tag = serverListQueryTags.get(serviceId);
+		return tag != null ? tag : defaultQueryTag;
 	}
 
 	public String getHostname() {
