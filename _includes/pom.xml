@@ -9,7 +9,7 @@
     <dependencies>
         <dependency>
             <groupId>{@= groupId @}</groupId>
-            <artifactId>spring-cloud-dependencies</artifactId>
+            <artifactId>spring-cloud-consul-dependencies</artifactId>
             <version>{@= version @}</version>
             <type>pom</type>
             <scope>import</scope>
