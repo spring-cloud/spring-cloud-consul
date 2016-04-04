@@ -16,11 +16,14 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +37,7 @@ import com.ecwid.consul.v1.agent.model.NewService;
 
 /**
  * @author Spencer Gibb
+ * @author Venil Noronha
  */
 @Slf4j
 public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
@@ -53,6 +57,10 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	private ServletContext servletContext;
 
 	private NewService service = new NewService();
+
+	@Getter
+	@Setter
+	private List<ConsulServiceCustomizer> serviceCustomizers = new ArrayList<>();
 
 	public ConsulLifecycle(ConsulClient client, ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
 		this.client = client;
@@ -104,6 +112,12 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 				checkPort = service.getPort();
 			}
 			service.setCheck(createCheck(checkPort));
+		}
+
+		if (!this.serviceCustomizers.isEmpty()) {
+			for (ConsulServiceCustomizer serviceCustomizer : serviceCustomizers) {
+				serviceCustomizer.customize(service);
+			}
 		}
 
 		register(service);
