@@ -1,11 +1,19 @@
-dependencies {
-    compile('{@= groupId @}:spring-cloud-starter-consul-all')
+buildscript {
+    dependencies {
+        classpath "io.spring.gradle:dependency-management-plugin:0.5.6.RELEASE"
+    }
 }
+
+apply plugin: "io.spring.dependency-management"
 
 dependencyManagement {
     imports { 
         mavenBom "{@= groupId @}:spring-cloud-dependencies:{@= version @}" 
     }
+}
+
+dependencies {
+    compile('{@= groupId @}:spring-cloud-starter-consul-all')
 }
 
 
