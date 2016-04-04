@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.discovery;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,12 @@ public class ConsulDiscoveryProperties {
 	/** Tags to use when registering management service */
 	private List<String> managementTags = Arrays.asList(MANAGEMENT);
 
+	/** Tags for services that should be excluded from discovery.  Default is empty */
+	private List<String> excludedTags = Collections.emptyList();
+
+	/** Tags for services that should be included in discovery.  Default is null, indicating all services */
+	private List<String> includedTags = null;
+
 	/** Alternate server path to invoke for health checking */
 	private String healthCheckPath = "/health";
 
@@ -86,12 +93,12 @@ public class ConsulDiscoveryProperties {
 	 * Use ip address rather than hostname during registration
 	 */
 	private boolean preferIpAddress = false;
-	
+
 	/**
 	 * Source of how we will determine the address to use
 	 */
 	private boolean preferAgentAddress = false;
-	
+
 	private int catalogServicesWatchDelay = 10;
 
 	private int catalogServicesWatchTimeout = 2;
@@ -133,7 +140,7 @@ public class ConsulDiscoveryProperties {
 	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {}
 
-	public ConsulDiscoveryProperties(InetUtils inetUtils) {
+	public ConsulDiscoveryProperties(final InetUtils inetUtils) {
 		this.hostInfo = inetUtils.findFirstNonLoopbackHostInfo();
 		this.ipAddress = this.hostInfo.getIpAddress();
 		this.hostname = this.hostInfo.getHostname();
@@ -143,12 +150,12 @@ public class ConsulDiscoveryProperties {
 		return this.preferIpAddress ? this.ipAddress : this.hostname;
 	}
 
-	public void setHostname(String hostname) {
+	public void setHostname(final String hostname) {
 		this.hostname = hostname;
 		this.hostInfo.override = true;
 	}
 
-	public void setIpAddress(String ipAddress) {
+	public void setIpAddress(final String ipAddress) {
 		this.ipAddress = ipAddress;
 		this.hostInfo.override = true;
 	}

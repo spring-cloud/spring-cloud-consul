@@ -16,9 +16,18 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
+
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.consul.discovery.filters.ConsulServiceDiscoveryFilter;
+import org.springframework.util.StringUtils;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -28,15 +37,7 @@ import com.ecwid.consul.v1.agent.model.Self;
 import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.health.model.HealthService;
 
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.cloud.client.DefaultServiceInstance;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.util.StringUtils;
-
 import lombok.extern.apachecommons.CommonsLog;
-
-import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
 
 /**
  * @author Spencer Gibb
@@ -50,16 +51,20 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	private final ConsulDiscoveryProperties properties;
 
+	private final ConsulServiceDiscoveryFilter filter;
+
 	private ServerProperties serverProperties;
 
-	public ConsulDiscoveryClient(ConsulClient client, ConsulLifecycle lifecycle,
-			ConsulDiscoveryProperties properties) {
+	public ConsulDiscoveryClient(final ConsulClient client, final ConsulLifecycle lifecycle,
+			final ConsulDiscoveryProperties properties,
+			final ConsulServiceDiscoveryFilter filter) {
 		this.client = client;
 		this.lifecycle = lifecycle;
 		this.properties = properties;
+		this.filter = filter;
 	}
 
-	public void setServerProperties(ServerProperties serverProperties) {
+	public void setServerProperties(final ServerProperties serverProperties) {
 		this.serverProperties = serverProperties;
 	}
 
@@ -74,6 +79,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		Service service = agentServices.getValue().get(lifecycle.getServiceId());
 		String serviceId;
 		Integer port;
+		List<String> tags;
 		if (service == null) {
 			// possibly called before registration
 			log.warn("Unable to locate service in consul agent: "
@@ -85,10 +91,12 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 					&& serverProperties.getPort() != null) {
 				port = serverProperties.getPort();
 			}
+			tags = Collections.emptyList();
 		}
 		else {
 			serviceId = service.getId();
 			port = service.getPort();
+			tags = service.getTags();
 		}
 		String host = "localhost";
 		Response<Self> agentSelf = client.getAgentSelf();
@@ -101,7 +109,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 				host = member.getName();
 			}
 		}
-		return new DefaultServiceInstance(serviceId, host, port, false);
+		return new ConsulServiceInstance(serviceId, host, port, false, tags);
 	}
 
 	@Override
@@ -113,13 +121,17 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		return instances;
 	}
 
-	private void addInstancesToList(List<ServiceInstance> instances, String serviceId) {
+	private void addInstancesToList(final List<ServiceInstance> instances, final String serviceId) {
 		Response<List<HealthService>> services = client.getHealthServices(serviceId,
 				this.properties.isQueryPassing(), QueryParams.DEFAULT);
 		for (HealthService service : services.getValue()) {
 			String host = findHost(service);
-			instances.add(new DefaultServiceInstance(serviceId, host, service
-					.getService().getPort(), false));
+			List<String> tags = service.getService().getTags();
+			ConsulServiceInstance serviceInstance = new ConsulServiceInstance(serviceId, host,
+			        service.getService().getPort(), false, tags);
+			if (filter.accept(serviceInstance)) {
+                instances.add(serviceInstance);
+            }
 		}
 	}
 

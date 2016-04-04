@@ -16,6 +16,9 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.HashSet;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -23,6 +26,9 @@ import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
+import org.springframework.cloud.consul.discovery.filters.ConsulServiceDiscoveryFilter;
+import org.springframework.cloud.consul.discovery.filters.TagMatchingDiscoveryFilter;
+import org.springframework.cloud.consul.discovery.filters.TagMatchingDiscoveryFilter.TagSet;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -45,17 +51,37 @@ public class ConsulDiscoveryClientConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulLifecycle consulLifecycle(ConsulDiscoveryProperties discoveryProperties,
-			HeartbeatProperties heartbeatProperties) {
+	public ConsulLifecycle consulLifecycle(final ConsulDiscoveryProperties discoveryProperties,
+			final HeartbeatProperties heartbeatProperties) {
 		return new ConsulLifecycle(consulClient, discoveryProperties, heartbeatProperties);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
-	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties) {
+	public TtlScheduler ttlScheduler(final HeartbeatProperties heartbeatProperties) {
 		return new TtlScheduler(heartbeatProperties, consulClient);
 	}
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConsulServiceDiscoveryFilter serviceDiscoveryFilter(final ConsulDiscoveryProperties properties) {
+    	TagSet included;
+    	List<String> includeList = properties.getIncludedTags();
+    	if (includeList == null) {
+    		included = TagMatchingDiscoveryFilter.MATCH_ALL;
+    	} else {
+    		included = TagMatchingDiscoveryFilter.wrapSet(new HashSet<>(includeList));
+    	}
+    	List<String> excludeList = properties.getExcludedTags();
+    	TagSet excluded;
+    	if (excludeList == null) {
+    		excluded = TagMatchingDiscoveryFilter.MATCH_NONE;
+    	} else {
+    		excluded = TagMatchingDiscoveryFilter.wrapSet(new HashSet<>(excludeList));
+    	}
+        return new TagMatchingDiscoveryFilter(excluded, included);
+    }
 
 	@Bean
 	public HeartbeatProperties heartbeatProperties() {
@@ -63,16 +89,17 @@ public class ConsulDiscoveryClientConfiguration {
 	}
 
 	@Bean
-	public ConsulDiscoveryProperties consulDiscoveryProperties(InetUtils inetUtils) {
+	public ConsulDiscoveryProperties consulDiscoveryProperties(final InetUtils inetUtils) {
 		return new ConsulDiscoveryProperties(inetUtils);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulDiscoveryClient consulDiscoveryClient(ConsulLifecycle consulLifecycle,
-			ConsulDiscoveryProperties discoveryProperties) {
+	public ConsulDiscoveryClient consulDiscoveryClient(final ConsulLifecycle consulLifecycle,
+			final ConsulDiscoveryProperties discoveryProperties,
+			final ConsulServiceDiscoveryFilter serviceDiscoveryFilter) {
 		ConsulDiscoveryClient discoveryClient = new ConsulDiscoveryClient(consulClient,
-				consulLifecycle, discoveryProperties);
+				consulLifecycle, discoveryProperties, serviceDiscoveryFilter);
 		discoveryClient.setServerProperties(serverProperties); //null ok
 		return discoveryClient;
 	}
@@ -80,7 +107,7 @@ public class ConsulDiscoveryClientConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulCatalogWatch consulCatalogWatch(
-			ConsulDiscoveryProperties discoveryProperties) {
+			final ConsulDiscoveryProperties discoveryProperties) {
 		return new ConsulCatalogWatch(discoveryProperties, consulClient);
 	}
 }
