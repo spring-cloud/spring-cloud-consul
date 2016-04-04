@@ -17,13 +17,13 @@
 package org.springframework.cloud.consul.discovery;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +58,6 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	private NewService service = new NewService();
 
-	@Getter
-	@Setter
 	private List<ConsulServiceCustomizer> serviceCustomizers = new ArrayList<>();
 
 	public ConsulLifecycle(ConsulClient client, ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
@@ -232,6 +230,39 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	 */
 	public String getManagementServiceName() {
 		return normalizeForDns(getAppName()) + SEPARATOR + properties.getManagementSuffix();
+	}
+
+	/**
+	 * Set {@link ConsulServiceCustomizer}s that should be applied to the
+	 * {@link NewService}. Calling this method will replace any existing
+	 * customizers.
+	 * 
+	 * @param customizers the customizers to set.
+	 */
+	public void setServiceCustomizers(Collection<? extends ConsulServiceCustomizer> customizers) {
+		Assert.notNull(customizers, "ConsulServiceCustomizers must not be null");
+		this.serviceCustomizers = new ArrayList<ConsulServiceCustomizer>(customizers);
+	}
+
+	/**
+	 * Returns a mutable collection of the {@link ConsulServiceCustomizer}s that
+	 * will be applied to the {@link NewService}.
+	 * 
+	 * @return the customizers that will be applied.
+	 */
+	public Collection<ConsulServiceCustomizer> getServiceCustomizers() {
+		return this.serviceCustomizers;
+	}
+
+	/**
+	 * Add {@link ConsulServiceCustomizer}s that should be used to customize the
+	 * {@link NewService}.
+	 * 
+	 * @param customizers the customizers to add.
+	 */
+	public void addServiceCustomizers(ConsulServiceCustomizer... customizers) {
+		Assert.notNull(customizers, "ConsulServiceCustomizers must not be null");
+		this.serviceCustomizers.addAll(Arrays.asList(customizers));
 	}
 
 	public static String normalizeForDns(String s) {
