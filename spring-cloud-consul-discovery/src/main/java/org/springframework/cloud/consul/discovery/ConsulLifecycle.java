@@ -112,10 +112,8 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 			service.setCheck(createCheck(checkPort));
 		}
 
-		if (!this.serviceCustomizers.isEmpty()) {
-			for (ConsulServiceCustomizer serviceCustomizer : serviceCustomizers) {
-				serviceCustomizer.customize(service);
-			}
+		for (ConsulServiceCustomizer serviceCustomizer : serviceCustomizers) {
+			serviceCustomizer.customize(service);
 		}
 
 		register(service);
