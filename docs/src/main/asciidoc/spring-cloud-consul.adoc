@@ -83,6 +83,21 @@ spring:
 ----
 
 
+==== Metadata and Consul tags
+
+Consul does not yet support metadata on services. Spring Cloud's `ServiceInstance` has a `Map<String, String> metadata` field. Spring Cloud Consul uses Consul tags to approximate metadata until Consul officially supports metadata. Tags with the form `key=value` will be split and used as a `Map` key and value respectively. Tags without the equal `=` sign, will be used as both the key and value.
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        tags: foo=bar, baz
+----
+
+The above configuration will result in a map with `foo->bar` and `baz->baz`.
+
 ==== Making the Consul Instance ID Unique
 
 By default a consul instance is registered with an ID that is equal to its Spring Application Context ID. By default, the Spring Application Context ID is `${spring.application.name}:comma,separated,profiles:${server.port}`. For most cases, this will allow multiple instances of one service to run on one machine.  If further uniqueness is required, Using Spring Cloud you can override this by providing a unique identifier in `spring.cloud.consul.discovery.instanceId`. For example:

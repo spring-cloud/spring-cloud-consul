@@ -16,11 +16,13 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
+import java.util.Map;
 
 import com.ecwid.consul.v1.health.model.Check;
 import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.loadbalancer.Server;
+
+import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
 
 /**
  * @author Spencer Gibb
@@ -65,6 +67,10 @@ public class ConsulServer extends Server {
 
 	public HealthService getHealthService() {
 		return this.service;
+	}
+
+	public Map<String, String> getMetadata() {
+		return ConsulServerUtils.getMetadata(this.service);
 	}
 
 	public boolean isPassingChecks() {

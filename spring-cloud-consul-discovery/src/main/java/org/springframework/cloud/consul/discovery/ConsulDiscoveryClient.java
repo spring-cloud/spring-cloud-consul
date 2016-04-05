@@ -20,6 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.cloud.client.DefaultServiceInstance;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.util.StringUtils;
+
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
@@ -28,15 +34,10 @@ import com.ecwid.consul.v1.agent.model.Self;
 import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.health.model.HealthService;
 
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.cloud.client.DefaultServiceInstance;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.util.StringUtils;
-
 import lombok.extern.apachecommons.CommonsLog;
 
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
+import static org.springframework.cloud.consul.discovery.ConsulServerUtils.getMetadata;
 
 /**
  * @author Spencer Gibb
@@ -74,6 +75,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		Service service = agentServices.getValue().get(lifecycle.getServiceId());
 		String serviceId;
 		Integer port;
+		Map<String, String> metadata;
 		if (service == null) {
 			// possibly called before registration
 			log.warn("Unable to locate service in consul agent: "
@@ -85,10 +87,12 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 					&& serverProperties.getPort() != null) {
 				port = serverProperties.getPort();
 			}
+			metadata = getMetadata(this.properties.getTags());
 		}
 		else {
 			serviceId = service.getId();
 			port = service.getPort();
+			metadata = getMetadata(service.getTags());
 		}
 		String host = "localhost";
 		Response<Self> agentSelf = client.getAgentSelf();
@@ -101,7 +105,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 				host = member.getName();
 			}
 		}
-		return new DefaultServiceInstance(serviceId, host, port, false);
+		return new DefaultServiceInstance(serviceId, host, port, false, metadata);
 	}
 
 	@Override
@@ -119,7 +123,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		for (HealthService service : services.getValue()) {
 			String host = findHost(service);
 			instances.add(new DefaultServiceInstance(serviceId, host, service
-					.getService().getPort(), false));
+					.getService().getPort(), false, getMetadata(service)));
 		}
 	}
 

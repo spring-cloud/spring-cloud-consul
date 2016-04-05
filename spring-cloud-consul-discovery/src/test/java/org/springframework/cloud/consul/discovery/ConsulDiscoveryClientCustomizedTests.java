@@ -16,11 +16,8 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.conn.util.InetAddressUtils;
 import org.junit.Test;
@@ -36,12 +33,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
 /**
  * @author Spencer Gibb
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ConsulDiscoveryClientCustomizedTests.MyTestConfig.class)
-@WebIntegrationTest(value = {"spring.application.name=testConsulDiscovery2", "spring.cloud.consul.discovery.instanceId=testConsulDiscovery2Id"}, randomPort = true)
+@WebIntegrationTest(value = { "spring.application.name=testConsulDiscovery2",
+		"spring.cloud.consul.discovery.instanceId=testConsulDiscovery2Id",
+		"spring.cloud.consul.discovery.tags=plaintag,foo=bar,foo2=bar2=baz2" }, randomPort = true)
 public class ConsulDiscoveryClientCustomizedTests {
 
 	@Autowired
@@ -55,7 +58,33 @@ public class ConsulDiscoveryClientCustomizedTests {
 	}
 
 	private void assertNotIpAddress(ServiceInstance instance) {
-		assertFalse("host is an ip address", InetAddressUtils.isIPv4Address(instance.getHost()));
+		assertFalse("host is an ip address",
+				InetAddressUtils.isIPv4Address(instance.getHost()));
+	}
+
+	@Test
+	public void getMetadataWorks() throws InterruptedException {
+		List<ServiceInstance> instances = discoveryClient
+				.getInstances("testConsulDiscovery2");
+		assertNotNull("instances was null", instances);
+		assertFalse("instances was empty", instances.isEmpty());
+
+		ServiceInstance instance = instances.get(0);
+		assertInstance(instance);
+	}
+
+	private void assertInstance(ServiceInstance instance) {
+		Map<String, String> metadata = instance.getMetadata();
+		assertNotNull("metadata was null", metadata);
+
+		String foo = metadata.get("foo");
+		assertEquals("metadata key foo was wrong", "bar", foo);
+
+		String plaintag = metadata.get("plaintag");
+		assertEquals("metadata key plaintag was wrong", "plaintag", plaintag);
+
+		String foo2 = metadata.get("foo2");
+		assertEquals("metadata key foo2 was wrong", "bar2=baz2", foo2);
 	}
 
 	@Test
@@ -63,7 +92,9 @@ public class ConsulDiscoveryClientCustomizedTests {
 		ServiceInstance instance = discoveryClient.getLocalServiceInstance();
 		assertNotNull("instance was null", instance);
 		assertNotIpAddress(instance);
-		assertEquals("instance id was wrong", "testConsulDiscovery2Id", instance.getServiceId());
+		assertEquals("instance id was wrong", "testConsulDiscovery2Id",
+				instance.getServiceId());
+		assertInstance(instance);
 	}
 
 	@Configuration
