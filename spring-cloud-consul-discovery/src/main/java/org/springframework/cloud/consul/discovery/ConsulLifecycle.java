@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,6 +37,7 @@ import com.ecwid.consul.v1.agent.model.NewService;
 
 /**
  * @author Spencer Gibb
+ * @author Venil Noronha
  */
 @Slf4j
 public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
@@ -53,6 +57,8 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	private ServletContext servletContext;
 
 	private NewService service = new NewService();
+
+	private List<ConsulServiceCustomizer> serviceCustomizers = new ArrayList<>();
 
 	public ConsulLifecycle(ConsulClient client, ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
 		this.client = client;
@@ -104,6 +110,10 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 				checkPort = service.getPort();
 			}
 			service.setCheck(createCheck(checkPort));
+		}
+
+		for (ConsulServiceCustomizer serviceCustomizer : serviceCustomizers) {
+			serviceCustomizer.customize(service);
 		}
 
 		register(service);
@@ -218,6 +228,39 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	 */
 	public String getManagementServiceName() {
 		return normalizeForDns(getAppName()) + SEPARATOR + properties.getManagementSuffix();
+	}
+
+	/**
+	 * Set {@link ConsulServiceCustomizer}s that should be applied to the
+	 * {@link NewService}. Calling this method will replace any existing
+	 * customizers.
+	 * 
+	 * @param customizers the customizers to set.
+	 */
+	public void setServiceCustomizers(Collection<? extends ConsulServiceCustomizer> customizers) {
+		Assert.notNull(customizers, "ConsulServiceCustomizers must not be null");
+		this.serviceCustomizers = new ArrayList<ConsulServiceCustomizer>(customizers);
+	}
+
+	/**
+	 * Returns a mutable collection of the {@link ConsulServiceCustomizer}s that
+	 * will be applied to the {@link NewService}.
+	 * 
+	 * @return the customizers that will be applied.
+	 */
+	public Collection<ConsulServiceCustomizer> getServiceCustomizers() {
+		return this.serviceCustomizers;
+	}
+
+	/**
+	 * Add {@link ConsulServiceCustomizer}s that should be used to customize the
+	 * {@link NewService}.
+	 * 
+	 * @param customizers the customizers to add.
+	 */
+	public void addServiceCustomizers(ConsulServiceCustomizer... customizers) {
+		Assert.notNull(customizers, "ConsulServiceCustomizers must not be null");
+		this.serviceCustomizers.addAll(Arrays.asList(customizers));
 	}
 
 	public static String normalizeForDns(String s) {
