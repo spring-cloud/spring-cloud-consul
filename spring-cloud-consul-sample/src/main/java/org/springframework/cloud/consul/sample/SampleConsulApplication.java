@@ -28,6 +28,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.feign.FeignClient;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author Spencer Gibb
@@ -63,6 +65,9 @@ public class SampleConsulApplication /*implements ApplicationListener<SimpleRemo
 	@Autowired
 	private SampleClient sampleClient;
 
+	@Autowired
+	private RestTemplate restTemplate;
+
 	@Value("${spring.application.name:testConsulApp}")
 	private String appName;
 
@@ -74,6 +79,11 @@ public class SampleConsulApplication /*implements ApplicationListener<SimpleRemo
 	@RequestMapping("/")
 	public ServiceInstance lb() {
 		return loadBalancer.choose(appName);
+	}
+
+	@RequestMapping("/rest")
+	public String rest() {
+		return this.restTemplate.getForObject("http://"+appName+"/me", String.class);
 	}
 
 	@RequestMapping("/choose")
@@ -110,6 +120,13 @@ public class SampleConsulApplication /*implements ApplicationListener<SimpleRemo
 	public SampleProperties sampleProperties() {
 		return new SampleProperties();
 	}
+
+	@Bean
+	@LoadBalanced
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
+
 
 	public static void main(String[] args) {
 		SpringApplication.run(SampleConsulApplication.class, args);
