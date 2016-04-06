@@ -41,6 +41,7 @@ import static org.springframework.cloud.consul.discovery.ConsulServerUtils.getMe
 
 /**
  * @author Spencer Gibb
+ * @author Joe Athman
  */
 @CommonsLog
 public class ConsulDiscoveryClient implements DiscoveryClient {
@@ -110,16 +111,20 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<ServiceInstance> getInstances(final String serviceId) {
+		return getInstances(serviceId, QueryParams.DEFAULT);
+	}
+
+	public List<ServiceInstance> getInstances(final String serviceId, final QueryParams queryParams) {
 		List<ServiceInstance> instances = new ArrayList<>();
 
-		addInstancesToList(instances, serviceId);
+		addInstancesToList(instances, serviceId, queryParams);
 
 		return instances;
 	}
 
-	private void addInstancesToList(List<ServiceInstance> instances, String serviceId) {
+	private void addInstancesToList(List<ServiceInstance> instances, String serviceId, QueryParams queryParams) {
 		Response<List<HealthService>> services = client.getHealthServices(serviceId,
-				this.properties.isQueryPassing(), QueryParams.DEFAULT);
+				this.properties.isQueryPassing(), queryParams);
 		for (HealthService service : services.getValue()) {
 			String host = findHost(service);
 			instances.add(new DefaultServiceInstance(serviceId, host, service
@@ -133,7 +138,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		Response<Map<String, List<String>>> services = client
 				.getCatalogServices(QueryParams.DEFAULT);
 		for (String serviceId : services.getValue().keySet()) {
-			addInstancesToList(instances, serviceId);
+			addInstancesToList(instances, serviceId, QueryParams.DEFAULT);
 		}
 		return instances;
 	}
