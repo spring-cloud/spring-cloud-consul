@@ -16,8 +16,6 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.junit.Assert.*;
-
 import java.util.List;
 
 import org.junit.Test;
@@ -33,17 +31,28 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.QueryParams;
+import com.ecwid.consul.v1.Response;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Spencer Gibb
+ * @author Joe Athman
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ConsulDiscoveryClientTests.MyTestConfig.class)
-@WebIntegrationTest(value = {"spring.application.name=testConsulDiscovery",
-		"spring.cloud.consul.discovery.preferIpAddress=true"}, randomPort = true)
+@WebIntegrationTest(value = { "spring.application.name=testConsulDiscovery",
+		"spring.cloud.consul.discovery.preferIpAddress=true" }, randomPort = true)
 public class ConsulDiscoveryClientTests {
 
 	@Autowired
 	private ConsulDiscoveryClient discoveryClient;
+	@Autowired
+	private ConsulClient consulClient;
 
 	@Test
 	public void getInstancesForServiceWorks() {
@@ -55,8 +64,23 @@ public class ConsulDiscoveryClientTests {
 		assertIpAddress(instance);
 	}
 
+	@Test
+	public void getInstancesForServiceRespectsQueryParams() {
+		Response<List<String>> catalogDatacenters = consulClient.getCatalogDatacenters();
+
+		List<String> dataCenterList = catalogDatacenters.getValue();
+		assertFalse("no data centers found", dataCenterList.isEmpty());
+		List<ServiceInstance> instances = discoveryClient.getInstances("consul",
+				new QueryParams(dataCenterList.get(0)));
+		assertFalse("instances was empty", instances.isEmpty());
+
+		ServiceInstance instance = instances.get(0);
+		assertIpAddress(instance);
+	}
+
 	private void assertIpAddress(ServiceInstance instance) {
-		assertTrue("host isn't an ip address", Character.isDigit(instance.getHost().charAt(0)));
+		assertTrue("host isn't an ip address",
+				Character.isDigit(instance.getHost().charAt(0)));
 	}
 
 	@Test
