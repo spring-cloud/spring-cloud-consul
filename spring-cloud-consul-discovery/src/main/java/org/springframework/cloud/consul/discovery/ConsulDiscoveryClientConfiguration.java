@@ -79,6 +79,7 @@ public class ConsulDiscoveryClientConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
+	@ConditionalOnProperty(name = "spring.cloud.consul.discovery.catalogServicesWatch.enabled", matchIfMissing = true)
 	public ConsulCatalogWatch consulCatalogWatch(
 			ConsulDiscoveryProperties discoveryProperties) {
 		return new ConsulCatalogWatch(discoveryProperties, consulClient);

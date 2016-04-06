@@ -1,4 +1,4 @@
-package org.springframework.cloud.consul.discovery;/*
+/*
  * Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,12 @@ package org.springframework.cloud.consul.discovery;/*
  * limitations under the License.
  */
 
+package org.springframework.cloud.consul.discovery;
+
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,6 +29,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Spencer Gibb
@@ -53,20 +55,26 @@ public class ConsulCatalogWatch implements ApplicationEventPublisherAware {
 
 	@Scheduled(fixedDelayString = "${spring.cloud.consul.discovery.catalogServicesWatchDelay:30000}")
 	public void catalogServicesWatch() {
-		long index = -1;
-		if (catalogServicesIndex.get() != null) {
-			index = catalogServicesIndex.get().longValue();
-		}
+		try {
+			long index = -1;
+			if (catalogServicesIndex.get() != null) {
+				index = catalogServicesIndex.get().longValue();
+			}
 
-		Response<Map<String, List<String>>> response = consul
-				.getCatalogServices(new QueryParams(properties
-						.getCatalogServicesWatchTimeout(), index));
-		Long consulIndex = response.getConsulIndex();
-		if (consulIndex != null) {
-			catalogServicesIndex.set(BigInteger.valueOf(consulIndex));
-		}
+			Response<Map<String, List<String>>> response = consul
+					.getCatalogServices(new QueryParams(properties
+							.getCatalogServicesWatchTimeout(), index));
+			Long consulIndex = response.getConsulIndex();
+			if (consulIndex != null) {
+				catalogServicesIndex.set(BigInteger.valueOf(consulIndex));
+			}
 
-		log.trace("Received services update from consul: {}, index: {}", response.getValue(), consulIndex);
-		publisher.publishEvent(new HeartbeatEvent(this, consulIndex));
+			log.trace("Received services update from consul: {}, index: {}",
+					response.getValue(), consulIndex);
+			publisher.publishEvent(new HeartbeatEvent(this, consulIndex));
+		}
+		catch (Exception e) {
+			log.error("Error watching Consul CatalogServices", e);
+		}
 	}
 }
