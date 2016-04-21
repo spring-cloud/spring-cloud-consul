@@ -16,9 +16,11 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.List;
-import java.util.Map;
-
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.QueryParams;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.Service;
+import com.ecwid.consul.v1.health.model.Check;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,14 +35,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-import com.ecwid.consul.v1.health.model.Check;
+import java.util.List;
+import java.util.Map;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.*;
 
 /**
  * @author Spencer Gibb
@@ -48,8 +50,8 @@ import static org.hamcrest.Matchers.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SpringApplicationConfiguration(classes = TestPropsConfig.class)
-@WebIntegrationTest(value = { "spring.application.name=myTestService",
-		"spring.cloud.consul.discovery.instanceId=myTestService1",
+@WebIntegrationTest(value = { "spring.application.name=myTestService-B",
+		"spring.cloud.consul.discovery.instanceId=myTestService1-B",
 		"spring.cloud.consul.discovery.port=4452",
 		"spring.cloud.consul.discovery.hostname=myhost",
 		"spring.cloud.consul.discovery.ipAddress=10.0.0.1",
@@ -72,16 +74,16 @@ public class ConsulLifecycleCustomizedPropsTests {
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
-		Service service = services.get("myTestService1");
+		Service service = services.get("myTestService1-B");
 		assertThat("service was null", service, is(notNullValue()));
 		assertThat("service port is discovery port", 4452, equalTo(service.getPort()));
-		assertThat("service id was wrong", "myTestService1", equalTo(service.getId()));
-		assertThat("service name was wrong", "myTestService", equalTo(service.getService()));
+		assertThat("service id was wrong", "myTestService1-B", equalTo(service.getId()));
+		assertThat("service name was wrong", "myTestService-B", equalTo(service.getService()));
 		assertThat("property hostname was wrong", "myhost", equalTo(this.properties.getHostname()));
 		assertThat("property ipAddress was wrong", "10.0.0.1", equalTo(this.properties.getIpAddress()));
 		assertThat("service address was wrong", "myhost", equalTo(service.getAddress()));
 
-		Response<List<Check>> checkResponse = consul.getHealthChecksForService("myTestService", QueryParams.DEFAULT);
+		Response<List<Check>> checkResponse = consul.getHealthChecksForService("myTestService-B", QueryParams.DEFAULT);
 		List<Check> checks = checkResponse.getValue();
 		assertThat("checks was wrong size", checks, hasSize(0));
 	}

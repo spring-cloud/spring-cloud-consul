@@ -16,13 +16,9 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Map;
-
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.Service;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,9 +30,12 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Spencer Gibb
@@ -44,8 +43,8 @@ import com.ecwid.consul.v1.agent.model.Service;
 @RunWith(SpringJUnit4ClassRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SpringApplicationConfiguration(classes = TestPropsConfig.class)
-@WebIntegrationTest(value = { "spring.application.name=myTestService",
-		"spring.cloud.consul.discovery.instanceId=myTestService1",
+@WebIntegrationTest(value = { "spring.application.name=myTestService-A",
+		"spring.cloud.consul.discovery.instanceId=myTestService1-A",
 		"spring.cloud.consul.discovery.serviceName=myprefix-${spring.application.name}",
 		"spring.cloud.consul.discovery.preferAgentAddress=true"}, randomPort = true)
 public class ConsulLifecycleCustomizedAgentAddressTests {
@@ -66,11 +65,11 @@ public class ConsulLifecycleCustomizedAgentAddressTests {
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
-		Service service = services.get("myTestService1");
+		Service service = services.get("myTestService1-A");
 		assertNotNull("service was null", service);
 		assertNotEquals("service port is 0", 0, service.getPort().intValue());
-		assertEquals("service id was wrong", "myTestService1", service.getId());
-		assertEquals("service name was wrong", "myprefix-myTestService", service.getService());
+		assertEquals("service id was wrong", "myTestService1-A", service.getId());
+		assertEquals("service name was wrong", "myprefix-myTestService-A", service.getService());
 		assertTrue("service address must be empty", StringUtils.isEmpty(service.getAddress()));
 	}
 }

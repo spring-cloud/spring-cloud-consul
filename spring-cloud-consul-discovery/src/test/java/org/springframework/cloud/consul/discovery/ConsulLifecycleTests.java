@@ -16,13 +16,9 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.util.Map;
-
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.Service;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,9 +34,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.StringUtils;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Spencer Gibb
@@ -48,7 +47,7 @@ import com.ecwid.consul.v1.agent.model.Service;
 @RunWith(SpringJUnit4ClassRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SpringApplicationConfiguration(classes = TestConfig.class)
-@WebIntegrationTest(value = "spring.application.name=myTestService1::something", randomPort = true)
+@WebIntegrationTest(value = "spring.application.name=myTestService1-F::something", randomPort = true)
 public class ConsulLifecycleTests {
 
 	@Autowired
@@ -72,7 +71,7 @@ public class ConsulLifecycleTests {
 		assertNotEquals("service port is 0", 0, service.getPort().intValue());
 		assertFalse("service id contained invalid character: " + service.getId(), service.getId().contains(":"));
 		assertEquals("service id was wrong", lifecycle.getServiceId(), service.getId());
-		assertEquals("service name was wrong", "myTestService1-something", service.getService());
+		assertEquals("service name was wrong", "myTestService1-F-something", service.getService());
 		assertFalse("service address must not be empty", StringUtils.isEmpty(service.getAddress()));
 		assertEquals("service address must equals hostname from discovery properties", discoveryProperties.getHostname(), service.getAddress());
 	}

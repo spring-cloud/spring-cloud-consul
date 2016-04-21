@@ -16,12 +16,9 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.Map;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +26,8 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Map;
 
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -38,8 +37,8 @@ import static org.junit.Assert.assertNotNull;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = TestPropsConfig.class)
-@WebIntegrationTest(value = { "spring.application.name=myTestService2",
-		"spring.cloud.consul.discovery.instanceId=myTestService2", }, randomPort = true)
+@WebIntegrationTest(value = { "spring.application.name=myTestService2-D",
+		"spring.cloud.consul.discovery.instanceId=myTestService2-D", }, randomPort = true)
 public class ConsulLifecycleDefaultPortTests {
 
 	@Autowired
@@ -55,7 +54,7 @@ public class ConsulLifecycleDefaultPortTests {
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
-		Service service = services.get("myTestService2");
+		Service service = services.get("myTestService2-D");
 		assertNotNull("service was null", service);
 		assertNotEquals("service port is 0", 0, service.getPort().intValue());
 	}
