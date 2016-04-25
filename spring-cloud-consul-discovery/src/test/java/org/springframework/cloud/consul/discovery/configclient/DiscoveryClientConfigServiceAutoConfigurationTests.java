@@ -59,7 +59,7 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 
 	@Test
 	public void onWhenRequested() throws Exception {
-		setup("spring.cloud.config.discovery.enabled=true",
+		setup("server.port=7000", "spring.cloud.config.discovery.enabled=true",
 				"spring.cloud.consul.discovery.port:7001",
 				"spring.cloud.consul.discovery.hostname:foo",
 				"spring.cloud.config.discovery.serviceId=configserver");
