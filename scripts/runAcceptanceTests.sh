@@ -2,8 +2,12 @@
 
 set -o errexit
 
+mkdir -p target
+
 SCRIPT_URL="https://raw.githubusercontent.com/spring-cloud-samples/brewery/master/runAcceptanceTests.sh"
 AT_WHAT_TO_TEST="CONSUL"
+
+cd target
 
 curl "${SCRIPT_URL}" --output runAcceptanceTests.sh
 
