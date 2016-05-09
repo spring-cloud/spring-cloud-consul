@@ -93,7 +93,8 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 
 				} catch (Exception e) {
 					if (this.properties.isFailFast()) {
-						log.error("Error initializing listener for context " + context, e);
+						log.debug("Error initializing listener for context " + context, e);
+						log.error("Error initializing listener for context " + context);
 					} else if (log.isTraceEnabled()) {
 						log.trace("Failfast is true. Error initializing listener for context " + context, e);
 					}
