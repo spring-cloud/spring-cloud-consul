@@ -34,6 +34,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import lombok.Data;
 import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * @author Spencer Gibb
@@ -47,6 +48,7 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 	private AtomicBoolean running = new AtomicBoolean(false);
 	private ApplicationEventPublisher publisher;
 	private HashMap<String, Long> consulIndexes = new HashMap<>();
+	private Boolean initialized = false;
 
 	public ConfigWatch(ConsulConfigProperties properties, List<String> contexts, ConsulClient consul) {
 		this.properties = properties;
@@ -64,7 +66,7 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 		this.running.compareAndSet(false, true);
 	}
 
-	@Scheduled(fixedDelayString = "${spring.cloud.consul.config.watch.delay:100}")
+	@Scheduled(fixedDelayString = "${spring.cloud.consul.config.watch.delay:1000}")
 	public void watchConfigKeyValues() {
 		if (this.running.get()) {
 			for (String context : this.contexts) {
@@ -92,14 +94,20 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 					}
 
 				} catch (Exception e) {
-					if (this.properties.isFailFast()) {
-						log.error("Error initializing listener for context " + context, e);
+					// only fail fast on the initial query, otherwise just log the error
+					if (!initialized && this.properties.isFailFast()) {
+						log.error("Fail fast is set and there was an error reading configuration from consul.");
+						ReflectionUtils.rethrowRuntimeException(e);
 					} else if (log.isTraceEnabled()) {
-						log.trace("Failfast is true. Error initializing listener for context " + context, e);
+						log.trace("Error querying consul Key/Values for context '" + context + "'", e);
+					} else if (log.isWarnEnabled()) {
+						// simplified one line log message in the event of an agent failure
+						log.warn("Error querying consul Key/Values for context '" + context + "'. Message: " + e.getMessage());
 					}
 				}
 			}
 		}
+		initialized = true;
 	}
 
 	@Override

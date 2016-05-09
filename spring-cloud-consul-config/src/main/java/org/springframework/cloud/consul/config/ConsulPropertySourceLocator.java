@@ -117,6 +117,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 					}
 				} catch (Exception e) {
 					if (this.properties.isFailFast()) {
+						log.error("Fail fast is set and there was an error reading configuration from consul.");
 						ReflectionUtils.rethrowRuntimeException(e);
 					} else {
 						log.warn("Unable to load consul config from "+ propertySourceContext, e);
