@@ -73,16 +73,6 @@
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-bus</artifactId>
-				<version>${spring-cloud-bus.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-context</artifactId>
-				<version>${spring-cloud-commons.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>com.ecwid.consul</groupId>
 				<artifactId>consul-api</artifactId>
 				<version>${consul-api.version}</version>
@@ -114,6 +104,20 @@
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
 				<version>${joda-time.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-bus-dependencies</artifactId>
+				<version>${spring-cloud-bus.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-commons-dependencies</artifactId>
+				<version>${spring-cloud-commons.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
