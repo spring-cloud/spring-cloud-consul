@@ -34,6 +34,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import lombok.Data;
 import lombok.extern.apachecommons.CommonsLog;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * @author Spencer Gibb
@@ -47,6 +48,7 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 	private AtomicBoolean running = new AtomicBoolean(false);
 	private ApplicationEventPublisher publisher;
 	private HashMap<String, Long> consulIndexes = new HashMap<>();
+	private Boolean initialized = false;
 
 	public ConfigWatch(ConsulConfigProperties properties, List<String> contexts, ConsulClient consul) {
 		this.properties = properties;
@@ -92,13 +94,20 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 					}
 
 				} catch (Exception e) {
-					log.info("Error watching listener for context " + context);
-					if (log.isTraceEnabled()) {
-						log.trace("Failfast is true. Error initializing listener for context " + context, e);
+					// only fail fast on the initial query, otherwise just log the error
+					if (!initialized && this.properties.isFailFast()) {
+						ReflectionUtils.rethrowRuntimeException(e);
+					} else {
+						// simplified one line log message in the event of an agent failure
+						log.warn("Error querying consul Key/Values for context " + context);
+						if (log.isTraceEnabled()) {
+							log.trace("Error querying consul Key/Values for context " + context, e);
+						}
 					}
 				}
 			}
 		}
+		initialized = true;
 	}
 
 	@Override
