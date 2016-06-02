@@ -17,24 +17,31 @@
 package org.springframework.cloud.consul.discovery;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.joda.time.DateTime;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.NewService;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.scheduling.config.Task;
+import org.springframework.scheduling.support.PeriodicTrigger;
 
 /**
  * Created by nicu on 11.03.2015.
+ * @author Stéphane LEROY
  */
 @Slf4j
 public class TtlScheduler {
 
-	public static final DateTime EXPIRED_DATE = new DateTime(0);
-	private final Map<String, DateTime> serviceHeartbeats = new ConcurrentHashMap<>();
+	private final Map<String, ScheduledFuture> serviceHeartbeats = new ConcurrentHashMap<>();
+
+	private final TaskScheduler scheduler = new ConcurrentTaskScheduler(Executors.newSingleThreadScheduledExecutor());
 
 	private HeartbeatProperties configuration;
 
@@ -49,27 +56,32 @@ public class TtlScheduler {
 	 * Add a service to the checks loop.
 	 */
 	public void add(final NewService service) {
-		serviceHeartbeats.put(service.getId(), EXPIRED_DATE);
+		ScheduledFuture task = scheduler.scheduleAtFixedRate(new ConsulHeartbeatTask(service.getId()), configuration.computeHearbeatInterval().toStandardDuration().getMillis());
+		serviceHeartbeats.put(service.getId(), task);
 	}
 
 	public void remove(String serviceId) {
+		ScheduledFuture task = serviceHeartbeats.get(serviceId);
+		if(task != null) {
+			task.cancel(true);
+		}
 		serviceHeartbeats.remove(serviceId);
 	}
 
-	@Scheduled(initialDelay = 0, fixedRateString = "${spring.cloud.consul.discovery.heartbeat.fixedRate:15000}")
-	private void heartbeatServices() {
-		for (String serviceId : serviceHeartbeats.keySet()) {
-			DateTime latestHeartbeatDoneForService = serviceHeartbeats.get(serviceId);
-			if (latestHeartbeatDoneForService.plus(configuration.getHeartbeatInterval())
-					.isBefore(DateTime.now())) {
-				String checkId = serviceId;
-				if (!checkId.startsWith("service:")) {
-					checkId = "service:" + checkId;
-				}
-				client.agentCheckPass(checkId);
-				log.debug("Sending consul heartbeat for: " + serviceId);
-				serviceHeartbeats.put(serviceId, DateTime.now());
+	private class ConsulHeartbeatTask implements Runnable {
+		private String checkId;
+
+		ConsulHeartbeatTask(String serviceId) {
+			this.checkId = serviceId;
+			if (!checkId.startsWith("service:")) {
+				checkId = "service:" + checkId;
 			}
+		}
+
+		@Override
+		public void run() {
+			client.agentCheckPass(checkId);
+			log.debug("Sending consul heartbeat for: " + checkId);
 		}
 	}
 }
