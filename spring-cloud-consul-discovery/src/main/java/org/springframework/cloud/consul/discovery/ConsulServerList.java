@@ -76,7 +76,7 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	}
 
 	private String getTag() {
-		return this.properties.getServerListQueryTags().get(this.serviceId);
+		return this.properties.getQueryTagForService(this.serviceId);
 	}
 
 	@Override
