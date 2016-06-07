@@ -221,6 +221,17 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		return normalizeForDns(getAppName()) + SEPARATOR + properties.getManagementSuffix();
 	}
 
+	/**
+	 * @return the port of the Management Service
+     */
+	protected Integer getManagementPort() {
+		// If an alternate external port is specified, use it instead
+		if (properties.getManagementPort() != null) {
+			return properties.getManagementPort();
+		}
+		return super.getManagementPort();
+	}
+
 	public static String normalizeForDns(String s) {
 		if (s == null || !Character.isLetter(s.charAt(0))
 				|| !Character.isLetterOrDigit(s.charAt(s.length()-1))) {
