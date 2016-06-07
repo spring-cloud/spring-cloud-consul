@@ -17,7 +17,7 @@
 		<spring-cloud-bus.version>1.1.1.BUILD-SNAPSHOT</spring-cloud-bus.version>
 		<spring-cloud-commons.version>1.1.1.BUILD-SNAPSHOT</spring-cloud-commons.version>
 		<spring-cloud-netflix.version>1.1.1.BUILD-SNAPSHOT</spring-cloud-netflix.version>
-		<consul-api.version>1.1.9</consul-api.version>
+		<consul-api.version>1.1.10</consul-api.version>
 		<gson.version>2.3.1</gson.version>
 		<httpclient.version>4.5</httpclient.version>
 		<httpcore.version>4.4.1</httpcore.version>
