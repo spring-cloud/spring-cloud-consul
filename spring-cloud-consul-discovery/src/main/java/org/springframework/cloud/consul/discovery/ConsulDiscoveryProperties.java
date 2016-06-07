@@ -80,6 +80,9 @@ public class ConsulDiscoveryProperties {
 	/** Port to register the service under (defaults to listening port) */
 	private Integer port;
 
+	/** Port to register the management service under (defaults to management port) */
+	private Integer managementPort;
+
 	private Lifecycle lifecycle = new Lifecycle();
 
 	/**
