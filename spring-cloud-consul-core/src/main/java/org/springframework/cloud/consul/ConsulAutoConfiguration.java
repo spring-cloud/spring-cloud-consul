@@ -56,21 +56,17 @@ public class ConsulAutoConfiguration {
 
 	@Configuration
 	@ConditionalOnClass(Endpoint.class)
-	@ConditionalOnBean(ConsulClient.class)
 	protected static class ConsulHealthConfig {
-
-		@Autowired
-		private ConsulClient consulClient;
 
 		@Bean
 		@ConditionalOnMissingBean
-		public ConsulEndpoint consulEndpoint() {
+		public ConsulEndpoint consulEndpoint(ConsulClient consulClient) {
 			return new ConsulEndpoint(consulClient);
 		}
 
 		@Bean
 		@ConditionalOnMissingBean
-		public ConsulHealthIndicator consulHealthIndicator() {
+		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient) {
 			return new ConsulHealthIndicator(consulClient);
 		}
 	}
