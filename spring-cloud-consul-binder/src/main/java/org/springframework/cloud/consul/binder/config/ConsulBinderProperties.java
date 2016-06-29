@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.consul.bus;
+package org.springframework.cloud.consul.binder.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -22,10 +22,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @author Spencer Gibb
  */
-@ConfigurationProperties("spring.cloud.consul.bus")
+@ConfigurationProperties("spring.cloud.stream.consul.binder")
 @Data
-public class ConsulBusProperties {
-	boolean enabled = true;
-	int eventDelay = 10;
-	int eventTimeout = 2;
+public class ConsulBinderProperties {
+	private int eventTimeout = 5;
 }

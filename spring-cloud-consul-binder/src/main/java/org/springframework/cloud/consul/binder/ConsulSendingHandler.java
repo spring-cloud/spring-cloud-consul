@@ -42,6 +42,10 @@ public class ConsulSendingHandler extends AbstractMessageHandler {
 
 	@Override
 	protected void handleMessageInternal(Message<?> message) throws Exception {
+		if (logger.isTraceEnabled()) {
+			logger.trace("Publishing message" + message);
+		}
+
 		Object payload = message.getPayload();
 		// TODO: support headers
 		// TODO: support consul event filters: NodeFilter, ServiceFilter, TagFilter

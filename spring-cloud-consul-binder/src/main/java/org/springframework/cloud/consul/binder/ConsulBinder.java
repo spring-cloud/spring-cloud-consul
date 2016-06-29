@@ -16,13 +16,11 @@
 
 package org.springframework.cloud.consul.binder;
 
-import com.ecwid.consul.v1.ConsulClient;
 import org.springframework.cloud.stream.binder.AbstractBinder;
 import org.springframework.cloud.stream.binder.Binding;
+import org.springframework.cloud.stream.binder.ConsumerProperties;
 import org.springframework.cloud.stream.binder.DefaultBinding;
-import org.springframework.cloud.stream.binder.ExtendedConsumerProperties;
-import org.springframework.cloud.stream.binder.ExtendedProducerProperties;
-import org.springframework.cloud.stream.binder.ExtendedPropertiesBinder;
+import org.springframework.cloud.stream.binder.ProducerProperties;
 import org.springframework.integration.endpoint.EventDrivenConsumer;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.SubscribableChannel;
@@ -31,45 +29,33 @@ import org.springframework.util.Assert;
 /**
  * @author Spencer Gibb
  */
-public class ConsulBinder
-		extends AbstractBinder<MessageChannel, ExtendedConsumerProperties<ConsulConsumerProperties>, ExtendedProducerProperties<ConsulProducerProperties>>
-		implements ExtendedPropertiesBinder<MessageChannel, ConsulConsumerProperties, ConsulProducerProperties> {
+public class ConsulBinder extends AbstractBinder<MessageChannel, ConsumerProperties, ProducerProperties> {
 
 	private static final String BEAN_NAME_TEMPLATE = "outbound.%s";
 
-	private ConsulExtendedBindingProperties consulExtendedBindingProperties;
+	private final EventService eventService;
 
-	private final ConsulClient consulClient;
-
-	public ConsulBinder(ConsulClient consulClient) {
-		this.consulClient = consulClient;
-	}
-
-	public void setConsulExtendedBindingProperties(ConsulExtendedBindingProperties consulExtendedBindingProperties) {
-		this.consulExtendedBindingProperties = consulExtendedBindingProperties;
+	public ConsulBinder(EventService eventService) {
+		this.eventService = eventService;
 	}
 
 	@Override
-	public ConsulConsumerProperties getExtendedConsumerProperties(String channelName) {
-		return consulExtendedBindingProperties.getExtendedConsumerProperties(channelName);
+	protected Binding<MessageChannel> doBindConsumer(String name, String group, MessageChannel inputChannel, ConsumerProperties properties) {
+		ConsulInboundMessageProducer messageProducer = new ConsulInboundMessageProducer(this.eventService);
+		messageProducer.setOutputChannel(inputChannel);
+		messageProducer.setBeanFactory(this.getBeanFactory());
+		messageProducer.afterPropertiesSet();
+		messageProducer.start();
+
+		return new DefaultBinding<>(name, group, inputChannel, messageProducer);
 	}
 
 	@Override
-	public ConsulProducerProperties getExtendedProducerProperties(String channelName) {
-		return consulExtendedBindingProperties.getExtendedProducerProperties(channelName);
-	}
-
-	@Override
-	protected Binding<MessageChannel> doBindConsumer(String name, String group, MessageChannel inputTarget, ExtendedConsumerProperties<ConsulConsumerProperties> properties) {
-		return null;
-	}
-
-	@Override
-	protected Binding<MessageChannel> doBindProducer(String name, MessageChannel channel, ExtendedProducerProperties<ConsulProducerProperties> properties) {
+	protected Binding<MessageChannel> doBindProducer(String name, MessageChannel channel, ProducerProperties properties) {
 		Assert.isInstanceOf(SubscribableChannel.class, channel);
 
 		logger.debug("Binding Consul client to eventName " + name);
-		ConsulSendingHandler sendingHandler = new ConsulSendingHandler(this.consulClient, name);
+		ConsulSendingHandler sendingHandler = new ConsulSendingHandler(this.eventService.getConsulClient(), name);
 
 		EventDrivenConsumer consumer = new EventDrivenConsumer((SubscribableChannel) channel, sendingHandler);
 		consumer.setBeanFactory(getBeanFactory());

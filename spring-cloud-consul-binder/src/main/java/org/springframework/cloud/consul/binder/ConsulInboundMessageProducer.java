@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.consul.bus;
+package org.springframework.cloud.consul.binder;
 
 import static org.springframework.util.Base64Utils.decodeFromString;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.endpoint.MessageProducerSupport;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import com.ecwid.consul.v1.event.model.Event;
 
@@ -32,15 +33,27 @@ import com.ecwid.consul.v1.event.model.Event;
  * Integration Messages, and sends the results to a Message Channel.
  * @author Spencer Gibb
  */
-public class ConsulInboundChannelAdapter {/*extends MessageProducerSupport {
-	@Autowired
-	private EventService eventService;
+public class ConsulInboundMessageProducer extends MessageProducerSupport {
 
-	public ConsulInboundChannelAdapter() {
+	private EventService eventService;
+	private final ScheduledExecutorService scheduler;
+	private final Runnable eventsRunnable;
+	private ScheduledFuture<?> eventsHandle;
+
+	public ConsulInboundMessageProducer(EventService eventService) {
+		this.eventService = eventService;
+		this.scheduler = Executors.newScheduledThreadPool(1);
+		this.eventsRunnable = new Runnable() {
+
+			@Override
+			public void run() {
+				getEvents();
+			}
+		};
 	}
 
 	// link eventService to sendMessage
-	*//*
+	/*
 	 * Map<String, Object> headers =
 	 * headerMapper.toHeadersFromRequest(message.getMessageProperties()); if
 	 * (messageListenerContainer.getAcknowledgeMode() == AcknowledgeMode.MANUAL) {
@@ -49,7 +62,7 @@ public class ConsulInboundChannelAdapter {/*extends MessageProducerSupport {
 	 * channel); }
 	 * sendMessage(AmqpInboundChannelAdapter.this.getMessageBuilderFactory().withPayload
 	 * (payload).copyHeaders(headers).build());
-	 *//*
+	 */
 
 	// start thread
 	// make blocking calls
@@ -57,10 +70,19 @@ public class ConsulInboundChannelAdapter {/*extends MessageProducerSupport {
 
 	@Override
 	protected void doStart() {
+		//TODO: make configurable
+		eventsHandle = this.scheduler.scheduleWithFixedDelay(eventsRunnable, 500, 500, TimeUnit.MILLISECONDS);
 	}
 
-	@Scheduled(fixedDelayString = "${spring.cloud.consul.bus.eventDelay:30000}")
-	public void getEvents() throws IOException {
+	@Override
+	protected void doStop() {
+		if (this.eventsHandle != null) {
+			this.eventsHandle.cancel(true);
+		}
+	}
+
+	// @Scheduled(fixedDelayString = "${spring.cloud.consul.binder.eventDelay:30000}")
+	public void getEvents() {
 		List<Event> events = eventService.watch();
 		for (Event event : events) {
 			// Map<String, Object> headers = new HashMap<>();
@@ -71,8 +93,4 @@ public class ConsulInboundChannelAdapter {/*extends MessageProducerSupport {
 					.build());
 		}
 	}
-
-	@Override
-	protected void doStop() {
-	}*/
 }

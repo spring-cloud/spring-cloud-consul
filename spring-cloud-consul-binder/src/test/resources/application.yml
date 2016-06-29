@@ -6,5 +6,5 @@ spring:
           type: consul
       consul:
         binder:
-          host: localhost
-          port: 18500
+#          host: localhost
+#          port: 18500

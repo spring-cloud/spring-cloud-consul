@@ -14,9 +14,11 @@
 	<name>spring-cloud-consul-dependencies</name>
 	<description>Spring Cloud Consul Dependencies</description>
 	<properties>
-		<spring-cloud-bus.version>1.1.1.BUILD-SNAPSHOT</spring-cloud-bus.version>
+		<!--<spring-cloud-bus.version>1.1.1.BUILD-SNAPSHOT</spring-cloud-bus.version>-->
 		<spring-cloud-commons.version>1.1.2.BUILD-SNAPSHOT</spring-cloud-commons.version>
 		<spring-cloud-netflix.version>1.1.2.BUILD-SNAPSHOT</spring-cloud-netflix.version>
+		<spring-cloud-deployer.version>1.0.0.BUILD-SNAPSHOT</spring-cloud-deployer.version>
+		<spring-cloud-stream.version>1.0.1.BUILD-SNAPSHOT</spring-cloud-stream.version>
 		<consul-api.version>1.1.10</consul-api.version>
 		<gson.version>2.3.1</gson.version>
 		<httpclient.version>4.5</httpclient.version>
@@ -32,7 +34,7 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-consul-bus</artifactId>
+				<artifactId>spring-cloud-consul-binder</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -105,12 +107,30 @@
 				<version>${joda-time.version}</version>
 			</dependency>
 			<dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-deployer-local</artifactId>
+                <version>${spring-cloud-deployer.version}</version>
+            </dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-stream-binder-test</artifactId>
+				<version>${spring-cloud-stream.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-stream-dependencies</artifactId>
+				<version>${spring-cloud-stream.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<!--<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-bus-dependencies</artifactId>
 				<version>${spring-cloud-bus.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
+			</dependency>-->
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-commons-dependencies</artifactId>
