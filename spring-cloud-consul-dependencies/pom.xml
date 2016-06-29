@@ -30,12 +30,11 @@
 				<artifactId>spring-cloud-consul-core</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<!-- TODO: add this back when consul-bus is implemented -->
-			<!--<dependency>
+			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-bus</artifactId>
 				<version>${project.version}</version>
-			</dependency>-->
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-consul-config</artifactId>
