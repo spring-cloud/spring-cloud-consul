@@ -50,6 +50,7 @@ public class ConsulBinderConfiguration {
 	protected ObjectMapper objectMapper = new ObjectMapper();
 
 	@Bean
+	@ConditionalOnMissingBean
 	public EventService eventService(ConsulClient consulClient) {
 		return new EventService(consulBinderProperties, consulClient, objectMapper);
 	}

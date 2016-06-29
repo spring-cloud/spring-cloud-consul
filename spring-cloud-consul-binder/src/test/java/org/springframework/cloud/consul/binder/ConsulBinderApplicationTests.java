@@ -17,14 +17,15 @@
 package org.springframework.cloud.consul.binder;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.awaitility.Awaitility.await;
 import static org.junit.Assert.assertNotNull;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.messaging.MessageHeaders.CONTENT_TYPE;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 
 import java.util.concurrent.TimeUnit;
@@ -68,6 +69,11 @@ public class ConsulBinderApplicationTests {
 
 		wireMock.stubFor(put(urlPathMatching("/v1/event/fire/purchases"))
 				.willReturn(aResponse().withStatus(200)));
+
+		wireMock.stubFor(get(urlPathMatching("/v1/event/list"))
+				.willReturn(aResponse().withBody("[]")
+						.withStatus(200)
+						.withHeader("X-Consul-Index", "1")));
 	}
 
 	@Test
@@ -106,5 +112,11 @@ public class ConsulBinderApplicationTests {
 			return new ConsulClient("localhost", 18500);
 		}
 
+		@Bean
+		public EventService eventService(ConsulClient consulClient) {
+			EventService eventService = mock(EventService.class);
+			when(eventService.getConsulClient()).thenReturn(consulClient);
+			return eventService;
+		}
 	}
 }
