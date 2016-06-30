@@ -8,6 +8,11 @@
         \"policy\": \"write\"
       }
     },
+    \"event\": {
+      \"\": {
+        \"policy\": \"write\"
+      }
+    },
     \"service\": {
       \"\": {
         \"policy\": \"write\"
