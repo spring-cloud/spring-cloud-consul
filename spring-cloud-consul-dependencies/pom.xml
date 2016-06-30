@@ -14,7 +14,7 @@
 	<name>spring-cloud-consul-dependencies</name>
 	<description>Spring Cloud Consul Dependencies</description>
 	<properties>
-		<!--<spring-cloud-bus.version>1.1.1.BUILD-SNAPSHOT</spring-cloud-bus.version>-->
+		<spring-cloud-bus.version>1.1.1.BUILD-SNAPSHOT</spring-cloud-bus.version>
 		<spring-cloud-commons.version>1.1.2.BUILD-SNAPSHOT</spring-cloud-commons.version>
 		<spring-cloud-netflix.version>1.1.2.BUILD-SNAPSHOT</spring-cloud-netflix.version>
 		<spring-cloud-deployer.version>1.0.0.BUILD-SNAPSHOT</spring-cloud-deployer.version>
@@ -52,12 +52,11 @@
 				<artifactId>spring-cloud-starter-consul</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<!-- TODO: add this back when consul-bus is implemented -->
-			<!--<dependency>
+			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-starter-consul-bus</artifactId>
 				<version>${project.version}</version>
-			</dependency>-->
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-starter-consul-config</artifactId>
@@ -124,13 +123,13 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			<!--<dependency>
+			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-bus-dependencies</artifactId>
 				<version>${spring-cloud-bus.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>-->
+			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-commons-dependencies</artifactId>

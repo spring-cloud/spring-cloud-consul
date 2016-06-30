@@ -34,7 +34,7 @@
 		<module>spring-cloud-consul-binder</module>
 		<module>spring-cloud-consul-sample</module>
 		<module>spring-cloud-starter-consul</module>
-		<!--<module>spring-cloud-starter-consul-bus</module>-->
+		<module>spring-cloud-starter-consul-bus</module>
 		<module>spring-cloud-starter-consul-config</module>
 		<module>spring-cloud-starter-consul-discovery</module>
 		<module>spring-cloud-starter-consul-all</module>
