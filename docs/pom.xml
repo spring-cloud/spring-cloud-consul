@@ -15,6 +15,7 @@
 	<properties>
 		<docs.main>spring-cloud-consul</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
+		<docs.whitelisted.branches>1.0.x</docs.whitelisted.branches>
 	</properties>
 	<profiles>
 		<profile>
