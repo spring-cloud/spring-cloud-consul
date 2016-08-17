@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 1.5.2">
+<meta name="generator" content="Asciidoctor 1.5.3">
 <title>Spring Cloud Consul</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
-/* Remove the comments around the @import statement below when using this as a custom stylesheet */
-/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400";*/
+/* Remove comment around @import statement below when using as a custom stylesheet */
+/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";*/
 article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section,summary{display:block}
 audio,canvas,video{display:inline-block}
 audio:not([controls]){display:none;height:0}
@@ -57,7 +57,6 @@ a:hover{cursor:pointer}
 img,object,embed{max-width:100%;height:auto}
 object,embed{height:100%}
 img{-ms-interpolation-mode:bicubic}
-#map_canvas img,#map_canvas embed,#map_canvas object,.map_canvas img,.map_canvas embed,.map_canvas object{max-width:none!important}
 .left{float:left!important}
 .right{float:right!important}
 .text-left{text-align:left!important}
@@ -65,10 +64,12 @@ img{-ms-interpolation-mode:bicubic}
 .text-center{text-align:center!important}
 .text-justify{text-align:justify!important}
 .hide{display:none}
-.antialiased,body{-webkit-font-smoothing:antialiased}
-img{display:inline-block;vertical-align:middle}
+body{-webkit-font-smoothing:antialiased}
+img,object,svg{display:inline-block;vertical-align:middle}
 textarea{height:auto;min-height:50px}
 select{width:100%}
+.center{margin-left:auto;margin-right:auto}
+.spread{width:100%}
 p.lead,.paragraph.lead>p,#preamble>.sectionbody>.paragraph:first-of-type p{font-size:1.21875em;line-height:1.6}
 .subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
 div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0;direction:ltr}
@@ -111,12 +112,14 @@ blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
 h1{font-size:2.75em}
 h2{font-size:2.3125em}
 h3,#toctitle,.sidebarblock>.content>.title{font-size:1.6875em}
-h4{font-size:1.4375em}}table{background:#fff;margin-bottom:1.25em;border:solid 1px #dedede}
+h4{font-size:1.4375em}}
+table{background:#fff;margin-bottom:1.25em;border:solid 1px #dedede}
 table thead,table tfoot{background:#f7f8f7;font-weight:bold}
 table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:.5em .625em .625em;font-size:inherit;color:rgba(0,0,0,.8);text-align:left}
 table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
 table tr.even,table tr.alt,table tr:nth-of-type(even){background:#f8f8f7}
 table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
+body{tab-size:4}
 h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
 h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
 .clearfix:before,.clearfix:after,.float-group:before,.float-group:after{content:" ";display:table}
@@ -124,7 +127,7 @@ h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title str
 *:not(pre)>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background-color:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed}
 pre,pre>code{line-height:1.45;color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;text-rendering:optimizeSpeed}
 .keyseq{color:rgba(51,51,51,.8)}
-kbd{display:inline-block;color:rgba(0,0,0,.8);font-size:.75em;line-height:1.4;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:-.15em .15em 0 .15em;padding:.2em .6em .2em .5em;vertical-align:middle;white-space:nowrap}
+kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background-color:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
 .keyseq kbd:first-child{margin-left:0}
 .keyseq kbd:last-child{margin-right:0}
 .menuseq,.menu{color:rgba(0,0,0,.8)}
@@ -155,29 +158,33 @@ p a>code:hover{color:rgba(0,0,0,.9)}
 #toc ul.sectlevel0>li>a{font-style:italic}
 #toc ul.sectlevel0 ul.sectlevel1{margin:.5em 0}
 #toc ul{font-family:"Open Sans","DejaVu Sans",sans-serif;list-style-type:none}
+#toc li{line-height:1.3334;margin-top:.3334em}
 #toc a{text-decoration:none}
 #toc a:active{text-decoration:underline}
 #toctitle{color:#7a2518;font-size:1.2em}
 @media only screen and (min-width:768px){#toctitle{font-size:1.375em}
 body.toc2{padding-left:15em;padding-right:0}
 #toc.toc2{margin-top:0!important;background-color:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #efefed;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto}
-#toc.toc2 #toctitle{margin-top:0;font-size:1.2em}
+#toc.toc2 #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
 #toc.toc2>ul{font-size:.9em;margin-bottom:0}
 #toc.toc2 ul ul{margin-left:0;padding-left:1em}
 #toc.toc2 ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
 body.toc2.toc-right{padding-left:0;padding-right:15em}
-body.toc2.toc-right #toc.toc2{border-right-width:0;border-left:1px solid #efefed;left:auto;right:0}}@media only screen and (min-width:1280px){body.toc2{padding-left:20em;padding-right:0}
+body.toc2.toc-right #toc.toc2{border-right-width:0;border-left:1px solid #efefed;left:auto;right:0}}
+@media only screen and (min-width:1280px){body.toc2{padding-left:20em;padding-right:0}
 #toc.toc2{width:20em}
 #toc.toc2 #toctitle{font-size:1.375em}
 #toc.toc2>ul{font-size:.95em}
 #toc.toc2 ul ul{padding-left:1.25em}
-body.toc2.toc-right{padding-left:0;padding-right:20em}}#content #toc{border-style:solid;border-width:1px;border-color:#e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;-webkit-border-radius:4px;border-radius:4px}
+body.toc2.toc-right{padding-left:0;padding-right:20em}}
+#content #toc{border-style:solid;border-width:1px;border-color:#e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;-webkit-border-radius:4px;border-radius:4px}
 #content #toc>:first-child{margin-top:0}
 #content #toc>:last-child{margin-bottom:0}
 #footer{max-width:100%;background-color:rgba(0,0,0,.8);padding:1.25em}
 #footer-text{color:rgba(255,255,255,.8);line-height:1.44}
 .sect1{padding-bottom:.625em}
-@media only screen and (min-width:768px){.sect1{padding-bottom:1.25em}}.sect1+.sect1{border-top:1px solid #efefed}
+@media only screen and (min-width:768px){.sect1{padding-bottom:1.25em}}
+.sect1+.sect1{border-top:1px solid #efefed}
 #content h1>a.anchor,h2>a.anchor,h3>a.anchor,#toctitle>a.anchor,.sidebarblock>.content>.title>a.anchor,h4>a.anchor,h5>a.anchor,h6>a.anchor{position:absolute;z-index:1001;width:1.5ex;margin-left:-1.5ex;display:block;text-decoration:none!important;visibility:hidden;text-align:center;font-weight:400}
 #content h1>a.anchor:before,h2>a.anchor:before,h3>a.anchor:before,#toctitle>a.anchor:before,.sidebarblock>.content>.title>a.anchor:before,h4>a.anchor:before,h5>a.anchor:before,h6>a.anchor:before{content:"\00A7";font-size:.85em;display:block;padding-top:.1em}
 #content h1:hover>a.anchor,#content h1>a.anchor:hover,h2:hover>a.anchor,h2>a.anchor:hover,h3:hover>a.anchor,#toctitle:hover>a.anchor,.sidebarblock>.content>.title:hover>a.anchor,h3>a.anchor:hover,#toctitle>a.anchor:hover,.sidebarblock>.content>.title>a.anchor:hover,h4:hover>a.anchor,h4>a.anchor:hover,h5:hover>a.anchor,h5>a.anchor:hover,h6:hover>a.anchor,h6>a.anchor:hover{visibility:visible}
@@ -206,7 +213,9 @@ table.tableblock #preamble>.sectionbody>.paragraph:first-of-type p{font-size:inh
 .sidebarblock .literalblock pre,.sidebarblock .listingblock pre:not(.highlight),.sidebarblock .listingblock pre[class="highlight"],.sidebarblock .listingblock pre[class^="highlight "],.sidebarblock .listingblock pre.CodeRay,.sidebarblock .listingblock pre.prettyprint{background:#f2f1f1}
 .literalblock pre,.literalblock pre[class],.listingblock pre,.listingblock pre[class]{-webkit-border-radius:4px;border-radius:4px;word-wrap:break-word;padding:1em;font-size:.8125em}
 .literalblock pre.nowrap,.literalblock pre[class].nowrap,.listingblock pre.nowrap,.listingblock pre[class].nowrap{overflow-x:auto;white-space:pre;word-wrap:normal}
-@media only screen and (min-width:768px){.literalblock pre,.literalblock pre[class],.listingblock pre,.listingblock pre[class]{font-size:.90625em}}@media only screen and (min-width:1280px){.literalblock pre,.literalblock pre[class],.listingblock pre,.listingblock pre[class]{font-size:1em}}.literalblock.output pre{color:#f7f7f8;background-color:rgba(0,0,0,.9)}
+@media only screen and (min-width:768px){.literalblock pre,.literalblock pre[class],.listingblock pre,.listingblock pre[class]{font-size:.90625em}}
+@media only screen and (min-width:1280px){.literalblock pre,.literalblock pre[class],.listingblock pre,.listingblock pre[class]{font-size:1em}}
+.literalblock.output pre{color:#f7f7f8;background-color:rgba(0,0,0,.9)}
 .listingblock pre.highlightjs{padding:0}
 .listingblock pre.highlightjs>code{padding:1em;-webkit-border-radius:4px;border-radius:4px}
 .listingblock pre.prettyprint{border-width:0}
@@ -216,7 +225,7 @@ table.tableblock #preamble>.sectionbody>.paragraph:first-of-type p{font-size:inh
 .listingblock.terminal pre .command:before{content:attr(data-prompt);padding-right:.5em;color:#999}
 .listingblock.terminal pre .command:not([data-prompt]):before{content:"$"}
 table.pyhltable{border-collapse:separate;border:0;margin-bottom:0;background:none}
-table.pyhltable td{vertical-align:top;padding-top:0;padding-bottom:0}
+table.pyhltable td{vertical-align:top;padding-top:0;padding-bottom:0;line-height:1.45}
 table.pyhltable td.code{padding-left:.75em;padding-right:0}
 pre.pygments .lineno,table.pyhltable td:not(.code){color:#999;padding-left:0;padding-right:.5em;border-right:1px solid #ddddd8}
 pre.pygments .lineno{display:inline-block;margin-right:.25em}
@@ -237,13 +246,12 @@ table.pyhltable .linenodiv{background:none!important;padding-right:0!important}
 .verseblock .attribution{margin-top:1.25rem;margin-left:.5ex}
 .quoteblock .attribution,.verseblock .attribution{font-size:.9375em;line-height:1.45;font-style:italic}
 .quoteblock .attribution br,.verseblock .attribution br{display:none}
-.quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.05em;color:rgba(0,0,0,.6)}
+.quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.025em;color:rgba(0,0,0,.6)}
 .quoteblock.abstract{margin:0 0 1.25em 0;display:block}
 .quoteblock.abstract blockquote,.quoteblock.abstract blockquote p{text-align:left;word-spacing:0}
 .quoteblock.abstract blockquote:before,.quoteblock.abstract blockquote p:first-of-type:before{display:none}
 table.tableblock{max-width:100%;border-collapse:separate}
 table.tableblock td>.paragraph:last-child p>p:last-child,table.tableblock th>p:last-child,table.tableblock td>p:last-child{margin-bottom:0}
-table.spread{width:100%}
 table.tableblock,th.tableblock,td.tableblock{border:0 solid #dedede}
 table.grid-all th.tableblock,table.grid-all td.tableblock{border-width:0 1px 1px 0}
 table.grid-all tfoot>tr>th.tableblock,table.grid-all tfoot>tr>td.tableblock{border-width:1px 1px 0 0}
@@ -289,8 +297,8 @@ ol.upperroman{list-style-type:upper-roman}
 ol.lowergreek{list-style-type:lower-greek}
 .hdlist>table,.colist>table{border:0;background:none}
 .hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
-td.hdlist1{padding-right:.75em;font-weight:bold}
-td.hdlist1,td.hdlist2{vertical-align:top}
+td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
+td.hdlist1{font-weight:bold;padding-bottom:1.25em}
 .literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
 .colist>table tr>td:first-of-type{padding:0 .75em;line-height:1}
 .colist>table tr>td:last-of-type{padding:.25em 0}
@@ -303,13 +311,14 @@ td.hdlist1,td.hdlist2{vertical-align:top}
 .image.left,.image.right{margin-top:.25em;margin-bottom:.25em;display:inline-block;line-height:0}
 .image.left{margin-right:.625em}
 .image.right{margin-left:.625em}
-a.image{text-decoration:none}
-span.footnote,span.footnoteref{vertical-align:super;font-size:.875em}
-span.footnote a,span.footnoteref a{text-decoration:none}
-span.footnote a:active,span.footnoteref a:active{text-decoration:underline}
+a.image{text-decoration:none;display:inline-block}
+a.image object{pointer-events:none}
+sup.footnote,sup.footnoteref{font-size:.875em;position:static;vertical-align:super}
+sup.footnote a,sup.footnoteref a{text-decoration:none}
+sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
 #footnotes{padding-top:.75em;padding-bottom:.75em;margin-bottom:.625em}
 #footnotes hr{width:20%;min-width:6.25em;margin:-.25em 0 .75em 0;border-width:1px 0 0 0}
-#footnotes .footnote{padding:0 .375em;line-height:1.3;font-size:.875em;margin-left:1.2em;text-indent:-1.2em;margin-bottom:.2em}
+#footnotes .footnote{padding:0 .375em 0 .225em;line-height:1.3334;font-size:.875em;margin-left:1.2em;text-indent:-1.05em;margin-bottom:.2em}
 #footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none}
 #footnotes .footnote:last-of-type{margin-bottom:0}
 #content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
@@ -367,11 +376,10 @@ span.icon>.fa{cursor:default}
 pre .conum[data-value]{position:relative;top:-.125em}
 b.conum *{color:inherit!important}
 .conum:not([data-value]):empty{display:none}
-h1,h2{letter-spacing:-.01em}
-dt,th.tableblock,td.content{text-rendering:optimizeLegibility}
-p,td.content{letter-spacing:-.01em}
-p strong,td.content strong{letter-spacing:-.005em}
-p,blockquote,dt,td.content{font-size:1.0625rem}
+dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
+h1,h2,p,td.content,span.alt{letter-spacing:-.01em}
+p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
+p,blockquote,dt,td.content,span.alt{font-size:1.0625rem}
 p{margin-bottom:1.25rem}
 .sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
 .exampleblock>.content{background-color:#fffef7;border-color:#e0e0dc;-webkit-box-shadow:0 1px 4px #e0e0dc;box-shadow:0 1px 4px #e0e0dc}
@@ -382,9 +390,9 @@ a{color:inherit!important;text-decoration:underline!important}
 a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
 a[href^="http:"]:not(.bare):after,a[href^="https:"]:not(.bare):after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
 abbr[title]:after{content:" (" attr(title) ")"}
-pre,blockquote,tr,img{page-break-inside:avoid}
+pre,blockquote,tr,img,object,svg{page-break-inside:avoid}
 thead{display:table-header-group}
-img{max-width:100%!important}
+svg{max-width:100%}
 p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
 h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
 #toc,.sidebarblock,.exampleblock>.content{background:none!important}
@@ -421,9 +429,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 and binding to the Spring Environment and other Spring programming model idioms. With a few
 simple annotations you can quickly enable and configure the common patterns inside your
 application and build large distributed systems with Consul based components. The
-patterns provided include Service Discovery, Circuit Breaker and Configuration.
-Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon) are provided by
-integration with Spring Cloud Netflix.</p>
+patterns provided include Service Discovery, Control Bus and Configuration.
+Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon), Circuit Breaker
+(Hystrix) are provided by integration with Spring Cloud Netflix.</p>
 </div>
 </div>
 </div>
@@ -460,7 +468,7 @@ integration with Spring Cloud Netflix.</p>
 <div class="sect2">
 <h3 id="_registering_with_consul">Registering with Consul</h3>
 <div class="paragraph">
-<p>When a client regsiters with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An HTTP <a href="https://www.consul.io/docs/agent/checks.html">Check</a> is created by default that Consul hits the <code>/health</code> endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.</p>
+<p>When a client registers with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An HTTP <a href="https://www.consul.io/docs/agent/checks.html">Check</a> is created by default that Consul hits the <code>/health</code> endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.</p>
 </div>
 <div class="paragraph">
 <p>Example Consul client:</p>
@@ -497,6 +505,18 @@ public class Application {
       port: 8500</pre>
 </div>
 </div>
+<div class="admonitionblock caution">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Caution</div>
+</td>
+<td class="content">
+If you use <a href="#spring-cloud-consul-config">Spring Cloud Consul Config</a>, the above values will need to be placed in <code>bootstrap.yml</code> instead of <code>application.yml</code>.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>The default service name, instance id and port, taken from the <code>Environment</code>, are <code>${spring.application.name}</code>, the Spring Context ID and <code>${server.port}</code> respectively.</p>
 </div>
@@ -507,7 +527,7 @@ public class Application {
 <div class="sect2">
 <h3 id="_http_health_check">HTTP Health Check</h3>
 <div class="paragraph">
-<p>The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. <code>server.servletPath=/foo</code>) or management endpoint path (e.g. <code>management.contextPath=/admin</code>). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectivly.  Example:</p>
+<p>The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. <code>server.servletPath=/foo</code>) or management endpoint path (e.g. <code>management.contextPath=/admin</code>). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectively.  Example:</p>
 </div>
 <div class="listingblock">
 <div class="title">application.yml</div>
@@ -521,9 +541,9 @@ public class Application {
 </div>
 </div>
 <div class="sect3">
-<h4 id="_making_the_consul_instance_id_unique">Making the Consul Instance ID Unique</h4>
+<h4 id="_metadata_and_consul_tags">Metadata and Consul tags</h4>
 <div class="paragraph">
-<p>By default a consul instance is registered with an ID that is equal to its Spring Application Context ID. By default, the Spring Application Context ID is <code>${spring.application.name}:comma,separated,profiles:${server.port}. For most cases, this will allow multiple instances of one service to run on one machine.  If further uniqueness is required, Using Spring Cloud you can override this by providing a unique identifier in `spring.cloud.consul.discovery.instanceId</code>. For example:</p>
+<p>Consul does not yet support metadata on services. Spring Cloud&#8217;s <code>ServiceInstance</code> has a <code>Map&lt;String, String&gt; metadata</code> field. Spring Cloud Consul uses Consul tags to approximate metadata until Consul officially supports metadata. Tags with the form <code>key=value</code> will be split and used as a <code>Map</code> key and value respectively. Tags without the equal <code>=</code> sign, will be used as both the key and value.</p>
 </div>
 <div class="listingblock">
 <div class="title">application.yml</div>
@@ -532,19 +552,37 @@ public class Application {
   cloud:
     consul:
       discovery:
-        instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}</pre>
+        tags: foo=bar, baz</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>With this metadata, and multiple service instances deployed on localhost, the random value will kick in there to make the instance unique. In Cloudfoundry the <code>spring.application.instance_id</code> will be populated automatically in a Spring Boot Actuator application, so the random value will not be needed.</p>
+<p>The above configuration will result in a map with <code>foo&#8594;bar</code> and <code>baz&#8594;baz</code>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_making_the_consul_instance_id_unique">Making the Consul Instance ID Unique</h4>
+<div class="paragraph">
+<p>By default a consul instance is registered with an ID that is equal to its Spring Application Context ID. By default, the Spring Application Context ID is <code>${spring.application.name}:comma,separated,profiles:${server.port}</code>. For most cases, this will allow multiple instances of one service to run on one machine.  If further uniqueness is required, Using Spring Cloud you can override this by providing a unique identifier in <code>spring.cloud.consul.discovery.instanceId</code>. For example:</p>
+</div>
+<div class="listingblock">
+<div class="title">application.yml</div>
+<div class="content">
+<pre>spring:
+  cloud:
+    consul:
+      discovery:
+        instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>With this metadata, and multiple service instances deployed on localhost, the random value will kick in there to make the instance unique. In Cloudfoundry the <code>vcap.application.instance_id</code> will be populated automatically in a Spring Boot application, so the random value will not be needed.</p>
 </div>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_using_the_discoveryclient">Using the DiscoveryClient</h3>
 <div class="paragraph">
-<p>Spring Cloud has support for <a href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign">Feign</a> (a REST client builder) and also <a href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-ribbon">Spring <code>RestTemplate</code></a> using the logical Consul servicec names instead of physical
-URLs.</p>
+<p>Spring Cloud has support for <a href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign">Feign</a> (a REST client builder) and also <a href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-ribbon">Spring <code>RestTemplate</code></a> using the logical service names instead of physical URLs.</p>
 </div>
 <div class="paragraph">
 <p>You can also use the <code>org.springframework.cloud.client.discovery.DiscoveryClient</code> which provides a simple API for discovery clients that is not specific to Netflix, e.g.</p>
@@ -555,7 +593,7 @@ URLs.</p>
 private DiscoveryClient discoveryClient;
 
 public String serviceUrl() {
-    List&lt;ServiceInstance&gt; list = client.getInstances("STORES");
+    List&lt;ServiceInstance&gt; list = discoveryClient.getInstances("STORES");
     if (list != null &amp;&amp; list.size() &gt; 0 ) {
         return list.get(0).getUri();
     }
@@ -570,7 +608,7 @@ public String serviceUrl() {
 <h2 id="spring-cloud-consul-config">Distributed Configuration with Consul</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Consul provides a <a href="https://consul.io/docs/agent/http/kv.html">Key/Value Store</a> for storing configuration and other metadata.  Spring Cloud Consul Config is an alternative to the <a href="https://github.com/spring-cloud/spring-cloud-config">Config Server and Client</a>.  Configuration is loaded into the Spring Environment during the special "bootstrap" phase.  Configuration is stored in the <code>/config</code> folder by default.  Multiple `PropertySource`s are created based on the application&#8217;s name and the active profiles that mimicks the Spring Cloud Config order of resolving properties.  For example, an application with the name "testApp" and with the "dev" profile will have the following property sources created:</p>
+<p>Consul provides a <a href="https://consul.io/docs/agent/http/kv.html">Key/Value Store</a> for storing configuration and other metadata.  Spring Cloud Consul Config is an alternative to the <a href="https://github.com/spring-cloud/spring-cloud-config">Config Server and Client</a>.  Configuration is loaded into the Spring Environment during the special "bootstrap" phase.  Configuration is stored in the <code>/config</code> folder by default.  Multiple <code>PropertySource</code> instances are created based on the application&#8217;s name and the active profiles that mimicks the Spring Cloud Config order of resolving properties.  For example, an application with the name "testApp" and with the "dev" profile will have the following property sources created:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -595,10 +633,10 @@ config/application/</pre>
 <div class="sect2">
 <h3 id="_customizing">Customizing</h3>
 <div class="paragraph">
-<p>Consul Config my be customized using the following properties:</p>
+<p>Consul Config may be customized using the following properties:</p>
 </div>
 <div class="listingblock">
-<div class="title">application.yml</div>
+<div class="title">bootstrap.yml</div>
 <div class="content">
 <pre>spring:
   cloud:
@@ -630,17 +668,192 @@ config/application/</pre>
 </div>
 </div>
 <div class="sect1">
+<h2 id="spring-cloud-consul-config-format">YAML or Properties with Config</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It may be more convenient to store a blob of properties in YAML or Properties format as opposed to individual key/value pairs.  Set the <code>spring.cloud.consul.config.format</code> property to <code>YAML</code> or <code>PROPERTIES</code>. For example to use YAML:</p>
+</div>
+<div class="listingblock">
+<div class="title">bootstrap.yml</div>
+<div class="content">
+<pre>spring:
+  cloud:
+    consul:
+      config:
+        format: YAML</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>YAML must be set in the appropriate <code>data</code> key in consul. Using the defaults above the keys would look like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>config/testApp,dev/data
+config/testApp/data
+config/application,dev/data
+config/application/data</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>You could store a YAML document in any of the keys listed above.</p>
+</div>
+<div class="paragraph">
+<p>You can change the data key using <code>spring.cloud.consul.config.data-key</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spring-cloud-consul-config-git2consul">git2consul with Config</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>git2consul is a Consul community project that loads files from a git repository to individual keys into Consul. By default the names of the keys are names of the files. YAML and Properties files are supported with file extensions of <code>.yml</code> and <code>.properties</code> respectively.  Set the <code>spring.cloud.consul.config.format</code> property to <code>FILES</code>. For example:</p>
+</div>
+<div class="listingblock">
+<div class="title">bootstrap.yml</div>
+<div class="content">
+<pre>spring:
+  cloud:
+    consul:
+      config:
+        format: FILES</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Given the following keys in <code>/config</code>, the <code>development</code> profile and an application name of <code>foo</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>.gitignore
+application.yml
+bar.properties
+foo-development.properties
+foo-production.yml
+foo.properties
+master.ref</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>the following property sources would be created:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>config/foo-development.properties
+config/foo.properties
+config/application.yml</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The value of each key needs to be a properly formatted YAML or Properties file.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spring-cloud-consul-failfast">Fail Fast</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It may be convenient in certain circumstances (like local development or certain test scenarios) to not fail if consul isn&#8217;t available for configuration. Setting <code>spring.cloud.consul.config.failFast=false</code> in <code>bootstrap.yml</code> will cause the configuration module to log a warning rather than throw an exception. This will allow the application to continue startup normally.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spring-cloud-consul-retry">Consul Retry</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>If you expect that the consul agent may occasionally be unavailable when
+your app starts, you can ask it to keep trying after a failure. You need to add
+<code>spring-retry</code> and <code>spring-boot-starter-aop</code> to your classpath. The default
+behaviour is to retry 6 times with an initial backoff interval of 1000ms and an
+exponential multiplier of 1.1 for subsequent backoffs. You can configure these
+properties (and others) using <code>spring.cloud.consul.retry.*</code> configuration properties.
+This works with both Spring Cloud Consul Config and Discovery registration.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Tip</div>
+</td>
+<td class="content">
+To take full control of the retry add a <code>@Bean</code> of type
+<code>RetryOperationsInterceptor</code> with id "consulRetryInterceptor". Spring
+Retry has a <code>RetryInterceptorBuilder</code> that makes it easy to create one.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
 <h2 id="spring-cloud-consul-bus">Spring Cloud Bus with Consul</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>TODO: document Spring Cloud Consul Bus</p>
+<p>Coming in a later release.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spring-cloud-consul-hystrix">Circuit Breaker with Hystrix</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Applications can use the Hystrix Circuit Breaker provided by the Spring Cloud Netflix project by including this starter in the projects pom.xml: <code>spring-cloud-starter-hystrix</code>.  Hystrix doesn&#8217;t depend on the Netflix Discovery Client. The <code>@EnableHystrix</code> annotation should be placed on a configuration class (usually the main class). Then methods can be annotated with <code>@HystrixCommand</code> to be protected by a circuit breaker. See <a href="http://projects.spring.io/spring-cloud/spring-cloud.html#_circuit_breaker_hystrix_clients">the documentation</a> for more details.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spring-cloud-consul-turbine">Hystrix metrics aggregation with Turbine and Consul</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Turbine (provided by the Spring Cloud Netflix project), aggregates multiple instances Hystrix metrics streams, so the dashboard can display an aggregate view. Turbine uses the <code>DiscoveryClient</code> interface to lookup relevant instances. To use Turbine with Spring Cloud Consul, configure the Turbine application in a manner similar to the following examples:</p>
+</div>
+<div class="listingblock">
+<div class="title">pom.xml</div>
+<div class="content">
+<pre>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-netflix-turbine&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-starter-consul-discovery&lt;/artifactId&gt;
+&lt;/dependency&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice that the Turbine dependency is not a starter. The turbine starter includes support for Netflix Eureka.</p>
+</div>
+<div class="listingblock">
+<div class="title">application.yml</div>
+<div class="content">
+<pre>spring.application.name: turbine
+applications: consulhystrixclient
+turbine:
+  aggregator:
+    clusterConfig: ${applications}
+  appConfig: ${applications}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>clusterConfig</code> and <code>appConfig</code> sections must match, so it&#8217;s useful to put the comma-separated list of service ID&#8217;s into a separate configuration property.</p>
+</div>
+<div class="listingblock">
+<div class="title">Turbine.java</div>
+<div class="content">
+<pre>@EnableTurbine
+@EnableDiscoveryClient
+@SpringBootApplication
+public class Turbine {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoturbinecommonsApplication.class, args);
+    }
+}</pre>
+</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2015-05-26 12:41:09 MDT
+Last updated 2016-08-17 13:40:08 UTC
 </div>
 </div>
 </body>
