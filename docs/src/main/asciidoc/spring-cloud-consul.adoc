@@ -26,6 +26,10 @@ This will start an agent in server mode on port 8500, with the ui available at h
 
 Service Discovery is one of the key tenets of a microservice based architecture. Trying to hand configure each client or some form of convention can be very difficult to do and can be very brittle.  Consul provides Service Discovery services via an https://www.consul.io/docs/agent/http.html[HTTP API] and https://www.consul.io/docs/agent/dns.html[DNS].  Spring Cloud Consul leverages the HTTP API for service registration and discovery.  This does not prevent non-Spring Cloud applications from leveraging the DNS interface.  Consul Agents servers are run in a https://www.consul.io/docs/internals/architecture.html[cluster] that communicates via a https://www.consul.io/docs/internals/gossip.html[gossip protocol] and uses the https://www.consul.io/docs/internals/consensus.html[Raft consensus protocol].
 
+=== How to activate
+
+To activate Consul Service Discovery use the starter with group `org.springframework.cloud` and artifact id `spring-cloud-starter-consul-discovery`. See the http://projects.spring.io/spring-cloud/[Spring Cloud Project page] for details on setting up your build system with the current Spring Cloud Release Train.
+
 === Registering with Consul
 
 When a client registers with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An HTTP https://www.consul.io/docs/agent/checks.html[Check] is created by default that Consul hits the `/health` endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.
@@ -149,7 +153,9 @@ Configuration is currently read on startup of the application.  Sending a HTTP P
 
 === How to activate
 
-Including a dependency on `org.springframework.cloud:spring-cloud-consul-config` will enable auto-configuration that will setup Spring Cloud Consul Config.
+To get started with Consul Configuration use the starter with group `org.springframework.cloud` and artifact id `spring-cloud-starter-consul-config`. See the http://projects.spring.io/spring-cloud/[Spring Cloud Project page] for details on setting up your build system with the current Spring Cloud Release Train.
+
+This will enable auto-configuration that will setup Spring Cloud Consul Config.
 
 === Customizing
 
@@ -267,7 +273,11 @@ Retry has a `RetryInterceptorBuilder` that makes it easy to create one.
 [[spring-cloud-consul-bus]]
 == Spring Cloud Bus with Consul
 
-Coming in a later release.
+=== How to activate
+
+To get started with the Consul Bus use the starter with group `org.springframework.cloud` and artifact id `spring-cloud-starter-consul-bus`. See the http://projects.spring.io/spring-cloud/[Spring Cloud Project page] for details on setting up your build system with the current Spring Cloud Release Train.
+
+See the https://cloud.spring.io/spring-cloud-bus/[Spring Cloud Bus] documentation for the available actuator endpoints and howto send custom messages.
 
 [[spring-cloud-consul-hystrix]]
 == Circuit Breaker with Hystrix
