@@ -71,9 +71,14 @@ public class ConsulConfigProperties {
 
 	@Data
 	public class Watch {
-		private int waitTime = 2;
+		/** The number of seconds to wait (or block) for watch query. Defaults to 60. */
+		private int waitTime = 60;
+
+		/** If the watch is enabled. Defaults to true. */
 		private boolean enabled = true;
-		private int delay = 10;
+
+		/** The value of the fixed delay for the watch in millis. Defaults to 1000. */
+		private int delay = 1000;
 	}
 
 	/**

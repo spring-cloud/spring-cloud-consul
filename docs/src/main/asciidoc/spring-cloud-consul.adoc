@@ -172,9 +172,17 @@ spring:
 * `defaultContext` sets the folder name used by all applications
 * `profileSeparator` sets the value of the separator used to separate the profile name in property sources with profiles
 
+[[spring-cloud-consul-config-watch]]
+=== Config Watch
+
+The Consul Config Watch takes advantage of the ability of consul to https://www.consul.io/docs/agent/watches.html#keyprefix[watch a key prefix]. The Config Watch makes a blocking Consul HTTP API call to determine if any relevant configuration data has changed for the current application. If there is new configuration data a Refresh Event is published. This is equivalent to calling the `/refresh` actuator endpoint.
+
+To change the frequency of when the Config Watch is called change `spring.cloud.consul.config.watch.delay`. The default value is 1000, which is in milliseconds.
+
+To disable the Config Watch set `spring.cloud.consul.config.watch.enabled=false`.
 
 [[spring-cloud-consul-config-format]]
-== YAML or Properties with Config
+=== YAML or Properties with Config
 
 It may be more convenient to store a blob of properties in YAML or Properties format as opposed to individual key/value pairs.  Set the `spring.cloud.consul.config.format` property to `YAML` or `PROPERTIES`. For example to use YAML:
 
@@ -201,7 +209,7 @@ You could store a YAML document in any of the keys listed above.
 You can change the data key using `spring.cloud.consul.config.data-key`.
 
 [[spring-cloud-consul-config-git2consul]]
-== git2consul with Config
+=== git2consul with Config
 git2consul is a Consul community project that loads files from a git repository to individual keys into Consul. By default the names of the keys are names of the files. YAML and Properties files are supported with file extensions of `.yml` and `.properties` respectively.  Set the `spring.cloud.consul.config.format` property to `FILES`. For example:
 
 .bootstrap.yml
@@ -237,7 +245,7 @@ The value of each key needs to be a properly formatted YAML or Properties file.
 
 
 [[spring-cloud-consul-failfast]]
-== Fail Fast
+=== Fail Fast
 
 It may be convenient in certain circumstances (like local development or certain test scenarios) to not fail if consul isn't available for configuration. Setting `spring.cloud.consul.config.failFast=false` in `bootstrap.yml` will cause the configuration module to log a warning rather than throw an exception. This will allow the application to continue startup normally.
 
