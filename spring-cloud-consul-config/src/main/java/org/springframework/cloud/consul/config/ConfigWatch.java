@@ -80,7 +80,9 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 						currentIndex = -1L;
 					}
 
-					Response<List<GetValue>> response = this.consul.getKVValues(context, new QueryParams(2, currentIndex));
+					Response<List<GetValue>> response = this.consul.getKVValues(context,
+							new QueryParams(this.properties.getWatch().getWaitTime(),
+									currentIndex));
 
 					Long newIndex = response.getConsulIndex();
 
