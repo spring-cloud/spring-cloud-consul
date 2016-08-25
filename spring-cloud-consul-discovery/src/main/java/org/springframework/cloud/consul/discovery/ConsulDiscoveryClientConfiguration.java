@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Configuration;
 
 import com.ecwid.consul.v1.ConsulClient;
 
+import javax.servlet.ServletContext;
+
 /**
  * @author Spencer Gibb
  */
@@ -43,11 +45,28 @@ public class ConsulDiscoveryClientConfiguration {
 	@Autowired(required = false)
 	private ServerProperties serverProperties;
 
+	@Autowired(required = false)
+	private TtlScheduler ttlScheduler;
+
+	@Autowired(required = false)
+	private ServletContext servletContext;
+
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulLifecycle consulLifecycle(ConsulDiscoveryProperties discoveryProperties,
 			HeartbeatProperties heartbeatProperties) {
-		return new ConsulLifecycle(consulClient, discoveryProperties, heartbeatProperties);
+		ConsulLifecycle lifecycle = new ConsulLifecycle(consulClient, discoveryProperties, heartbeatProperties);
+		if (this.ttlScheduler != null) {
+			lifecycle.setTtlScheduler(this.ttlScheduler);
+		}
+		if (this.servletContext != null) {
+			lifecycle.setServletContext(this.servletContext);
+		}
+		if (this.serverProperties != null && this.serverProperties.getPort() != null && this.serverProperties.getPort() > 0) {
+			// no need to wait for events for this to start since the user has explicitly set the port.
+			lifecycle.setPort(this.serverProperties.getPort());
+		}
+		return lifecycle;
 	}
 
 	@Bean

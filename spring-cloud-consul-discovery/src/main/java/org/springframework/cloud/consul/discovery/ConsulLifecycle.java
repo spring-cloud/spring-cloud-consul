@@ -21,9 +21,6 @@ import java.util.List;
 
 import javax.servlet.ServletContext;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.Assert;
@@ -31,6 +28,8 @@ import org.springframework.util.StringUtils;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.NewService;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Spencer Gibb
@@ -46,10 +45,8 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	private HeartbeatProperties ttlConfig;
 
-	@Autowired(required = false)
 	private TtlScheduler ttlScheduler;
 
-	@Autowired(required = false)
 	private ServletContext servletContext;
 
 	private NewService service = new NewService();
@@ -60,6 +57,14 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		this.ttlConfig = ttlConfig;
 	}
 
+	public void setTtlScheduler(TtlScheduler ttlScheduler) {
+		this.ttlScheduler = ttlScheduler;
+	}
+
+	public void setServletContext(ServletContext servletContext) {
+		this.servletContext = servletContext;
+	}
+
 	@Override
 	protected int getConfiguredPort() {
 		return service.getPort() == null? 0 : service.getPort();
@@ -68,6 +73,10 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	@Override
 	protected void setConfiguredPort(int port) {
 		service.setPort(port);
+	}
+
+	public void setPort(int port) {
+		getPort().set(port);
 	}
 
 	@Override
