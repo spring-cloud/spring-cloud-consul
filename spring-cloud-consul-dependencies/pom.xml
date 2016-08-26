@@ -5,20 +5,20 @@
 	<parent>
 		<artifactId>spring-cloud-dependencies-parent</artifactId>
 		<groupId>org.springframework.cloud</groupId>
-		<version>1.2.0.RELEASE</version>
+		<version>1.2.1.BUILD-SNAPSHOT</version>
         <relativePath/>
 	</parent>
 	<artifactId>spring-cloud-consul-dependencies</artifactId>
-	<version>1.1.0.M1</version>
+	<version>1.1.0.BUILD-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>spring-cloud-consul-dependencies</name>
 	<description>Spring Cloud Consul Dependencies</description>
 	<properties>
-		<spring-cloud-bus.version>1.2.0.M1</spring-cloud-bus.version>
-		<spring-cloud-commons.version>1.1.1.RELEASE</spring-cloud-commons.version>
-		<spring-cloud-netflix.version>1.2.0.M1</spring-cloud-netflix.version>
-		<spring-cloud-deployer.version>1.0.2.RELEASE</spring-cloud-deployer.version>
-		<spring-cloud-stream.version>Brooklyn.M1</spring-cloud-stream.version>
+		<spring-cloud-bus.version>1.2.0.BUILD-SNAPSHOT</spring-cloud-bus.version>
+		<spring-cloud-commons.version>1.1.2.BUILD-SNAPSHOT</spring-cloud-commons.version>
+		<spring-cloud-netflix.version>1.2.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
+		<spring-cloud-deployer.version>1.0.3.BUILD-SNAPSHOT</spring-cloud-deployer.version>
+		<spring-cloud-stream.version>Brooklyn.BUILD-SNAPSHOT</spring-cloud-stream.version>
 		<consul-api.version>1.1.10</consul-api.version>
 		<gson.version>2.3.1</gson.version>
 		<httpclient.version>4.5</httpclient.version>
