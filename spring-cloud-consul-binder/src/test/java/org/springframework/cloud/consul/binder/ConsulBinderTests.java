@@ -90,7 +90,7 @@ public class ConsulBinderTests {
 	 */
 	@Test
 	public void testMessageSendReceive() throws Exception {
-		testMessageSendReceive(null, false);
+		testMessageSendReceive(null);
 	}
 
 	/**
@@ -120,20 +120,16 @@ public class ConsulBinderTests {
 	 * @param partitioned if true, execute test with a partition selector
 	 * @throws Exception
 	 */
-	private void testMessageSendReceive(String[] groups, boolean partitioned) throws Exception {
+	private void testMessageSendReceive(String[] groups) throws Exception {
 		Set<AppId> consumers = null;
 		AppId producer = null;
 
 		try {
 			consumers = launchConsumers(groups);
-			producer = launchProducer(partitioned);
+			producer = launchProducer();
 
 			for (AppId consumer : consumers) {
 				assertEquals(MESSAGE_PAYLOAD, waitForMessage(consumer.port));
-			}
-
-			if (partitioned) {
-				assertTrue(partitionSelectorUsed(producer.port));
 			}
 		}
 		finally {
@@ -182,16 +178,15 @@ public class ConsulBinderTests {
 	/**
 	 * Launch a producer that publishes a test message.
 	 *
-	 * @param partitioned if true, configure producer to use a partition selector
 	 * @return {@link AppId} for producer
 	 */
-	private AppId launchProducer(boolean partitioned) {
+	private AppId launchProducer() {
 		int producerPort = SocketUtils.findAvailableTcpPort();
 		Map<String, String> appProperties = new HashMap<>();
 		appProperties.put("server.port", String.valueOf(producerPort));
 		List<String> args = new ArrayList<>();
 		args.add(String.format("--server.port=%d", producerPort));
-		args.add(String.format("--partitioned=%b", partitioned));
+		args.add(String.format("--partitioned=%b", false));
 		args.add("--debug");
 
 		return new AppId(launchApplication(TestProducer.class, appProperties, args), producerPort);

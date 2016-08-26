@@ -60,10 +60,10 @@ public class TestProducer implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		if (args.containsOption("partitioned")
+		/*if (args.containsOption("partitioned")
 				&& Boolean.valueOf(args.getOptionValues("partitioned").get(0))) {
 			binder.setPartitionSelector(stubPartitionSelectorStrategy());
-		}
+		}*/
 		SubscribableChannel producerChannel = producerChannel();
 		ProducerProperties properties = new ProducerProperties();
 		properties.setPartitionKeyExpression(new SpelExpressionParser().parseExpression("payload"));
