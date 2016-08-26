@@ -91,7 +91,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 			String key = getValue.getKey();
 			if (!StringUtils.endsWithIgnoreCase(key, "/")) {
 				key = key.replace(context, "").replace('/', '.');
-				String value = getDecoded(getValue.getValue());
+				String value = getValue.getDecodedValue();
 				properties.put(key, value);
 			}
 		}
@@ -118,7 +118,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 	}
 
 	protected void parseValue(GetValue getValue, ConsulConfigProperties.Format format) {
-		String value = getDecoded(getValue.getValue());
+		String value = getValue.getDecodedValue();
 		Properties props = generateProperties(value, format);
 
 		for (Map.Entry entry : props.entrySet()) {
@@ -154,6 +154,10 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		return props;
 	}
 
+	/**
+	 * @deprecated As of 1.1.0 use {@link GetValue#getDecodedValue()}.
+	 */
+	@Deprecated
 	public String getDecoded(String value) {
 		if (value == null)
 			return null;
