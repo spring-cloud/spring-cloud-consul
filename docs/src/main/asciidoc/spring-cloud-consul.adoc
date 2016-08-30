@@ -4,6 +4,8 @@
 :github-code: http://github.com/{github-repo}/tree/{github-tag}
 = Spring Cloud Consul
 
+*{spring-cloud-version}*
+
 include::intro.adoc[]
 
 [[spring-cloud-consul-install]]
