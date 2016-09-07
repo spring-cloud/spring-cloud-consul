@@ -2,6 +2,7 @@
 :github-repo: spring-cloud/spring-cloud-consul
 :github-raw: http://raw.github.com/{github-repo}/{github-tag}
 :github-code: http://github.com/{github-repo}/tree/{github-tag}
+:nofooter:
 = Spring Cloud Consul
 
 *{spring-cloud-version}*
