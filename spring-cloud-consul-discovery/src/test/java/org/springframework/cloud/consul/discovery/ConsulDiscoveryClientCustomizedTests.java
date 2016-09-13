@@ -24,27 +24,29 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Spencer Gibb
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = ConsulDiscoveryClientCustomizedTests.MyTestConfig.class)
-@WebIntegrationTest(value = { "spring.application.name=testConsulDiscovery2",
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ConsulDiscoveryClientCustomizedTests.MyTestConfig.class,
+	properties = { "spring.application.name=testConsulDiscovery2",
 		"spring.cloud.consul.discovery.instanceId=testConsulDiscovery2Id",
-		"spring.cloud.consul.discovery.tags=plaintag,foo=bar,foo2=bar2=baz2" }, randomPort = true)
+		"spring.cloud.consul.discovery.hostname=testConsulDiscovery2Host",
+		"spring.cloud.consul.discovery.tags=plaintag,foo=bar,foo2=bar2=baz2" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulDiscoveryClientCustomizedTests {
 
 	@Autowired

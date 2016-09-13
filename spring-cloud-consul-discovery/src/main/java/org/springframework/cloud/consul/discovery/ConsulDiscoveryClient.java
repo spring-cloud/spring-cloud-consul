@@ -77,8 +77,16 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		String serviceId;
 		Integer port;
 		Map<String, String> metadata;
-		if (service == null) {
-			// possibly called before registration
+		String host = "localhost";
+
+		// if we have a response from consul, that is the ultimate source of truth
+		if (service != null) {
+			serviceId = service.getId();
+			port = service.getPort();
+			host = service.getAddress();
+			metadata = getMetadata(service.getTags());
+		} else {
+			// possibly called before registration, use configuration or best guess
 			log.warn("Unable to locate service in consul agent: "
 					+ lifecycle.getServiceId());
 
@@ -89,24 +97,32 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 				port = serverProperties.getPort();
 			}
 			metadata = getMetadata(this.properties.getTags());
+
+			if (StringUtils.hasText(this.properties.getHostname())) {
+				host = this.properties.getHostname();
+			} else if (this.properties.isPreferAgentAddress()){
+				// try and use the agent host
+				String agentHost = getAgentHost();
+				if (agentHost != null) {
+					host = agentHost;
+				}
+			}
 		}
-		else {
-			serviceId = service.getId();
-			port = service.getPort();
-			metadata = getMetadata(service.getTags());
-		}
-		String host = "localhost";
+
+		return new DefaultServiceInstance(serviceId, host, port, false, metadata);
+	}
+
+	private String getAgentHost() {
 		Response<Self> agentSelf = client.getAgentSelf();
 		Member member = agentSelf.getValue().getMember();
 		if (member != null) {
 			if (properties.isPreferIpAddress()) {
-				host = member.getAddress();
-			}
-			else if (StringUtils.hasText(member.getName())) {
-				host = member.getName();
+				return member.getAddress();
+			} else if (StringUtils.hasText(member.getName())) {
+				return member.getName();
 			}
 		}
-		return new DefaultServiceInstance(serviceId, host, port, false, metadata);
+		return null;
 	}
 
 	@Override
