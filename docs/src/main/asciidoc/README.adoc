@@ -1,4 +1,5 @@
-image::https://travis-ci.org/spring-cloud/spring-cloud-consul.svg?branch=master[Build Status, link=https://travis-ci.org/spring-cloud/spring-cloud-consul]
+image::https://circleci.com/gh/spring-cloud/spring-cloud-consul/tree/master.svg?style=svg["CircleCI", link="https://circleci.com/gh/spring-cloud/spring-cloud-consul/tree/master"]
+image::https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/master/graph/badge.svg["Codecov", link="https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/master"]
 
 include::intro.adoc[]
 
