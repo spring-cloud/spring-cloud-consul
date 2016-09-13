@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.discovery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.commons.util.InetUtils;
@@ -52,7 +53,7 @@ public class ConsulDiscoveryClientConfiguration {
 	private ServletContext servletContext;
 
 	@Bean
-	@ConditionalOnMissingBean
+	@ConditionalOnMissingBean(search = SearchStrategy.CURRENT)
 	public ConsulLifecycle consulLifecycle(ConsulDiscoveryProperties discoveryProperties,
 			HeartbeatProperties heartbeatProperties) {
 		ConsulLifecycle lifecycle = new ConsulLifecycle(consulClient, discoveryProperties, heartbeatProperties);

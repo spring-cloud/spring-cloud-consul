@@ -18,21 +18,31 @@ package org.springframework.cloud.consul.discovery.configclient;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.config.client.ConfigServicePropertySourceLocator;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration;
+import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 /**
- * Eureka-specific helper for config client that wants to lookup the config server via
- * discovery.
+ * Helper for config client that wants to lookup the config server via discovery.
  *
- * @author Dave Syer
+ * @author Spencer Gibb
  */
 @ConditionalOnClass(ConfigServicePropertySourceLocator.class)
 @ConditionalOnProperty(value = "spring.cloud.config.discovery.enabled", matchIfMissing = false)
 @Configuration
 @Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class})
 public class ConsulDiscoveryClientConfigServiceBootstrapConfiguration {
+
+	@Bean
+	public ConsulDiscoveryProperties consulDiscoveryProperties(InetUtils inetUtils) {
+		ConsulDiscoveryProperties properties = new ConsulDiscoveryProperties(inetUtils);
+		// for bootstrap, lifecycle (and hence registration) is not needed, just discovery client
+		properties.getLifecycle().setEnabled(false);
+		return properties;
+	}
 }
