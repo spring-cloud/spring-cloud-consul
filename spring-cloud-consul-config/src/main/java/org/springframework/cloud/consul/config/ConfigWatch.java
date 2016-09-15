@@ -84,6 +84,10 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 							new QueryParams(this.properties.getWatch().getWaitTime(),
 									currentIndex));
 
+                    // if the value is null, ignore it
+                    if (response.getValue() == null)
+                        continue;
+
 					Long newIndex = response.getConsulIndex();
 
 					if (newIndex != null && !newIndex.equals(currentIndex)) {
