@@ -14,11 +14,6 @@
 	<name>spring-cloud-consul-dependencies</name>
 	<description>Spring Cloud Consul Dependencies</description>
 	<properties>
-		<spring-cloud-bus.version>1.2.0.BUILD-SNAPSHOT</spring-cloud-bus.version>
-		<spring-cloud-commons.version>1.1.2.BUILD-SNAPSHOT</spring-cloud-commons.version>
-		<spring-cloud-netflix.version>1.2.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
-		<spring-cloud-deployer.version>1.0.3.BUILD-SNAPSHOT</spring-cloud-deployer.version>
-		<spring-cloud-stream.version>Brooklyn.BUILD-SNAPSHOT</spring-cloud-stream.version>
 		<consul-api.version>1.1.11</consul-api.version>
 		<gson.version>2.3.1</gson.version>
 		<httpclient.version>4.5</httpclient.version>
@@ -104,46 +99,6 @@
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
 				<version>${joda-time.version}</version>
-			</dependency>
-			<dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-deployer-local</artifactId>
-                <version>${spring-cloud-deployer.version}</version>
-				<scope>test</scope>
-            </dependency>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-stream-binder-test</artifactId>
-				<version>${spring-cloud-stream.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-stream-dependencies</artifactId>
-				<version>${spring-cloud-stream.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-bus-dependencies</artifactId>
-				<version>${spring-cloud-bus.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-commons-dependencies</artifactId>
-				<version>${spring-cloud-commons.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-netflix-dependencies</artifactId>
-				<version>${spring-cloud-netflix.version}</version>
-				<scope>import</scope>
-				<type>pom</type>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
