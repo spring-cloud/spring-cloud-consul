@@ -54,6 +54,8 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	private NewService service = new NewService();
 
+	private String instanceId;
+
 	public ConsulLifecycle(ConsulClient client, ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
 		this.client = client;
 		this.properties = properties;
@@ -129,11 +131,16 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	}
 
 	public String getServiceId() {
-		if (!StringUtils.hasText(properties.getInstanceId())) {
-			return normalizeForDns(getContext().getId());
-		} else {
-			return normalizeForDns(properties.getInstanceId());
+		// cache instanceId, so on refresh this won't get recomputed
+		// this is a problem if ${random.value} is used
+		if (this.instanceId == null) {
+			if (!StringUtils.hasText(properties.getInstanceId())) {
+				this.instanceId = normalizeForDns(getContext().getId());
+			} else {
+				this.instanceId = normalizeForDns(properties.getInstanceId());
+			}
 		}
+		return this.instanceId;
 	}
 
 	@Override

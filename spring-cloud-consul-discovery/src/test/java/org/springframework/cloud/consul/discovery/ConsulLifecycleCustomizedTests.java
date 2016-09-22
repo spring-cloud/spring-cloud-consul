@@ -41,7 +41,7 @@ import static org.junit.Assert.assertNotNull;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ConsulLifecycleCustomizedTests.MyTestConfig.class)
-@WebIntegrationTest(value = { "spring.application.name=testCustomLifecycle" }, randomPort = true)
+@WebIntegrationTest(value = { "spring.application.name=testCustomLifecycle", "spring.cloud.consul.discovery.instanceId=foo" }, randomPort = true)
 public class ConsulLifecycleCustomizedTests {
 
 	@Autowired
@@ -50,6 +50,8 @@ public class ConsulLifecycleCustomizedTests {
 	private ConsulLifecycle lifecycle1;
 	@Autowired
 	private CustomConsulLifecycle lifecycle2;
+	@Autowired
+	private ConsulDiscoveryProperties properties;
 
 	@Test
 	public void getInstancesForServiceWorks() {
@@ -60,8 +62,15 @@ public class ConsulLifecycleCustomizedTests {
 
 	@Test
 	public void usesCustomConsulLifecycle() {
-		assertEquals("serviceId is not customized", "foo", lifecycle1.getServiceId());
-		assertEquals("serviceId is not customized", "foo", lifecycle2.getServiceId());
+		assertEquals("serviceId is not customized", "foo:bar", lifecycle1.getServiceId());
+		assertEquals("serviceId is not customized", "foo:bar", lifecycle2.getServiceId());
+	}
+
+	@Test
+	public void serviceIdIsCached() {
+		// simulate a refresh where instanceId is changed
+		this.properties.setInstanceId("baz");
+		assertEquals("serviceId is not cached", "foo:bar", lifecycle2.getServiceId());
 	}
 
 	@Configuration
@@ -76,15 +85,18 @@ public class ConsulLifecycleCustomizedTests {
 	}
 
 	public static class CustomConsulLifecycle extends ConsulLifecycle {
+		private ConsulDiscoveryProperties properties;
+
 		@Autowired
 		public CustomConsulLifecycle(ConsulClient client,
 				ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
 			super(client, properties, ttlConfig);
+			this.properties = properties;
 		}
 
 		@Override
 		public String getServiceId() {
-			return "foo";
+			return super.getServiceId()+":bar";
 		}
 	}
 }
