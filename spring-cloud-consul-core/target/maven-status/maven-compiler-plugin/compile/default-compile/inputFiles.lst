@@ -1,0 +1,7 @@
+/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-core/src/main/java/org/springframework/cloud/consul/ConsulEndpoint.java
+/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-core/src/main/java/org/springframework/cloud/consul/ConsulProperties.java
+/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-core/src/main/java/org/springframework/cloud/consul/ConsulHealthIndicator.java
+/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-core/src/main/java/org/springframework/cloud/consul/RetryProperties.java
+/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-core/src/main/java/org/springframework/cloud/consul/ConsulAutoConfiguration.java
+/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-core/src/main/java/org/springframework/cloud/consul/ConditionalOnConsulEnabled.java
+/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-core/src/main/java/org/springframework/cloud/consul/model/SerfStatusEnum.java

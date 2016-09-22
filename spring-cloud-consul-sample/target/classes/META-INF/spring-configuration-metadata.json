@@ -1,0 +1,14 @@
+{
+  "groups": [{
+    "name": "sample",
+    "type": "org.springframework.cloud.consul.sample.SampleProperties",
+    "sourceType": "org.springframework.cloud.consul.sample.SampleProperties"
+  }],
+  "properties": [{
+    "name": "sample.prop",
+    "type": "java.lang.String",
+    "sourceType": "org.springframework.cloud.consul.sample.SampleProperties",
+    "defaultValue": "default value"
+  }],
+  "hints": []
+}

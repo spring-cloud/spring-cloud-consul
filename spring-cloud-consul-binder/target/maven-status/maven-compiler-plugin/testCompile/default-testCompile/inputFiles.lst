@@ -1,0 +1,4 @@
+/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-binder/src/test/java/org/springframework/cloud/consul/binder/ConsulBinderTests.java
+/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-binder/src/test/java/org/springframework/cloud/consul/binder/test/producer/TestProducer.java
+/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-binder/src/test/java/org/springframework/cloud/consul/binder/ConsulBinderApplicationTests.java
+/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-binder/src/test/java/org/springframework/cloud/consul/binder/test/consumer/TestConsumer.java

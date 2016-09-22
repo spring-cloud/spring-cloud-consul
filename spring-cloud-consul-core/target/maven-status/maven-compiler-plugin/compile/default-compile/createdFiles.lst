@@ -1,0 +1,14 @@
+META-INF/spring-configuration-metadata.json
+org/springframework/cloud/consul/ConsulAutoConfiguration$RetryConfiguration.class
+org/springframework/cloud/consul/model/SerfStatusEnum.class
+org/springframework/cloud/consul/ConsulProperties.class
+org/springframework/cloud/consul/ConsulAutoConfiguration.class
+org/springframework/cloud/consul/ConsulEndpoint.class
+org/springframework/cloud/consul/RetryProperties.class
+org/springframework/cloud/consul/ConditionalOnConsulEnabled.class
+org/springframework/cloud/consul/ConsulHealthIndicator.class
+org/springframework/cloud/consul/ConditionalOnConsulEnabled$OnConsulEnabledCondition$FoundProperty.class
+org/springframework/cloud/consul/ConditionalOnConsulEnabled$OnConsulEnabledCondition.class
+org/springframework/cloud/consul/ConditionalOnConsulEnabled$OnConsulEnabledCondition$FoundClass.class
+org/springframework/cloud/consul/ConsulAutoConfiguration$ConsulHealthConfig.class
+org/springframework/cloud/consul/ConsulEndpoint$ConsulData.class

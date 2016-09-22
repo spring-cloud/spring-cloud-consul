@@ -1,0 +1,10 @@
+org/springframework/cloud/consul/binder/test/producer/TestProducer$StubPartitionSelectorStrategy.class
+org/springframework/cloud/consul/binder/ConsulBinderTests$ClasspathDeployer.class
+org/springframework/cloud/consul/binder/ConsulBinderTests.class
+org/springframework/cloud/consul/binder/ConsulBinderApplicationTests.class
+org/springframework/cloud/consul/binder/test/consumer/TestConsumer$1.class
+org/springframework/cloud/consul/binder/test/producer/TestProducer.class
+org/springframework/cloud/consul/binder/ConsulBinderApplicationTests$Application.class
+org/springframework/cloud/consul/binder/ConsulBinderApplicationTests$Events.class
+org/springframework/cloud/consul/binder/ConsulBinderTests$AppId.class
+org/springframework/cloud/consul/binder/test/consumer/TestConsumer.class

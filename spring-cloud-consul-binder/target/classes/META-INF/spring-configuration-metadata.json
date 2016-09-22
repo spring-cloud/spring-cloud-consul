@@ -1,0 +1,14 @@
+{
+  "groups": [{
+    "name": "spring.cloud.stream.consul.binder",
+    "type": "org.springframework.cloud.consul.binder.config.ConsulBinderProperties",
+    "sourceType": "org.springframework.cloud.consul.binder.config.ConsulBinderProperties"
+  }],
+  "properties": [{
+    "name": "spring.cloud.stream.consul.binder.event-timeout",
+    "type": "java.lang.Integer",
+    "sourceType": "org.springframework.cloud.consul.binder.config.ConsulBinderProperties",
+    "defaultValue": 5
+  }],
+  "hints": []
+}

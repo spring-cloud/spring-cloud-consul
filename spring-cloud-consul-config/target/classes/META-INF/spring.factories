@@ -1,0 +1,7 @@
+# Auto Configuration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+org.springframework.cloud.consul.config.ConsulConfigAutoConfiguration
+
+# Bootstrap Configuration
+org.springframework.cloud.bootstrap.BootstrapConfiguration=\
+org.springframework.cloud.consul.config.ConsulConfigBootstrapConfiguration
