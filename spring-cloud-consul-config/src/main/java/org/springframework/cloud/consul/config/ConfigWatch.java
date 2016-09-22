@@ -84,15 +84,19 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 							new QueryParams(this.properties.getWatch().getWaitTime(),
 									currentIndex));
 
-					Long newIndex = response.getConsulIndex();
+					// if response.value == null, response was a 404, otherwise it was a 200
+					// reducing churn if there wasn't anything
+					if (response.getValue() != null && !response.getValue().isEmpty()) {
+						Long newIndex = response.getConsulIndex();
 
-					if (newIndex != null && !newIndex.equals(currentIndex)) {
-						// don't publish the same index again, don't publish the first time (-1) so index can be primed
-						if (!this.consulIndexes.containsValue(newIndex) && !currentIndex.equals(-1L)) {
-							RefreshEventData data = new RefreshEventData(context, currentIndex, newIndex);
-							this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
+						if (newIndex != null && !newIndex.equals(currentIndex)) {
+							// don't publish the same index again, don't publish the first time (-1) so index can be primed
+							if (!this.consulIndexes.containsValue(newIndex) && !currentIndex.equals(-1L)) {
+								RefreshEventData data = new RefreshEventData(context, currentIndex, newIndex);
+								this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
+							}
+							this.consulIndexes.put(context, newIndex);
 						}
-						this.consulIndexes.put(context, newIndex);
 					}
 
 				} catch (Exception e) {
@@ -115,6 +119,10 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 	@Override
 	public void close() {
 		this.running.compareAndSet(true, false);
+	}
+
+	/* for testing */ HashMap<String, Long> getConsulIndexes() {
+		return this.consulIndexes;
 	}
 
 	@Data
