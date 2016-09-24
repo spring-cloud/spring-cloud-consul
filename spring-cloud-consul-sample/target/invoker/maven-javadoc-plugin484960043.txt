@@ -1,0 +1,34 @@
+Invoking Maven for the goals: [org.apache.maven.plugins:maven-javadoc-plugin:2.10.4:javadoc] with no properties
+
+M2_HOME=/home/jenkins/.m2/wrapper/dists/apache-maven-3.3.9-bin/2609u9g41na2l7ogackmif6fj2/apache-maven-3.3.9
+MAVEN_OPTS=null
+JAVA_HOME=/opt/jenkins/data/tools/hudson.model.JDK/jdk8/jdk1.8.0_91/jre/..
+JAVA_OPTS=null
+
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for org.springframework.cloud:spring-cloud-starter-consul-all:jar:1.1.1.BUILD-SNAPSHOT
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-source-plugin is missing. @ org.springframework.cloud:spring-cloud-build:1.2.1.BUILD-SNAPSHOT, /opt/jenkins/.m2/repository/org/springframework/cloud/spring-cloud-build/1.2.1.BUILD-SNAPSHOT/spring-cloud-build-1.2.1.BUILD-SNAPSHOT.pom, line 147, column 12
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-javadoc-plugin is missing. @ org.springframework.cloud:spring-cloud-build:1.2.1.BUILD-SNAPSHOT, /opt/jenkins/.m2/repository/org/springframework/cloud/spring-cloud-build/1.2.1.BUILD-SNAPSHOT/spring-cloud-build-1.2.1.BUILD-SNAPSHOT.pom, line 132, column 12
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Spring Cloud Starter Consul All 1.1.1.BUILD-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] >>> maven-javadoc-plugin:2.10.4:javadoc (default-cli) > generate-sources @ spring-cloud-starter-consul-all >>>
+[INFO] 
+[INFO] <<< maven-javadoc-plugin:2.10.4:javadoc (default-cli) < generate-sources @ spring-cloud-starter-consul-all <<<
+[INFO] 
+[INFO] --- maven-javadoc-plugin:2.10.4:javadoc (default-cli) @ spring-cloud-starter-consul-all ---
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 1.559 s
+[INFO] Finished at: 2016-09-24T13:41:00+00:00
+[INFO] Final Memory: 30M/356M
+[INFO] ------------------------------------------------------------------------
