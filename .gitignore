@@ -6,3 +6,31 @@ _site
 *.sw[op]
 .project
 sample-pages
+
+*.class
+*.iml
+
+.idea/
+.gradle/
+target/
+build/
+src/s
+
+hs_err_pid*
+.DS_Store
+*.log
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+*.iws
+
+# Maven
+log/
+target/
+
+interpolated-settings.xml
+interpolated-pom.xml
