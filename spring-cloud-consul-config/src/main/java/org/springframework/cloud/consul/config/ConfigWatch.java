@@ -36,6 +36,8 @@ import lombok.Data;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.util.ReflectionUtils;
 
+import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
+
 /**
  * @author Spencer Gibb
  */
@@ -70,7 +72,9 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 	public void watchConfigKeyValues() {
 		if (this.running.get()) {
 			for (String context : this.contexts) {
-				if (!context.endsWith("/")) {
+
+				// turn the context into a Consul folder path (unless our config format are FILES)
+				if (properties.getFormat() != FILES && !context.endsWith("/")) {
 					context = context + "/";
 				}
 
