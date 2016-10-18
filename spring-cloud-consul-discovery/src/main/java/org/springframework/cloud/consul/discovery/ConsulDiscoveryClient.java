@@ -163,7 +163,14 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<String> getServices() {
-		return new ArrayList<>(client.getCatalogServices(QueryParams.DEFAULT).getValue()
-				.keySet());
+		String aclToken = properties.getAclToken();
+
+		if (aclToken != null && !aclToken.isEmpty()) {
+			return new ArrayList<>(client.getCatalogServices(QueryParams.DEFAULT, aclToken).getValue()
+					.keySet());
+		} else {
+			return new ArrayList<>(client.getCatalogServices(QueryParams.DEFAULT).getValue()
+					.keySet());
+		}
 	}
 }
