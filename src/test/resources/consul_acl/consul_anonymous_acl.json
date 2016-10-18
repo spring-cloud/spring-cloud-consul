@@ -18,7 +18,10 @@
         \"policy\": \"write\"
       },
       \"testConsulDiscoveryAcl\": {
-        \"policy\": \"read\"
+        \"policy\": \"deny\"
+      },
+      \"testConsulDiscoveryAcl\": {
+        \"policy\": \"deny\"
       }
     }
   }"
