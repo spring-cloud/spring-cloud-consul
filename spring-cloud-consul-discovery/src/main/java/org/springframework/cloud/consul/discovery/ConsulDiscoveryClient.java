@@ -165,7 +165,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	public List<String> getServices() {
 		String aclToken = properties.getAclToken();
 
-		if (aclToken != null && !aclToken.isEmpty()) {
+		if (StringUtils.hasText(aclToken)) {
 			return new ArrayList<>(client.getCatalogServices(QueryParams.DEFAULT, aclToken).getValue()
 					.keySet());
 		} else {
