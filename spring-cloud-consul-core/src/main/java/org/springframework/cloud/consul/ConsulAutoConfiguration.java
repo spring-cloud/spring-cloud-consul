@@ -16,13 +16,11 @@
 
 package org.springframework.cloud.consul;
 
-import com.ecwid.consul.v1.ConsulClient;
-
 import org.aspectj.lang.annotation.Aspect;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.ConditionalOnEnabledHealthIndicator;
+import org.springframework.boot.actuate.condition.ConditionalOnEnabledEndpoint;
 import org.springframework.boot.actuate.endpoint.Endpoint;
 import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -33,6 +31,8 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.interceptor.RetryInterceptorBuilder;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
+
+import com.ecwid.consul.v1.ConsulClient;
 
 /**
  * @author Spencer Gibb
@@ -60,12 +60,14 @@ public class ConsulAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
+		@ConditionalOnEnabledEndpoint("consul")
 		public ConsulEndpoint consulEndpoint(ConsulClient consulClient) {
 			return new ConsulEndpoint(consulClient);
 		}
 
 		@Bean
 		@ConditionalOnMissingBean
+		@ConditionalOnEnabledHealthIndicator("consul")
 		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient) {
 			return new ConsulHealthIndicator(consulClient);
 		}
