@@ -16,6 +16,28 @@
 
 package org.springframework.cloud.consul.binder;
 
+import java.util.concurrent.TimeUnit;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.annotation.Output;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import com.ecwid.consul.v1.ConsulClient;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
@@ -27,35 +49,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
-
-import java.util.concurrent.TimeUnit;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.annotation.Output;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-
-import com.ecwid.consul.v1.ConsulClient;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 /**
  * @author Spencer Gibb
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = ConsulBinderApplicationTests.Application.class)
-@WebAppConfiguration
+@SpringBootTest(classes = ConsulBinderApplicationTests.Application.class)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class ConsulBinderApplicationTests {
 	@Autowired
@@ -70,10 +68,10 @@ public class ConsulBinderApplicationTests {
 		wireMock.stubFor(put(urlPathMatching("/v1/event/fire/purchases"))
 				.willReturn(aResponse().withStatus(200)));
 
-		wireMock.stubFor(get(urlPathMatching("/v1/event/list"))
+		/*wireMock.stubFor(get(urlPathMatching("/v1/event/list"))
 				.willReturn(aResponse().withBody("[]")
 						.withStatus(200)
-						.withHeader("X-Consul-Index", "1")));
+						.withHeader("X-Consul-Index", "1")));*/
 	}
 
 	@Test
