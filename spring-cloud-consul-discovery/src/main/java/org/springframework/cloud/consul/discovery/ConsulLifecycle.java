@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,10 @@ import javax.servlet.ServletContext;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.Assert;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.ecwid.consul.ConsulException;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.NewService;
 
@@ -33,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Spencer Gibb
+ * @author Venil Noronha
  */
 @Slf4j
 public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
@@ -170,9 +173,18 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	protected void register(NewService newService) {
 		log.info("Registering service with consul: {}", newService.toString());
-		client.agentServiceRegister(newService, properties.getAclToken());
-		if (ttlConfig.isEnabled() && ttlScheduler != null) {
-			ttlScheduler.add(newService);
+		try {
+			client.agentServiceRegister(newService, properties.getAclToken());
+			if (ttlConfig.isEnabled() && ttlScheduler != null) {
+				ttlScheduler.add(newService);
+			}
+		}
+		catch (ConsulException e) {
+			if (this.properties.isFailFast()) {
+				log.error("Error registering service with consul: {}", newService.toString(), e);
+				ReflectionUtils.rethrowRuntimeException(e);
+			}
+			log.warn("Failfast is false. Error registering service with consul: {}", newService.toString(), e);
 		}
 	}
 
