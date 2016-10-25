@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import lombok.Setter;
  * Defines configuration for service discovery and registration.
  *
  * @author Spencer Gibb
+ * @author Donnabell Dmello
  */
 @ConfigurationProperties("spring.cloud.consul.discovery")
 @Data
@@ -69,6 +70,9 @@ public class ConsulDiscoveryProperties {
 
 	/** Timeout for health check (e.g. 10s) */
 	private String healthCheckTimeout;
+
+	/** Timeout to deregister services critical for longer than timeout. */
+	private String healthCheckCriticalTimeout;
 
 	/** IP address to use when accessing service (must also set preferIpAddress
 			to use) */

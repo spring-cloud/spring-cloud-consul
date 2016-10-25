@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Spencer Gibb
+ * @author Donnabell Dmello
  */
 @Slf4j
 public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
@@ -136,6 +137,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		}
 		check.setInterval(properties.getHealthCheckInterval());
 		check.setTimeout(properties.getHealthCheckTimeout());
+		check.setDeregisterCriticalServiceAfter(properties.getHealthCheckCriticalTimeout());
 		return check;
 	}
 
