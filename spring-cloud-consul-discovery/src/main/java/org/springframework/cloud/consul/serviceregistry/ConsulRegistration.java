@@ -225,6 +225,9 @@ public class ConsulRegistration implements Registration {
 		}
 		check.setInterval(properties.getHealthCheckInterval());
 		check.setTimeout(properties.getHealthCheckTimeout());
+		if (StringUtils.hasText(properties.getHealthCheckCriticalTimeout())) {
+			check.setDeregisterCriticalServiceAfter(properties.getHealthCheckCriticalTimeout());
+		}
 		return check;
 	}
 

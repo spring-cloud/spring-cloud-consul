@@ -37,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Spencer Gibb
+ * @author Donnabell Dmello
  * @author Venil Noronha
  *
  * @deprecated See {@link org.springframework.cloud.consul.serviceregistry.ConsulAutoServiceRegistration}
