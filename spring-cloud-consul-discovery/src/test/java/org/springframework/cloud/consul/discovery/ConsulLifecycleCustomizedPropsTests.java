@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,9 +43,11 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Spencer Gibb
+ * @author Venil Noronha
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -55,7 +57,8 @@ import static org.junit.Assert.assertThat;
 		"spring.cloud.consul.discovery.port=4452",
 		"spring.cloud.consul.discovery.hostname=myhost",
 		"spring.cloud.consul.discovery.ipAddress=10.0.0.1",
-		"spring.cloud.consul.discovery.registerHealthCheck=false", }, randomPort = true)
+		"spring.cloud.consul.discovery.registerHealthCheck=false",
+		"spring.cloud.consul.discovery.failFast=true" }, randomPort = true)
 public class ConsulLifecycleCustomizedPropsTests {
 
 	@Autowired
@@ -87,6 +90,12 @@ public class ConsulLifecycleCustomizedPropsTests {
 		List<Check> checks = checkResponse.getValue();
 		assertThat("checks was wrong size", checks, hasSize(0));
 	}
+
+	@Test
+	public void testFailFastEnabled() {
+		assertTrue("property failFast was wrong", this.properties.isFailFast());
+	}
+
 }
 
 @Configuration
