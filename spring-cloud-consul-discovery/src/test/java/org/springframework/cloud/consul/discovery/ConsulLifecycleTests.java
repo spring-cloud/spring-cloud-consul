@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import com.ecwid.consul.ConsulException;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.NewService;
 import com.ecwid.consul.v1.agent.model.Service;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -43,11 +45,13 @@ import static org.junit.Assert.assertNotNull;
 
 /**
  * @author Spencer Gibb
+ * @author Venil Noronha
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SpringApplicationConfiguration(classes = TestConfig.class)
-@WebIntegrationTest(value = "spring.application.name=myTestService1-F::something", randomPort = true)
+@WebIntegrationTest(value = { "spring.application.name=myTestService1-F::something",
+		"spring.cloud.consul.discovery.failFast=true" }, randomPort = true)
 public class ConsulLifecycleTests {
 
 	@Autowired
@@ -81,6 +85,11 @@ public class ConsulLifecycleTests {
 		assertEquals("abc1", ConsulLifecycle.normalizeForDns("abc1"));
 		assertEquals("ab-c1", ConsulLifecycle.normalizeForDns("ab:c1"));
 		assertEquals("ab-c1", ConsulLifecycle.normalizeForDns("ab::c1"));
+	}
+
+	@Test(expected = ConsulException.class)
+	public void testFailFastEnabled() {
+		lifecycle.register(new NewService());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
