@@ -57,7 +57,10 @@ public class TtlScheduler {
 		ScheduledFuture task = scheduler.scheduleAtFixedRate(new ConsulHeartbeatTask(
 				service.getId()), configuration.computeHearbeatInterval()
 				.toStandardDuration().getMillis());
-		serviceHeartbeats.put(service.getId(), task);
+		ScheduledFuture previousTask = serviceHeartbeats.put(service.getId(), task);
+		if (previousTask != null) {
+			previousTask.cancel(true);
+		}
 	}
 
 	public void remove(String serviceId) {
