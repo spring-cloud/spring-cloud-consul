@@ -42,8 +42,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Spencer Gibb
@@ -58,7 +58,7 @@ import static org.junit.Assert.assertTrue;
 		"spring.cloud.consul.discovery.hostname=myhost",
 		"spring.cloud.consul.discovery.ipAddress=10.0.0.1",
 		"spring.cloud.consul.discovery.registerHealthCheck=false",
-		"spring.cloud.consul.discovery.failFast=true" }, randomPort = true)
+		"spring.cloud.consul.discovery.failFast=false" }, randomPort = true)
 public class ConsulLifecycleCustomizedPropsTests {
 
 	@Autowired
@@ -92,8 +92,8 @@ public class ConsulLifecycleCustomizedPropsTests {
 	}
 
 	@Test
-	public void testFailFastEnabled() {
-		assertTrue("property failFast was wrong", this.properties.isFailFast());
+	public void testFailFastDisabled() {
+		assertFalse("property failFast was wrong", this.properties.isFailFast());
 	}
 
 }
