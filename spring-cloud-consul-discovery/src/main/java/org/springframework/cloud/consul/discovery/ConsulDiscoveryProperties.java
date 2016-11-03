@@ -141,9 +141,9 @@ public class ConsulDiscoveryProperties {
 
 	/**
 	 * Throw exceptions during service registration if true, otherwise, log
-	 * warnings (defaults to false).
+	 * warnings (defaults to true).
 	 */
-	private boolean failFast = false;
+	private boolean failFast = true;
 
 	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {}
