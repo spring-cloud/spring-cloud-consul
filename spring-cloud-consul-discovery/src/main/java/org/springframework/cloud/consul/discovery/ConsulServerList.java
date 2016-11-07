@@ -16,16 +16,16 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.AbstractServerList;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Spencer Gibb
@@ -40,6 +40,18 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	public ConsulServerList(ConsulClient client, ConsulDiscoveryProperties properties) {
 		this.client = client;
 		this.properties = properties;
+	}
+
+	protected ConsulClient getClient() {
+		return client;
+	}
+
+	protected ConsulDiscoveryProperties getProperties() {
+		return properties;
+	}
+
+	protected String getServiceId() {
+		return serviceId;
 	}
 
 	@Override
@@ -64,18 +76,38 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		String tag = getTag(); // null is ok
 		Response<List<HealthService>> response = this.client.getHealthServices(
 				this.serviceId, tag, this.properties.isQueryPassing(),
-				QueryParams.DEFAULT);
+				createQueryParamsForClientRequest());
 		if (response.getValue() == null || response.getValue().isEmpty()) {
 			return Collections.emptyList();
 		}
+		return transformResponse(response.getValue());
+	}
+
+	/**
+	 * Transforms the response from Consul in to a list of usable {@link ConsulServer}s.
+	 *
+	 * @param healthServices the initial list of servers from Consul. Guaranteed to be non-empty list
+	 * @return ConsulServer instances
+	 * @see ConsulServer#ConsulServer(HealthService)
+	 */
+	protected List<ConsulServer> transformResponse(List<HealthService> healthServices) {
 		List<ConsulServer> servers = new ArrayList<>();
-		for (HealthService service : response.getValue()) {
+		for (HealthService service : healthServices) {
 			servers.add(new ConsulServer(service));
 		}
 		return servers;
 	}
 
-	private String getTag() {
+	/**
+	 * This method will create teh {@link QueryParams} to use when retrieving the
+	 * services from Consul. By default {@link QueryParams#DEFAULT} is used.
+	 * @return an instance of {@link QueryParams}
+	 */
+	protected QueryParams createQueryParamsForClientRequest() {
+		return QueryParams.DEFAULT;
+	}
+
+	protected String getTag() {
 		return this.properties.getQueryTagForService(this.serviceId);
 	}
 
