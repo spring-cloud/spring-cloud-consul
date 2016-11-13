@@ -210,6 +210,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 				&& StringUtils.hasText(servletContext.getContextPath().replaceAll("/", ""))) {
 			tags.add("contextPath=" + servletContext.getContextPath());
 		}
+		if (!StringUtils.isEmpty(properties.getInstanceZone())) {
+			tags.add(properties.getDefaultZoneMetadataName() + "=" + properties.getInstanceZone());
+		}
 		return tags;
 	}
 

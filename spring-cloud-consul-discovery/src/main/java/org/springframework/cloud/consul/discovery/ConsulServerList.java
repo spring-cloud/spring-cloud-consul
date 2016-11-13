@@ -70,7 +70,11 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		}
 		List<ConsulServer> servers = new ArrayList<>();
 		for (HealthService service : response.getValue()) {
-			servers.add(new ConsulServer(service));
+			ConsulServer server = new ConsulServer(service);
+			if (server.getMetadata().containsKey(this.properties.getDefaultZoneMetadataName())) {
+				server.setZone(server.getMetadata().get(this.properties.getDefaultZoneMetadataName()));
+			}
+			servers.add(server);
 		}
 		return servers;
 	}
