@@ -46,11 +46,10 @@ import static org.springframework.cloud.consul.discovery.ConsulServerUtils.getMe
 @CommonsLog
 public class ConsulDiscoveryClient implements DiscoveryClient {
 
-	private final ConsulLifecycle lifecycle;
-
 	private final ConsulClient client;
 
 	private final ConsulDiscoveryProperties properties;
+	private final ConsulLifecycle lifecycle;
 
 	private ServerProperties serverProperties;
 

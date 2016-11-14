@@ -16,16 +16,18 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 
+import org.springframework.beans.BeansException;
+import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
+import org.springframework.cloud.consul.serviceregistry.ConsulRegistration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 
 import com.ecwid.consul.ConsulException;
 import com.ecwid.consul.v1.ConsulClient;
@@ -36,8 +38,11 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * @author Spencer Gibb
  * @author Venil Noronha
+ *
+ * @deprecated See {@link org.springframework.cloud.consul.serviceregistry.ConsulAutoServiceRegistration}
  */
 @Slf4j
+@Deprecated
 public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	public static final char SEPARATOR = '-';
@@ -55,6 +60,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	private NewService service = new NewService();
 
 	private String instanceId;
+	private RelaxedPropertyResolver propertyResolver;
 
 	public ConsulLifecycle(ConsulClient client, ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
 		this.client = client;
@@ -68,6 +74,12 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	public void setServletContext(ServletContext servletContext) {
 		this.servletContext = servletContext;
+	}
+
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		super.setApplicationContext(applicationContext);
+		this.propertyResolver = new RelaxedPropertyResolver(applicationContext.getEnvironment());
 	}
 
 	@Override
@@ -97,60 +109,24 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 			return;
 		}
 		Assert.notNull(service.getPort(), "service.port has not been set");
-		String appName = getAppName();
-		service.setId(getServiceId());
-		if(!properties.isPreferAgentAddress()) {
-			service.setAddress(properties.getHostname());
+		ConsulRegistration registration = ConsulRegistration.registration(service.getPort(), this.properties, getContext(), this.servletContext, this.ttlConfig);
+		if (registration.getService().getPort() == null) { // not set by properties
+			registration.getService().setPort(service.getPort());
 		}
-		service.setName(normalizeForDns(appName));
-		service.setTags(createTags());
-
-		// If an alternate external port is specified, register using it instead
-		if (properties.getPort() != null) {
-			service.setPort(properties.getPort());
-		}
-
-		if (this.properties.isRegisterHealthCheck()) {
-			Integer checkPort;
-			if (shouldRegisterManagement()) {
-				checkPort = getManagementPort();
-			} else {
-				checkPort = service.getPort();
-			}
-			service.setCheck(createCheck(checkPort));
-		}
+		this.service = registration.getService();
 
 		register(service);
 	}
 
 	private NewService.Check createCheck(Integer port) {
-		NewService.Check check = new NewService.Check();
-		if (ttlConfig.isEnabled()) {
-			check.setTtl(ttlConfig.getTtl());
-			return check;
-		}
-
-		if (properties.getHealthCheckUrl() != null) {
-			check.setHttp(properties.getHealthCheckUrl());
-		} else {
-			check.setHttp(String.format("%s://%s:%s%s", properties.getScheme(),
-					properties.getHostname(), port,
-					properties.getHealthCheckPath()));
-		}
-		check.setInterval(properties.getHealthCheckInterval());
-		check.setTimeout(properties.getHealthCheckTimeout());
-		return check;
+		return ConsulRegistration.createCheck(port, this.ttlConfig, this.properties);
 	}
 
 	public String getServiceId() {
 		// cache instanceId, so on refresh this won't get recomputed
 		// this is a problem if ${random.value} is used
 		if (this.instanceId == null) {
-			if (!StringUtils.hasText(properties.getInstanceId())) {
-				this.instanceId = normalizeForDns(getContext().getId());
-			} else {
-				this.instanceId = normalizeForDns(properties.getInstanceId());
-			}
+			this.instanceId = ConsulRegistration.getServiceId(properties, getContext());
 		}
 		return this.instanceId;
 	}
@@ -160,15 +136,10 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		if (!this.properties.isRegister()) {
 			return;
 		}
-		NewService management = new NewService();
-		management.setId(getManagementServiceId());
-		management.setAddress(properties.getHostname());
-		management.setName(getManagementServiceName());
-		management.setPort(getManagementPort());
-		management.setTags(properties.getManagementTags());
-		management.setCheck(createCheck(getManagementPort()));
 
-		register(management);
+		ConsulRegistration registration = ConsulRegistration.managementRegistration(this.properties, getContext(), this.ttlConfig);
+
+		register(registration.getService());
 	}
 
 	protected void register(NewService newService) {
@@ -204,19 +175,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	}
 
 	private List<String> createTags() {
-		List<String> tags = new LinkedList<>(properties.getTags());
-		if(servletContext != null
-				&& StringUtils.hasText(servletContext.getContextPath())
-				&& StringUtils.hasText(servletContext.getContextPath().replaceAll("/", ""))) {
-			tags.add("contextPath=" + servletContext.getContextPath());
-		}
-		if (!StringUtils.isEmpty(properties.getInstanceZone())) {
-			tags.add(properties.getDefaultZoneMetadataName() + "=" + properties.getInstanceZone());
-		}
-		if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
-			tags.add("group=" + properties.getInstanceGroup());
-		}
-		return tags;
+		return ConsulRegistration.createTags(this.properties, this.servletContext);
 	}
 
 	private void deregister(String serviceId) {
@@ -237,56 +196,35 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	
 	@Override
 	protected String getAppName() {
-		String appName = properties.getServiceName();
-		return StringUtils.isEmpty(appName) ? super.getAppName() : appName;
+		return ConsulRegistration.getAppName(this.properties, this.propertyResolver);
 	}
 
 	/**
 	 * @return the serviceId of the Management Service
 	 */
 	public String getManagementServiceId() {
-		return normalizeForDns(getContext().getId()) + SEPARATOR + properties.getManagementSuffix();
+		return ConsulRegistration.normalizeForDns(getContext().getId()) + SEPARATOR + properties.getManagementSuffix();
 	}
 
 	/**
 	 * @return the service name of the Management Service
 	 */
 	public String getManagementServiceName() {
-		return normalizeForDns(getAppName()) + SEPARATOR + properties.getManagementSuffix();
+		return ConsulRegistration.normalizeForDns(getAppName()) + SEPARATOR + properties.getManagementSuffix();
 	}
 
 	/**
 	 * @return the port of the Management Service
 	 */
 	protected Integer getManagementPort() {
-		// If an alternate external port is specified, use it instead
-		if (properties.getManagementPort() != null) {
-			return properties.getManagementPort();
-		}
-		return super.getManagementPort();
+		return ConsulRegistration.getManagementPort(this.properties, getContext());
 	}
 
+	/**
+	 * @deprecated See {@link org.springframework.cloud.consul.serviceregistry.ConsulRegistration#normalizeForDns(String)}
+	 */
+	@Deprecated
 	public static String normalizeForDns(String s) {
-		if (s == null || !Character.isLetter(s.charAt(0))
-				|| !Character.isLetterOrDigit(s.charAt(s.length()-1))) {
-			throw new IllegalArgumentException("Consul service ids must not be empty, must start with a letter, end with a letter or digit, and have as interior characters only letters, digits, and hyphen");
-		}
-
-		StringBuilder normalized = new StringBuilder();
-		Character prev = null;
-		for (char curr : s.toCharArray()) {
-			Character toAppend = null;
-			if (Character.isLetterOrDigit(curr)) {
-				toAppend = curr;
-			} else if (prev == null || !(prev == SEPARATOR)) {
-				toAppend = SEPARATOR;
-			}
-			if (toAppend != null) {
-				normalized.append(toAppend);
-				prev = toAppend;
-			}
-		}
-
-		return normalized.toString();
+		return ConsulRegistration.normalizeForDns(s);
 	}
 }
