@@ -18,29 +18,29 @@ package org.springframework.cloud.consul.discovery;
 
 import java.util.Map;
 
-import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
 
 import static org.junit.Assert.assertNull;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Spencer Gibb
+ * @deprecated remove in Edgware
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@SpringApplicationConfiguration(classes = TestPropsConfig.class)
-@WebIntegrationTest(value = { "spring.application.name=myTestNotRegisteredService",
-		"spring.cloud.consul.discovery.register=false"}, randomPort = true)
+@Deprecated
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = TestPropsConfig.class,
+	properties = { "spring.application.name=myTestNotRegisteredService",
+		"spring.cloud.consul.discovery.register=false"},
+		webEnvironment = RANDOM_PORT)
 public class ConsulLifecycleRegistrationDisabledTests {
 	@Autowired
 	private ConsulClient consul;

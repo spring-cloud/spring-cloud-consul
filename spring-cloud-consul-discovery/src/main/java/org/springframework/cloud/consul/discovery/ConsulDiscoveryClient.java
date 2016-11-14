@@ -34,10 +34,10 @@ import com.ecwid.consul.v1.agent.model.Self;
 import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.health.model.HealthService;
 
-import lombok.extern.apachecommons.CommonsLog;
-
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.getMetadata;
+
+import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * @author Spencer Gibb
@@ -46,19 +46,38 @@ import static org.springframework.cloud.consul.discovery.ConsulServerUtils.getMe
 @CommonsLog
 public class ConsulDiscoveryClient implements DiscoveryClient {
 
-	private final ConsulLifecycle lifecycle;
+	interface LocalResolver {
+		String getServiceId();
+		Integer getPort();
+	}
 
 	private final ConsulClient client;
-
 	private final ConsulDiscoveryProperties properties;
+	private final LocalResolver localResolver;
 
 	private ServerProperties serverProperties;
 
-	public ConsulDiscoveryClient(ConsulClient client, ConsulLifecycle lifecycle,
-			ConsulDiscoveryProperties properties) {
+	@Deprecated
+	public ConsulDiscoveryClient(ConsulClient client, final ConsulLifecycle lifecycle,
+								 ConsulDiscoveryProperties properties) {
+		this(client, properties, new LocalResolver() {
+			@Override
+			public String getServiceId() {
+				return lifecycle.getServiceId();
+			}
+
+			@Override
+			public Integer getPort() {
+				return lifecycle.getConfiguredPort();
+			}
+		});
+	}
+
+	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties,
+				LocalResolver localResolver) {
 		this.client = client;
-		this.lifecycle = lifecycle;
 		this.properties = properties;
+		this.localResolver = localResolver;
 	}
 
 	public void setServerProperties(ServerProperties serverProperties) {
@@ -73,7 +92,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	@Override
 	public ServiceInstance getLocalServiceInstance() {
 		Response<Map<String, Service>> agentServices = client.getAgentServices();
-		Service service = agentServices.getValue().get(lifecycle.getServiceId());
+		Service service = agentServices.getValue().get(localResolver.getServiceId());
 		String serviceId;
 		Integer port;
 		Map<String, String> metadata;
@@ -88,10 +107,10 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		} else {
 			// possibly called before registration, use configuration or best guess
 			log.warn("Unable to locate service in consul agent: "
-					+ lifecycle.getServiceId());
+					+ localResolver.getServiceId());
 
-			serviceId = lifecycle.getServiceId();
-			port = lifecycle.getConfiguredPort();
+			serviceId = localResolver.getServiceId();
+			port = localResolver.getPort();
 			if (port == 0 && serverProperties != null
 					&& serverProperties.getPort() != null) {
 				port = serverProperties.getPort();

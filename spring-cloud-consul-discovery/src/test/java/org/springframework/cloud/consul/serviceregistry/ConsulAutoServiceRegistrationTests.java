@@ -14,28 +14,25 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.consul.discovery;
+package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
-import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
-import com.ecwid.consul.ConsulException;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.NewService;
 import com.ecwid.consul.v1.agent.model.Service;
 
 import static org.junit.Assert.assertEquals;
@@ -43,23 +40,22 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.cloud.consul.serviceregistry.ConsulRegistration.normalizeForDns;
 
 /**
  * @author Spencer Gibb
  * @author Venil Noronha
- * @deprecated remove in Edgware
  */
-@Deprecated
 @RunWith(SpringRunner.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@SpringBootTest(classes = TestConfig.class,
-	properties = { "spring.application.name=myTestService1-F::something",
-		"spring.cloud.consul.discovery.failFast=true" },
+@SpringBootTest(properties = { "spring.application.name=myTestService1-FF::something" },
 		webEnvironment = RANDOM_PORT)
-public class ConsulLifecycleTests {
+public class ConsulAutoServiceRegistrationTests {
 
 	@Autowired
-	private ConsulLifecycle lifecycle;
+	private ConsulAutoServiceRegistration autoRegistration;
+
+	@Autowired
+	private ConsulRegistration registration;
 
 	@Autowired
 	private ConsulClient consul;
@@ -67,54 +63,45 @@ public class ConsulLifecycleTests {
 	@Autowired
 	private ConsulDiscoveryProperties discoveryProperties;
 
-	@Autowired
-	private ApplicationContext context;
-
 	@Test
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
-		Service service = services.get(lifecycle.getServiceId());
+		Service service = services.get(registration.getServiceId());
 		assertNotNull("service was null", service);
 		assertNotEquals("service port is 0", 0, service.getPort().intValue());
 		assertFalse("service id contained invalid character: " + service.getId(), service.getId().contains(":"));
-		assertEquals("service id was wrong", lifecycle.getServiceId(), service.getId());
-		assertEquals("service name was wrong", "myTestService1-F-something", service.getService());
+		assertEquals("service id was wrong", registration.getServiceId(), service.getId());
+		assertEquals("service name was wrong", "myTestService1-FF-something", service.getService());
 		assertFalse("service address must not be empty", StringUtils.isEmpty(service.getAddress()));
 		assertEquals("service address must equals hostname from discovery properties", discoveryProperties.getHostname(), service.getAddress());
 	}
 
 	@Test
 	public void normalizeForDnsWorks() {
-		assertEquals("abc1", ConsulLifecycle.normalizeForDns("abc1"));
-		assertEquals("ab-c1", ConsulLifecycle.normalizeForDns("ab:c1"));
-		assertEquals("ab-c1", ConsulLifecycle.normalizeForDns("ab::c1"));
-	}
-
-	@Test(expected = ConsulException.class)
-	public void testFailFastEnabled() {
-		lifecycle.register(new NewService());
+		assertEquals("abc1", normalizeForDns("abc1"));
+		assertEquals("ab-c1", normalizeForDns("ab:c1"));
+		assertEquals("ab-c1", normalizeForDns("ab::c1"));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void normalizedFailsIfFirstCharIsNumber() {
-		ConsulLifecycle.normalizeForDns("9abc");
+		normalizeForDns("9abc");
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void normalizedFailsIfFirstCharIsNotAlpha() {
-		ConsulLifecycle.normalizeForDns(":abc");
+		normalizeForDns(":abc");
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void normalizedFailsIfLastCharIsNotAlphaNumeric() {
-		ConsulLifecycle.normalizeForDns("abc:");
+		normalizeForDns("abc:");
 	}
+
+	@SpringBootConfiguration
+	@EnableAutoConfiguration
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
+	protected static class TestConfig { }
 }
 
-@Configuration
-@EnableAutoConfiguration
-@Import({ TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
-class TestConfig {
-
-}

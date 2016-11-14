@@ -191,7 +191,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	@Data
-	public class Lifecycle {
+	public static class Lifecycle {
 		private boolean enabled = true;
 	}
 }
