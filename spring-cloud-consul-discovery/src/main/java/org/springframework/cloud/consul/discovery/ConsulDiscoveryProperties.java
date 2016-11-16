@@ -106,6 +106,15 @@ public class ConsulDiscoveryProperties {
 	/** Unique service instance id */
 	private String instanceId;
 
+	/** Service instance zone */
+	private String instanceZone;
+
+	/**
+	 * Service instance zone comes from metadata.
+	 * This allows changing the metadata tag name.
+	 */
+	private String defaultZoneMetadataName = "zone";
+
 	/** Whether to register an http or https service */
 	private String scheme = "http";
 
