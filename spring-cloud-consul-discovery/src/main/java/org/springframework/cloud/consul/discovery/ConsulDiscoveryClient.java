@@ -143,7 +143,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 			QueryParams queryParams) {
 
 		String aclToken = properties.getAclToken();
-        Response<List<HealthService>> services;
+		Response<List<HealthService>> services;
 		if (StringUtils.hasText(aclToken)) {
 			services = client.getHealthServices(serviceId,
 					this.properties.isQueryPassing(), queryParams, aclToken);

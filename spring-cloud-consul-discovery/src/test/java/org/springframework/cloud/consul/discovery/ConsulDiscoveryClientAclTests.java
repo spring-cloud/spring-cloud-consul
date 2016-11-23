@@ -61,7 +61,7 @@ public class ConsulDiscoveryClientAclTests {
 	@Test
 	public void getInstancesForSecondServiceWorks() throws Exception {
 
-		new SpringApplicationBuilder(MySecondService.class)
+		new SpringApplicationBuilder(MyTestConfig.class)
 				.run("--spring.application.name=testSecondServiceAcl",
 						"--server.port=0",
 						"--spring.cloud.consul.discovery.preferIpAddress=true",
@@ -77,14 +77,6 @@ public class ConsulDiscoveryClientAclTests {
 	@EnableAutoConfiguration
 	@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
 	public static class MyTestConfig {
-
-	}
-
-	@Configuration
-	@EnableDiscoveryClient
-	@EnableAutoConfiguration
-	@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
-	public static class MySecondService {
 
 	}
 }
