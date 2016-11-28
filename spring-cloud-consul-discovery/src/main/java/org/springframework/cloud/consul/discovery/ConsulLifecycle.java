@@ -213,6 +213,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		if (!StringUtils.isEmpty(properties.getInstanceZone())) {
 			tags.add(properties.getDefaultZoneMetadataName() + "=" + properties.getInstanceZone());
 		}
+		if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
+			tags.add("group=" + properties.getInstanceGroup());
+		}
 		return tags;
 	}
 

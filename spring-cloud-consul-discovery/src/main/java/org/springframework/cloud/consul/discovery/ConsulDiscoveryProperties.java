@@ -109,6 +109,9 @@ public class ConsulDiscoveryProperties {
 	/** Service instance zone */
 	private String instanceZone;
 
+	/** Service instance group*/
+	private String instanceGroup;
+
 	/**
 	 * Service instance zone comes from metadata.
 	 * This allows changing the metadata tag name.

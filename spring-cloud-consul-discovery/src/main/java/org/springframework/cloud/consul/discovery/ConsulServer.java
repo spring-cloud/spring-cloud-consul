@@ -31,10 +31,12 @@ public class ConsulServer extends Server {
 
 	private final MetaInfo metaInfo;
 	private final HealthService service;
+	private final Map<String, String> metadata;
 
 	public ConsulServer(final HealthService healthService) {
 		super(findHost(healthService), healthService.getService().getPort());
 		this.service = healthService;
+		this.metadata = ConsulServerUtils.getMetadata(this.service);
 		metaInfo = new MetaInfo() {
 			@Override
 			public String getAppName() {
@@ -43,7 +45,7 @@ public class ConsulServer extends Server {
 
 			@Override
 			public String getServerGroup() {
-				return null;
+				return getMetadata().get("group");
 			}
 
 			@Override
@@ -70,7 +72,7 @@ public class ConsulServer extends Server {
 	}
 
 	public Map<String, String> getMetadata() {
-		return ConsulServerUtils.getMetadata(this.service);
+		return metadata;
 	}
 
 	public boolean isPassingChecks() {
