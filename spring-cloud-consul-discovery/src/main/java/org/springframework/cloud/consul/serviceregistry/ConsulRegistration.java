@@ -41,14 +41,55 @@ public class ConsulRegistration implements Registration {
 	public static final char SEPARATOR = '-';
 
 	private final NewService service;
+	private final ConsulDiscoveryProperties properties;
+	private final ApplicationContext context;
+	private final HeartbeatProperties heartbeatProperties;
 	private String instanceId;
 
-	public ConsulRegistration(NewService service) {
+	public ConsulRegistration(NewService service, ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
 		this.service = service;
-
+		this.properties = properties;
+		this.context = context;
+		this.heartbeatProperties = heartbeatProperties;
 	}
 
-	public static ConsulRegistration registration(Integer port, ConsulDiscoveryProperties properties, ApplicationContext context,
+	public void initializePort(int knownPort) {
+		if (getService().getPort() == null) {
+			// not set by properties
+			getService().setPort(knownPort);
+		}
+		// we might not have a port until now, so this is the earliest we
+		// can create a check
+
+		setCheck(this.service, this.properties, this.context, this.heartbeatProperties);
+	}
+
+	public ConsulRegistration managementRegistration() {
+		return managementRegistration(this.properties, this.context, this.heartbeatProperties);
+	}
+
+	public static ConsulRegistration registration(ConsulDiscoveryProperties properties, ApplicationContext context,
+												  ServletContext servletContext, HeartbeatProperties heartbeatProperties) {
+		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(context.getEnvironment());
+
+		NewService service = new NewService();
+		String appName = getAppName(properties, propertyResolver);
+		service.setId(getServiceId(properties, context));
+		if(!properties.isPreferAgentAddress()) {
+			service.setAddress(properties.getHostname());
+		}
+		service.setName(normalizeForDns(appName));
+		service.setTags(createTags(properties, servletContext));
+
+		if (properties.getPort() != null) {
+			service.setPort(properties.getPort());
+		}
+
+		return new ConsulRegistration(service, properties, context, heartbeatProperties);
+	}
+
+	@Deprecated //TODO: do I need this here, or should I just copy what I need back into lifecycle?
+	public static ConsulRegistration lifecycleRegistration(Integer port, ConsulDiscoveryProperties properties, ApplicationContext context,
 												  ServletContext servletContext, HeartbeatProperties heartbeatProperties) {
 		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(context.getEnvironment());
 
@@ -70,6 +111,12 @@ public class ConsulRegistration implements Registration {
 
 		Assert.notNull(service.getPort(), "service.port may not be null");
 
+		setCheck(service, properties, context, heartbeatProperties);
+
+		return new ConsulRegistration(service, properties, context, heartbeatProperties);
+	}
+
+	public static void setCheck(NewService service, ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
 		if (properties.isRegisterHealthCheck()) {
 			Integer checkPort;
 			if (shouldRegisterManagement(properties, context)) {
@@ -80,8 +127,6 @@ public class ConsulRegistration implements Registration {
 			Assert.notNull(checkPort, "checkPort may not be null");
 			service.setCheck(createCheck(checkPort, heartbeatProperties, properties));
 		}
-
-		return new ConsulRegistration(service);
 	}
 
 	public static ConsulRegistration managementRegistration(ConsulDiscoveryProperties properties, ApplicationContext context,
@@ -96,7 +141,7 @@ public class ConsulRegistration implements Registration {
 		if (properties.isRegisterHealthCheck()) {
 			management.setCheck(createCheck(getManagementPort(properties, context), heartbeatProperties, properties));
 		}
-		return new ConsulRegistration(management);
+		return new ConsulRegistration(management, properties, context, heartbeatProperties);
 	}
 
 	public String getServiceId() {

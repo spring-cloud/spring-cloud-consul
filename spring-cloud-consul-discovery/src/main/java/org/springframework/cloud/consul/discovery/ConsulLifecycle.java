@@ -109,9 +109,9 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 			return;
 		}
 		Assert.notNull(service.getPort(), "service.port has not been set");
-		ConsulRegistration registration = ConsulRegistration.registration(service.getPort(), this.properties, getContext(), this.servletContext, this.ttlConfig);
+		ConsulRegistration registration = ConsulRegistration.lifecycleRegistration(service.getPort(), this.properties, getContext(), this.servletContext, this.ttlConfig);
 		if (registration.getService().getPort() == null) { // not set by properties
-			registration.getService().setPort(service.getPort());
+			registration.initializePort(service.getPort());
 		}
 		this.service = registration.getService();
 

@@ -33,13 +33,20 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 
 	private static Log log = LogFactory.getLog(ConsulServiceRegistry.class);
 
-	private ConsulClient client;
+	private final ConsulClient client;
 
-	private ConsulDiscoveryProperties properties;
+	private final ConsulDiscoveryProperties properties;
 
-	private TtlScheduler ttlScheduler;
+	private final TtlScheduler ttlScheduler;
 
-	private HeartbeatProperties heartbeatProperties;
+	private final HeartbeatProperties heartbeatProperties;
+
+	public ConsulServiceRegistry(ConsulClient client, ConsulDiscoveryProperties properties, TtlScheduler ttlScheduler, HeartbeatProperties heartbeatProperties) {
+		this.client = client;
+		this.properties = properties;
+		this.ttlScheduler = ttlScheduler;
+		this.heartbeatProperties = heartbeatProperties;
+	}
 
 	@Override
 	public void register(ConsulRegistration reg) {

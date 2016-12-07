@@ -1,6 +1,7 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 org.springframework.cloud.consul.discovery.RibbonConsulAutoConfiguration,\
-org.springframework.cloud.consul.discovery.configclient.ConsulConfigServerAutoConfiguration
+org.springframework.cloud.consul.discovery.configclient.ConsulConfigServerAutoConfiguration,\
+org.springframework.cloud.consul.serviceregistry.ConsulAutoServiceRegistrationAutoConfiguration
 
 # Discovery Client Configuration
 org.springframework.cloud.client.discovery.EnableDiscoveryClient=\
