@@ -46,7 +46,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 	private String context;
 	private ConsulConfigProperties configProperties;
 
-	private final Map<String, String> properties = new LinkedHashMap<>();
+	private final Map<String, Object> properties = new LinkedHashMap<>();
 
 	public ConsulPropertySource(String context, ConsulClient source,
 			ConsulConfigProperties configProperties) {
@@ -123,7 +123,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 		for (Map.Entry entry : props.entrySet()) {
 			properties
-					.put(entry.getKey().toString(), entry.getValue().toString());
+					.put(entry.getKey().toString(), entry.getValue());
 		}
 	}
 
@@ -164,7 +164,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		return new String(decodeFromString(value));
 	}
 
-	protected Map<String, String> getProperties() {
+	protected Map<String, Object> getProperties() {
 		return properties;
 	}
 
