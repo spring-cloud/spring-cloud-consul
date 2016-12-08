@@ -119,6 +119,10 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 	protected void parseValue(GetValue getValue, ConsulConfigProperties.Format format) {
 		String value = getValue.getDecodedValue();
+		if (value == null) {
+			return;
+		}
+
 		Properties props = generateProperties(value, format);
 
 		for (Map.Entry entry : props.entrySet()) {
