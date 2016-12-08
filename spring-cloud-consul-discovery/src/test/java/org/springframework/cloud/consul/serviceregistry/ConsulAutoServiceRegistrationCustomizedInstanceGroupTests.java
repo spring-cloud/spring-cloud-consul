@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.consul.discovery;
+package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.List;
 import java.util.Map;
@@ -22,8 +22,15 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
+import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.discovery.ConsulServer;
+import org.springframework.cloud.consul.discovery.ConsulServerList;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -40,20 +47,16 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * @author Jin Zhang
  */
-@Deprecated
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TestPropsConfig.class,
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedInstanceGroupTests.TestConfig.class,
 	properties = { "spring.application.name=myTestService-WithGroup",
 		"spring.cloud.consul.discovery.instanceId=myTestService1-WithGroup",
 		"spring.cloud.consul.discovery.instanceGroup=test"},
 		webEnvironment = RANDOM_PORT)
-public class ConsulLifecycleCustomizedInstanceGroupTests {
+public class ConsulAutoServiceRegistrationCustomizedInstanceGroupTests {
 
 	@Autowired
 	private ConsulClient consul;
-
-	@Autowired
-	private ApplicationContext context;
 
 	@Autowired
 	private ConsulDiscoveryProperties properties;
@@ -77,4 +80,10 @@ public class ConsulLifecycleCustomizedInstanceGroupTests {
 		assertEquals("servers was wrong size", 1, servers.size());
 		assertEquals("service group was wrong", "test", servers.get(0).getMetaInfo().getServerGroup());
 	}
+
+
+	@Configuration
+	@EnableAutoConfiguration
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
+	public static class TestConfig { }
 }

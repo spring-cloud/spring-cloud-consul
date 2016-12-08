@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.consul.discovery;
+package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
+import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -38,21 +42,17 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * @author Sixian Liu
  */
-@Deprecated
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TestPropsConfig.class,
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedInstanceZoneTests.TestConfig.class,
 	properties = { "spring.application.name=myTestService-WithZone",
 		"spring.cloud.consul.discovery.instanceId=myTestService1-WithZone",
 		"spring.cloud.consul.discovery.instanceZone=zone1",
 		"spring.cloud.consul.discovery.defaultZoneMetadataName=myZone"},
 		webEnvironment = RANDOM_PORT)
-public class ConsulLifecycleCustomizedInstanceZoneTests {
+public class ConsulAutoServiceRegistrationCustomizedInstanceZoneTests {
 
 	@Autowired
 	private ConsulClient consul;
-
-	@Autowired
-	private ApplicationContext context;
 
 	@Test
 	public void contextLoads() {
@@ -64,4 +64,9 @@ public class ConsulLifecycleCustomizedInstanceZoneTests {
 		assertEquals("service id was wrong", "myTestService1-WithZone", service.getId());
 		assertTrue("service zone was wrong", service.getTags().contains("myZone=zone1"));
 	}
+
+	@Configuration
+	@EnableAutoConfiguration
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
+	public static class TestConfig { }
 }

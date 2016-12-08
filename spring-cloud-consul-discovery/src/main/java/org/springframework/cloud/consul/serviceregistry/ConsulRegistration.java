@@ -196,6 +196,12 @@ public class ConsulRegistration implements Registration {
 				&& StringUtils.hasText(servletContext.getContextPath().replaceAll("/", ""))) {
 			tags.add("contextPath=" + servletContext.getContextPath());
 		}
+		if (!StringUtils.isEmpty(properties.getInstanceZone())) {
+			tags.add(properties.getDefaultZoneMetadataName() + "=" + properties.getInstanceZone());
+		}
+		if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
+			tags.add("group=" + properties.getInstanceGroup());
+		}
 		return tags;
 	}
 
