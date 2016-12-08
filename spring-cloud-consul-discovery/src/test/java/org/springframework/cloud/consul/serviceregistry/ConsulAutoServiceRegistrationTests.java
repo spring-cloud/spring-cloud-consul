@@ -52,9 +52,6 @@ import static org.springframework.cloud.consul.serviceregistry.ConsulRegistratio
 public class ConsulAutoServiceRegistrationTests {
 
 	@Autowired
-	private ConsulAutoServiceRegistration autoRegistration;
-
-	@Autowired
 	private ConsulRegistration registration;
 
 	@Autowired

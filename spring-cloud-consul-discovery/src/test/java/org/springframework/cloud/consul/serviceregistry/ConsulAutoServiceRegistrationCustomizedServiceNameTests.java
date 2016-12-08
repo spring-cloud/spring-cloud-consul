@@ -26,7 +26,6 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -49,11 +48,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 		"spring.cloud.consul.discovery.serviceName=myprefix-${spring.application.name}"},
 		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedServiceNameTests {
-	@Autowired
-	ConsulClient consul;
 
 	@Autowired
-	ApplicationContext context;
+	private ConsulClient consul;
 
 	@Test
 	public void contextLoads() {

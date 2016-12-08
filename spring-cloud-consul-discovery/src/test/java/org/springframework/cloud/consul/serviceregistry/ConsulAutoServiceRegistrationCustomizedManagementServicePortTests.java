@@ -53,14 +53,15 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 		"spring.cloud.consul.discovery.managementPort=4452", "management.port=0"},
 		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedManagementServicePortTests {
-	@Autowired
-	ConsulClient consul;
 
 	@Autowired
-	ConsulDiscoveryProperties discoveryProperties;
+	private ConsulClient consul;
 
 	@Autowired
-	ManagementServerProperties managementServerProperties;
+	private ConsulDiscoveryProperties discoveryProperties;
+
+	@Autowired
+	private ManagementServerProperties managementServerProperties;
 
 	@Test
 	public void contextLoads() {

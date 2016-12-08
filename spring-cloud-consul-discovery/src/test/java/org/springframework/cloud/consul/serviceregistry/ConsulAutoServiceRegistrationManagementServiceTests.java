@@ -51,11 +51,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 				"management.port=0"},
 		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationManagementServiceTests {
-	@Autowired
-	ConsulClient consul;
 
 	@Autowired
-	ConsulDiscoveryProperties discoveryProperties;
+	private ConsulClient consul;
+
+	@Autowired
+	private ConsulDiscoveryProperties discoveryProperties;
 
 	@Test
 	public void contextLoads() {

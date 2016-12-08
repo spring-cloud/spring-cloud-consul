@@ -45,12 +45,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 		"spring.cloud.service-registry.auto-registration.enabled=false"},
 		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationDisabledTests {
+
 	@Autowired
 	private ConsulClient consul;
 
 	@Autowired(required = false)
 	private ConsulAutoServiceRegistration autoServiceRegistration;
-
 
 	@Test
 	public void contextLoads() {
@@ -61,7 +61,6 @@ public class ConsulAutoServiceRegistrationDisabledTests {
 		Service service = services.get("myTestNotRegisteredService2");
 		assertNull("service was registered", service);
 	}
-
 
 	@Configuration
 	@EnableAutoConfiguration

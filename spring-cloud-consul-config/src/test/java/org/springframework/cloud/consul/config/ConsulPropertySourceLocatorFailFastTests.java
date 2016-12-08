@@ -19,21 +19,23 @@ package org.springframework.cloud.consul.config;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Spencer Gibb
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = ConsulPropertySourceLocatorFailFastTests.Config.class)
-@WebIntegrationTest(value = {"spring.application.name=testConsulPropertySourceLocatorFailFast",
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ConsulPropertySourceLocatorFailFastTests.Config.class,
+	properties = {"spring.application.name=testConsulPropertySourceLocatorFailFast",
 		"spring.cloud.consul.host=53210a7c-4809-42cb-8b30-057d2db85fcc",
 		"spring.cloud.consul.port=65530",
 		"spring.cloud.consul.retry.maxAttempts=0",
-		"spring.cloud.consul.config.failFast=false"}, randomPort = true)
+		"spring.cloud.consul.config.failFast=false"},
+		webEnvironment = RANDOM_PORT)
 public class ConsulPropertySourceLocatorFailFastTests {
 
 	@Configuration

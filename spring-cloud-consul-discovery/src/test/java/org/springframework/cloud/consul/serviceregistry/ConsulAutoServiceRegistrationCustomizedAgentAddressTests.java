@@ -26,8 +26,6 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
@@ -55,14 +53,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 public class ConsulAutoServiceRegistrationCustomizedAgentAddressTests {
 
 	@Autowired
-	ConsulClient consul;
+	private ConsulClient consul;
 	
-	@Autowired
-	ConsulDiscoveryProperties discoveryProperties;
-
-	@Autowired
-	ApplicationContext context;
-
 	@Test
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
