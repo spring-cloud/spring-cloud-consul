@@ -94,6 +94,19 @@ public class ConsulPropertySourceTests {
 		assertProperties(source, "fooymlval", 8080);
 	}
 
+	@Test
+	public void testEmptyYaml() {
+		// yaml file property
+		String yamlContext = prefix + "/yaml";
+		client.setKVValue(yamlContext+"/data", "");
+
+		ConsulConfigProperties configProperties = new ConsulConfigProperties();
+		configProperties.setFormat(ConsulConfigProperties.Format.YAML);
+		ConsulPropertySource source = new ConsulPropertySource(yamlContext, client, configProperties);
+		// Should NOT through a NPE
+		source.init();
+	}
+
 	private ConsulPropertySource getConsulPropertySource(ConsulConfigProperties configProperties, String context) {
 		ConsulPropertySource source = new ConsulPropertySource(context, client, configProperties);
 		source.init();
