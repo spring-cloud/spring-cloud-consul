@@ -51,6 +51,14 @@ public class ConsulRegistration implements Registration {
 		this.properties = properties;
 		this.context = context;
 		this.heartbeatProperties = heartbeatProperties;
+
+		// cache instanceId, so on refresh this won't get recomputed
+		// this is a problem if ${random.value} is used
+		this.instanceId = ConsulRegistration.getServiceId(properties, context);
+	}
+
+	public String getInstanceId() {
+		return this.instanceId;
 	}
 
 	public void initializePort(int knownPort) {

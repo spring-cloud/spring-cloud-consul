@@ -16,20 +16,20 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.SearchStrategy;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
+import org.springframework.cloud.consul.serviceregistry.ConsulRegistration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.ecwid.consul.v1.ConsulClient;
-
-import javax.servlet.ServletContext;
 
 /**
  * @author Spencer Gibb
@@ -46,55 +46,75 @@ public class ConsulDiscoveryClientConfiguration {
 	@Autowired(required = false)
 	private ServerProperties serverProperties;
 
-	@Autowired(required = false)
-	private TtlScheduler ttlScheduler;
-
-	@Autowired(required = false)
-	private ServletContext servletContext;
-
-	@Bean
-	@ConditionalOnMissingBean(search = SearchStrategy.CURRENT)
-	public ConsulLifecycle consulLifecycle(ConsulDiscoveryProperties discoveryProperties,
-			HeartbeatProperties heartbeatProperties) {
-		ConsulLifecycle lifecycle = new ConsulLifecycle(consulClient, discoveryProperties, heartbeatProperties);
-		if (this.ttlScheduler != null) {
-			lifecycle.setTtlScheduler(this.ttlScheduler);
-		}
-		if (this.servletContext != null) {
-			lifecycle.setServletContext(this.servletContext);
-		}
-		if (this.serverProperties != null && this.serverProperties.getPort() != null && this.serverProperties.getPort() > 0) {
-			// no need to wait for events for this to start since the user has explicitly set the port.
-			lifecycle.setPort(this.serverProperties.getPort());
-		}
-		return lifecycle;
-	}
-
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
+	//TODO: move to service-registry for Edgware
 	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties) {
 		return new TtlScheduler(heartbeatProperties, consulClient);
 	}
 
 	@Bean
+	//TODO: move to service-registry for Edgware
 	public HeartbeatProperties heartbeatProperties() {
 		return new HeartbeatProperties();
 	}
 
 	@Bean
+	//TODO: Split appropriate values to service-registry for Edgware
 	public ConsulDiscoveryProperties consulDiscoveryProperties(InetUtils inetUtils) {
 		return new ConsulDiscoveryProperties(inetUtils);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulDiscoveryClient consulDiscoveryClient(ConsulLifecycle consulLifecycle,
-			ConsulDiscoveryProperties discoveryProperties) {
+	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties discoveryProperties, final ApplicationContext context) {
 		ConsulDiscoveryClient discoveryClient = new ConsulDiscoveryClient(consulClient,
-				consulLifecycle, discoveryProperties);
+				discoveryProperties, new LifecycleRegistrationResolver(context));
 		discoveryClient.setServerProperties(serverProperties); //null ok
 		return discoveryClient;
+	}
+
+	class LifecycleRegistrationResolver implements ConsulDiscoveryClient.LocalResolver {
+		private ApplicationContext context;
+
+		public LifecycleRegistrationResolver(ApplicationContext context) {
+			this.context = context;
+		}
+
+		@Override
+		public String getServiceId() {
+			ConsulRegistration registration = getBean(ConsulRegistration.class);
+			if (registration != null) {
+				return registration.getServiceId();
+			}
+			ConsulLifecycle lifecycle = getBean(ConsulLifecycle.class);
+			if (lifecycle != null) {
+				return lifecycle.getServiceId();
+			}
+			throw new IllegalStateException("Must have one of ConsulRegistration or ConsulLifecycle");
+		}
+
+		@Override
+		public Integer getPort() {
+			ConsulRegistration registration = getBean(ConsulRegistration.class);
+			if (registration != null) {
+				return registration.getService().getPort();
+			}
+			ConsulLifecycle lifecycle = getBean(ConsulLifecycle.class);
+			if (lifecycle != null) {
+				return lifecycle.getConfiguredPort();
+			}
+			throw new IllegalStateException("Must have one of ConsulRegistration or ConsulLifecycle");
+		}
+
+		<T> T getBean(Class<T> type) {
+			try {
+				return context.getBean(type);
+			} catch (NoSuchBeanDefinitionException e) {
+			}
+			return null;
+		}
 	}
 
 	@Bean

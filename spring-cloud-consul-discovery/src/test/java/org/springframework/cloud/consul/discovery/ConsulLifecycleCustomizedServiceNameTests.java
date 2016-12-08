@@ -16,34 +16,35 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.junit4.SpringRunner;
+
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Spencer Gibb
+ * @deprecated remove in Edgware
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@SpringApplicationConfiguration(classes = TestPropsConfig.class)
-@WebIntegrationTest(value = { "spring.application.name=myTestService-C",
+@Deprecated
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = TestPropsConfig.class,
+	properties = { "spring.application.name=myTestService-C",
 		"spring.cloud.consul.discovery.instanceId=myTestService1-C",
-		"spring.cloud.consul.discovery.serviceName=myprefix-${spring.application.name}"}, randomPort = true)
+		"spring.cloud.consul.discovery.serviceName=myprefix-${spring.application.name}"},
+		webEnvironment = RANDOM_PORT)
 public class ConsulLifecycleCustomizedServiceNameTests {
 
 	@Autowired

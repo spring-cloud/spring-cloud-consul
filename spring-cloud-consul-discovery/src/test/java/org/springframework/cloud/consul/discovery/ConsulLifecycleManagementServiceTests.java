@@ -5,11 +5,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
@@ -24,7 +20,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 /**
  * @author Aleksandr Tarasov (aatarasov)
+ * @deprecated remove in Edgware
  */
+@Deprecated
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConfig.class, properties =
 		{"spring.application.name=myTestService-E",
@@ -53,13 +51,5 @@ public class ConsulLifecycleManagementServiceTests {
 		assertEquals("service name was wrong", "myTestService-E-management", service.getService());
 		assertFalse("service address must not be empty", StringUtils.isEmpty(service.getAddress()));
 		assertEquals("service address must equals hostname from discovery properties", discoveryProperties.getHostname(), service.getAddress());
-	}
-
-	@Configuration
-	@EnableAutoConfiguration
-	@Import({ConsulAutoConfiguration.class,
-			ConsulDiscoveryClientConfiguration.class})
-	public static class TestConfig {
-
 	}
 }

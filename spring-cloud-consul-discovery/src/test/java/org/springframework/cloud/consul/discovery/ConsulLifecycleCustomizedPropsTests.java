@@ -19,17 +19,15 @@ package org.springframework.cloud.consul.discovery;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -49,9 +47,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * @author Spencer Gibb
  * @author Venil Noronha
+ * @deprecated remove in Edgware
  */
+@Deprecated
 @RunWith(SpringRunner.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @SpringBootTest(classes = TestPropsConfig.class,
 	properties = { "spring.application.name=myTestService-B",
 		"spring.cloud.consul.discovery.instanceId=myTestService1-B",
@@ -102,7 +101,7 @@ public class ConsulLifecycleCustomizedPropsTests {
 
 @Configuration
 @EnableAutoConfiguration
-@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+@ImportAutoConfiguration({ TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
 class TestPropsConfig {
 
 }

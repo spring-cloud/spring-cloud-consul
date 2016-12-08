@@ -18,30 +18,33 @@ package org.springframework.cloud.consul.discovery;
 
 import java.util.List;
 
-import com.ecwid.consul.v1.ConsulClient;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import com.ecwid.consul.v1.ConsulClient;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Marcin Biegan
+ * @deprecated remove in Edgware
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = ConsulLifecycleCustomizedTests.MyTestConfig.class)
-@WebIntegrationTest(value = { "spring.application.name=testCustomLifecycle", "spring.cloud.consul.discovery.instanceId=foo" }, randomPort = true)
+@Deprecated
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ConsulLifecycleCustomizedTests.MyTestConfig.class,
+		properties = { "spring.application.name=testCustomLifecycle", "spring.cloud.consul.discovery.instanceId=foo" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulLifecycleCustomizedTests {
 
 	@Autowired

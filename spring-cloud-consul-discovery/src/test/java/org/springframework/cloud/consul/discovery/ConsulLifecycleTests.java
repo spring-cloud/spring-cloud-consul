@@ -16,42 +16,46 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import com.ecwid.consul.ConsulException;
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.NewService;
-import com.ecwid.consul.v1.agent.model.Service;
+import java.util.Map;
+
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
-import java.util.Map;
+import com.ecwid.consul.ConsulException;
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.NewService;
+import com.ecwid.consul.v1.agent.model.Service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Spencer Gibb
  * @author Venil Noronha
+ * @deprecated remove in Edgware
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@Deprecated
+@RunWith(SpringRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@SpringApplicationConfiguration(classes = TestConfig.class)
-@WebIntegrationTest(value = { "spring.application.name=myTestService1-F::something",
-		"spring.cloud.consul.discovery.failFast=true" }, randomPort = true)
+@SpringBootTest(classes = TestConfig.class,
+	properties = { "spring.application.name=myTestService1-F::something",
+		"spring.cloud.consul.discovery.failFast=true" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulLifecycleTests {
 
 	@Autowired
@@ -110,7 +114,7 @@ public class ConsulLifecycleTests {
 
 @Configuration
 @EnableAutoConfiguration
-@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+@Import({ TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
 class TestConfig {
 
 }
