@@ -22,26 +22,27 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Spencer Gibb
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = ConsulDiscoveryClientAclTests.MyTestConfig.class)
-@WebIntegrationTest(value = {"spring.application.name=testConsulDiscoveryAcl",
-		"spring.cloud.consul.discovery.preferIpAddress=true",
-		"consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304"}, randomPort = true)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = ConsulDiscoveryClientAclTests.MyTestConfig.class,
+		properties = {"spring.application.name=testConsulDiscoveryAcl",
+			"spring.cloud.consul.discovery.preferIpAddress=true",
+			"consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304"},
+		webEnvironment = RANDOM_PORT)
 public class ConsulDiscoveryClientAclTests {
 
 	@Autowired

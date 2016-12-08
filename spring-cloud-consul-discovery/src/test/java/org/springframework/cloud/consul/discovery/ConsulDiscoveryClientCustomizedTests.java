@@ -45,6 +45,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 	properties = { "spring.application.name=testConsulDiscovery2",
 		"spring.cloud.consul.discovery.instanceId=testConsulDiscovery2Id",
 		"spring.cloud.consul.discovery.hostname=testConsulDiscovery2Host",
+		"spring.cloud.consul.discovery.registerHealthCheck=false",
 		"spring.cloud.consul.discovery.tags=plaintag,foo=bar,foo2=bar2=baz2" },
 		webEnvironment = RANDOM_PORT)
 public class ConsulDiscoveryClientCustomizedTests {

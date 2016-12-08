@@ -1,36 +1,35 @@
 package org.springframework.cloud.consul.discovery;
 
+import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StringUtils;
+
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.StringUtils;
-
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Aleksandr Tarasov (aatarasov)
+ * @deprecated remove in Edgware
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@SpringApplicationConfiguration(classes = TestConfig.class)
-@WebIntegrationTest(value = {"spring.application.name=myTestService-E",
-		"spring.cloud.consul.discovery.instanceId=myTestService1-E", "management.port=0"}, randomPort = true)
+@Deprecated
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = TestConfig.class, properties =
+		{"spring.application.name=myTestService-E",
+				"spring.cloud.consul.discovery.instanceId=myTestService1-E",
+				"spring.cloud.consul.discovery.registerHealthCheck=false",
+				"management.port=0"},
+		webEnvironment = RANDOM_PORT)
 public class ConsulLifecycleManagementServiceTests {
 	@Autowired
 	ConsulLifecycle lifecycle;
@@ -52,13 +51,5 @@ public class ConsulLifecycleManagementServiceTests {
 		assertEquals("service name was wrong", "myTestService-E-management", service.getService());
 		assertFalse("service address must not be empty", StringUtils.isEmpty(service.getAddress()));
 		assertEquals("service address must equals hostname from discovery properties", discoveryProperties.getHostname(), service.getAddress());
-	}
-
-	@Configuration
-	@EnableAutoConfiguration
-	@Import({ConsulAutoConfiguration.class,
-			ConsulDiscoveryClientConfiguration.class})
-	public static class TestConfig {
-
 	}
 }

@@ -16,37 +16,38 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.Map;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.StringUtils;
+
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.context.ApplicationContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.util.StringUtils;
-
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Spencer Gibb
+ * @deprecated remove in Edgware
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@SpringApplicationConfiguration(classes = TestPropsConfig.class)
-@WebIntegrationTest(value = { "spring.application.name=myTestService-A",
+@Deprecated
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = TestPropsConfig.class,
+	properties = { "spring.application.name=myTestService-A",
 		"spring.cloud.consul.discovery.instanceId=myTestService1-A",
 		"spring.cloud.consul.discovery.serviceName=myprefix-${spring.application.name}",
-		"spring.cloud.consul.discovery.preferAgentAddress=true"}, randomPort = true)
+		"spring.cloud.consul.discovery.preferAgentAddress=true"},
+		webEnvironment = RANDOM_PORT)
 public class ConsulLifecycleCustomizedAgentAddressTests {
 
 	@Autowired

@@ -14,40 +14,41 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.consul.discovery;
+package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
+import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Spencer Gibb
- * @deprecated remove in Edgware
  */
-@Deprecated
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TestPropsConfig.class,
-	properties = { "spring.application.name=myTestService2-D",
-		"spring.cloud.consul.discovery.instanceId=myTestService2-D", },
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedServiceNameTests.TestConfig.class,
+	properties = { "spring.application.name=myTestService-CC",
+		"spring.cloud.consul.discovery.instanceId=myTestService1-CC",
+		"spring.cloud.consul.discovery.serviceName=myprefix-${spring.application.name}"},
 		webEnvironment = RANDOM_PORT)
-public class ConsulLifecycleDefaultPortTests {
-
-	@Autowired
-	ConsulLifecycle lifecycle;
-
+public class ConsulAutoServiceRegistrationCustomizedServiceNameTests {
 	@Autowired
 	ConsulClient consul;
 
@@ -58,9 +59,15 @@ public class ConsulLifecycleDefaultPortTests {
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
-		Service service = services.get("myTestService2-D");
+		Service service = services.get("myTestService1-CC");
 		assertNotNull("service was null", service);
 		assertNotEquals("service port is 0", 0, service.getPort().intValue());
+		assertEquals("service id was wrong", "myTestService1-CC", service.getId());
+		assertEquals("service name was wrong", "myprefix-myTestService-CC", service.getService());
 	}
-}
 
+	@Configuration
+	@EnableAutoConfiguration
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
+	public static class TestConfig { }
+}

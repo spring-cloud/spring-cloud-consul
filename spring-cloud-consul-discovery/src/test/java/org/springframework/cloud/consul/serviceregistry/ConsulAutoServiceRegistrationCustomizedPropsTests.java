@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.consul.discovery;
+package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.List;
 import java.util.Map;
@@ -25,7 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -47,11 +49,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * @author Spencer Gibb
  * @author Venil Noronha
- * @deprecated remove in Edgware
  */
-@Deprecated
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TestPropsConfig.class,
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedPropsTests.TestPropsConfig.class,
 	properties = { "spring.application.name=myTestService-B",
 		"spring.cloud.consul.discovery.instanceId=myTestService1-B",
 		"spring.cloud.consul.discovery.port=4452",
@@ -60,10 +60,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 		"spring.cloud.consul.discovery.registerHealthCheck=false",
 		"spring.cloud.consul.discovery.failFast=false" },
 		webEnvironment = RANDOM_PORT)
-public class ConsulLifecycleCustomizedPropsTests {
-
-	@Autowired
-	ConsulLifecycle lifecycle;
+public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 
 	@Autowired
 	ConsulClient consul;
@@ -97,11 +94,9 @@ public class ConsulLifecycleCustomizedPropsTests {
 		assertFalse("property failFast was wrong", this.properties.isFailFast());
 	}
 
-}
 
-@Configuration
-@EnableAutoConfiguration
-@ImportAutoConfiguration({ TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
-class TestPropsConfig {
-
+	@Configuration
+	@EnableAutoConfiguration
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
+	public static class TestPropsConfig { }
 }

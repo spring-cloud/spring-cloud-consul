@@ -19,29 +19,29 @@ package org.springframework.cloud.consul.discovery;
 import java.util.Arrays;
 import java.util.Collections;
 
-import com.ecwid.consul.transport.RawResponse;
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Member;
-import com.ecwid.consul.v1.agent.model.Self;
-import com.ecwid.consul.v1.agent.model.Service;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK;
+import com.ecwid.consul.transport.RawResponse;
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.Member;
+import com.ecwid.consul.v1.agent.model.Self;
+import com.ecwid.consul.v1.agent.model.Service;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK;
 
 /**
  * @author Spencer Gibb
@@ -142,14 +142,14 @@ public class ConsulDiscoveryClientLocalServiceInstanceTests {
 		given(this.lifecycle.getConfiguredPort()).willReturn(port);
 		given(this.properties.getTags()).willReturn(Arrays.asList(TAG));
 		given(this.properties.getHostname()).willReturn(address);
+		given(this.properties.getLifecycle()).willReturn(new ConsulDiscoveryProperties.Lifecycle());
 
 		given(this.consul.getAgentServices()).willReturn(new Response<>(Collections.<String, Service>emptyMap(), RAW_RESPONSE));
 	}
 
 	@Configuration
 	@EnableDiscoveryClient
-	@EnableAutoConfiguration
-	@Import({ ConsulDiscoveryClientConfiguration.class })
+	@ImportAutoConfiguration({ ConsulDiscoveryClientConfiguration.class })
 	protected static class LocalServiceTestConfig {
 
 	}
