@@ -103,7 +103,7 @@ public class ConsulPropertySourceTests {
 		ConsulConfigProperties configProperties = new ConsulConfigProperties();
 		configProperties.setFormat(ConsulConfigProperties.Format.YAML);
 		ConsulPropertySource source = new ConsulPropertySource(yamlContext, client, configProperties);
-		// Should NOT through a NPE
+		// Should NOT throw a NPE
 		source.init();
 	}
 
