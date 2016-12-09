@@ -84,6 +84,7 @@ public class ConsulInboundMessageProducer extends MessageProducerSupport {
 		if (this.eventsHandle != null) {
 			this.eventsHandle.cancel(true);
 		}
+		this.scheduler.shutdown();
 	}
 
 	// @Scheduled(fixedDelayString = "${spring.cloud.consul.binder.eventDelay:30000}")
