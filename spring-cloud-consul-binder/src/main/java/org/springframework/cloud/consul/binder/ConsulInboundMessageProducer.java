@@ -24,6 +24,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import com.ecwid.consul.v1.OperationException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.integration.endpoint.MessageProducerSupport;
 
 import com.ecwid.consul.v1.event.model.Event;
@@ -34,6 +37,8 @@ import com.ecwid.consul.v1.event.model.Event;
  * @author Spencer Gibb
  */
 public class ConsulInboundMessageProducer extends MessageProducerSupport {
+
+	protected static final Log logger = LogFactory.getLog(ConsulInboundMessageProducer.class);
 
 	private EventService eventService;
 	private final ScheduledExecutorService scheduler;
@@ -79,18 +84,32 @@ public class ConsulInboundMessageProducer extends MessageProducerSupport {
 		if (this.eventsHandle != null) {
 			this.eventsHandle.cancel(true);
 		}
+		this.scheduler.shutdown();
 	}
 
 	// @Scheduled(fixedDelayString = "${spring.cloud.consul.binder.eventDelay:30000}")
 	public void getEvents() {
-		List<Event> events = eventService.watch();
-		for (Event event : events) {
-			// Map<String, Object> headers = new HashMap<>();
-			// headers.put(MessageHeaders.REPLY_CHANNEL, outputChannel.)
-			String decoded = new String(decodeFromString(event.getPayload()));
-			sendMessage(getMessageBuilderFactory().withPayload(decoded)
-			// TODO: support headers
-					.build());
+		try {
+			List<Event> events = eventService.watch();
+			for (Event event : events) {
+				// Map<String, Object> headers = new HashMap<>();
+				// headers.put(MessageHeaders.REPLY_CHANNEL, outputChannel.)
+				String decoded = new String(decodeFromString(event.getPayload()));
+				sendMessage(getMessageBuilderFactory().withPayload(decoded)
+				// TODO: support headers
+						.build());
+			}
+		} catch (OperationException e) {
+			if (logger.isErrorEnabled()) {
+				logger.error("Error getting consul events: " + e);
+			}
+		} catch (Exception e) {
+			if (logger.isErrorEnabled()) {
+				logger.error("Error getting consul events: " + e.getMessage());
+			}
+			if (logger.isDebugEnabled()) {
+				logger.debug("Error getting consul events", e);
+			}
 		}
 	}
 }

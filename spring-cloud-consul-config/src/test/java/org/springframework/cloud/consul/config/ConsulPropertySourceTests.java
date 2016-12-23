@@ -63,9 +63,9 @@ public class ConsulPropertySourceTests {
 		assertProperties(source, "fookvval", "8080");
 	}
 
-	private void assertProperties(ConsulPropertySource source, String fooval, String barval) {
-		assertThat("fooprop was wrong", (String)source.getProperty("fooprop"), is(equalTo(fooval)));
-		assertThat("bar.prop was wrong", (String)source.getProperty("bar.prop"), is(equalTo(barval)));
+	private void assertProperties(ConsulPropertySource source, Object fooval, Object barval) {
+		assertThat("fooprop was wrong", source.getProperty("fooprop"), is(equalTo(fooval)));
+		assertThat("bar.prop was wrong", source.getProperty("bar.prop"), is(equalTo(barval)));
 	}
 
 	@Test
@@ -91,7 +91,20 @@ public class ConsulPropertySourceTests {
 		configProperties.setFormat(ConsulConfigProperties.Format.YAML);
 		ConsulPropertySource source = getConsulPropertySource(configProperties, yamlContext);
 
-		assertProperties(source, "fooymlval", "8080");
+		assertProperties(source, "fooymlval", 8080);
+	}
+
+	@Test
+	public void testEmptyYaml() {
+		// yaml file property
+		String yamlContext = prefix + "/yaml";
+		client.setKVValue(yamlContext+"/data", "");
+
+		ConsulConfigProperties configProperties = new ConsulConfigProperties();
+		configProperties.setFormat(ConsulConfigProperties.Format.YAML);
+		ConsulPropertySource source = new ConsulPropertySource(yamlContext, client, configProperties);
+		// Should NOT throw a NPE
+		source.init();
 	}
 
 	private ConsulPropertySource getConsulPropertySource(ConsulConfigProperties configProperties, String context) {

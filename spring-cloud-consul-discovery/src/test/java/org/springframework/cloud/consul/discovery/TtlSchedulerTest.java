@@ -2,19 +2,16 @@ package org.springframework.cloud.consul.discovery;
 
 import java.util.List;
 
-import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -24,17 +21,18 @@ import com.ecwid.consul.v1.health.model.Check;
 import static com.ecwid.consul.v1.health.model.Check.CheckStatus.PASSING;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Stéphane Leroy
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@SpringApplicationConfiguration(classes = TtlSchedulerTestConfig.class)
-@WebIntegrationTest(value = { "spring.application.name=ttlScheduler",
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = TtlSchedulerTest.TtlSchedulerTestConfig.class,
+	properties = { "spring.application.name=ttlScheduler",
 		"spring.cloud.consul.discovery.instanceId=ttlScheduler-id",
 		"spring.cloud.consul.discovery.heartbeat.enabled=true",
-		"spring.cloud.consul.discovery.heartbeat.ttlValue=2", "management.port=0" }, randomPort = true)
+		"spring.cloud.consul.discovery.heartbeat.ttlValue=2", "management.port=0" },
+		webEnvironment = RANDOM_PORT)
 public class TtlSchedulerTest {
 
 	@Autowired
@@ -62,12 +60,11 @@ public class TtlSchedulerTest {
 		return null;
 	}
 
+	@Configuration
+	@EnableDiscoveryClient(autoRegister = false) //FIXME:
+	@EnableAutoConfiguration
+	@ImportAutoConfiguration({ TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+	public static class TtlSchedulerTestConfig { }
 }
 
-@Configuration
-@EnableDiscoveryClient
-@EnableAutoConfiguration
-@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
-class TtlSchedulerTestConfig {
 
-}

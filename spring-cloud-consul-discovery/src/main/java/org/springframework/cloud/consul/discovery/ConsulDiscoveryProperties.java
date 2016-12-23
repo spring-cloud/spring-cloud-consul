@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import lombok.Setter;
  * Defines configuration for service discovery and registration.
  *
  * @author Spencer Gibb
+ * @author Venil Noronha
  */
 @ConfigurationProperties("spring.cloud.consul.discovery")
 @Data
@@ -105,6 +106,18 @@ public class ConsulDiscoveryProperties {
 	/** Unique service instance id */
 	private String instanceId;
 
+	/** Service instance zone */
+	private String instanceZone;
+
+	/** Service instance group*/
+	private String instanceGroup;
+
+	/**
+	 * Service instance zone comes from metadata.
+	 * This allows changing the metadata tag name.
+	 */
+	private String defaultZoneMetadataName = "zone";
+
 	/** Whether to register an http or https service */
 	private String scheme = "http";
 
@@ -137,6 +150,12 @@ public class ConsulDiscoveryProperties {
 	 * Register health check in consul. Useful during development of a service.
 	 */
 	private boolean registerHealthCheck = true;
+
+	/**
+	 * Throw exceptions during service registration if true, otherwise, log
+	 * warnings (defaults to true).
+	 */
+	private boolean failFast = true;
 
 	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {}
@@ -172,7 +191,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	@Data
-	public class Lifecycle {
+	public static class Lifecycle {
 		private boolean enabled = true;
 	}
 }

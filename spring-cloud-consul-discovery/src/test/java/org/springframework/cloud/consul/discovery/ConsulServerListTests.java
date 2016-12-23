@@ -36,38 +36,49 @@ import static org.junit.Assert.assertThat;
  * @author Spencer Gibb
  */
 public class ConsulServerListTests {
+	private final String name = "consulServerListTestsService";
 
 	@Test
 	public void tagsWork() {
-		String name = "consulServerListTestsService";
 		ConsulClient consul = new ConsulClient();
-		NewService nonTagged = new NewService();
-		nonTagged.setAddress("localhost");
-		nonTagged.setId(name+"NonTagged");
-		nonTagged.setName(name);
-		nonTagged.setPort(8080);
 
-		NewService tagged = new NewService();
-		tagged.setAddress("localhost");
-		tagged.setId(name+"Tagged");
-		tagged.setName(name);
-		tagged.setPort(9080);
+		NewService nonTagged = createService("NonTagged", 8080, null);
+
 		String tag = "mytag";
-		tagged.setTags(Arrays.asList(tag));
+		NewService tagged = createService("Tagged", 9080, Arrays.asList(tag));
+
+		String zone = "myzone";
+		NewService withZone = createService("WithZone", 10080, Arrays.asList("zone=" + zone));
+
+		String group = "test";
+		NewService withGroup = createService("WithGroup", 11080, Arrays.asList("group=" + group));
 
 		try {
 			consul.agentServiceRegister(nonTagged);
 			consul.agentServiceRegister(tagged);
+			consul.agentServiceRegister(withZone);
+			consul.agentServiceRegister(withGroup);
 
 			InetUtils inetUtils = new InetUtils(new InetUtilsProperties());
 			DefaultClientConfigImpl config = new DefaultClientConfigImpl();
-			config.setClientName(tagged.getName());
+			config.setClientName(name);
 
 			ConsulServerList serverList = new ConsulServerList(consul, new ConsulDiscoveryProperties(inetUtils));
 			serverList.initWithNiwsConfig(config);
 
 			List<ConsulServer> servers = serverList.getInitialListOfServers();
-			assertThat("servers was wrong size", servers, hasSize(2));
+			assertThat("servers was wrong size", servers, hasSize(4));
+
+			int serverWithZoneCount = 0;
+			for (ConsulServer server : servers) {
+				if (server.getMetadata().containsKey("zone")) {
+					serverWithZoneCount++;
+					assertThat("server was wrong zone", server.getZone(), is(zone));
+				} else {
+					assertThat("server was wrong zone", server.getZone(), is(ConsulServer.UNKNOWN_ZONE));
+				}
+			}
+			assertThat("server was wrong zone", serverWithZoneCount, is(1));
 
 			serverList = new ConsulServerList(consul, getProperties(name, tag, inetUtils));
 			serverList.initWithNiwsConfig(config);
@@ -76,9 +87,21 @@ public class ConsulServerListTests {
 			assertThat("servers was wrong size", servers, hasSize(1));
 			ConsulServer server = servers.get(0);
 			assertThat("server was wrong", server.getPort(), is(9080));
+
+			// test server group
+			serverList = new ConsulServerList(consul, getProperties(name, "group=" + group, inetUtils));
+			serverList.initWithNiwsConfig(config);
+
+			servers = serverList.getInitialListOfServers();
+			assertThat("servers was wrong size", servers, hasSize(1));
+			server = servers.get(0);
+			assertThat("server was wrong", server.getPort(), is(11080));
+			assertThat("server group was wrong", server.getMetaInfo().getServerGroup(), is(group));
 		} finally {
 			consul.agentServiceDeregister(nonTagged.getId());
 			consul.agentServiceDeregister(tagged.getId());
+			consul.agentServiceDeregister(withZone.getId());
+			consul.agentServiceDeregister(withGroup.getId());
 		}
 	}
 
@@ -88,5 +111,17 @@ public class ConsulServerListTests {
 		map.put(name, tag);
 		properties.setServerListQueryTags(map);
 		return properties;
+	}
+
+	private NewService createService(String id, int port, List<String> tags) {
+		NewService service = new NewService();
+		service.setName(name);
+		service.setId(name + id);
+		service.setAddress("localhost");
+		service.setPort(port);
+		if (tags != null) {
+			service.setTags(tags);
+		}
+		return service;
 	}
 }
