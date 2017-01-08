@@ -24,11 +24,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -47,6 +49,15 @@ public class ConfigWatchTests {
 	@Before
 	public void setUp() throws Exception {
 		configProperties = new ConsulConfigProperties();
+	}
+
+	@Test
+	public void watchPublishesEventWithAcl() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		setupWatch(eventPublisher, new GetValue(), "2ee647bd-bd69-4118-9f34-b9a6e9e60746");
+
+		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
 	}
 
 	@Test
@@ -77,7 +88,15 @@ public class ConfigWatchTests {
 		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
 	}
 
-	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue, ConsulConfigProperties configProperties, String context ) {
+	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue, String aclToken) {
+		setupWatch(eventPublisher, getValue, this.configProperties, "/app/");
+	}
+
+	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue, ConsulConfigProperties configProperties, String context) {
+		setupWatch(eventPublisher, getValue, configProperties, context, null);
+	}
+
+	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue, ConsulConfigProperties configProperties, String context, String aclToken) {
 		ConsulClient consul = mock(ConsulClient.class);
 		List<GetValue> getValues = null;
 
@@ -86,7 +105,12 @@ public class ConfigWatchTests {
 		}
 
 		Response<List<GetValue>> response = new Response<>(getValues, 1L, false, 1L);
-		when(consul.getKVValues(eq(context), any(QueryParams.class))).thenReturn(response);
+		when(consul.getKVValues(eq(context), anyString(), any(QueryParams.class))).thenReturn(response);
+
+		ConsulConfigProperties properties = new ConsulConfigProperties();
+		if (StringUtils.hasText(aclToken)) {
+			properties.setAclToken(aclToken);
+		}
 
 		ConfigWatch watch = new ConfigWatch(configProperties, Arrays.asList(context), consul);
 		watch.setApplicationEventPublisher(eventPublisher);
