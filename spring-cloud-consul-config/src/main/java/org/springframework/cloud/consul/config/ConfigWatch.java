@@ -31,6 +31,7 @@ import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.util.StringUtils;
 
 import lombok.Data;
 import lombok.extern.apachecommons.CommonsLog;
@@ -80,7 +81,13 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 						currentIndex = -1L;
 					}
 
-					Response<List<GetValue>> response = this.consul.getKVValues(context, new QueryParams(2, currentIndex));
+					// use the consul ACL token if found
+					String aclToken = properties.getAclToken();
+					if (StringUtils.isEmpty(aclToken)) {
+					    aclToken = null;
+					}
+
+					Response<List<GetValue>> response = this.consul.getKVValues(context, aclToken, new QueryParams(2, currentIndex));
 
 					// if response.value == null, response was a 404, otherwise it was a 200
 					// reducing churn if there wasn't anything
