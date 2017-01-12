@@ -84,18 +84,9 @@ public class ConsulDiscoveryClientTests {
 				Character.isDigit(instance.getHost().charAt(0)));
 	}
 
-	@Test
-	public void getLocalInstance() {
-		ServiceInstance instance = discoveryClient.getLocalServiceInstance();
-		assertNotNull("instance was null", instance);
-		assertIpAddress(instance);
-	}
-
 	@Configuration
 	@EnableDiscoveryClient
 	@EnableAutoConfiguration
 	@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
-	public static class MyTestConfig {
-
-	}
+	public static class MyTestConfig { }
 }

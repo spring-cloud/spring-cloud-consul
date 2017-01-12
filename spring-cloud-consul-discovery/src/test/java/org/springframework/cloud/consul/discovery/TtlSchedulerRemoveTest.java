@@ -67,9 +67,9 @@ public class TtlSchedulerRemoveTest {
 	}
 
 	@Configuration
-	@EnableDiscoveryClient(autoRegister = false) //FIXME: this is weird because we're testing the deprecated lifecycle, not autoconfiguration
+	@EnableDiscoveryClient
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+	@ImportAutoConfiguration({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
 	public static class TtlSchedulerRemoveTestConfig { }
 }
 

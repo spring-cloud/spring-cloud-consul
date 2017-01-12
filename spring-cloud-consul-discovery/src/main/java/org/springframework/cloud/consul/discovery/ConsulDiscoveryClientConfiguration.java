@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,7 +23,6 @@ import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
-import org.springframework.cloud.consul.serviceregistry.ConsulRegistration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -70,51 +68,9 @@ public class ConsulDiscoveryClientConfiguration {
 	@ConditionalOnMissingBean
 	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties discoveryProperties, final ApplicationContext context) {
 		ConsulDiscoveryClient discoveryClient = new ConsulDiscoveryClient(consulClient,
-				discoveryProperties, new LifecycleRegistrationResolver(context));
+				discoveryProperties);
 		discoveryClient.setServerProperties(serverProperties); //null ok
 		return discoveryClient;
-	}
-
-	class LifecycleRegistrationResolver implements ConsulDiscoveryClient.LocalResolver {
-		private ApplicationContext context;
-
-		public LifecycleRegistrationResolver(ApplicationContext context) {
-			this.context = context;
-		}
-
-		@Override
-		public String getServiceId() {
-			ConsulRegistration registration = getBean(ConsulRegistration.class);
-			if (registration != null) {
-				return registration.getServiceId();
-			}
-			ConsulLifecycle lifecycle = getBean(ConsulLifecycle.class);
-			if (lifecycle != null) {
-				return lifecycle.getServiceId();
-			}
-			throw new IllegalStateException("Must have one of ConsulRegistration or ConsulLifecycle");
-		}
-
-		@Override
-		public Integer getPort() {
-			ConsulRegistration registration = getBean(ConsulRegistration.class);
-			if (registration != null) {
-				return registration.getService().getPort();
-			}
-			ConsulLifecycle lifecycle = getBean(ConsulLifecycle.class);
-			if (lifecycle != null) {
-				return lifecycle.getConfiguredPort();
-			}
-			throw new IllegalStateException("Must have one of ConsulRegistration or ConsulLifecycle");
-		}
-
-		<T> T getBean(Class<T> type) {
-			try {
-				return context.getBean(type);
-			} catch (NoSuchBeanDefinitionException e) {
-			}
-			return null;
-		}
 	}
 
 	@Bean

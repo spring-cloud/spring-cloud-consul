@@ -90,16 +90,6 @@ public class ConsulDiscoveryClientCustomizedTests {
 		assertEquals("metadata key foo2 was wrong", "bar2=baz2", foo2);
 	}
 
-	@Test
-	public void getLocalInstance() {
-		ServiceInstance instance = discoveryClient.getLocalServiceInstance();
-		assertNotNull("instance was null", instance);
-		assertNotIpAddress(instance);
-		assertEquals("instance id was wrong", "testConsulDiscovery2Id",
-				instance.getServiceId());
-		assertInstance(instance);
-	}
-
 	@Configuration
 	@EnableDiscoveryClient
 	@EnableAutoConfiguration

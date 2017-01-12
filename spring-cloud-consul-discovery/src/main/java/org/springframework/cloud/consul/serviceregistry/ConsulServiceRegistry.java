@@ -84,11 +84,12 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 
 	@Override
 	public void setStatus(ConsulRegistration registration, String status) {
-
+		//TODO:
 	}
 
 	@Override
 	public Object getStatus(ConsulRegistration registration) {
+		//TODO:
 		return null;
 	}
 }

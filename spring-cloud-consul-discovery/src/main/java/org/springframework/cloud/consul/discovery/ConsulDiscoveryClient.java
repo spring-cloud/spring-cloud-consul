@@ -31,7 +31,6 @@ import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Member;
 import com.ecwid.consul.v1.agent.model.Self;
-import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.health.model.HealthService;
 
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
@@ -53,31 +52,18 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	private final ConsulClient client;
 	private final ConsulDiscoveryProperties properties;
-	private final LocalResolver localResolver;
 
 	private ServerProperties serverProperties;
 
 	@Deprecated
-	public ConsulDiscoveryClient(ConsulClient client, final ConsulLifecycle lifecycle,
-								 ConsulDiscoveryProperties properties) {
-		this(client, properties, new LocalResolver() {
-			@Override
-			public String getServiceId() {
-				return lifecycle.getServiceId();
-			}
-
-			@Override
-			public Integer getPort() {
-				return lifecycle.getConfiguredPort();
-			}
-		});
-	}
-
 	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties,
 				LocalResolver localResolver) {
+		this(client, properties);
+	}
+
+	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties) {
 		this.client = client;
 		this.properties = properties;
-		this.localResolver = localResolver;
 	}
 
 	public void setServerProperties(ServerProperties serverProperties) {
@@ -91,44 +77,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public ServiceInstance getLocalServiceInstance() {
-		Response<Map<String, Service>> agentServices = client.getAgentServices();
-		Service service = agentServices.getValue().get(localResolver.getServiceId());
-		String serviceId;
-		Integer port;
-		Map<String, String> metadata;
-		String host = "localhost";
-
-		// if we have a response from consul, that is the ultimate source of truth
-		if (service != null) {
-			serviceId = service.getId();
-			port = service.getPort();
-			host = service.getAddress();
-			metadata = getMetadata(service.getTags());
-		} else {
-			// possibly called before registration, use configuration or best guess
-			log.warn("Unable to locate service in consul agent: "
-					+ localResolver.getServiceId());
-
-			serviceId = localResolver.getServiceId();
-			port = localResolver.getPort();
-			if (port == 0 && serverProperties != null
-					&& serverProperties.getPort() != null) {
-				port = serverProperties.getPort();
-			}
-			metadata = getMetadata(this.properties.getTags());
-
-			if (StringUtils.hasText(this.properties.getHostname())) {
-				host = this.properties.getHostname();
-			} else if (this.properties.isPreferAgentAddress()){
-				// try and use the agent host
-				String agentHost = getAgentHost();
-				if (agentHost != null) {
-					host = agentHost;
-				}
-			}
-		}
-
-		return new DefaultServiceInstance(serviceId, host, port, false, metadata);
+		throw new UnsupportedOperationException("getLocalServiceInstance will be removed");
 	}
 
 	private String getAgentHost() {
