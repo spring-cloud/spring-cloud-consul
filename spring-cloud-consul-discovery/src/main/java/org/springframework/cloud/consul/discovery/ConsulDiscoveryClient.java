@@ -161,7 +161,8 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	private void addInstancesToList(List<ServiceInstance> instances, String serviceId,
 			QueryParams queryParams) {
 		Response<List<HealthService>> services = client.getHealthServices(serviceId,
-				this.properties.isQueryPassing(), queryParams);
+				this.properties.getDefaultQueryTag(), this.properties.isQueryPassing(),
+				queryParams);
 		for (HealthService service : services.getValue()) {
 			String host = findHost(service);
 			instances.add(new DefaultServiceInstance(serviceId, host, service
