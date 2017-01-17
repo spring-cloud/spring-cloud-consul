@@ -14,7 +14,7 @@
 	<name>spring-cloud-consul-dependencies</name>
 	<description>Spring Cloud Consul Dependencies</description>
 	<properties>
-		<consul-api.version>1.1.11</consul-api.version>
+		<consul-api.version>1.2.1</consul-api.version>
 		<gson.version>2.3.1</gson.version>
 		<httpclient.version>4.5</httpclient.version>
 		<httpcore.version>4.4.1</httpcore.version>
