@@ -23,11 +23,13 @@ import com.ecwid.consul.v1.kv.model.GetValue;
 import org.junit.Test;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -39,6 +41,15 @@ import static org.mockito.Mockito.when;
  * @author Spencer Gibb
  */
 public class ConfigWatchTests {
+
+	@Test
+	public void watchPublishesEventWithAcl() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		setupWatch(eventPublisher, new GetValue(), "2ee647bd-bd69-4118-9f34-b9a6e9e60746");
+
+		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
+	}
 
 	@Test
 	public void watchPublishesEvent() {
@@ -59,6 +70,10 @@ public class ConfigWatchTests {
 	}
 
 	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue) {
+		setupWatch(eventPublisher, getValue, null);
+	}
+
+	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue, String aclToken) {
 		ConsulClient consul = mock(ConsulClient.class);
 		List<GetValue> getValues = null;
 
@@ -67,9 +82,13 @@ public class ConfigWatchTests {
 		}
 
 		Response<List<GetValue>> response = new Response<>(getValues, 1L, false, 1L);
-		when(consul.getKVValues(eq("/app/"), any(QueryParams.class))).thenReturn(response);
+		when(consul.getKVValues(eq("/app/"), anyString(), any(QueryParams.class))).thenReturn(response);
 
-		ConfigWatch watch = new ConfigWatch(new ConsulConfigProperties(), Arrays.asList("/app/"), consul);
+		ConsulConfigProperties properties = new ConsulConfigProperties();
+		if (StringUtils.hasText(aclToken)) {
+			properties.setAclToken(aclToken);
+		}
+		ConfigWatch watch = new ConfigWatch(properties, Arrays.asList("/app/"), consul);
 		watch.setApplicationEventPublisher(eventPublisher);
 		watch.getConsulIndexes().put("/app/", 0L);
 		watch.start();
