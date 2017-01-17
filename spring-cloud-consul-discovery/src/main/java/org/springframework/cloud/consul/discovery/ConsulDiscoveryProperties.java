@@ -35,6 +35,7 @@ import lombok.Setter;
  * Defines configuration for service discovery and registration.
  *
  * @author Spencer Gibb
+ * @author Donnabell Dmello
  * @author Venil Noronha
  */
 @ConfigurationProperties("spring.cloud.consul.discovery")
@@ -65,14 +66,19 @@ public class ConsulDiscoveryProperties {
 	/** Custom health check url to override default */
 	private String healthCheckUrl;
 
-	/** How often to perform the health check (e.g. 10s) */
+	/** How often to perform the health check (e.g. 10s), defaults to 10s. */
 	private String healthCheckInterval = "10s";
 
-	/** Timeout for health check (e.g. 10s) */
+	/** Timeout for health check (e.g. 10s). */
 	private String healthCheckTimeout;
 
-	/** IP address to use when accessing service (must also set preferIpAddress
-			to use) */
+	/**
+	 * Timeout to deregister services critical for longer than timeout (e.g. 30m).
+	 * Requires consul version 7.x or higher.
+	 */
+	private String healthCheckCriticalTimeout;
+
+	/** IP address to use when accessing service (must also set preferIpAddress to use) */
 	private String ipAddress;
 
 	/** Hostname to use when accessing server */
@@ -86,14 +92,10 @@ public class ConsulDiscoveryProperties {
 
 	private Lifecycle lifecycle = new Lifecycle();
 
-	/**
-	 * Use ip address rather than hostname during registration
-	 */
+	/** Use ip address rather than hostname during registration */
 	private boolean preferIpAddress = false;
 	
-	/**
-	 * Source of how we will determine the address to use
-	 */
+	/** Source of how we will determine the address to use */
 	private boolean preferAgentAddress = false;
 	
 	private int catalogServicesWatchDelay = 10;
@@ -130,9 +132,7 @@ public class ConsulDiscoveryProperties {
 	 */
 	private Map<String, String> serverListQueryTags = new HashMap<>();
 
-	/**
-	 * Tag to query for in service list if one is not listed in serverListQueryTags.
-	 */
+	/** Tag to query for in service list if one is not listed in serverListQueryTags. */
 	private String defaultQueryTag;
 
 	/**
@@ -141,14 +141,10 @@ public class ConsulDiscoveryProperties {
 	 */
 	private boolean queryPassing = false;
 
-	/**
-	 * Register as a service in consul.
-	 */
+	/** Register as a service in consul. */
 	private boolean register = true;
 
-	/**
-	 * Register health check in consul. Useful during development of a service.
-	 */
+	/** Register health check in consul. Useful during development of a service. */
 	private boolean registerHealthCheck = true;
 
 	/**
