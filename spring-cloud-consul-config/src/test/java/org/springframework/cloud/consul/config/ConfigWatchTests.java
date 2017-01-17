@@ -107,9 +107,8 @@ public class ConfigWatchTests {
 		Response<List<GetValue>> response = new Response<>(getValues, 1L, false, 1L);
 		when(consul.getKVValues(eq(context), anyString(), any(QueryParams.class))).thenReturn(response);
 
-		ConsulConfigProperties properties = new ConsulConfigProperties();
 		if (StringUtils.hasText(aclToken)) {
-			properties.setAclToken(aclToken);
+			configProperties.setAclToken(aclToken);
 		}
 
 		ConfigWatch watch = new ConfigWatch(configProperties, Arrays.asList(context), consul);
