@@ -76,12 +76,12 @@ public class ConsulServiceRegistryTests {
 			serviceRegistry.register(registration);
 			assertHasInstance(serviceId);
 
-			Object status = serviceRegistry.getStatus(registration);
-			assertThat(status).isNotNull();
+			assertStatus(registration, "UP");
 
 			// only works if query-passing = true
 			serviceRegistry.setStatus(registration, "OUT_OF_SERVICE");
 			assertEmptyInstances(serviceId);
+			assertStatus(registration, "OUT_OF_SERVICE");
 
 			serviceRegistry.setStatus(registration, "UP");
 			assertHasInstance(serviceId);
@@ -94,6 +94,11 @@ public class ConsulServiceRegistryTests {
 			}
 		}
 
+	}
+
+	private void assertStatus(ConsulRegistration registration, String status) {
+		Object o = serviceRegistry.getStatus(registration);
+		assertThat(o).isEqualTo(status);
 	}
 
 	private void assertHasInstance(String serviceId) {

@@ -17,8 +17,10 @@
 package org.springframework.cloud.consul.serviceregistry;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.client.serviceregistry.ServiceRegistryAutoConfiguration;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
@@ -35,6 +37,7 @@ import com.ecwid.consul.v1.ConsulClient;
 @Configuration
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty(value = "spring.cloud.service-registry.enabled", matchIfMissing = true)
+@AutoConfigureBefore(ServiceRegistryAutoConfiguration.class)
 public class ConsulServiceRegistryAutoConfiguration {
 
 	@Autowired(required = false)

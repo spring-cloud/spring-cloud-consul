@@ -16,11 +16,8 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import com.ecwid.consul.ConsulException;
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.health.model.HealthService;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
@@ -29,7 +26,14 @@ import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.util.ReflectionUtils;
 
-import java.util.List;
+import com.ecwid.consul.ConsulException;
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.QueryParams;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.health.model.Check;
+
+import static org.springframework.boot.actuate.health.Status.OUT_OF_SERVICE;
+import static org.springframework.boot.actuate.health.Status.UP;
 
 /**
  * @author Spencer Gibb
@@ -89,9 +93,9 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 
 	@Override
 	public void setStatus(ConsulRegistration registration, String status) {
-		if (status.equalsIgnoreCase("out_of_service")) {
+		if (status.equalsIgnoreCase(OUT_OF_SERVICE.getCode())) {
 			client.agentServiceSetMaintenance(registration.getInstanceId(), true);
-		} else if (status.equalsIgnoreCase("up")) {
+		} else if (status.equalsIgnoreCase(UP.getCode())) {
 			client.agentServiceSetMaintenance(registration.getInstanceId(), false);
 		} else {
 			throw new IllegalArgumentException("Unknown status: "+status);
@@ -101,10 +105,18 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 
 	@Override
 	public Object getStatus(ConsulRegistration registration) {
-		final String serviceId = registration.getServiceId();
-		Response<List<HealthService>> healthServices = client.getHealthServices(serviceId,
-				this.properties.getQueryTagForService(serviceId), false,
-				QueryParams.DEFAULT, this.properties.getAclToken());
-		return healthServices.getValue();
+		String serviceId = registration.getServiceId();
+		Response<List<Check>> response = client.getHealthChecksForService(serviceId, QueryParams.DEFAULT);
+		List<Check> checks = response.getValue();
+
+		for (Check check : checks) {
+			if (check.getServiceId().equals(registration.getInstanceId())) {
+				if (check.getName().equalsIgnoreCase("Service Maintenance Mode")) {
+					return OUT_OF_SERVICE.getCode();
+				}
+			}
+		}
+
+		return UP.getCode();
 	}
 }
