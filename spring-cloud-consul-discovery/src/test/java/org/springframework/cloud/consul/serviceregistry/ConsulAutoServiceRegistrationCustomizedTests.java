@@ -59,7 +59,7 @@ public class ConsulAutoServiceRegistrationCustomizedTests {
 	public static class MyTestConfig {
 		@Bean
 		public CustomAutoRegistration consulAutoServiceRegistration(ConsulServiceRegistry serviceRegistry, ConsulDiscoveryProperties properties,
-																	ConsulRegistration registration) {
+																	ConsulAutoRegistration registration) {
 			return new CustomAutoRegistration(serviceRegistry, properties, registration);
 		}
 	}
@@ -68,7 +68,7 @@ public class ConsulAutoServiceRegistrationCustomizedTests {
 
 		@Autowired
 		public CustomAutoRegistration(ConsulServiceRegistry serviceRegistry, ConsulDiscoveryProperties properties,
-									  ConsulRegistration registration) {
+									  ConsulAutoRegistration registration) {
 			super(serviceRegistry, properties, registration);
 		}
 

@@ -16,14 +16,12 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.List;
-
 import javax.servlet.ServletContext;
 
 import org.springframework.beans.BeansException;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
-import org.springframework.cloud.consul.serviceregistry.ConsulRegistration;
+import org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.Assert;
@@ -110,7 +108,8 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 			return;
 		}
 		Assert.notNull(service.getPort(), "service.port has not been set");
-		ConsulRegistration registration = ConsulRegistration.lifecycleRegistration(service.getPort(), this.properties, getContext(), this.servletContext, this.ttlConfig);
+		ConsulAutoRegistration registration = ConsulAutoRegistration.lifecycleRegistration(service.getPort(),
+				getServiceId(), this.properties, getContext(), this.servletContext, this.ttlConfig);
 		if (registration.getService().getPort() == null) { // not set by properties
 			registration.initializePort(service.getPort());
 		}
@@ -119,15 +118,16 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		register(service);
 	}
 
-	private NewService.Check createCheck(Integer port) {
-		return ConsulRegistration.createCheck(port, this.ttlConfig, this.properties);
+	@Deprecated
+	public String getServiceId() {
+		return getInstanceId();
 	}
 
-	public String getServiceId() {
+	public String getInstanceId() {
 		// cache instanceId, so on refresh this won't get recomputed
 		// this is a problem if ${random.value} is used
 		if (this.instanceId == null) {
-			this.instanceId = ConsulRegistration.getServiceId(properties, getContext());
+			this.instanceId = ConsulAutoRegistration.getInstanceId(properties, getContext());
 		}
 		return this.instanceId;
 	}
@@ -138,7 +138,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 			return;
 		}
 
-		ConsulRegistration registration = ConsulRegistration.managementRegistration(this.properties, getContext(), this.ttlConfig);
+		ConsulAutoRegistration registration = ConsulAutoRegistration.managementRegistration(this.properties, getContext(), this.ttlConfig);
 
 		register(registration.getService());
 	}
@@ -175,10 +175,6 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		deregister(getManagementServiceId());
 	}
 
-	private List<String> createTags() {
-		return ConsulRegistration.createTags(this.properties, this.servletContext);
-	}
-
 	private void deregister(String serviceId) {
 		if (!this.properties.isRegister()) {
 			return;
@@ -197,35 +193,35 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	
 	@Override
 	protected String getAppName() {
-		return ConsulRegistration.getAppName(this.properties, this.propertyResolver);
+		return ConsulAutoRegistration.getAppName(this.properties, this.propertyResolver);
 	}
 
 	/**
 	 * @return the serviceId of the Management Service
 	 */
 	public String getManagementServiceId() {
-		return ConsulRegistration.normalizeForDns(getContext().getId()) + SEPARATOR + properties.getManagementSuffix();
+		return ConsulAutoRegistration.normalizeForDns(getContext().getId()) + SEPARATOR + properties.getManagementSuffix();
 	}
 
 	/**
 	 * @return the service name of the Management Service
 	 */
 	public String getManagementServiceName() {
-		return ConsulRegistration.normalizeForDns(getAppName()) + SEPARATOR + properties.getManagementSuffix();
+		return ConsulAutoRegistration.normalizeForDns(getAppName()) + SEPARATOR + properties.getManagementSuffix();
 	}
 
 	/**
 	 * @return the port of the Management Service
 	 */
 	protected Integer getManagementPort() {
-		return ConsulRegistration.getManagementPort(this.properties, getContext());
+		return ConsulAutoRegistration.getManagementPort(this.properties, getContext());
 	}
 
 	/**
-	 * @deprecated See {@link org.springframework.cloud.consul.serviceregistry.ConsulRegistration#normalizeForDns(String)}
+	 * @deprecated See {@link org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistration#normalizeForDns(String)}
 	 */
 	@Deprecated
 	public static String normalizeForDns(String s) {
-		return ConsulRegistration.normalizeForDns(s);
+		return ConsulAutoRegistration.normalizeForDns(s);
 	}
 }

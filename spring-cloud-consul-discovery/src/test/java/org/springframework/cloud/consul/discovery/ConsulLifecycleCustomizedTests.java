@@ -65,15 +65,15 @@ public class ConsulLifecycleCustomizedTests {
 
 	@Test
 	public void usesCustomConsulLifecycle() {
-		assertEquals("serviceId is not customized", "foo:bar", lifecycle1.getServiceId());
-		assertEquals("serviceId is not customized", "foo:bar", lifecycle2.getServiceId());
+		assertEquals("serviceId is not customized", "foo:bar", lifecycle1.getInstanceId());
+		assertEquals("serviceId is not customized", "foo:bar", lifecycle2.getInstanceId());
 	}
 
 	@Test
-	public void serviceIdIsCached() {
+	public void instanceIdIsCached() {
 		// simulate a refresh where instanceId is changed
 		this.properties.setInstanceId("baz");
-		assertEquals("serviceId is not cached", "foo:bar", lifecycle2.getServiceId());
+		assertEquals("serviceId is not cached", "foo:bar", lifecycle2.getInstanceId());
 	}
 
 	@Configuration
@@ -98,8 +98,8 @@ public class ConsulLifecycleCustomizedTests {
 		}
 
 		@Override
-		public String getServiceId() {
-			return super.getServiceId()+":bar";
+		public String getInstanceId() {
+			return super.getInstanceId()+":bar";
 		}
 	}
 }

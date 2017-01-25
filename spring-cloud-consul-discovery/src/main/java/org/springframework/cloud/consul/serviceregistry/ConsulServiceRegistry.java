@@ -18,6 +18,9 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import com.ecwid.consul.ConsulException;
 import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.QueryParams;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.health.model.HealthService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
@@ -25,6 +28,8 @@ import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.util.ReflectionUtils;
+
+import java.util.List;
 
 /**
  * @author Spencer Gibb
@@ -54,7 +59,7 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 		try {
 			client.agentServiceRegister(reg.getService(), properties.getAclToken());
 			if (heartbeatProperties.isEnabled() && ttlScheduler != null) {
-				ttlScheduler.add(reg.getService());
+				ttlScheduler.add(reg.getInstanceId());
 			}
 		}
 		catch (ConsulException e) {
@@ -69,12 +74,12 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 	@Override
 	public void deregister(ConsulRegistration reg) {
 		if (ttlScheduler != null) {
-			ttlScheduler.remove(reg.getServiceId());
+			ttlScheduler.remove(reg.getInstanceId());
 		}
 		if (log.isInfoEnabled()) {
-			log.info("Deregistering service with consul: " + reg.getServiceId());
+			log.info("Deregistering service with consul: " + reg.getInstanceId());
 		}
-		client.agentServiceDeregister(reg.getServiceId());
+		client.agentServiceDeregister(reg.getInstanceId());
 	}
 
 	@Override
@@ -84,11 +89,22 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 
 	@Override
 	public void setStatus(ConsulRegistration registration, String status) {
+		if (status.equalsIgnoreCase("out_of_service")) {
+			client.agentServiceSetMaintenance(registration.getInstanceId(), true);
+		} else if (status.equalsIgnoreCase("up")) {
+			client.agentServiceSetMaintenance(registration.getInstanceId(), false);
+		} else {
+			throw new IllegalArgumentException("Unknown status: "+status);
+		}
 
 	}
 
 	@Override
 	public Object getStatus(ConsulRegistration registration) {
-		return null;
+		final String serviceId = registration.getServiceId();
+		Response<List<HealthService>> healthServices = client.getHealthServices(serviceId,
+				this.properties.getQueryTagForService(serviceId), false,
+				QueryParams.DEFAULT, this.properties.getAclToken());
+		return healthServices.getValue();
 	}
 }

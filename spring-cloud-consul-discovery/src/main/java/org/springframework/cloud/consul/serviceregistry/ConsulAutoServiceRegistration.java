@@ -32,10 +32,10 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 	private static Log log = LogFactory.getLog(ConsulAutoServiceRegistration.class);
 
 	private ConsulDiscoveryProperties properties;
-	private ConsulRegistration registration;
+	private ConsulAutoRegistration registration;
 
 	public ConsulAutoServiceRegistration(ConsulServiceRegistry serviceRegistry, ConsulDiscoveryProperties properties,
-										 ConsulRegistration registration) {
+										 ConsulAutoRegistration registration) {
 		super(serviceRegistry);
 		this.properties = properties;
 		this.registration = registration;
@@ -56,13 +56,13 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 	}
 
 	@Override
-	protected ConsulRegistration getRegistration() {
+	protected ConsulAutoRegistration getRegistration() {
 		Assert.notNull(this.registration.getService().getPort(), "service.port has not been set");
 		return this.registration;
 	}
 
 	@Override
-	protected ConsulRegistration getManagementRegistration() {
+	protected ConsulAutoRegistration getManagementRegistration() {
 		return this.registration.managementRegistration();
 	}
 

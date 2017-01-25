@@ -43,15 +43,15 @@ public class ConsulAutoServiceRegistrationAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulAutoServiceRegistration consulAutoServiceRegistration(ConsulServiceRegistry registry, ConsulDiscoveryProperties properties, ConsulRegistration consulRegistration) {
+	public ConsulAutoServiceRegistration consulAutoServiceRegistration(ConsulServiceRegistry registry, ConsulDiscoveryProperties properties, ConsulAutoRegistration consulRegistration) {
 		return new ConsulAutoServiceRegistration(registry, properties, consulRegistration);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulRegistration consulRegistration(ConsulDiscoveryProperties properties, ApplicationContext applicationContext,
+	public ConsulAutoRegistration consulRegistration(ConsulDiscoveryProperties properties, ApplicationContext applicationContext,
 												 ServletContext servletContext, HeartbeatProperties heartbeatProperties) {
-		return ConsulRegistration.registration(properties, applicationContext, servletContext, heartbeatProperties);
+		return ConsulAutoRegistration.registration(properties, applicationContext, servletContext, heartbeatProperties);
 	}
 
 }
