@@ -136,6 +136,11 @@ public class ConsulDiscoveryProperties {
 	private String defaultQueryTag;
 
 	/**
+	 * Tag to query for in service list if one is not listed in serverListQueryTags.
+	 */
+	private String defaultQueryTag;
+
+	/**
 	 * Add the 'passing` parameter to /v1/health/service/serviceName.
 	 * This pushes health check passing to the server.
 	 */
