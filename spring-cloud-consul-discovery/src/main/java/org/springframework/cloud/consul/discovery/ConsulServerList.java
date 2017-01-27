@@ -16,16 +16,16 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.AbstractServerList;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Spencer Gibb
