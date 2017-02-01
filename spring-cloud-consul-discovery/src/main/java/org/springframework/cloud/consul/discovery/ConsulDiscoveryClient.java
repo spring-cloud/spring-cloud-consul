@@ -106,12 +106,12 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 			metadata = getMetadata(service.getTags());
 		} else {
 			// possibly called before registration, use configuration or best guess
-			log.warn("Unable to locate service in consul agent: "
+			log.warn("getLocalServiceInstance(): Unable to locate service in consul agent: "
 					+ localResolver.getInstanceId());
 
 			instanceId = localResolver.getInstanceId();
 			port = localResolver.getPort();
-			if (port == 0 && serverProperties != null
+			if (port != null && port == 0 && serverProperties != null
 					&& serverProperties.getPort() != null) {
 				port = serverProperties.getPort();
 			}
@@ -126,6 +126,11 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 					host = agentHost;
 				}
 			}
+		}
+
+		if (port == null) {
+			log.warn("getLocalServiceInstance(): Unable to determine port.");
+			port = 0;
 		}
 
 		return new DefaultServiceInstance(instanceId, host, port, false, metadata);
