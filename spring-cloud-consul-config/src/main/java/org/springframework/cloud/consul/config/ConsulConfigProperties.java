@@ -70,7 +70,7 @@ public class ConsulConfigProperties {
 	}
 
 	@Data
-	public class Watch {
+	public static class Watch {
 		/** The number of seconds to wait (or block) for watch query, defaults to 55.
 		 * Needs to be less than default ConsulClient (defaults to 60). To increase ConsulClient
 		 * timeout create a ConsulClient bean with a custom ConsulRawClient with a custom
