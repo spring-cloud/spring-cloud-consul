@@ -48,14 +48,14 @@ import static org.junit.Assert.assertThat;
  */
 @DirtiesContext
 public class ConsulPropertySourceLocatorTests {
-	public static final String PREFIX = "_propertySourceLocatorTests_config__";
-	public static final String ROOT = PREFIX + UUID.randomUUID();
-	public static final String VALUE1 = "testPropVal";
-	public static final String TEST_PROP = "testProp";
-	public static final String KEY1 = ROOT + "/application/"+ TEST_PROP;
-	public static final String VALUE2 = "testPropVal2";
-	public static final String TEST_PROP2 = "testProp2";
-	public static final String KEY2 = ROOT + "/application/"+ TEST_PROP2;
+	private static final String PREFIX = "_propertySourceLocatorTests_config__";
+	private static final String ROOT = PREFIX + UUID.randomUUID();
+	private static final String VALUE1 = "testPropVal";
+	private static final String TEST_PROP = "testProp";
+	private static final String KEY1 = ROOT + "/application/"+ TEST_PROP;
+	private static final String VALUE2 = "testPropVal2";
+	private static final String TEST_PROP2 = "testProp2";
+	private static final String KEY2 = ROOT + "/application/"+ TEST_PROP2;
 
 	private ConfigurableApplicationContext context;
 
@@ -106,7 +106,7 @@ public class ConsulPropertySourceLocatorTests {
 
 		this.context = new SpringApplicationBuilder(Config.class)
 				.web(false)
-				.run("--spring.application.name=testConsulPropertySourceLocator",
+				.run("--SPRING_APPLICATION_NAME=testConsulPropertySourceLocator",
 						"--spring.cloud.consul.config.prefix="+ROOT,
 						"spring.cloud.consul.config.watch.delay=1");
 
