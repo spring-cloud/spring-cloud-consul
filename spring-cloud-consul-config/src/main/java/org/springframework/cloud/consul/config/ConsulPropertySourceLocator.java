@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.CompositePropertySource;
@@ -65,7 +66,14 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 	public PropertySource<?> locate(Environment environment) {
 		if (environment instanceof ConfigurableEnvironment) {
 			ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
-			String appName = env.getProperty("spring.application.name");
+			RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(env);
+
+			String appName = properties.getName();
+
+			if (appName == null) {
+				appName = propertyResolver.getProperty("spring.application.name");
+			}
+
 			List<String> profiles = Arrays.asList(env.getActiveProfiles());
 
 			String prefix = this.properties.getPrefix();

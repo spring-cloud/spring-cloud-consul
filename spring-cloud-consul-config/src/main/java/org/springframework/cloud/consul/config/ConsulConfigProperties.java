@@ -62,6 +62,11 @@ public class ConsulConfigProperties {
 	 */
 	private boolean failFast = true;
 
+	/**
+	 * Alternative to spring.application.name to use in looking up values in consul KV.
+	 */
+	private String name;
+
 	@PostConstruct
 	public void init() {
 		if (this.format == Format.FILES) {
