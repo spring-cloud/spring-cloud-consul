@@ -16,7 +16,9 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -24,6 +26,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.annotation.DirtiesContext;
 
 import com.ecwid.consul.ConsulException;
 import com.ecwid.consul.v1.ConsulClient;
@@ -32,11 +35,18 @@ import com.ecwid.consul.v1.ConsulClient;
  * @author Spencer Gibb
  * @author Venil Noronha
  */
+@DirtiesContext
 public class ConsulAutoServiceRegistrationFailFastTests {
 
-	@Test(expected = ConsulException.class)
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
+
+	@Test
 	public void testFailFastEnabled() {
-		new SpringApplicationBuilder(TestConfig.class).properties("server.port=0", "spring.cloud.consul.discovery.failFast=true").run();
+		this.exception.expect(ConsulException.class);
+		new SpringApplicationBuilder(TestConfig.class).properties("spring.application.name=testregistrationfails-fast",
+				"spring.jmx.default-domain=testautoregfailfast",
+				"server.port=0", "spring.cloud.consul.discovery.failFast=true").run();
 	}
 
 	@SpringBootConfiguration

@@ -4,7 +4,13 @@
   "Type": "client",
   "Rules": "{
     \"service\": {
+      \"\": {
+        \"policy\": \"write\"
+      },
       \"testConsulDiscoveryAcl\": {
+        \"policy\": \"write\"
+      },
+      \"testSecondServiceAcl\": {
         \"policy\": \"write\"
       }
     }

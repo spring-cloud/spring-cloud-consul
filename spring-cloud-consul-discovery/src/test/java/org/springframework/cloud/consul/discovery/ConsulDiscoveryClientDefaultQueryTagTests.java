@@ -30,6 +30,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -49,6 +50,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 				properties = {
 						"spring.cloud.consul.discovery.catalogServicesWatch.enabled=false",
 						"spring.cloud.consul.discovery.defaultQueryTag=intg"})
+@DirtiesContext
 public class ConsulDiscoveryClientDefaultQueryTagTests {
 
 	public static final String NAME = "consulServiceDefaultTag";
