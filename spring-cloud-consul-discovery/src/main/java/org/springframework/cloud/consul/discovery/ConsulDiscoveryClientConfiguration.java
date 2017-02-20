@@ -83,14 +83,14 @@ public class ConsulDiscoveryClientConfiguration {
 		}
 
 		@Override
-		public String getServiceId() {
+		public String getInstanceId() {
 			ConsulRegistration registration = getBean(ConsulRegistration.class);
 			if (registration != null) {
-				return registration.getServiceId();
+				return registration.getInstanceId();
 			}
 			ConsulLifecycle lifecycle = getBean(ConsulLifecycle.class);
 			if (lifecycle != null) {
-				return lifecycle.getServiceId();
+				return lifecycle.getInstanceId();
 			}
 			throw new IllegalStateException("Must have one of ConsulRegistration or ConsulLifecycle");
 		}

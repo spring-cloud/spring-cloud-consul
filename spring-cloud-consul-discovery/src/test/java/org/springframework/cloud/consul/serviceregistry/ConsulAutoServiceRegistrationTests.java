@@ -40,7 +40,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-import static org.springframework.cloud.consul.serviceregistry.ConsulRegistration.normalizeForDns;
+import static org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistration.normalizeForDns;
 
 /**
  * @author Spencer Gibb
@@ -64,11 +64,11 @@ public class ConsulAutoServiceRegistrationTests {
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
-		Service service = services.get(registration.getServiceId());
+		Service service = services.get(registration.getInstanceId());
 		assertNotNull("service was null", service);
 		assertNotEquals("service port is 0", 0, service.getPort().intValue());
 		assertFalse("service id contained invalid character: " + service.getId(), service.getId().contains(":"));
-		assertEquals("service id was wrong", registration.getServiceId(), service.getId());
+		assertEquals("service id was wrong", registration.getInstanceId(), service.getId());
 		assertEquals("service name was wrong", "myTestService1-FF-something", service.getService());
 		assertFalse("service address must not be empty", StringUtils.isEmpty(service.getAddress()));
 		assertEquals("service address must equals hostname from discovery properties", discoveryProperties.getHostname(), service.getAddress());

@@ -62,6 +62,11 @@ public class ConsulConfigProperties {
 	 */
 	private boolean failFast = true;
 
+	/**
+	 * Alternative to spring.application.name to use in looking up values in consul KV.
+	 */
+	private String name;
+
 	@PostConstruct
 	public void init() {
 		if (this.format == Format.FILES) {
@@ -70,7 +75,7 @@ public class ConsulConfigProperties {
 	}
 
 	@Data
-	public class Watch {
+	public static class Watch {
 		/** The number of seconds to wait (or block) for watch query, defaults to 55.
 		 * Needs to be less than default ConsulClient (defaults to 60). To increase ConsulClient
 		 * timeout create a ConsulClient bean with a custom ConsulRawClient with a custom

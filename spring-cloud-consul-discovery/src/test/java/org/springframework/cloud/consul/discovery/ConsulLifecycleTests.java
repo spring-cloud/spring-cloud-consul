@@ -70,11 +70,11 @@ public class ConsulLifecycleTests {
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
-		Service service = services.get(lifecycle.getServiceId());
+		Service service = services.get(lifecycle.getInstanceId());
 		assertNotNull("service was null", service);
 		assertNotEquals("service port is 0", 0, service.getPort().intValue());
 		assertFalse("service id contained invalid character: " + service.getId(), service.getId().contains(":"));
-		assertEquals("service id was wrong", lifecycle.getServiceId(), service.getId());
+		assertEquals("service id was wrong", lifecycle.getInstanceId(), service.getId());
 		assertEquals("service name was wrong", "myTestService1-F-something", service.getService());
 		assertFalse("service address must not be empty", StringUtils.isEmpty(service.getAddress()));
 		assertEquals("service address must equals hostname from discovery properties", discoveryProperties.getHostname(), service.getAddress());

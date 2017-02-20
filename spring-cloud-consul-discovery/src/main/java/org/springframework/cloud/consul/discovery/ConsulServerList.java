@@ -42,6 +42,18 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		this.properties = properties;
 	}
 
+	protected ConsulClient getClient() {
+		return client;
+	}
+
+	protected ConsulDiscoveryProperties getProperties() {
+		return properties;
+	}
+
+	protected String getServiceId() {
+		return serviceId;
+	}
+
 	@Override
 	public void initWithNiwsConfig(IClientConfig clientConfig) {
 		this.serviceId = clientConfig.getClientName();
@@ -64,12 +76,23 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		String tag = getTag(); // null is ok
 		Response<List<HealthService>> response = this.client.getHealthServices(
 				this.serviceId, tag, this.properties.isQueryPassing(),
-				QueryParams.DEFAULT);
+				createQueryParamsForClientRequest());
 		if (response.getValue() == null || response.getValue().isEmpty()) {
 			return Collections.emptyList();
 		}
+		return transformResponse(response.getValue());
+	}
+
+	/**
+	 * Transforms the response from Consul in to a list of usable {@link ConsulServer}s.
+	 *
+	 * @param healthServices the initial list of servers from Consul. Guaranteed to be non-empty list
+	 * @return ConsulServer instances
+	 * @see ConsulServer#ConsulServer(HealthService)
+	 */
+	protected List<ConsulServer> transformResponse(List<HealthService> healthServices) {
 		List<ConsulServer> servers = new ArrayList<>();
-		for (HealthService service : response.getValue()) {
+		for (HealthService service : healthServices) {
 			ConsulServer server = new ConsulServer(service);
 			if (server.getMetadata().containsKey(this.properties.getDefaultZoneMetadataName())) {
 				server.setZone(server.getMetadata().get(this.properties.getDefaultZoneMetadataName()));
@@ -79,7 +102,16 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		return servers;
 	}
 
-	private String getTag() {
+	/**
+	 * This method will create teh {@link QueryParams} to use when retrieving the
+	 * services from Consul. By default {@link QueryParams#DEFAULT} is used.
+	 * @return an instance of {@link QueryParams}
+	 */
+	protected QueryParams createQueryParamsForClientRequest() {
+		return QueryParams.DEFAULT;
+	}
+
+	protected String getTag() {
 		return this.properties.getQueryTagForService(this.serviceId);
 	}
 

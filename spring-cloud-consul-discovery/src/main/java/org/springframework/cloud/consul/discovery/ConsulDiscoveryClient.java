@@ -47,7 +47,7 @@ import lombok.extern.apachecommons.CommonsLog;
 public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	interface LocalResolver {
-		String getServiceId();
+		String getInstanceId();
 		Integer getPort();
 	}
 
@@ -62,8 +62,8 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 								 ConsulDiscoveryProperties properties) {
 		this(client, properties, new LocalResolver() {
 			@Override
-			public String getServiceId() {
-				return lifecycle.getServiceId();
+			public String getInstanceId() {
+				return lifecycle.getInstanceId();
 			}
 
 			@Override
@@ -92,26 +92,26 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	@Override
 	public ServiceInstance getLocalServiceInstance() {
 		Response<Map<String, Service>> agentServices = client.getAgentServices();
-		Service service = agentServices.getValue().get(localResolver.getServiceId());
-		String serviceId;
+		Service service = agentServices.getValue().get(localResolver.getInstanceId());
+		String instanceId;
 		Integer port;
 		Map<String, String> metadata;
 		String host = "localhost";
 
 		// if we have a response from consul, that is the ultimate source of truth
 		if (service != null) {
-			serviceId = service.getId();
+			instanceId = service.getId();
 			port = service.getPort();
 			host = service.getAddress();
 			metadata = getMetadata(service.getTags());
 		} else {
 			// possibly called before registration, use configuration or best guess
-			log.warn("Unable to locate service in consul agent: "
-					+ localResolver.getServiceId());
+			log.warn("getLocalServiceInstance(): Unable to locate service in consul agent: "
+					+ localResolver.getInstanceId());
 
-			serviceId = localResolver.getServiceId();
+			instanceId = localResolver.getInstanceId();
 			port = localResolver.getPort();
-			if (port == 0 && serverProperties != null
+			if (port != null && port == 0 && serverProperties != null
 					&& serverProperties.getPort() != null) {
 				port = serverProperties.getPort();
 			}
@@ -128,7 +128,12 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 			}
 		}
 
-		return new DefaultServiceInstance(serviceId, host, port, false, metadata);
+		if (port == null) {
+			log.warn("getLocalServiceInstance(): Unable to determine port.");
+			port = 0;
+		}
+
+		return new DefaultServiceInstance(instanceId, host, port, false, metadata);
 	}
 
 	private String getAgentHost() {
@@ -160,15 +165,16 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	private void addInstancesToList(List<ServiceInstance> instances, String serviceId,
 			QueryParams queryParams) {
-
 		String aclToken = properties.getAclToken();
 		Response<List<HealthService>> services;
 		if (StringUtils.hasText(aclToken)) {
 			services = client.getHealthServices(serviceId,
-					this.properties.isQueryPassing(), queryParams, aclToken);
+					this.properties.getDefaultQueryTag(), this.properties.isQueryPassing(),
+					queryParams, aclToken);
 		} else {
 			services = client.getHealthServices(serviceId,
-					this.properties.isQueryPassing(), queryParams);
+				this.properties.getDefaultQueryTag(), this.properties.isQueryPassing(),
+				queryParams);
 		}
 		for (HealthService service : services.getValue()) {
 			String host = findHost(service);

@@ -82,7 +82,7 @@ public class ConsulDiscoveryClientLocalServiceInstanceTests {
 		service.setId(SERVICE_ID);
 		service.setTags(Arrays.asList(TAG));
 
-		given(this.lifecycle.getServiceId()).willReturn(SERVICE_ID);
+		given(this.lifecycle.getInstanceId()).willReturn(SERVICE_ID);
 
 		given(this.consul.getAgentServices()).willReturn(new Response<>(Collections.singletonMap(SERVICE_ID, service), RAW_RESPONSE));
 
@@ -138,7 +138,7 @@ public class ConsulDiscoveryClientLocalServiceInstanceTests {
 	}
 
 	private void mockFromConfig(int port, String address) {
-		given(this.lifecycle.getServiceId()).willReturn(SERVICE_ID);
+		given(this.lifecycle.getInstanceId()).willReturn(SERVICE_ID);
 		given(this.lifecycle.getConfiguredPort()).willReturn(port);
 		given(this.properties.getTags()).willReturn(Arrays.asList(TAG));
 		given(this.properties.getHostname()).willReturn(address);

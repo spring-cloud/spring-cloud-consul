@@ -24,11 +24,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -50,10 +52,19 @@ public class ConfigWatchTests {
 	}
 
 	@Test
+	public void watchPublishesEventWithAcl() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		setupWatch(eventPublisher, new GetValue(), "/app/", "2ee647bd-bd69-4118-9f34-b9a6e9e60746");
+
+		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
+	}
+
+	@Test
 	public void watchPublishesEvent() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		setupWatch(eventPublisher, new GetValue(), configProperties, "/app/");
+		setupWatch(eventPublisher, new GetValue(), "/app/");
 
 		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
 	}
@@ -62,7 +73,7 @@ public class ConfigWatchTests {
 	public void watchWithNullValueDoesNotPublishEvent() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		setupWatch(eventPublisher, null, configProperties, "/app/");
+		setupWatch(eventPublisher, null, "/app/");
 
 		verify(eventPublisher, never()).publishEvent(any(RefreshEvent.class));
 	}
@@ -72,12 +83,16 @@ public class ConfigWatchTests {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
 		configProperties.setFormat(FILES);
-		setupWatch(eventPublisher, new GetValue(), configProperties, "/config/app.yml" );
+		setupWatch(eventPublisher, new GetValue(), "/config/app.yml" );
 
 		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
 	}
 
-	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue, ConsulConfigProperties configProperties, String context ) {
+	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue, String context) {
+		setupWatch(eventPublisher, getValue, context, null);
+	}
+
+	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue, String context, String aclToken) {
 		ConsulClient consul = mock(ConsulClient.class);
 		List<GetValue> getValues = null;
 
@@ -86,7 +101,11 @@ public class ConfigWatchTests {
 		}
 
 		Response<List<GetValue>> response = new Response<>(getValues, 1L, false, 1L);
-		when(consul.getKVValues(eq(context), any(QueryParams.class))).thenReturn(response);
+		when(consul.getKVValues(eq(context), anyString(), any(QueryParams.class))).thenReturn(response);
+
+		if (StringUtils.hasText(aclToken)) {
+			configProperties.setAclToken(aclToken);
+		}
 
 		ConfigWatch watch = new ConfigWatch(configProperties, Arrays.asList(context), consul);
 		watch.setApplicationEventPublisher(eventPublisher);

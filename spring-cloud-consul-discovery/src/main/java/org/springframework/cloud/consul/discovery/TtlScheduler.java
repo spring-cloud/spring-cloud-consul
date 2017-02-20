@@ -50,25 +50,30 @@ public class TtlScheduler {
 		this.client = client;
 	}
 
+	@Deprecated
+	public void add(final NewService service) {
+		add(service.getId());
+	}
+
 	/**
 	 * Add a service to the checks loop.
 	 */
-	public void add(final NewService service) {
+	public void add(String instanceId) {
 		ScheduledFuture task = scheduler.scheduleAtFixedRate(new ConsulHeartbeatTask(
-				service.getId()), configuration.computeHearbeatInterval()
+				instanceId), configuration.computeHearbeatInterval()
 				.toStandardDuration().getMillis());
-		ScheduledFuture previousTask = serviceHeartbeats.put(service.getId(), task);
+		ScheduledFuture previousTask = serviceHeartbeats.put(instanceId, task);
 		if (previousTask != null) {
 			previousTask.cancel(true);
 		}
 	}
 
-	public void remove(String serviceId) {
-		ScheduledFuture task = serviceHeartbeats.get(serviceId);
+	public void remove(String instanceId) {
+		ScheduledFuture task = serviceHeartbeats.get(instanceId);
 		if (task != null) {
 			task.cancel(true);
 		}
-		serviceHeartbeats.remove(serviceId);
+		serviceHeartbeats.remove(instanceId);
 	}
 
 	private class ConsulHeartbeatTask implements Runnable {
