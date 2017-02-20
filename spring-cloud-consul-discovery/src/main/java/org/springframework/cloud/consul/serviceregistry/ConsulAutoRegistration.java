@@ -80,6 +80,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 		if (properties.getPort() != null) {
 			service.setPort(properties.getPort());
+			// we know the port and can set the check
+			setCheck(service, properties, context, heartbeatProperties);
 		}
 
 		return new ConsulAutoRegistration(service, properties, context, heartbeatProperties);
@@ -114,7 +116,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	}
 
 	public static void setCheck(NewService service, ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
-		if (properties.isRegisterHealthCheck()) {
+		if (properties.isRegisterHealthCheck() && service.getCheck() == null) {
 			Integer checkPort;
 			if (shouldRegisterManagement(properties, context)) {
 				checkPort = getManagementPort(properties, context);
