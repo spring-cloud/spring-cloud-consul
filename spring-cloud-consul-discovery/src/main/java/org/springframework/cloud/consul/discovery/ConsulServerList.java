@@ -117,7 +117,7 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 
 	@Override
 	public String toString() {
-		final StringBuffer sb = new StringBuffer("ConsulServerList{");
+		final StringBuilder sb = new StringBuilder("ConsulServerList{");
 		sb.append("serviceId='").append(serviceId).append('\'');
 		sb.append(", tag=").append(getTag());
 		sb.append('}');
