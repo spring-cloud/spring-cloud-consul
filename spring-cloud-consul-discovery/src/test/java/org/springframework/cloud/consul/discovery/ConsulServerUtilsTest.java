@@ -11,8 +11,8 @@ public class ConsulServerUtilsTest {
 
     @Test
     public void testAddressFormat() {
-        String s = ConsulServerUtils.fixIPv6Address("fc00:ec:cd::242:ac11:c");
-        assertEquals("[fc00:ec:cd:0:0:242:ac11:c]", s);
+        String s1 = ConsulServerUtils.fixIPv6Address("fc00:ec:cd::242:ac11:c");
+        assertEquals("[fc00:ec:cd:0:0:242:ac11:c]", s1);
 
         String s2 = ConsulServerUtils.fixIPv6Address("[fc00:ec:cd::242:ac11:c]");
         assertEquals("[fc00:ec:cd:0:0:242:ac11:c]", s2);
@@ -22,5 +22,8 @@ public class ConsulServerUtilsTest {
 
         String s4 = ConsulServerUtils.fixIPv6Address("projects.spring.io");
         assertEquals("projects.spring.io", s4);
+
+        String s5 = ConsulServerUtils.fixIPv6Address("veryLongHostName");
+        assertEquals("veryLongHostName", s5);
     }
 }
