@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * 		http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,64 +31,64 @@ import org.springframework.util.StringUtils;
 import lombok.extern.apachecommons.CommonsLog;
 
 /**
- * @author Spencer Gibb
+ * @author Spencer Gibb, Semenkov Alexey
  */
 @CommonsLog
 public class ConsulServerUtils {
 
-    public static String findHost(HealthService healthService) {
-        HealthService.Service service = healthService.getService();
-        HealthService.Node node = healthService.getNode();
+	public static String findHost(HealthService healthService) {
+		HealthService.Service service = healthService.getService();
+		HealthService.Node node = healthService.getNode();
 
-        if (StringUtils.hasText(service.getAddress())) {
-            return fixIPv6Address(service.getAddress());
-        } else if (StringUtils.hasText(node.getAddress())) {
-            return fixIPv6Address(node.getAddress());
-        }
-        return node.getNode();
-    }
+		if (StringUtils.hasText(service.getAddress())) {
+			return fixIPv6Address(service.getAddress());
+		} else if (StringUtils.hasText(node.getAddress())) {
+			return fixIPv6Address(node.getAddress());
+		}
+		return node.getNode();
+	}
 
-    public static String fixIPv6Address(String address) {
-        try {
-            InetAddress inetAdr = InetAddress.getByName(address);
-            if (inetAdr instanceof Inet6Address) {
-                return "[" + inetAdr.getHostName() + "]";
-            }
-            return address;
-        } catch (UnknownHostException e) {
-            log.debug("Not InetAddress: " + address + " , resolved as is.");
-            return address;
-        }
-    }
+	public static String fixIPv6Address(String address) {
+		try {
+			InetAddress inetAdr = InetAddress.getByName(address);
+			if (inetAdr instanceof Inet6Address) {
+				return "[" + inetAdr.getHostName() + "]";
+			}
+			return address;
+		} catch (UnknownHostException e) {
+			log.debug("Not InetAddress: " + address + " , resolved as is.");
+			return address;
+		}
+	}
 
 
-    public static Map<String, String> getMetadata(HealthService healthService) {
-        return getMetadata(healthService.getService().getTags());
-    }
+	public static Map<String, String> getMetadata(HealthService healthService) {
+		return getMetadata(healthService.getService().getTags());
+	}
 
-    public static Map<String, String> getMetadata(List<String> tags) {
-        LinkedHashMap<String, String> metadata = new LinkedHashMap<>();
-        if (tags != null) {
-            for (String tag : tags) {
-                String[] parts = StringUtils.delimitedListToStringArray(tag, "=");
-                switch (parts.length) {
-                    case 0:
-                        break;
-                    case 1:
-                        metadata.put(parts[0], parts[0]);
-                        break;
-                    case 2:
-                        metadata.put(parts[0], parts[1]);
-                        break;
-                    default:
-                        String[] end = Arrays.copyOfRange(parts, 1, parts.length);
-                        metadata.put(parts[0], StringUtils.arrayToDelimitedString(end, "="));
-                        break;
-                }
+	public static Map<String, String> getMetadata(List<String> tags) {
+		LinkedHashMap<String, String> metadata = new LinkedHashMap<>();
+		if (tags != null) {
+			for (String tag : tags) {
+				String[] parts = StringUtils.delimitedListToStringArray(tag, "=");
+				switch (parts.length) {
+					case 0:
+						break;
+					case 1:
+						metadata.put(parts[0], parts[0]);
+						break;
+					case 2:
+						metadata.put(parts[0], parts[1]);
+						break;
+					default:
+						String[] end = Arrays.copyOfRange(parts, 1, parts.length);
+						metadata.put(parts[0], StringUtils.arrayToDelimitedString(end, "="));
+						break;
+				}
 
-            }
-        }
+			}
+		}
 
-        return metadata;
-    }
+		return metadata;
+	}
 }
