@@ -37,9 +37,9 @@ See the https://consul.io/intro/index.html[intro] for more information.
 1. Run `docker-compose up`
 2. Verify consul is running by visiting http://localhost:8500
 3. Run `mvn package` this will bring in the required spring cloud maven repositories and build
-4. Run `java -jar spring-cloud-consul-sample/target/spring-cloud-consul-sample-1.2.0.BUILD-SNAPSHOT.jar`
+4. Run `java -jar spring-cloud-consul-sample/target/spring-cloud-consul-sample-${VERSION}.jar`
 5. visit http://localhost:8080, verify that `{"serviceId":"<yourhost>:8080","host":"<yourhost>","port":8080}` results
-6. run `java -jar spring-cloud-consul-sample/target/spring-cloud-consul-sample-1.2.0.BUILD-SNAPSHOT.jar --server.port=8081`
+6. run `java -jar spring-cloud-consul-sample/target/spring-cloud-consul-sample-${VERSION}.jar --server.port=8081`
 7. visit http://localhost:8080 again, verify that `{"serviceId":"<yourhost>:8081","host":"<yourhost>","port":8081}` eventually shows up in the results in a round robbin fashion (may take a minute or so).
 
 == Building
