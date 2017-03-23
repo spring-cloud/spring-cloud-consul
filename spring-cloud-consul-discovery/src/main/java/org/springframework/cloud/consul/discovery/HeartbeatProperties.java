@@ -27,10 +27,12 @@ import lombok.Data;
 import lombok.extern.apachecommons.CommonsLog;
 import org.joda.time.Period;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 @ConfigurationProperties(prefix = "spring.cloud.consul.discovery.heartbeat")
 @Data
 @CommonsLog
+@Validated
 public class HeartbeatProperties {
 
 	// TODO: change enabled to default to true when I stop seeing messages like

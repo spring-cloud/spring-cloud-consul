@@ -22,6 +22,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 import lombok.Data;
 
@@ -30,6 +31,7 @@ import lombok.Data;
  */
 @ConfigurationProperties("spring.cloud.consul.config")
 @Data
+@Validated
 public class ConsulConfigProperties {
 	private boolean enabled = true;
 
