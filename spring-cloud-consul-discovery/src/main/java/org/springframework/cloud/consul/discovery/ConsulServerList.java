@@ -76,7 +76,7 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		String tag = getTag(); // null is ok
 		Response<List<HealthService>> response = this.client.getHealthServices(
 				this.serviceId, tag, this.properties.isQueryPassing(),
-				createQueryParamsForClientRequest());
+				createQueryParamsForClientRequest(), this.properties.getAclToken());
 		if (response.getValue() == null || response.getValue().isEmpty()) {
 			return Collections.emptyList();
 		}
