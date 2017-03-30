@@ -24,8 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.commons.util.InetUtils;
-import org.springframework.cloud.commons.util.InetUtilsProperties;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -33,7 +31,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
@@ -62,18 +61,6 @@ public class ConsulServerListAclTests {
         List<ConsulServer> servers = consulServerList.getUpdatedListOfServers();
         assertNotNull("servers was null", servers);
         assertFalse("servers was empty", servers.isEmpty());
-    }
-
-    @Test
-    public void testWithoutAclToken() {
-        ConsulDiscoveryProperties noAclProperties = new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties()));
-        ConsulServerList consulServerList = new ConsulServerList(consulClient, noAclProperties);
-        DefaultClientConfigImpl config = new DefaultClientConfigImpl();
-        config.setClientName("testConsulServerListAcl");
-        consulServerList.initWithNiwsConfig(config);
-        List<ConsulServer> servers = consulServerList.getUpdatedListOfServers();
-        assertNotNull("servers was null", servers);
-        assertTrue("servers must be empty", servers.isEmpty());
     }
 
     @Configuration
