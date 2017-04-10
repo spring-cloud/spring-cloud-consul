@@ -19,7 +19,9 @@ package org.springframework.cloud.consul.config;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
@@ -35,9 +37,9 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
 
-import lombok.extern.apachecommons.CommonsLog;
-
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
+
+import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * @author Spencer Gibb
@@ -46,19 +48,26 @@ import static org.springframework.cloud.consul.config.ConsulConfigProperties.For
 @CommonsLog
 public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
-	private ConsulClient consul;
+	private final ConsulClient consul;
 
-	private ConsulConfigProperties properties;
+	private final ConsulConfigProperties properties;
 
-	private List<String> contexts = new ArrayList<>();
+	private final List<String> contexts = new ArrayList<>();
+
+	private final LinkedHashMap<String, Long> contextIndex = new LinkedHashMap<>();
 
 	public ConsulPropertySourceLocator(ConsulClient consul, ConsulConfigProperties properties) {
 		this.consul = consul;
 		this.properties = properties;
 	}
 
+	@Deprecated
 	public List<String> getContexts() {
 		return contexts;
+	}
+
+	public LinkedHashMap<String, Long> getContextIndexes() {
+		return contextIndex;
 	}
 
 	@Override
@@ -112,13 +121,14 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 					ConsulPropertySource propertySource = null;
 					if (this.properties.getFormat() == FILES) {
 						Response<GetValue> response = this.consul.getKVValue(propertySourceContext, this.properties.getAclToken());
+						addIndex(propertySourceContext, response.getConsulIndex());
 						if (response.getValue() != null) {
 							ConsulFilesPropertySource filesPropertySource = new ConsulFilesPropertySource(propertySourceContext, this.consul, this.properties);
 							filesPropertySource.init(response.getValue());
 							propertySource = filesPropertySource;
 						}
 					} else {
-						propertySource = create(propertySourceContext);
+						propertySource = create(propertySourceContext, contextIndex);
 					}
 					if (propertySource != null) {
 						composite.addPropertySource(propertySource);
@@ -138,9 +148,14 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 		return null;
 	}
 
-	private ConsulPropertySource create(String context) {
+	private void addIndex(String propertySourceContext, Long consulIndex) {
+		contextIndex.put(propertySourceContext, consulIndex);
+	}
+
+	private ConsulPropertySource create(String context, Map<String, Long> contextIndex) {
 		ConsulPropertySource propertySource = new ConsulPropertySource(context, this.consul, this.properties);
 		propertySource.init();
+		addIndex(context, propertySource.getInitialIndex());
 		return propertySource;
 	}
 

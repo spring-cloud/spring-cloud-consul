@@ -48,6 +48,8 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 	private final Map<String, Object> properties = new LinkedHashMap<>();
 
+	private Long initialIndex;
+
 	public ConsulPropertySource(String context, ConsulClient source,
 			ConsulConfigProperties configProperties) {
 		super(context, source);
@@ -64,6 +66,8 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		Response<List<GetValue>> response = source.getKVValues(context,
 				configProperties.getAclToken(), QueryParams.DEFAULT);
 
+		initialIndex = response.getConsulIndex();
+
 		final List<GetValue> values = response.getValue();
 		ConsulConfigProperties.Format format = configProperties.getFormat();
 		switch (format) {
@@ -74,6 +78,10 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		case YAML:
 			parsePropertiesWithNonKeyValueFormat(values, format);
 		}
+	}
+
+	public Long getInitialIndex() {
+		return initialIndex;
 	}
 
 	/**
