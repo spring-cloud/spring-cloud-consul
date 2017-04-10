@@ -17,27 +17,29 @@
 package org.springframework.cloud.consul.config;
 
 import java.io.Closeable;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import javax.annotation.PostConstruct;
+
+import org.springframework.cloud.endpoint.event.RefreshEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
 
-import org.springframework.cloud.endpoint.event.RefreshEvent;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.util.StringUtils;
+import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
 
 import lombok.Data;
 import lombok.extern.apachecommons.CommonsLog;
-import org.springframework.util.ReflectionUtils;
 
-import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
+import javax.annotation.PostConstruct;
 
 /**
  * @author Spencer Gibb
@@ -46,17 +48,21 @@ import static org.springframework.cloud.consul.config.ConsulConfigProperties.For
 public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 
 	private final ConsulConfigProperties properties;
-	private final List<String> contexts;
 	private final ConsulClient consul;
-	private AtomicBoolean running = new AtomicBoolean(false);
+	private LinkedHashMap<String, Long> consulIndexes;
+	private final AtomicBoolean running = new AtomicBoolean(false);
 	private ApplicationEventPublisher publisher;
-	private HashMap<String, Long> consulIndexes = new HashMap<>();
-	private Boolean initialized = false;
+	private boolean firstTime = true;
 
+	@Deprecated
 	public ConfigWatch(ConsulConfigProperties properties, List<String> contexts, ConsulClient consul) {
+		this(properties, consul, new LinkedHashMap<String, Long>());
+	}
+
+	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul, LinkedHashMap<String, Long> initialIndexes) {
 		this.properties = properties;
-		this.contexts = contexts;
 		this.consul = consul;
+		this.consulIndexes = new LinkedHashMap<>(initialIndexes);
 	}
 
 	@Override
@@ -72,7 +78,7 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 	@Scheduled(fixedDelayString = "${spring.cloud.consul.config.watch.delay:1000}")
 	public void watchConfigKeyValues() {
 		if (this.running.get()) {
-			for (String context : this.contexts) {
+			for (String context : this.consulIndexes.keySet()) {
 
 				// turn the context into a Consul folder path (unless our config format are FILES)
 				if (properties.getFormat() != FILES && !context.endsWith("/")) {
@@ -112,7 +118,7 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 
 				} catch (Exception e) {
 					// only fail fast on the initial query, otherwise just log the error
-					if (!initialized && this.properties.isFailFast()) {
+					if (firstTime && this.properties.isFailFast()) {
 						log.error("Fail fast is set and there was an error reading configuration from consul.");
 						ReflectionUtils.rethrowRuntimeException(e);
 					} else if (log.isTraceEnabled()) {
@@ -124,7 +130,7 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 				}
 			}
 		}
-		initialized = true;
+		firstTime = false;
 	}
 
 	@Override
@@ -132,7 +138,7 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 		this.running.compareAndSet(true, false);
 	}
 
-	/* for testing */ HashMap<String, Long> getConsulIndexes() {
+	/* for testing */ LinkedHashMap<String, Long> getConsulIndexes() {
 		return this.consulIndexes;
 	}
 
