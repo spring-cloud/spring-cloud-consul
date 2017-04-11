@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONSUL_VER="0.7.2"
+CONSUL_VER="0.7.5"
 CONSUL_ZIP="consul_${CONSUL_VER}_linux_amd64.zip"
 IGNORE_CERTS="${IGNORE_CERTS:-no}"
 
