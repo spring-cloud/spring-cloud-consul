@@ -19,28 +19,26 @@ package org.springframework.cloud.consul.config;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import com.ecwid.consul.v1.ConsulClient;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.consul.ConsulProperties;
-import org.springframework.cloud.context.refresh.ContextRefresher;
-import org.springframework.cloud.context.scope.refresh.RefreshScope;
-import org.springframework.cloud.endpoint.RefreshEndpoint;
+import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 
+import com.ecwid.consul.v1.ConsulClient;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -48,6 +46,7 @@ import static org.junit.Assert.assertThat;
  */
 @DirtiesContext
 public class ConsulPropertySourceLocatorTests {
+	private static final String APP_NAME = "testConsulPropertySourceLocator";
 	private static final String PREFIX = "_propertySourceLocatorTests_config__";
 	private static final String ROOT = PREFIX + UUID.randomUUID();
 	private static final String VALUE1 = "testPropVal";
@@ -56,38 +55,32 @@ public class ConsulPropertySourceLocatorTests {
 	private static final String VALUE2 = "testPropVal2";
 	private static final String TEST_PROP2 = "testProp2";
 	private static final String KEY2 = ROOT + "/application/"+ TEST_PROP2;
+	private static final String TEST_PROP3 = "testProp3";
+	private static final String KEY3 = ROOT + "/"+APP_NAME+"/"+ TEST_PROP3;
 
 	private ConfigurableApplicationContext context;
 
 	@Configuration
 	@EnableAutoConfiguration
 	static class Config {
+
 		@Bean
-		public RefreshEndpoint refreshEndpoint(ConfigurableApplicationContext context,
-											   RefreshScope scope) {
-			RefreshEndpoint endpoint = new TestRefreshEndpoint(context, scope);
-			return endpoint;
-		}
-	}
-
-	static class TestRefreshEndpoint extends RefreshEndpoint {
-		private CountDownLatch successLatch = new CountDownLatch(1);
-		private CountDownLatch toManyLatch = new CountDownLatch(1);
-		private AtomicInteger count = new AtomicInteger();
-
-		public TestRefreshEndpoint( ConfigurableApplicationContext context, RefreshScope scope) {
-			super(new ContextRefresher(context, scope));
+		public CountDownLatch countDownLatch1() {
+			return new CountDownLatch(1);
 		}
 
-		@Override
-		public synchronized String[] refresh() {
-			String[] keys = super.refresh();
-			if (this.count.incrementAndGet() == 1) {
-				this.successLatch.countDown();
-			} else {
-				this.toManyLatch.countDown();
+		@Bean
+		public CountDownLatch countDownLatch2() {
+			return new CountDownLatch(1);
+		}
+
+		@EventListener
+		public void handle(EnvironmentChangeEvent event) {
+			if (event.getKeys().contains(TEST_PROP)) {
+				countDownLatch1().countDown();
+			} else if (event.getKeys().contains(TEST_PROP3)) {
+				countDownLatch2().countDown();
 			}
-			return keys;
 		}
 	}
 
@@ -106,9 +99,9 @@ public class ConsulPropertySourceLocatorTests {
 
 		this.context = new SpringApplicationBuilder(Config.class)
 				.web(false)
-				.run("--SPRING_APPLICATION_NAME=testConsulPropertySourceLocator",
+				.run("--SPRING_APPLICATION_NAME="+ APP_NAME,
 						"--spring.cloud.consul.config.prefix="+ROOT,
-						"spring.cloud.consul.config.watch.delay=1");
+						"spring.cloud.consul.config.watch.delay=10");
 
 		this.client = context.getBean(ConsulClient.class);
 		this.properties = context.getBean(ConsulProperties.class);
@@ -128,21 +121,32 @@ public class ConsulPropertySourceLocatorTests {
 	}
 
 	@Test
-	@Ignore("failing on travis")
 	public void propertyLoadedAndUpdated() throws Exception {
 		String testProp = this.environment.getProperty(TEST_PROP);
 		assertThat("testProp was wrong", testProp, is(equalTo(VALUE1)));
 
 		this.client.setKVValue(KEY1, "testPropValUpdate");
 
-		TestRefreshEndpoint endpoint = this.context.getBean(TestRefreshEndpoint.class);
-		boolean receivedEvent = endpoint.successLatch.await(3, TimeUnit.MINUTES);
+		CountDownLatch latch = this.context.getBean("countDownLatch1", CountDownLatch.class);
+		boolean receivedEvent = latch.await(15, TimeUnit.SECONDS);
 		assertThat("listener didn't receive event", receivedEvent, is(true));
 
 		testProp = this.environment.getProperty(TEST_PROP);
 		assertThat("testProp was wrong after update", testProp, is(equalTo("testPropValUpdate")));
+	}
 
-		boolean receivedExtraEvent = endpoint.toManyLatch.await(15, TimeUnit.SECONDS);
-		assertThat("refresh called to many times", receivedExtraEvent, is(false));
+	@Test
+	public void contextDoesNotExistThenExists() throws Exception {
+		String testProp = this.environment.getProperty(TEST_PROP3);
+		assertThat("testProp was wrong", testProp, is(nullValue()));
+
+		this.client.setKVValue(KEY3, "testPropValInsert");
+
+		CountDownLatch latch = this.context.getBean("countDownLatch2", CountDownLatch.class);
+		boolean receivedEvent = latch.await(15, TimeUnit.SECONDS);
+		assertThat("listener didn't receive event", receivedEvent, is(true));
+
+		testProp = this.environment.getProperty(TEST_PROP3);
+		assertThat(TEST_PROP3 + " was wrong after update", testProp, is(equalTo("testPropValInsert")));
 	}
 }

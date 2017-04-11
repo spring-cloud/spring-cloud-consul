@@ -48,13 +48,13 @@ import lombok.extern.apachecommons.CommonsLog;
 @CommonsLog
 public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
-	private ConsulClient consul;
+	private final ConsulClient consul;
 
-	private ConsulConfigProperties properties;
+	private final ConsulConfigProperties properties;
 
-	private List<String> contexts = new ArrayList<>();
+	private final List<String> contexts = new ArrayList<>();
 
-	private LinkedHashMap<String, Long> contextIndex;
+	private final LinkedHashMap<String, Long> contextIndex = new LinkedHashMap<>();
 
 	public ConsulPropertySourceLocator(ConsulClient consul, ConsulConfigProperties properties) {
 		this.consul = consul;
@@ -66,7 +66,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 		return contexts;
 	}
 
-	public LinkedHashMap<String, Long> getContextIndex() {
+	public LinkedHashMap<String, Long> getContextIndexes() {
 		return contextIndex;
 	}
 
@@ -116,13 +116,12 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
 			CompositePropertySource composite = new CompositePropertySource("consul");
 
-			contextIndex = new LinkedHashMap<>();
 			for (String propertySourceContext : this.contexts) {
 				try {
 					ConsulPropertySource propertySource = null;
 					if (this.properties.getFormat() == FILES) {
 						Response<GetValue> response = this.consul.getKVValue(propertySourceContext, this.properties.getAclToken());
-						contextIndex.put(propertySourceContext, response.getConsulIndex());
+						addIndex(propertySourceContext, response.getConsulIndex());
 						if (response.getValue() != null) {
 							ConsulFilesPropertySource filesPropertySource = new ConsulFilesPropertySource(propertySourceContext, this.consul, this.properties);
 							filesPropertySource.init(response.getValue());
@@ -149,10 +148,14 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 		return null;
 	}
 
+	private void addIndex(String propertySourceContext, Long consulIndex) {
+		contextIndex.put(propertySourceContext, consulIndex);
+	}
+
 	private ConsulPropertySource create(String context, Map<String, Long> contextIndex) {
 		ConsulPropertySource propertySource = new ConsulPropertySource(context, this.consul, this.properties);
 		propertySource.init();
-		contextIndex.put(context, propertySource.getInitialIndex());
+		addIndex(context, propertySource.getInitialIndex());
 		return propertySource;
 	}
 

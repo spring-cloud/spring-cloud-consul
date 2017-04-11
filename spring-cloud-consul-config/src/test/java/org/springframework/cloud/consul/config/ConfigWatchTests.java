@@ -109,9 +109,10 @@ public class ConfigWatchTests {
 			configProperties.setAclToken(aclToken);
 		}
 
-		ConfigWatch watch = new ConfigWatch(configProperties, consul, new LinkedHashMap<String, Long>());
+		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
+		initialIndexes.put(context, 0L);
+		ConfigWatch watch = new ConfigWatch(configProperties, consul, initialIndexes);
 		watch.setApplicationEventPublisher(eventPublisher);
-		watch.getConsulIndexes().put(context, 0L);
 		watch.start();
 
 		watch.watchConfigKeyValues();
@@ -130,7 +131,7 @@ public class ConfigWatchTests {
 		Response<List<GetValue>> response = new Response<>(getValues, 1L, false, 1L);
 		when(consul.getKVValues(eq(context), anyString(), any(QueryParams.class))).thenReturn(response);
 
-		ConfigWatch watch = new ConfigWatch(configProperties, Collections.singletonList(context), consul);
+		ConfigWatch watch = new ConfigWatch(configProperties, consul, new LinkedHashMap<String, Long>());
 		watch.setApplicationEventPublisher(eventPublisher);
 
 		watch.watchConfigKeyValues();

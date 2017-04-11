@@ -21,10 +21,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -38,8 +39,6 @@ import static org.springframework.cloud.consul.config.ConsulConfigProperties.For
 
 import lombok.Data;
 import lombok.extern.apachecommons.CommonsLog;
-
-import javax.annotation.PostConstruct;
 
 /**
  * @author Spencer Gibb
@@ -136,10 +135,6 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 	@Override
 	public void close() {
 		this.running.compareAndSet(true, false);
-	}
-
-	/* for testing */ LinkedHashMap<String, Long> getConsulIndexes() {
-		return this.consulIndexes;
 	}
 
 	@Data
