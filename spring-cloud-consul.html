@@ -425,6 +425,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
+<p><strong>1.2.1.BUILD-SNAPSHOT</strong></p>
+</div>
+<div class="paragraph">
 <p>This project provides Consul integrations for Spring Boot apps through autoconfiguration
 and binding to the Spring Environment and other Spring programming model idioms. With a few
 simple annotations you can quickly enable and configure the common patterns inside your
@@ -464,6 +467,12 @@ Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon), Circuit Brea
 <div class="sectionbody">
 <div class="paragraph">
 <p>Service Discovery is one of the key tenets of a microservice based architecture. Trying to hand configure each client or some form of convention can be very difficult to do and can be very brittle.  Consul provides Service Discovery services via an <a href="https://www.consul.io/docs/agent/http.html">HTTP API</a> and <a href="https://www.consul.io/docs/agent/dns.html">DNS</a>.  Spring Cloud Consul leverages the HTTP API for service registration and discovery.  This does not prevent non-Spring Cloud applications from leveraging the DNS interface.  Consul Agents servers are run in a <a href="https://www.consul.io/docs/internals/architecture.html">cluster</a> that communicates via a <a href="https://www.consul.io/docs/internals/gossip.html">gossip protocol</a> and uses the <a href="https://www.consul.io/docs/internals/consensus.html">Raft consensus protocol</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="_how_to_activate">How to activate</h3>
+<div class="paragraph">
+<p>To activate Consul Service Discovery use the starter with group <code>org.springframework.cloud</code> and artifact id <code>spring-cloud-starter-consul-discovery</code>. See the <a href="http://projects.spring.io/spring-cloud/">Spring Cloud Project page</a> for details on setting up your build system with the current Spring Cloud Release Train.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_registering_with_consul">Registering with Consul</h3>
@@ -527,7 +536,7 @@ If you use <a href="#spring-cloud-consul-config">Spring Cloud Consul Config</a>,
 <div class="sect2">
 <h3 id="_http_health_check">HTTP Health Check</h3>
 <div class="paragraph">
-<p>The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. <code>server.servletPath=/foo</code>) or management endpoint path (e.g. <code>management.contextPath=/admin</code>). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectively.  Example:</p>
+<p>The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. <code>server.servletPath=/foo</code>) or management endpoint path (e.g. <code>management.context-path=/admin</code>). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectively.  Example:</p>
 </div>
 <div class="listingblock">
 <div class="title">application.yml</div>
@@ -536,7 +545,7 @@ If you use <a href="#spring-cloud-consul-config">Spring Cloud Consul Config</a>,
   cloud:
     consul:
       discovery:
-        healthCheckPath: ${management.contextPath}/health
+        healthCheckPath: ${management.context-path}/health
         healthCheckInterval: 15s</pre>
 </div>
 </div>
@@ -625,9 +634,12 @@ config/application/</pre>
 <p>Configuration is currently read on startup of the application.  Sending a HTTP POST to <code>/refresh</code> will cause the configuration to be reloaded.  Watching the key value store (which Consul supports) is not currently possible, but will be a future addition to this project.</p>
 </div>
 <div class="sect2">
-<h3 id="_how_to_activate">How to activate</h3>
+<h3 id="_how_to_activate_2">How to activate</h3>
 <div class="paragraph">
-<p>Including a dependency on <code>org.springframework.cloud:spring-cloud-consul-config</code> will enable auto-configuration that will setup Spring Cloud Consul Config.</p>
+<p>To get started with Consul Configuration use the starter with group <code>org.springframework.cloud</code> and artifact id <code>spring-cloud-starter-consul-config</code>. See the <a href="http://projects.spring.io/spring-cloud/">Spring Cloud Project page</a> for details on setting up your build system with the current Spring Cloud Release Train.</p>
+</div>
+<div class="paragraph">
+<p>This will enable auto-configuration that will setup Spring Cloud Consul Config.</p>
 </div>
 </div>
 <div class="sect2">
@@ -665,11 +677,20 @@ config/application/</pre>
 </ul>
 </div>
 </div>
+<div class="sect2">
+<h3 id="spring-cloud-consul-config-watch">Config Watch</h3>
+<div class="paragraph">
+<p>The Consul Config Watch takes advantage of the ability of consul to <a href="https://www.consul.io/docs/agent/watches.html#keyprefix">watch a key prefix</a>. The Config Watch makes a blocking Consul HTTP API call to determine if any relevant configuration data has changed for the current application. If there is new configuration data a Refresh Event is published. This is equivalent to calling the <code>/refresh</code> actuator endpoint.</p>
+</div>
+<div class="paragraph">
+<p>To change the frequency of when the Config Watch is called change <code>spring.cloud.consul.config.watch.delay</code>. The default value is 1000, which is in milliseconds.</p>
+</div>
+<div class="paragraph">
+<p>To disable the Config Watch set <code>spring.cloud.consul.config.watch.enabled=false</code>.</p>
 </div>
 </div>
-<div class="sect1">
-<h2 id="spring-cloud-consul-config-format">YAML or Properties with Config</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="spring-cloud-consul-config-format">YAML or Properties with Config</h3>
 <div class="paragraph">
 <p>It may be more convenient to store a blob of properties in YAML or Properties format as opposed to individual key/value pairs.  Set the <code>spring.cloud.consul.config.format</code> property to <code>YAML</code> or <code>PROPERTIES</code>. For example to use YAML:</p>
 </div>
@@ -701,10 +722,8 @@ config/application/data</pre>
 <p>You can change the data key using <code>spring.cloud.consul.config.data-key</code>.</p>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="spring-cloud-consul-config-git2consul">git2consul with Config</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="spring-cloud-consul-config-git2consul">git2consul with Config</h3>
 <div class="paragraph">
 <p>git2consul is a Consul community project that loads files from a git repository to individual keys into Consul. By default the names of the keys are names of the files. YAML and Properties files are supported with file extensions of <code>.yml</code> and <code>.properties</code> respectively.  Set the <code>spring.cloud.consul.config.format</code> property to <code>FILES</code>. For example:</p>
 </div>
@@ -746,12 +765,11 @@ config/application.yml</pre>
 <p>The value of each key needs to be a properly formatted YAML or Properties file.</p>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="spring-cloud-consul-failfast">Fail Fast</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="spring-cloud-consul-failfast">Fail Fast</h3>
 <div class="paragraph">
 <p>It may be convenient in certain circumstances (like local development or certain test scenarios) to not fail if consul isn&#8217;t available for configuration. Setting <code>spring.cloud.consul.config.failFast=false</code> in <code>bootstrap.yml</code> will cause the configuration module to log a warning rather than throw an exception. This will allow the application to continue startup normally.</p>
+</div>
 </div>
 </div>
 </div>
@@ -786,8 +804,14 @@ Retry has a <code>RetryInterceptorBuilder</code> that makes it easy to create on
 <div class="sect1">
 <h2 id="spring-cloud-consul-bus">Spring Cloud Bus with Consul</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_how_to_activate_3">How to activate</h3>
 <div class="paragraph">
-<p>Coming in a later release.</p>
+<p>To get started with the Consul Bus use the starter with group <code>org.springframework.cloud</code> and artifact id <code>spring-cloud-starter-consul-bus</code>. See the <a href="http://projects.spring.io/spring-cloud/">Spring Cloud Project page</a> for details on setting up your build system with the current Spring Cloud Release Train.</p>
+</div>
+<div class="paragraph">
+<p>See the <a href="https://cloud.spring.io/spring-cloud-bus/">Spring Cloud Bus</a> documentation for the available actuator endpoints and howto send custom messages.</p>
+</div>
 </div>
 </div>
 </div>
@@ -849,11 +873,6 @@ public class Turbine {
 </div>
 </div>
 </div>
-</div>
-</div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2016-08-18 10:40:05 UTC
 </div>
 </div>
 </body>
