@@ -571,11 +571,11 @@ If you use <a href="#spring-cloud-consul-config">Spring Cloud Consul Config</a>,
   cloud:
     consul:
       discovery:
-        instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}</pre>
+        instanceId: ${spring.application.name}:${spring.application.instance_id:${random.value}}</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>With this metadata, and multiple service instances deployed on localhost, the random value will kick in there to make the instance unique. In Cloudfoundry the <code>vcap.application.instance_id</code> will be populated automatically in a Spring Boot application, so the random value will not be needed.</p>
+<p>With this metadata, and multiple service instances deployed on localhost, the random value will kick in there to make the instance unique. In Cloudfoundry the <code>spring.application.instance_id</code> will be populated automatically in a Spring Boot Actuator application, so the random value will not be needed.</p>
 </div>
 </div>
 </div>
@@ -849,11 +849,6 @@ public class Turbine {
 </div>
 </div>
 </div>
-</div>
-</div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2016-08-18 10:40:05 UTC
 </div>
 </div>
 </body>
