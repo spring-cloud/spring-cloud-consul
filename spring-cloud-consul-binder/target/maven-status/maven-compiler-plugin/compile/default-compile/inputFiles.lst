@@ -1,6 +1,0 @@
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-binder/src/main/java/org/springframework/cloud/consul/binder/ConsulInboundMessageProducer.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-binder/src/main/java/org/springframework/cloud/consul/binder/EventService.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-binder/src/main/java/org/springframework/cloud/consul/binder/config/ConsulBinderConfiguration.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-binder/src/main/java/org/springframework/cloud/consul/binder/ConsulSendingHandler.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-binder/src/main/java/org/springframework/cloud/consul/binder/config/ConsulBinderProperties.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-binder/src/main/java/org/springframework/cloud/consul/binder/ConsulBinder.java

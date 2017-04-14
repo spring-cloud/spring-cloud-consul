@@ -1,8 +1,0 @@
-org/springframework/cloud/consul/config/ConsulPropertySourceLocatorFilesTests$Config.class
-org/springframework/cloud/consul/config/ConsulPropertySourceLocatorTests.class
-org/springframework/cloud/consul/config/ConsulPropertySourceLocatorTests$TestRefreshEndpoint.class
-org/springframework/cloud/consul/config/ConsulPropertySourceLocatorTests$Config.class
-org/springframework/cloud/consul/config/ConsulPropertySourceLocatorFailFastTests$Config.class
-org/springframework/cloud/consul/config/ConsulPropertySourceTests.class
-org/springframework/cloud/consul/config/ConsulPropertySourceLocatorFailFastTests.class
-org/springframework/cloud/consul/config/ConsulPropertySourceLocatorFilesTests.class

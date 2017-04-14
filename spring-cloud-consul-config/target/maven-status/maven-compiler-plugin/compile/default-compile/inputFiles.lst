@@ -1,7 +1,0 @@
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-config/src/main/java/org/springframework/cloud/consul/config/ConsulPropertySource.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-config/src/main/java/org/springframework/cloud/consul/config/ConsulPropertySourceLocator.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-config/src/main/java/org/springframework/cloud/consul/config/ConsulConfigProperties.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-config/src/main/java/org/springframework/cloud/consul/config/ConsulFilesPropertySource.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-config/src/main/java/org/springframework/cloud/consul/config/ConfigWatch.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-config/src/main/java/org/springframework/cloud/consul/config/ConsulConfigAutoConfiguration.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-config/src/main/java/org/springframework/cloud/consul/config/ConsulConfigBootstrapConfiguration.java

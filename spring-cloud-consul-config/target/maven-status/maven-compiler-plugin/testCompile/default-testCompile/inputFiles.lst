@@ -1,4 +1,0 @@
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-config/src/test/java/org/springframework/cloud/consul/config/ConsulPropertySourceTests.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-config/src/test/java/org/springframework/cloud/consul/config/ConsulPropertySourceLocatorTests.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-config/src/test/java/org/springframework/cloud/consul/config/ConsulPropertySourceLocatorFilesTests.java
-/opt/jenkins/data/workspace/spring-cloud-consul-master-ci/spring-cloud-consul-config/src/test/java/org/springframework/cloud/consul/config/ConsulPropertySourceLocatorFailFastTests.java
