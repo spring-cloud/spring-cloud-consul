@@ -88,6 +88,9 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 					Long currentIndex = this.consulIndexes.get(context);
 					if (currentIndex == null) {
 						currentIndex = -1L;
+   						// Add unique seed value to the stored indexes to indicate
+						// that this method has been called once on this context
+						this.consulIndexes.put(context, -2L);
 					}
 
 					// use the consul ACL token if found
