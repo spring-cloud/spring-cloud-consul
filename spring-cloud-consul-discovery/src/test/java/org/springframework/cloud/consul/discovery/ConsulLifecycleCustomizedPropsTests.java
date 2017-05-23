@@ -19,6 +19,8 @@ package org.springframework.cloud.consul.discovery;
 import java.util.List;
 import java.util.Map;
 
+import org.hamcrest.Matchers;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +59,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 		"spring.cloud.consul.discovery.hostname=myhost",
 		"spring.cloud.consul.discovery.ipAddress=10.0.0.1",
 		"spring.cloud.consul.discovery.registerHealthCheck=false",
-		"spring.cloud.consul.discovery.failFast=false" },
+		"spring.cloud.consul.discovery.failFast=false",
+		"spring.cloud.consul.discovery.tags=foo=bar"},
 		webEnvironment = RANDOM_PORT)
 public class ConsulLifecycleCustomizedPropsTests {
 
@@ -66,6 +69,11 @@ public class ConsulLifecycleCustomizedPropsTests {
 
 	@Autowired
 	private ConsulDiscoveryProperties properties;
+
+	@BeforeClass
+	public static void setupSystemProperties() {
+		System.setProperty(ConsulTagsPropertySource.TAG_PROPERTY_NAME, "baz");
+	}
 
 	@Test
 	public void contextLoads() {
@@ -79,6 +87,9 @@ public class ConsulLifecycleCustomizedPropsTests {
 		assertThat("property hostname was wrong", "myhost", equalTo(this.properties.getHostname()));
 		assertThat("property ipAddress was wrong", "10.0.0.1", equalTo(this.properties.getIpAddress()));
 		assertThat("service address was wrong", "myhost", equalTo(service.getAddress()));
+		assertThat("property tags has wrong count", this.properties.getTags().size(), equalTo(2));
+		assertThat("property tags was wrong", this.properties.getTags(), Matchers.hasItem("foo=bar"));
+		assertThat("property tags was wrong", this.properties.getTags(), Matchers.hasItem("baz"));
 
 		Response<List<Check>> checkResponse = consul.getHealthChecksForService("myTestService-B", QueryParams.DEFAULT);
 		List<Check> checks = checkResponse.getValue();

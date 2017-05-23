@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.conn.util.InetAddressUtils;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,11 @@ public class ConsulDiscoveryClientCustomizedTests {
 
 	@Autowired
 	private ConsulDiscoveryClient discoveryClient;
+
+	@BeforeClass
+	public static void setupSystemProperties() {
+		System.setProperty(ConsulTagsPropertySource.TAG_PROPERTY_NAME, "system=blah");
+	}
 
 	@Test
 	public void getInstancesForServiceWorks() {
@@ -88,6 +94,9 @@ public class ConsulDiscoveryClientCustomizedTests {
 
 		String foo2 = metadata.get("foo2");
 		assertEquals("metadata key foo2 was wrong", "bar2=baz2", foo2);
+
+		String system = metadata.get("system");
+		assertEquals("metadata key system was wrong", "blah", system);
 	}
 
 	@Test
