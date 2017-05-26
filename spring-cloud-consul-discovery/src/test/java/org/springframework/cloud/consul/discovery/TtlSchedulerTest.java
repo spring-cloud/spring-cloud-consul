@@ -63,7 +63,7 @@ public class TtlSchedulerTest {
 	@Configuration
 	@EnableDiscoveryClient(autoRegister = false) //FIXME:
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+	@ImportAutoConfiguration({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
 	public static class TtlSchedulerTestConfig { }
 }
 

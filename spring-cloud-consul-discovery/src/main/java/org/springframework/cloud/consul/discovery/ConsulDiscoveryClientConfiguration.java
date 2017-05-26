@@ -70,15 +70,16 @@ public class ConsulDiscoveryClientConfiguration {
 	@ConditionalOnMissingBean
 	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties discoveryProperties, final ApplicationContext context) {
 		ConsulDiscoveryClient discoveryClient = new ConsulDiscoveryClient(consulClient,
-				discoveryProperties, new LifecycleRegistrationResolver(context));
+				discoveryProperties, new RegistrationLocalResolver(context));
 		discoveryClient.setServerProperties(serverProperties); //null ok
 		return discoveryClient;
 	}
 
-	class LifecycleRegistrationResolver implements ConsulDiscoveryClient.LocalResolver {
+	//FIXME: remove?
+	class RegistrationLocalResolver implements ConsulDiscoveryClient.LocalResolver {
 		private ApplicationContext context;
 
-		public LifecycleRegistrationResolver(ApplicationContext context) {
+		public RegistrationLocalResolver(ApplicationContext context) {
 			this.context = context;
 		}
 
@@ -88,10 +89,6 @@ public class ConsulDiscoveryClientConfiguration {
 			if (registration != null) {
 				return registration.getInstanceId();
 			}
-			ConsulLifecycle lifecycle = getBean(ConsulLifecycle.class);
-			if (lifecycle != null) {
-				return lifecycle.getInstanceId();
-			}
 			throw new IllegalStateException("Must have one of ConsulRegistration or ConsulLifecycle");
 		}
 
@@ -100,10 +97,6 @@ public class ConsulDiscoveryClientConfiguration {
 			ConsulRegistration registration = getBean(ConsulRegistration.class);
 			if (registration != null) {
 				return registration.getService().getPort();
-			}
-			ConsulLifecycle lifecycle = getBean(ConsulLifecycle.class);
-			if (lifecycle != null) {
-				return lifecycle.getConfiguredPort();
 			}
 			throw new IllegalStateException("Must have one of ConsulRegistration or ConsulLifecycle");
 		}

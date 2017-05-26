@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.discovery;
 import java.util.Arrays;
 import java.util.Collections;
 
+import com.ecwid.consul.v1.agent.model.NewService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.consul.serviceregistry.ConsulRegistration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -64,7 +66,7 @@ public class ConsulDiscoveryClientLocalServiceInstanceTests {
 	private ConsulClient consul;
 
 	@MockBean
-	private ConsulLifecycle lifecycle;
+	private ConsulRegistration lifecycle;
 
 	@MockBean
 	private ConsulDiscoveryProperties properties;
@@ -139,7 +141,9 @@ public class ConsulDiscoveryClientLocalServiceInstanceTests {
 
 	private void mockFromConfig(int port, String address) {
 		given(this.lifecycle.getInstanceId()).willReturn(SERVICE_ID);
-		given(this.lifecycle.getConfiguredPort()).willReturn(port);
+		NewService service = new NewService();
+		service.setPort(port);
+		given(this.lifecycle.getService()).willReturn(service);
 		given(this.properties.getTags()).willReturn(Arrays.asList(TAG));
 		given(this.properties.getHostname()).willReturn(address);
 		given(this.properties.getLifecycle()).willReturn(new ConsulDiscoveryProperties.Lifecycle());

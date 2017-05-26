@@ -57,22 +57,6 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	private ServerProperties serverProperties;
 
-	@Deprecated
-	public ConsulDiscoveryClient(ConsulClient client, final ConsulLifecycle lifecycle,
-								 ConsulDiscoveryProperties properties) {
-		this(client, properties, new LocalResolver() {
-			@Override
-			public String getInstanceId() {
-				return lifecycle.getInstanceId();
-			}
-
-			@Override
-			public Integer getPort() {
-				return lifecycle.getConfiguredPort();
-			}
-		});
-	}
-
 	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties,
 				LocalResolver localResolver) {
 		this.client = client;

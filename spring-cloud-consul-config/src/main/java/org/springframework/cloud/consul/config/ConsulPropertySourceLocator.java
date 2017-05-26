@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.CompositePropertySource;
@@ -75,12 +74,11 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 	public PropertySource<?> locate(Environment environment) {
 		if (environment instanceof ConfigurableEnvironment) {
 			ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
-			RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(env);
 
 			String appName = properties.getName();
 
 			if (appName == null) {
-				appName = propertyResolver.getProperty("spring.application.name");
+				appName = env.getProperty("spring.application.name");
 			}
 
 			List<String> profiles = Arrays.asList(env.getActiveProfiles());

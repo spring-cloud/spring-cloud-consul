@@ -41,16 +41,6 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 		this.registration = registration;
 	}
 
-	@Override
-	protected int getConfiguredPort() {
-		return this.registration.getService().getPort() == null? 0 : this.registration.getService().getPort();
-	}
-
-	@Override
-	protected void setConfiguredPort(int port) {
-		this.registration.initializePort(port);
-	}
-
 	public void setPort(int port) {
 		getPort().set(port);
 	}
