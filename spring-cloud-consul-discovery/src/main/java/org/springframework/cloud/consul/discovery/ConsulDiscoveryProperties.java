@@ -153,6 +153,12 @@ public class ConsulDiscoveryProperties {
 	 */
 	private boolean failFast = true;
 
+	/**
+	 * Skips certificate verification during service checks if true, otherwise
+	 * runs certificate verification.
+	 */
+	private Boolean healthCheckTlsSkipVerify;
+
 	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {}
 
