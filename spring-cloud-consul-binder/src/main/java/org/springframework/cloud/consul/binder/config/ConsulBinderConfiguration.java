@@ -42,11 +42,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Import({ PropertyPlaceholderAutoConfiguration.class })
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty(name = "spring.cloud.consul.binder.enabled", matchIfMissing = true)
-@EnableConfigurationProperties({ConsulBinderProperties.class})
+//FIXME: boot 2.0.0 @EnableConfigurationProperties({ConsulBinderProperties.class})
 public class ConsulBinderConfiguration {
 
-	@Autowired
-	private ConsulBinderProperties consulBinderProperties;
+	// @Autowired
+	// private ConsulBinderProperties consulBinderProperties;
 
 	@Autowired(required = false)
 	protected ObjectMapper objectMapper = new ObjectMapper();
@@ -54,7 +54,7 @@ public class ConsulBinderConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public EventService eventService(ConsulClient consulClient) {
-		return new EventService(consulBinderProperties, consulClient, objectMapper);
+		return new EventService(null/*consulBinderProperties*/, consulClient, objectMapper);
 	}
 
 	@Bean

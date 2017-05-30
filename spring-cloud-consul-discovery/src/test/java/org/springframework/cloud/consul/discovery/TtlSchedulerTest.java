@@ -29,7 +29,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TtlSchedulerTest.TtlSchedulerTestConfig.class,
 	properties = { "spring.application.name=ttlScheduler",
-		"spring.cloud.consul.discovery.instanceId=ttlScheduler-id",
+		"spring.cloud.consul.discovery.instance-id=ttlScheduler-id",
 		"spring.cloud.consul.discovery.heartbeat.enabled=true",
 		"spring.cloud.consul.discovery.heartbeat.ttlValue=2", "management.port=0" },
 		webEnvironment = RANDOM_PORT)
@@ -61,7 +61,7 @@ public class TtlSchedulerTest {
 	}
 
 	@Configuration
-	@EnableDiscoveryClient(autoRegister = false) //FIXME:
+	@EnableDiscoveryClient
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
 	public static class TtlSchedulerTestConfig { }
