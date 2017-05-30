@@ -16,9 +16,6 @@
 
 package org.springframework.cloud.consul.binder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,11 +23,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.cloud.consul.binder.test.consumer.TestConsumer;
 import org.springframework.cloud.consul.binder.test.producer.TestProducer;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
@@ -43,6 +38,9 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.util.SocketUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for {@link org.springframework.cloud.consul.binder.ConsulBinder}.
@@ -90,7 +88,6 @@ public class ConsulBinderTests {
 	 * @throws Exception
 	 */
 	@Test
-	@Ignore //FIXME: problems with upgrade to boot 2.0.0
 	public void testMessageSendReceive() throws Exception {
 		testMessageSendReceive(null);
 	}
@@ -166,6 +163,7 @@ public class ConsulBinderTests {
 			args.add(String.format("--server.port=%d", consumerPort));
 			args.add("--management.context-path=/");
 			args.add("--management.security.enabled=false");
+			args.add("--endpoints.shutdown.enabled=true");
 			args.add("--debug");
 			if (groups != null) {
 				args.add(String.format("--group=%s", groups[i]));
@@ -192,6 +190,7 @@ public class ConsulBinderTests {
 		args.add(String.format("--server.port=%d", producerPort));
 		args.add("--management.context-path=/");
 		args.add("--management.security.enabled=false");
+		args.add("--endpoints.shutdown.enabled=true");
 		args.add(String.format("--partitioned=%b", false));
 		args.add("--debug");
 
