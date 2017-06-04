@@ -32,16 +32,16 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Patrick Hi
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedDiscoveryHealthCheckTlsSkipVerifyTests.TestConfig.class,
+@SpringBootTest(classes = ConsulAutoRegistrationHealthCheckTlsSkipVerifyTests.TestConfig.class,
 	properties = { "spring.application.name=myTestService-DiscoveryHealthCheckTlsSkipVerify", },
-		webEnvironment = DEFINED_PORT)
-public class ConsulAutoServiceRegistrationCustomizedDiscoveryHealthCheckTlsSkipVerifyTests {
+		webEnvironment = RANDOM_PORT)
+public class ConsulAutoRegistrationHealthCheckTlsSkipVerifyTests {
 
 	@Autowired
 	private ConsulAutoRegistration registration;
