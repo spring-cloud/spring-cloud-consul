@@ -38,12 +38,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Patrick Hi
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoRegistrationHealthCheckTlsSkipVerifyTests.TestConfig.class,
-	properties = {
+@SpringBootTest(classes = ConsulAutoRegistrationHealthCheckTlsSkipVerifyTests.TestConfig.class, properties = {
 		"spring.application.name=myTestService-DiscoveryHealthCheckTlsSkipVerify",
-	"spring.cloud.consul.discovery.health-check-tls-skip-verify=true"
-	},
-		webEnvironment = RANDOM_PORT)
+		"spring.cloud.consul.discovery.health-check-tls-skip-verify=true" }, webEnvironment = RANDOM_PORT)
 public class ConsulAutoRegistrationHealthCheckTlsSkipVerifyTests {
 
 	@Autowired
@@ -59,14 +56,17 @@ public class ConsulAutoRegistrationHealthCheckTlsSkipVerifyTests {
 
 		NewService.Check check = service.getCheck();
 		assertThat(check).as("check was null").isNotNull();
-		assertThat(check.getTlsSkipVerify()).as("tls_skip_verify was wrong").isEqualTo(Boolean.TRUE);
+		assertThat(check.getTlsSkipVerify()).as("tls_skip_verify was wrong")
+				.isEqualTo(Boolean.TRUE);
 
 		// unable to call consul api to get health check details
 	}
 
-
 	@Configuration
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
-	public static class TestConfig { }
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
+			ConsulAutoConfiguration.class,
+			ConsulAutoServiceRegistrationAutoConfiguration.class })
+	public static class TestConfig {
+	}
 }
