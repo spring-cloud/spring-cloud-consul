@@ -17,8 +17,6 @@
 package org.springframework.cloud.consul.serviceregistry;
 
 import com.ecwid.consul.v1.agent.model.NewService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
