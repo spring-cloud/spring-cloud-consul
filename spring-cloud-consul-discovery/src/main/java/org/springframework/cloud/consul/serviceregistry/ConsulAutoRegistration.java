@@ -211,6 +211,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		if (StringUtils.hasText(properties.getHealthCheckCriticalTimeout())) {
 			check.setDeregisterCriticalServiceAfter(properties.getHealthCheckCriticalTimeout());
 		}
+		check.setTlsSkipVerify(properties.getHealthCheckTlsSkipVerify());
 		return check;
 	}
 
