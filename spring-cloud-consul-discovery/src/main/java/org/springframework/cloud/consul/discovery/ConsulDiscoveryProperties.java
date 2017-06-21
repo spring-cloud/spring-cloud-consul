@@ -144,6 +144,9 @@ public class ConsulDiscoveryProperties {
 	/** Register as a service in consul. */
 	private boolean register = true;
 
+	/** Disable automatic de-registration of service in consul. */
+	private boolean deregister = true;
+
 	/** Register health check in consul. Useful during development of a service. */
 	private boolean registerHealthCheck = true;
 
