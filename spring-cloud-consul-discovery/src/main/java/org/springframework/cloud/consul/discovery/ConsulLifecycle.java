@@ -143,6 +143,11 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		register(registration.getService());
 	}
 
+	@Override
+	protected boolean shouldRegisterManagement() {
+		return ConsulAutoRegistration.shouldRegisterManagement(properties, getContext());
+	}
+
 	protected void register(NewService newService) {
 		log.info("Registering service with consul: {}", newService.toString());
 		try {

@@ -123,6 +123,9 @@ public class ConsulDiscoveryProperties {
 	/** Whether to register an http or https service */
 	private String scheme = "http";
 
+	/** Whether to register the management as a service in Consul */
+	private boolean registerManagement = true;
+
 	/** Suffix to use when registering management service */
 	private String managementSuffix = MANAGEMENT;
 

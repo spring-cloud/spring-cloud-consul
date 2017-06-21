@@ -82,6 +82,10 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 		super.register();
 	}
 
+	@Override
+	protected boolean shouldRegisterManagement() {
+		return ConsulAutoRegistration.shouldRegisterManagement(properties, getContext());
+	}
 
 	@Override
 	protected void registerManagement() {
