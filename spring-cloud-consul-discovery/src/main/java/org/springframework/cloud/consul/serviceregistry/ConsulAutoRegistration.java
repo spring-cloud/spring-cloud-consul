@@ -127,15 +127,17 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 	public static void setCheck(NewService service, ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
 		if (properties.isRegisterHealthCheck() && service.getCheck() == null) {
-			Integer checkPort;
-			if (shouldRegisterManagement(properties, context)) {
-				checkPort = getManagementPort(properties, context);
-			} else {
-				checkPort = service.getPort();
-			}
-			Assert.notNull(checkPort, "checkPort may not be null");
+			Integer checkPort = getCheckPort(service, properties, context);
 			service.setCheck(createCheck(checkPort, heartbeatProperties, properties));
 		}
+	}
+
+	private static Integer getCheckPort(NewService service, ConsulDiscoveryProperties properties, ApplicationContext context) {
+		Integer checkPort;
+		Integer managementPort = getManagementPort(properties, context);
+		checkPort = managementPort != null ? managementPort : service.getPort();
+		Assert.notNull(checkPort, "checkPort may not be null");
+		return checkPort;
 	}
 
 	public static ConsulAutoRegistration managementRegistration(ConsulDiscoveryProperties properties, ApplicationContext context,
@@ -240,7 +242,9 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	 * @return if the management service should be registered with the {@link ServiceRegistry}
 	 */
 	public static boolean shouldRegisterManagement(ConsulDiscoveryProperties properties, ApplicationContext context) {
-		return getManagementPort(properties, context) != null && ManagementServerPortUtils.isDifferent(context);
+		return properties.isRegisterManagement()
+				&& getManagementPort(properties, context) != null
+				&& ManagementServerPortUtils.isDifferent(context);
 	}
 
 	/**
