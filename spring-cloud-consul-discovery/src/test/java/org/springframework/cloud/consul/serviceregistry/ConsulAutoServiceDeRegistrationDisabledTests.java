@@ -27,11 +27,13 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -39,31 +41,49 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceDeRegistrationDisabledTests.TestConfig.class,
-	properties = { "spring.application.name=myTestNotRegisteredService2",
-		"spring.cloud.service-registry.auto-registration.enabled=false"},
-		webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = ConsulAutoServiceRegistrationDisabledTests.TestConfig.class,
+        properties = {"spring.application.name=myTestNotDeRegisteredService",
+                "spring.cloud.consul.discovery.instanceId=myTestNotDeRegisteredService-D",
+                "spring.cloud.consul.discovery.deregister=false"},
+        webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceDeRegistrationDisabledTests {
+    @Autowired
+    private ConsulClient consul;
 
-	@Autowired
-	private ConsulClient consul;
+    @Autowired(required = false)
+    private ConsulAutoServiceRegistration autoServiceRegistration;
 
-	@Autowired(required = false)
-	private ConsulAutoServiceRegistration autoServiceRegistration;
+    @Autowired(required = false)
+    private ConsulDiscoveryProperties discoveryProperties;
 
-	@Test
-	public void contextLoads() {
-		assertNull("ConsulAutoServiceRegistration was created", autoServiceRegistration);
+    @Test
+    public void contextLoads() {
+        assertNotNull("ConsulAutoServiceRegistration was not created", autoServiceRegistration);
+        assertNotNull("ConsulDiscoveryProperties was not created", discoveryProperties);
 
-		Response<Map<String, Service>> response = consul.getAgentServices();
-		Map<String, Service> services = response.getValue();
-		Service service = services.get("myTestNotRegisteredService2");
-		assertNull("service was registered", service);
-	}
+        checkService(true);
+        autoServiceRegistration.deregister();
+        checkService(true);
+        discoveryProperties.setDeregister(true);
+        autoServiceRegistration.deregister();
+        checkService(false);
+    }
 
-	@Configuration
-	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
-			ConsulAutoServiceRegistrationAutoConfiguration.class })
-	public static class TestConfig { }
+    private void checkService(final boolean expected) {
+        final Response<Map<String, Service>> response = consul.getAgentServices();
+        final Map<String, Service> services = response.getValue();
+        final Service service = services.get("myTestNotDeRegisteredService-D");
+        if (expected) {
+            assertNotNull("service was not registered", service);
+        } else {
+            assertNull("service was registered", service);
+        }
+    }
+
+    @Configuration
+    @EnableAutoConfiguration
+    @ImportAutoConfiguration({AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
+            ConsulAutoServiceRegistrationAutoConfiguration.class})
+    public static class TestConfig {
+    }
 }
