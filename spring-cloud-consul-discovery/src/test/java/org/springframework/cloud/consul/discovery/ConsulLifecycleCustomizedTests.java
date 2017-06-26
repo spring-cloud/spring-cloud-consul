@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -54,6 +55,8 @@ public class ConsulLifecycleCustomizedTests {
 	@Autowired
 	private CustomConsulLifecycle lifecycle2;
 	@Autowired
+	AutoServiceRegistrationProperties autoServiceRegistrationProperties;
+	@Autowired
 	private ConsulDiscoveryProperties properties;
 
 	@Test
@@ -82,8 +85,10 @@ public class ConsulLifecycleCustomizedTests {
 	public static class MyTestConfig {
 		@Bean
 		public ConsulLifecycle customizedLifecycle(ConsulClient client,
+				AutoServiceRegistrationProperties autoServiceRegistrationProperties,
 				ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
-			return new CustomConsulLifecycle(client, properties, ttlConfig);
+			return new CustomConsulLifecycle(client, autoServiceRegistrationProperties,
+					properties, ttlConfig);
 		}
 	}
 
@@ -92,8 +97,9 @@ public class ConsulLifecycleCustomizedTests {
 
 		@Autowired
 		public CustomConsulLifecycle(ConsulClient client,
+				AutoServiceRegistrationProperties autoServiceRegistrationProperties,
 				ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
-			super(client, properties, ttlConfig);
+			super(client, autoServiceRegistrationProperties, properties, ttlConfig);
 			this.properties = properties;
 		}
 

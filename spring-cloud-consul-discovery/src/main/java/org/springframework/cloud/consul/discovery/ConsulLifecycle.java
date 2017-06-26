@@ -21,6 +21,7 @@ import javax.servlet.ServletContext;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.retry.annotation.Retryable;
@@ -48,6 +49,8 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	private ConsulClient client;
 
+	AutoServiceRegistrationProperties autoServiceRegistrationProperties;
+
 	private ConsulDiscoveryProperties properties;
 
 	private HeartbeatProperties ttlConfig;
@@ -61,8 +64,11 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 	private String instanceId;
 	private RelaxedPropertyResolver propertyResolver;
 
-	public ConsulLifecycle(ConsulClient client, ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
+	public ConsulLifecycle(ConsulClient client,
+			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+			ConsulDiscoveryProperties properties, HeartbeatProperties ttlConfig) {
 		this.client = client;
+		this.autoServiceRegistrationProperties = autoServiceRegistrationProperties;
 		this.properties = properties;
 		this.ttlConfig = ttlConfig;
 	}
@@ -108,8 +114,10 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 			return;
 		}
 		Assert.notNull(service.getPort(), "service.port has not been set");
-		ConsulAutoRegistration registration = ConsulAutoRegistration.lifecycleRegistration(service.getPort(),
-				getServiceId(), this.properties, getContext(), this.servletContext, this.ttlConfig);
+		ConsulAutoRegistration registration = ConsulAutoRegistration
+				.lifecycleRegistration(service.getPort(), getServiceId(),
+						this.autoServiceRegistrationProperties, this.properties,
+						getContext(), this.servletContext, this.ttlConfig);
 		if (registration.getService().getPort() == null) { // not set by properties
 			registration.initializePort(service.getPort());
 		}
@@ -138,14 +146,11 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 			return;
 		}
 
-		ConsulAutoRegistration registration = ConsulAutoRegistration.managementRegistration(this.properties, getContext(), this.ttlConfig);
+		ConsulAutoRegistration registration = ConsulAutoRegistration
+				.managementRegistration(this.autoServiceRegistrationProperties,
+						this.properties, getContext(), this.ttlConfig);
 
 		register(registration.getService());
-	}
-
-	@Override
-	protected boolean shouldRegisterManagement() {
-		return ConsulAutoRegistration.shouldRegisterManagement(properties, getContext());
 	}
 
 	protected void register(NewService newService) {

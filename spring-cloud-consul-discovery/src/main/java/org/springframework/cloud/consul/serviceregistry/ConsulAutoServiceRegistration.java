@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.serviceregistry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.cloud.client.serviceregistry.AbstractAutoServiceRegistration;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.Assert;
@@ -31,12 +32,15 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 
 	private static Log log = LogFactory.getLog(ConsulAutoServiceRegistration.class);
 
+	private AutoServiceRegistrationProperties autoServiceRegistrationProperties;
 	private ConsulDiscoveryProperties properties;
 	private ConsulAutoRegistration registration;
 
-	public ConsulAutoServiceRegistration(ConsulServiceRegistry serviceRegistry, ConsulDiscoveryProperties properties,
-										 ConsulAutoRegistration registration) {
+	public ConsulAutoServiceRegistration(ConsulServiceRegistry serviceRegistry,
+			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+			ConsulDiscoveryProperties properties, ConsulAutoRegistration registration) {
 		super(serviceRegistry);
+		this.autoServiceRegistrationProperties = autoServiceRegistrationProperties;
 		this.properties = properties;
 		this.registration = registration;
 	}
@@ -84,7 +88,8 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 
 	@Override
 	protected boolean shouldRegisterManagement() {
-		return ConsulAutoRegistration.shouldRegisterManagement(properties, getContext());
+		return ConsulAutoRegistration.shouldRegisterManagement(
+				autoServiceRegistrationProperties, properties, getContext());
 	}
 
 	@Override

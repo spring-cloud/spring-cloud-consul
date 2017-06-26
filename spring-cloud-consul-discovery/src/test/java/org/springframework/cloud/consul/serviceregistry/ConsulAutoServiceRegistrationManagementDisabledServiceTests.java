@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.serviceregistry;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,10 @@ public class ConsulAutoServiceRegistrationManagementDisabledServiceTests {
     @Autowired
     private ConsulDiscoveryProperties discoveryProperties;
 
+    @Ignore("Can be enabled after " +
+            "org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistration.shouldRegisterManagement() " +
+            "will start taking autoServiceRegistrationProperties.isRegisterManagement() into account. " +
+            "See https://github.com/spring-cloud/spring-cloud-commons/pull/221")
     @Test
     public void contextLoads() {
         Response<Map<String, Service>> response = consul.getAgentServices();

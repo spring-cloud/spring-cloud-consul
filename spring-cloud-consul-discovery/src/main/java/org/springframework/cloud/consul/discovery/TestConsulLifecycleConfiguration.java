@@ -20,6 +20,7 @@ import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -39,10 +40,17 @@ public class TestConsulLifecycleConfiguration {
 	@Autowired(required = false)
 	private ServletContext servletContext;
 
+	@Autowired(required = false)
+	AutoServiceRegistrationProperties autoServiceRegistrationProperties;
+
 	@Bean
-	public ConsulLifecycle consulLifecycle(ConsulClient consulClient, ConsulDiscoveryProperties discoveryProperties,
-										   HeartbeatProperties heartbeatProperties) {
-		ConsulLifecycle lifecycle = new ConsulLifecycle(consulClient, discoveryProperties, heartbeatProperties);
+	public ConsulLifecycle consulLifecycle(ConsulClient consulClient,
+			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+			ConsulDiscoveryProperties discoveryProperties,
+			HeartbeatProperties heartbeatProperties) {
+		ConsulLifecycle lifecycle = new ConsulLifecycle(consulClient,
+				autoServiceRegistrationProperties, discoveryProperties,
+				heartbeatProperties);
 		if (this.ttlScheduler != null) {
 			lifecycle.setTtlScheduler(this.ttlScheduler);
 		}

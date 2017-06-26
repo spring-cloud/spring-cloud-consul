@@ -18,10 +18,13 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import javax.servlet.ServletContext;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationAutoConfiguration;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
@@ -38,20 +41,31 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnMissingBean(type = "org.springframework.cloud.consul.discovery.ConsulLifecycle")
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty(value = "spring.cloud.service-registry.auto-registration.enabled", matchIfMissing = true)
-@AutoConfigureAfter(ConsulServiceRegistryAutoConfiguration.class)
+@AutoConfigureAfter({AutoServiceRegistrationConfiguration.class, ConsulServiceRegistryAutoConfiguration.class})
 public class ConsulAutoServiceRegistrationAutoConfiguration {
+
+	@Autowired
+	AutoServiceRegistrationProperties autoServiceRegistrationProperties;
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulAutoServiceRegistration consulAutoServiceRegistration(ConsulServiceRegistry registry, ConsulDiscoveryProperties properties, ConsulAutoRegistration consulRegistration) {
-		return new ConsulAutoServiceRegistration(registry, properties, consulRegistration);
+	public ConsulAutoServiceRegistration consulAutoServiceRegistration(
+			ConsulServiceRegistry registry,
+			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+			ConsulDiscoveryProperties properties,
+			ConsulAutoRegistration consulRegistration) {
+		return new ConsulAutoServiceRegistration(registry,
+				autoServiceRegistrationProperties, properties, consulRegistration);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulAutoRegistration consulRegistration(ConsulDiscoveryProperties properties, ApplicationContext applicationContext,
-												 ServletContext servletContext, HeartbeatProperties heartbeatProperties) {
-		return ConsulAutoRegistration.registration(properties, applicationContext, servletContext, heartbeatProperties);
+	public ConsulAutoRegistration consulRegistration(
+			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+			ConsulDiscoveryProperties properties, ApplicationContext applicationContext,
+			ServletContext servletContext, HeartbeatProperties heartbeatProperties) {
+		return ConsulAutoRegistration.registration(autoServiceRegistrationProperties,
+				properties, applicationContext, servletContext, heartbeatProperties);
 	}
 
 }

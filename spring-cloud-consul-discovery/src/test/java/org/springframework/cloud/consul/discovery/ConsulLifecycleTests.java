@@ -25,6 +25,7 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -110,7 +111,9 @@ public class ConsulLifecycleTests {
 
 @Configuration
 @EnableAutoConfiguration
-@Import({ TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+@Import({ AutoServiceRegistrationConfiguration.class,
+		TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class,
+		ConsulDiscoveryClientConfiguration.class })
 class TestConfig {
 
 }

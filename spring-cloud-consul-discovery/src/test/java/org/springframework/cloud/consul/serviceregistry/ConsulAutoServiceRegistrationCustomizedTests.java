@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.context.annotation.Bean;
@@ -42,6 +43,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 public class ConsulAutoServiceRegistrationCustomizedTests {
 
 	@Autowired
+	private AutoServiceRegistrationProperties autoServiceRegistrationProperties;
+
+	@Autowired
 	private ConsulAutoServiceRegistration registration1;
 
 	@Autowired
@@ -58,18 +62,25 @@ public class ConsulAutoServiceRegistrationCustomizedTests {
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class MyTestConfig {
 		@Bean
-		public CustomAutoRegistration consulAutoServiceRegistration(ConsulServiceRegistry serviceRegistry, ConsulDiscoveryProperties properties,
-																	ConsulAutoRegistration registration) {
-			return new CustomAutoRegistration(serviceRegistry, properties, registration);
+		public CustomAutoRegistration consulAutoServiceRegistration(
+				ConsulServiceRegistry serviceRegistry,
+				AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+				ConsulDiscoveryProperties properties,
+				ConsulAutoRegistration registration) {
+			return new CustomAutoRegistration(serviceRegistry,
+					autoServiceRegistrationProperties, properties, registration);
 		}
 	}
 
 	public static class CustomAutoRegistration extends ConsulAutoServiceRegistration {
 
 		@Autowired
-		public CustomAutoRegistration(ConsulServiceRegistry serviceRegistry, ConsulDiscoveryProperties properties,
-									  ConsulAutoRegistration registration) {
-			super(serviceRegistry, properties, registration);
+		public CustomAutoRegistration(ConsulServiceRegistry serviceRegistry,
+				AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+				ConsulDiscoveryProperties properties,
+				ConsulAutoRegistration registration) {
+			super(serviceRegistry, autoServiceRegistrationProperties, properties,
+					registration);
 		}
 
 		@Override
