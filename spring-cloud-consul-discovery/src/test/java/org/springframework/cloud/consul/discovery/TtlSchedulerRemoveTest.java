@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -69,7 +70,9 @@ public class TtlSchedulerRemoveTest {
 	@Configuration
 	@EnableDiscoveryClient(autoRegister = false) //FIXME: this is weird because we're testing the deprecated lifecycle, not autoconfiguration
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
+			TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class,
+			ConsulDiscoveryClientConfiguration.class })
 	public static class TtlSchedulerRemoveTestConfig { }
 }
 

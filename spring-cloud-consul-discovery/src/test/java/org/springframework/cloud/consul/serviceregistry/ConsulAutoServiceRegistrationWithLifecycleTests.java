@@ -24,6 +24,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.ConsulLifecycle;
@@ -54,6 +55,9 @@ public class ConsulAutoServiceRegistrationWithLifecycleTests {
 	@Autowired(required = false)
 	private ConsulServiceRegistry consulServiceRegistry;
 
+	@Autowired(required = false)
+	private AutoServiceRegistrationProperties autoServiceRegistrationProperties;
+
 	@Test
 	public void contextLoads() {
 		assertNull("consulRegistration was created by mistake", consulRegistration);
@@ -66,8 +70,12 @@ public class ConsulAutoServiceRegistrationWithLifecycleTests {
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
 	protected static class TestConfig {
 		@Bean
-		public ConsulLifecycle consulLifecycle(ConsulClient client, ConsulDiscoveryProperties properties, HeartbeatProperties heartbeatProperties) {
-			return new ConsulLifecycle(client, properties, heartbeatProperties);
+		public ConsulLifecycle consulLifecycle(ConsulClient client,
+				AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+				ConsulDiscoveryProperties properties,
+				HeartbeatProperties heartbeatProperties) {
+			return new ConsulLifecycle(client, autoServiceRegistrationProperties,
+					properties, heartbeatProperties);
 		}
 	}
 }
