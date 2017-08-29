@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?asciidoc-toc?>
+<?asciidoc-numbered?>
+<book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
+<info>
+<title>Spring Cloud Consul</title>
+<date>2017-08-29</date>
+</info>
+<preface>
+<title></title>
+<simpara><emphasis role="strong">2.0.0.BUILD-SNAPSHOT</emphasis></simpara>
+<simpara>This project provides Consul integrations for Spring Boot apps through autoconfiguration
+and binding to the Spring Environment and other Spring programming model idioms. With a few
+simple annotations you can quickly enable and configure the common patterns inside your
+application and build large distributed systems with Consul based components. The
+patterns provided include Service Discovery, Control Bus and Configuration.
+Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon), Circuit Breaker
+(Hystrix) are provided by integration with Spring Cloud Netflix.</simpara>
+</preface>
+<chapter xml:id="spring-cloud-consul-install">
+<title>Install Consul</title>
+<simpara>Please see the <link xl:href="https://www.consul.io/intro/getting-started/install.html">installation documentation</link> for instructions on how to install Consul.</simpara>
+</chapter>
+<chapter xml:id="spring-cloud-consul-agent">
+<title>Consul Agent</title>
+<simpara>A Consul Agent client must be available to all Spring Cloud Consul applications.  By default, the Agent client is expected to be at <literal>localhost:8500</literal>.  See the <link xl:href="https://consul.io/docs/agent/basics.html">Agent documentation</link> for specifics on how to start an Agent client and how to connect to a cluster of Consul Agent Servers.  For development, after you have installed consul, you may start a Consul Agent using the following command:</simpara>
+<screen>./src/main/bash/local_run_consul.sh</screen>
+<simpara>This will start an agent in server mode on port 8500, with the ui available at <link xl:href="http://localhost:8500">http://localhost:8500</link></simpara>
+</chapter>
+<chapter xml:id="spring-cloud-consul-discovery">
+<title>Service Discovery with Consul</title>
+<simpara>Service Discovery is one of the key tenets of a microservice based architecture. Trying to hand configure each client or some form of convention can be very difficult to do and can be very brittle.  Consul provides Service Discovery services via an <link xl:href="https://www.consul.io/docs/agent/http.html">HTTP API</link> and <link xl:href="https://www.consul.io/docs/agent/dns.html">DNS</link>.  Spring Cloud Consul leverages the HTTP API for service registration and discovery.  This does not prevent non-Spring Cloud applications from leveraging the DNS interface.  Consul Agents servers are run in a <link xl:href="https://www.consul.io/docs/internals/architecture.html">cluster</link> that communicates via a <link xl:href="https://www.consul.io/docs/internals/gossip.html">gossip protocol</link> and uses the <link xl:href="https://www.consul.io/docs/internals/consensus.html">Raft consensus protocol</link>.</simpara>
+<section xml:id="_how_to_activate">
+<title>How to activate</title>
+<simpara>To activate Consul Service Discovery use the starter with group <literal>org.springframework.cloud</literal> and artifact id <literal>spring-cloud-starter-consul-discovery</literal>. See the <link xl:href="http://projects.spring.io/spring-cloud/">Spring Cloud Project page</link> for details on setting up your build system with the current Spring Cloud Release Train.</simpara>
+</section>
+<section xml:id="_registering_with_consul">
+<title>Registering with Consul</title>
+<simpara>When a client registers with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An HTTP <link xl:href="https://www.consul.io/docs/agent/checks.html">Check</link> is created by default that Consul hits the <literal>/health</literal> endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.</simpara>
+<simpara>Example Consul client:</simpara>
+<programlisting language="java" linenumbering="unnumbered">@SpringBootApplication
+@EnableDiscoveryClient
+@RestController
+public class Application {
+
+    @RequestMapping("/")
+    public String home() {
+        return "Hello world";
+    }
+
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(Application.class).web(true).run(args);
+    }
+
+}</programlisting>
+<simpara>(i.e. utterly normal Spring Boot app).  If the Consul client is located somewhere other than <literal>localhost:8500</literal>, the configuration is required to locate the client. Example:</simpara>
+<formalpara>
+<title>application.yml</title>
+<para>
+<screen>spring:
+  cloud:
+    consul:
+      host: localhost
+      port: 8500</screen>
+</para>
+</formalpara>
+<caution>
+<simpara>If you use <link linkend="spring-cloud-consul-config">Spring Cloud Consul Config</link>, the above values will need to be placed in <literal>bootstrap.yml</literal> instead of <literal>application.yml</literal>.</simpara>
+</caution>
+<simpara>The default service name, instance id and port, taken from the <literal>Environment</literal>, are <literal>${spring.application.name}</literal>, the Spring Context ID and <literal>${server.port}</literal> respectively.</simpara>
+<simpara><literal>@EnableDiscoveryClient</literal> make the app into both a Consul "service" (i.e. it registers itself) and a "client" (i.e. it can query Consul to locate other services).</simpara>
+</section>
+<section xml:id="_http_health_check">
+<title>HTTP Health Check</title>
+<simpara>The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. <literal>server.servletPath=/foo</literal>) or management endpoint path (e.g. <literal>management.context-path=/admin</literal>). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectively.  Example:</simpara>
+<formalpara>
+<title>application.yml</title>
+<para>
+<screen>spring:
+  cloud:
+    consul:
+      discovery:
+        healthCheckPath: ${management.context-path}/health
+        healthCheckInterval: 15s</screen>
+</para>
+</formalpara>
+<section xml:id="_metadata_and_consul_tags">
+<title>Metadata and Consul tags</title>
+<simpara>Consul does not yet support metadata on services. Spring Cloud&#8217;s <literal>ServiceInstance</literal> has a <literal>Map&lt;String, String&gt; metadata</literal> field. Spring Cloud Consul uses Consul tags to approximate metadata until Consul officially supports metadata. Tags with the form <literal>key=value</literal> will be split and used as a <literal>Map</literal> key and value respectively. Tags without the equal <literal>=</literal> sign, will be used as both the key and value.</simpara>
+<formalpara>
+<title>application.yml</title>
+<para>
+<screen>spring:
+  cloud:
+    consul:
+      discovery:
+        tags: foo=bar, baz</screen>
+</para>
+</formalpara>
+<simpara>The above configuration will result in a map with <literal>foo&#8594;bar</literal> and <literal>baz&#8594;baz</literal>.</simpara>
+</section>
+<section xml:id="_making_the_consul_instance_id_unique">
+<title>Making the Consul Instance ID Unique</title>
+<simpara>By default a consul instance is registered with an ID that is equal to its Spring Application Context ID. By default, the Spring Application Context ID is <literal>${spring.application.name}:comma,separated,profiles:${server.port}</literal>. For most cases, this will allow multiple instances of one service to run on one machine.  If further uniqueness is required, Using Spring Cloud you can override this by providing a unique identifier in <literal>spring.cloud.consul.discovery.instanceId</literal>. For example:</simpara>
+<formalpara>
+<title>application.yml</title>
+<para>
+<screen>spring:
+  cloud:
+    consul:
+      discovery:
+        instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}</screen>
+</para>
+</formalpara>
+<simpara>With this metadata, and multiple service instances deployed on localhost, the random value will kick in there to make the instance unique. In Cloudfoundry the <literal>vcap.application.instance_id</literal> will be populated automatically in a Spring Boot application, so the random value will not be needed.</simpara>
+</section>
+</section>
+<section xml:id="_using_the_discoveryclient">
+<title>Using the DiscoveryClient</title>
+<simpara>Spring Cloud has support for <link xl:href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign">Feign</link> (a REST client builder) and also <link xl:href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-ribbon">Spring <literal>RestTemplate</literal></link> using the logical service names instead of physical URLs.</simpara>
+<simpara>You can also use the <literal>org.springframework.cloud.client.discovery.DiscoveryClient</literal> which provides a simple API for discovery clients that is not specific to Netflix, e.g.</simpara>
+<screen>@Autowired
+private DiscoveryClient discoveryClient;
+
+public String serviceUrl() {
+    List&lt;ServiceInstance&gt; list = discoveryClient.getInstances("STORES");
+    if (list != null &amp;&amp; list.size() &gt; 0 ) {
+        return list.get(0).getUri();
+    }
+    return null;
+}</screen>
+</section>
+</chapter>
+<chapter xml:id="spring-cloud-consul-config">
+<title>Distributed Configuration with Consul</title>
+<simpara>Consul provides a <link xl:href="https://consul.io/docs/agent/http/kv.html">Key/Value Store</link> for storing configuration and other metadata.  Spring Cloud Consul Config is an alternative to the <link xl:href="https://github.com/spring-cloud/spring-cloud-config">Config Server and Client</link>.  Configuration is loaded into the Spring Environment during the special "bootstrap" phase.  Configuration is stored in the <literal>/config</literal> folder by default.  Multiple <literal>PropertySource</literal> instances are created based on the application&#8217;s name and the active profiles that mimicks the Spring Cloud Config order of resolving properties.  For example, an application with the name "testApp" and with the "dev" profile will have the following property sources created:</simpara>
+<screen>config/testApp,dev/
+config/testApp/
+config/application,dev/
+config/application/</screen>
+<simpara>The most specific property source is at the top, with the least specific at the bottom.  Properties in the <literal>config/application</literal> folder are applicable to all applications using consul for configuration.  Properties in the <literal>config/testApp</literal> folder are only available to the instances of the service named "testApp".</simpara>
+<simpara>Configuration is currently read on startup of the application.  Sending a HTTP POST to <literal>/refresh</literal> will cause the configuration to be reloaded.  Watching the key value store (which Consul supports) is not currently possible, but will be a future addition to this project.</simpara>
+<section xml:id="_how_to_activate_2">
+<title>How to activate</title>
+<simpara>To get started with Consul Configuration use the starter with group <literal>org.springframework.cloud</literal> and artifact id <literal>spring-cloud-starter-consul-config</literal>. See the <link xl:href="http://projects.spring.io/spring-cloud/">Spring Cloud Project page</link> for details on setting up your build system with the current Spring Cloud Release Train.</simpara>
+<simpara>This will enable auto-configuration that will setup Spring Cloud Consul Config.</simpara>
+</section>
+<section xml:id="_customizing">
+<title>Customizing</title>
+<simpara>Consul Config may be customized using the following properties:</simpara>
+<formalpara>
+<title>bootstrap.yml</title>
+<para>
+<screen>spring:
+  cloud:
+    consul:
+      config:
+        enabled: true
+        prefix: configuration
+        defaultContext: apps
+        profileSeparator: '::'</screen>
+</para>
+</formalpara>
+<itemizedlist>
+<listitem>
+<simpara><literal>enabled</literal> setting this value to "false" disables Consul Config</simpara>
+</listitem>
+<listitem>
+<simpara><literal>prefix</literal> sets the base folder for configuration values</simpara>
+</listitem>
+<listitem>
+<simpara><literal>defaultContext</literal> sets the folder name used by all applications</simpara>
+</listitem>
+<listitem>
+<simpara><literal>profileSeparator</literal> sets the value of the separator used to separate the profile name in property sources with profiles</simpara>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="spring-cloud-consul-config-watch">
+<title>Config Watch</title>
+<simpara>The Consul Config Watch takes advantage of the ability of consul to <link xl:href="https://www.consul.io/docs/agent/watches.html#keyprefix">watch a key prefix</link>. The Config Watch makes a blocking Consul HTTP API call to determine if any relevant configuration data has changed for the current application. If there is new configuration data a Refresh Event is published. This is equivalent to calling the <literal>/refresh</literal> actuator endpoint.</simpara>
+<simpara>To change the frequency of when the Config Watch is called change <literal>spring.cloud.consul.config.watch.delay</literal>. The default value is 1000, which is in milliseconds.</simpara>
+<simpara>To disable the Config Watch set <literal>spring.cloud.consul.config.watch.enabled=false</literal>.</simpara>
+</section>
+<section xml:id="spring-cloud-consul-config-format">
+<title>YAML or Properties with Config</title>
+<simpara>It may be more convenient to store a blob of properties in YAML or Properties format as opposed to individual key/value pairs.  Set the <literal>spring.cloud.consul.config.format</literal> property to <literal>YAML</literal> or <literal>PROPERTIES</literal>. For example to use YAML:</simpara>
+<formalpara>
+<title>bootstrap.yml</title>
+<para>
+<screen>spring:
+  cloud:
+    consul:
+      config:
+        format: YAML</screen>
+</para>
+</formalpara>
+<simpara>YAML must be set in the appropriate <literal>data</literal> key in consul. Using the defaults above the keys would look like:</simpara>
+<screen>config/testApp,dev/data
+config/testApp/data
+config/application,dev/data
+config/application/data</screen>
+<simpara>You could store a YAML document in any of the keys listed above.</simpara>
+<simpara>You can change the data key using <literal>spring.cloud.consul.config.data-key</literal>.</simpara>
+</section>
+<section xml:id="spring-cloud-consul-config-git2consul">
+<title>git2consul with Config</title>
+<simpara>git2consul is a Consul community project that loads files from a git repository to individual keys into Consul. By default the names of the keys are names of the files. YAML and Properties files are supported with file extensions of <literal>.yml</literal> and <literal>.properties</literal> respectively.  Set the <literal>spring.cloud.consul.config.format</literal> property to <literal>FILES</literal>. For example:</simpara>
+<formalpara>
+<title>bootstrap.yml</title>
+<para>
+<screen>spring:
+  cloud:
+    consul:
+      config:
+        format: FILES</screen>
+</para>
+</formalpara>
+<simpara>Given the following keys in <literal>/config</literal>, the <literal>development</literal> profile and an application name of <literal>foo</literal>:</simpara>
+<screen>.gitignore
+application.yml
+bar.properties
+foo-development.properties
+foo-production.yml
+foo.properties
+master.ref</screen>
+<simpara>the following property sources would be created:</simpara>
+<screen>config/foo-development.properties
+config/foo.properties
+config/application.yml</screen>
+<simpara>The value of each key needs to be a properly formatted YAML or Properties file.</simpara>
+</section>
+<section xml:id="spring-cloud-consul-failfast">
+<title>Fail Fast</title>
+<simpara>It may be convenient in certain circumstances (like local development or certain test scenarios) to not fail if consul isn&#8217;t available for configuration. Setting <literal>spring.cloud.consul.config.failFast=false</literal> in <literal>bootstrap.yml</literal> will cause the configuration module to log a warning rather than throw an exception. This will allow the application to continue startup normally.</simpara>
+</section>
+</chapter>
+<chapter xml:id="spring-cloud-consul-retry">
+<title>Consul Retry</title>
+<simpara>If you expect that the consul agent may occasionally be unavailable when
+your app starts, you can ask it to keep trying after a failure. You need to add
+<literal>spring-retry</literal> and <literal>spring-boot-starter-aop</literal> to your classpath. The default
+behaviour is to retry 6 times with an initial backoff interval of 1000ms and an
+exponential multiplier of 1.1 for subsequent backoffs. You can configure these
+properties (and others) using <literal>spring.cloud.consul.retry.*</literal> configuration properties.
+This works with both Spring Cloud Consul Config and Discovery registration.</simpara>
+<tip>
+<simpara>To take full control of the retry add a <literal>@Bean</literal> of type
+<literal>RetryOperationsInterceptor</literal> with id "consulRetryInterceptor". Spring
+Retry has a <literal>RetryInterceptorBuilder</literal> that makes it easy to create one.</simpara>
+</tip>
+</chapter>
+<chapter xml:id="spring-cloud-consul-bus">
+<title>Spring Cloud Bus with Consul</title>
+<section xml:id="_how_to_activate_3">
+<title>How to activate</title>
+<simpara>To get started with the Consul Bus use the starter with group <literal>org.springframework.cloud</literal> and artifact id <literal>spring-cloud-starter-consul-bus</literal>. See the <link xl:href="http://projects.spring.io/spring-cloud/">Spring Cloud Project page</link> for details on setting up your build system with the current Spring Cloud Release Train.</simpara>
+<simpara>See the <link xl:href="https://cloud.spring.io/spring-cloud-bus/">Spring Cloud Bus</link> documentation for the available actuator endpoints and howto send custom messages.</simpara>
+</section>
+</chapter>
+<chapter xml:id="spring-cloud-consul-hystrix">
+<title>Circuit Breaker with Hystrix</title>
+<simpara>Applications can use the Hystrix Circuit Breaker provided by the Spring Cloud Netflix project by including this starter in the projects pom.xml: <literal>spring-cloud-starter-hystrix</literal>.  Hystrix doesn&#8217;t depend on the Netflix Discovery Client. The <literal>@EnableHystrix</literal> annotation should be placed on a configuration class (usually the main class). Then methods can be annotated with <literal>@HystrixCommand</literal> to be protected by a circuit breaker. See <link xl:href="http://projects.spring.io/spring-cloud/spring-cloud.html#_circuit_breaker_hystrix_clients">the documentation</link> for more details.</simpara>
+</chapter>
+<chapter xml:id="spring-cloud-consul-turbine">
+<title>Hystrix metrics aggregation with Turbine and Consul</title>
+<simpara>Turbine (provided by the Spring Cloud Netflix project), aggregates multiple instances Hystrix metrics streams, so the dashboard can display an aggregate view. Turbine uses the <literal>DiscoveryClient</literal> interface to lookup relevant instances. To use Turbine with Spring Cloud Consul, configure the Turbine application in a manner similar to the following examples:</simpara>
+<formalpara>
+<title>pom.xml</title>
+<para>
+<screen>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-netflix-turbine&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-starter-consul-discovery&lt;/artifactId&gt;
+&lt;/dependency&gt;</screen>
+</para>
+</formalpara>
+<simpara>Notice that the Turbine dependency is not a starter. The turbine starter includes support for Netflix Eureka.</simpara>
+<formalpara>
+<title>application.yml</title>
+<para>
+<screen>spring.application.name: turbine
+applications: consulhystrixclient
+turbine:
+  aggregator:
+    clusterConfig: ${applications}
+  appConfig: ${applications}</screen>
+</para>
+</formalpara>
+<simpara>The <literal>clusterConfig</literal> and <literal>appConfig</literal> sections must match, so it&#8217;s useful to put the comma-separated list of service ID&#8217;s into a separate configuration property.</simpara>
+<formalpara>
+<title>Turbine.java</title>
+<para>
+<screen>@EnableTurbine
+@EnableDiscoveryClient
+@SpringBootApplication
+public class Turbine {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoturbinecommonsApplication.class, args);
+    }
+}</screen>
+</para>
+</formalpara>
+</chapter>
+</book>
