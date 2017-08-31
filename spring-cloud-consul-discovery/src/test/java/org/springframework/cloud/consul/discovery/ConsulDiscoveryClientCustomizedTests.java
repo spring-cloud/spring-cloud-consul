@@ -101,7 +101,6 @@ public class ConsulDiscoveryClientCustomizedTests {
 	}
 
 	@Configuration
-	@EnableDiscoveryClient
 	@EnableAutoConfiguration
 	@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
 	public static class MyTestConfig {

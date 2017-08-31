@@ -42,7 +42,6 @@ Example Consul client:
 [source,java,indent=0]
 ----
 @SpringBootApplication
-@EnableDiscoveryClient
 @RestController
 public class Application {
 
@@ -72,8 +71,6 @@ spring:
 CAUTION: If you use <<spring-cloud-consul-config,Spring Cloud Consul Config>>, the above values will need to be placed in `bootstrap.yml` instead of `application.yml`.
 
 The default service name, instance id and port, taken from the `Environment`, are `${spring.application.name}`, the Spring Context ID and `${server.port}` respectively.
-
-`@EnableDiscoveryClient` make the app into both a Consul "service" (i.e. it registers itself) and a "client" (i.e. it can query Consul to locate other services).
 
 === HTTP Health Check
 
@@ -322,7 +319,6 @@ The `clusterConfig` and `appConfig` sections must match, so it's useful to put t
 .Turbine.java
 ----
 @EnableTurbine
-@EnableDiscoveryClient
 @SpringBootApplication
 public class Turbine {
     public static void main(String[] args) {
