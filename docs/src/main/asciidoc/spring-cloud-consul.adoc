@@ -72,6 +72,8 @@ CAUTION: If you use <<spring-cloud-consul-config,Spring Cloud Consul Config>>, t
 
 The default service name, instance id and port, taken from the `Environment`, are `${spring.application.name}`, the Spring Context ID and `${server.port}` respectively.
 
+To disable the auto registration of the client with Consul you can set `spring.cloud.service-registry.auto-registration.enabled` to `false`.
+
 === HTTP Health Check
 
 The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. `server.servletPath=/foo`) or management endpoint path (e.g. `management.context-path=/admin`). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectively.  Example:
