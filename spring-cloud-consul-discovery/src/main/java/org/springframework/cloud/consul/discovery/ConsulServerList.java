@@ -29,6 +29,7 @@ import com.netflix.loadbalancer.AbstractServerList;
 
 /**
  * @author Spencer Gibb
+ * @author Richard Kettelerij
  */
 public class ConsulServerList extends AbstractServerList<ConsulServer> {
 

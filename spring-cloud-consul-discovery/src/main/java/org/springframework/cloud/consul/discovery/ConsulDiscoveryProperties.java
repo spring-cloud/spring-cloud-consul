@@ -37,6 +37,7 @@ import lombok.Setter;
  * @author Spencer Gibb
  * @author Donnabell Dmello
  * @author Venil Noronha
+ * @author Richard Kettelerij
  */
 @ConfigurationProperties("spring.cloud.consul.discovery")
 @Data
