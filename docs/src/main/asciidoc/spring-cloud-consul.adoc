@@ -72,7 +72,7 @@ CAUTION: If you use <<spring-cloud-consul-config,Spring Cloud Consul Config>>, t
 
 The default service name, instance id and port, taken from the `Environment`, are `${spring.application.name}`, the Spring Context ID and `${server.port}` respectively.
 
-To disable the auto registration of the client with Consul you can set `spring.cloud.consul.discovery.enabled` to `false`.
+To disable the Consul Discovery Client you can set `spring.cloud.consul.discovery.enabled` to `false`.
 
 === HTTP Health Check
 
