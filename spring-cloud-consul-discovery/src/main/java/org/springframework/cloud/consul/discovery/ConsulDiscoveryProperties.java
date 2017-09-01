@@ -132,6 +132,12 @@ public class ConsulDiscoveryProperties {
 	 */
 	private Map<String, String> serverListQueryTags = new HashMap<>();
 
+	/**
+	 * Map of serviceId's -> datacenter to query for in server list.
+	 * This allows filtering services by a single datacenter.
+	 */
+	private Map<String, String> serverListQueryDatacenters = new HashMap<>();
+
 	/** Tag to query for in service list if one is not listed in serverListQueryTags. */
 	private String defaultQueryTag;
 
@@ -169,13 +175,21 @@ public class ConsulDiscoveryProperties {
 	}
 
 	/**
-	 *
 	 * @param serviceId The service who's filtering tag is being looked up
 	 * @return The tag the given service id should be filtered by, or null.
      */
 	public String getQueryTagForService(String serviceId){
 		String tag = serverListQueryTags.get(serviceId);
 		return tag != null ? tag : defaultQueryTag;
+	}
+
+	/**
+	 * @param serviceId The service who's datacenter is being looked up
+	 * @return The datacenter in which the given service resides or <tt>null</tt>, in case no datacenter is
+	 * specified. In that case we'll assume it's in the same dc as the local consul agent.
+	 */
+	public String getQueryDatacenterForService(String serviceId){
+		return serverListQueryDatacenters.get(serviceId);
 	}
 
 	public String getHostname() {
