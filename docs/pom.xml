@@ -15,7 +15,7 @@
 	<properties>
 		<docs.main>spring-cloud-consul</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
-		<docs.whitelisted.branches>1.0.x</docs.whitelisted.branches>
+		<docs.whitelisted.branches>1.0.x,2.0.x</docs.whitelisted.branches>
 	</properties>
 	<profiles>
 		<profile>
@@ -23,9 +23,17 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+					</plugin>
+					<plugin>
 						<groupId>org.asciidoctor</groupId>
 						<artifactId>asciidoctor-maven-plugin</artifactId>
 						<inherited>false</inherited>
+					</plugin>
+					<plugin>
+						<groupId>com.agilejava.docbkx</groupId>
+						<artifactId>docbkx-maven-plugin</artifactId>
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
