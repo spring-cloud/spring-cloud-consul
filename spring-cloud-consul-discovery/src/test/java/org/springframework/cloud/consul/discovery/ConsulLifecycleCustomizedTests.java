@@ -77,7 +77,6 @@ public class ConsulLifecycleCustomizedTests {
 	}
 
 	@Configuration
-	@EnableDiscoveryClient
 	@EnableAutoConfiguration
 	public static class MyTestConfig {
 		@Bean

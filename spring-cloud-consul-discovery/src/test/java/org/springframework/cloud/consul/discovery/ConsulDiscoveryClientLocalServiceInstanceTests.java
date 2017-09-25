@@ -148,7 +148,6 @@ public class ConsulDiscoveryClientLocalServiceInstanceTests {
 	}
 
 	@Configuration
-	@EnableDiscoveryClient
 	@ImportAutoConfiguration({ ConsulDiscoveryClientConfiguration.class })
 	protected static class LocalServiceTestConfig {
 

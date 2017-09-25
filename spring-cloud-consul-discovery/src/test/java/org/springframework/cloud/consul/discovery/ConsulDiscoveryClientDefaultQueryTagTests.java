@@ -94,7 +94,6 @@ public class ConsulDiscoveryClientDefaultQueryTagTests {
 	}
 
 	@Configuration
-	@EnableDiscoveryClient
 	@EnableAutoConfiguration
 	@Import({ ConsulDiscoveryClientConfiguration.class })
 	protected static class TestConfig {

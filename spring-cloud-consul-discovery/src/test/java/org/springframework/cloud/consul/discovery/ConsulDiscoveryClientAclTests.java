@@ -72,7 +72,6 @@ public class ConsulDiscoveryClientAclTests {
 	}
 
 	@Configuration
-	@EnableDiscoveryClient
 	@EnableAutoConfiguration
 	@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
 	public static class MyTestConfig {

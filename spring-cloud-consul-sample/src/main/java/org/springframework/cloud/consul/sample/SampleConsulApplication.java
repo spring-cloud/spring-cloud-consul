@@ -46,7 +46,6 @@ import org.springframework.web.client.RestTemplate;
  */
 @Configuration
 @EnableAutoConfiguration
-@EnableDiscoveryClient
 @RestController
 @EnableConfigurationProperties
 @EnableFeignClients
