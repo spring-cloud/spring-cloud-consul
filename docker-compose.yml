@@ -1,13 +1,8 @@
 # Work in Progress
 consul:
-  image: progrium/consul
-  volumes:
-    - /data
-    - /config
-    - ./src/test/resources/consul_ui:/ui
+  image: library/consul
   ports:
     - "8300:8300"
     - "8400:8400"
     - "8500:8500"
     - "8600:8600"
-  command: -server -bootstrap -data-dir /data -ui-dir /ui
