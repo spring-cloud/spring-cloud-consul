@@ -18,7 +18,6 @@ turbine:
   appConfig: ${applications}</pre><p>
 </p><p>The <code class="literal">clusterConfig</code> and <code class="literal">appConfig</code> sections must match, so it&#8217;s useful to put the comma-separated list of service ID&#8217;s into a separate configuration property.</p><p><b>Turbine.java.&nbsp;</b>
 </p><pre class="screen">@EnableTurbine
-@EnableDiscoveryClient
 @SpringBootApplication
 public class Turbine {
     public static void main(String[] args) {

@@ -39,7 +39,6 @@ Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon), Circuit Brea
 <simpara>When a client registers with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An HTTP <link xl:href="https://www.consul.io/docs/agent/checks.html">Check</link> is created by default that Consul hits the <literal>/health</literal> endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.</simpara>
 <simpara>Example Consul client:</simpara>
 <programlisting language="java" linenumbering="unnumbered">@SpringBootApplication
-@EnableDiscoveryClient
 @RestController
 public class Application {
 
@@ -68,7 +67,7 @@ public class Application {
 <simpara>If you use <link linkend="spring-cloud-consul-config">Spring Cloud Consul Config</link>, the above values will need to be placed in <literal>bootstrap.yml</literal> instead of <literal>application.yml</literal>.</simpara>
 </caution>
 <simpara>The default service name, instance id and port, taken from the <literal>Environment</literal>, are <literal>${spring.application.name}</literal>, the Spring Context ID and <literal>${server.port}</literal> respectively.</simpara>
-<simpara><literal>@EnableDiscoveryClient</literal> make the app into both a Consul "service" (i.e. it registers itself) and a "client" (i.e. it can query Consul to locate other services).</simpara>
+<simpara>To disable the Consul Discovery Client you can set <literal>spring.cloud.consul.discovery.enabled</literal> to <literal>false</literal>.</simpara>
 </section>
 <section xml:id="_http_health_check">
 <title>HTTP Health Check</title>
@@ -295,7 +294,6 @@ turbine:
 <title>Turbine.java</title>
 <para>
 <screen>@EnableTurbine
-@EnableDiscoveryClient
 @SpringBootApplication
 public class Turbine {
     public static void main(String[] args) {
