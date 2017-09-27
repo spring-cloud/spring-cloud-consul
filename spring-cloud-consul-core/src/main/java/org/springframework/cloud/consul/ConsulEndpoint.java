@@ -20,10 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Data;
-
-import org.springframework.boot.actuate.endpoint.AbstractEndpoint;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -32,20 +30,21 @@ import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.catalog.model.CatalogService;
 import com.ecwid.consul.v1.catalog.model.Node;
 
+import lombok.Data;
+
 /**
  * @author Spencer Gibb
  */
-@ConfigurationProperties(prefix = "endpoints.consul", ignoreUnknownFields = false)
-public class ConsulEndpoint extends AbstractEndpoint<ConsulEndpoint.ConsulData> {
+@Endpoint(id = "consul")
+public class ConsulEndpoint {
 
 	private ConsulClient consul;
 
 	public ConsulEndpoint(ConsulClient consul) {
-		super("consul", false, true);
 		this.consul = consul;
 	}
 
-	@Override
+	@ReadOperation
 	public ConsulData invoke() {
 		ConsulData data = new ConsulData();
 		// data.setKeyValues(kvClient.getKeyValueRecurse());

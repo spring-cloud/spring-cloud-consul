@@ -29,9 +29,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtilsProperties;
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -115,7 +113,7 @@ public class ConsulDiscoveryClientTests {
 
 	@Configuration
 	@EnableAutoConfiguration
-	@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+	@EnableDiscoveryClient
 	public static class MyTestConfig {
 
 	}

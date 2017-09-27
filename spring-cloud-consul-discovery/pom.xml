@@ -74,7 +74,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-archaius</artifactId>
+			<artifactId>spring-cloud-starter-netflix-archaius</artifactId>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
