@@ -20,14 +20,14 @@ public class ConsulDiscoveryPropertiesTests {
     private static final String SERVICE_NAME_NOT_IN_MAP = "serviceNameNotInMap";
     private ConsulDiscoveryProperties properties;
     private Map<String, String> serverListQueryTags = Collections.singletonMap(SERVICE_NAME_IN_MAP, MAP_TAG);
-    private Map<String, String> serverListQueryDatacenters = Collections.singletonMap(SERVICE_NAME_IN_MAP, MAP_DC);
+    private Map<String, String> datacenters = Collections.singletonMap(SERVICE_NAME_IN_MAP, MAP_DC);
 
     @Before
     public void setUp() throws Exception {
         properties = new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties()));
         properties.setDefaultQueryTag(DEFAULT_TAG);
         properties.setServerListQueryTags(serverListQueryTags);
-        properties.setServerListQueryDatacenters(serverListQueryDatacenters);
+        properties.setDatacenters(datacenters);
     }
 
     @Test

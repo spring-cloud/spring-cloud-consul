@@ -149,7 +149,7 @@ public String getFirstProduct() {
 ----
 
 If you have Consul clusters in multiple datacenters and you want to access a service in another datacenter a service name/id alone is not enough. In that case
-you use property `spring.cloud.consul.discovery.server-list-query-datacenters.STORES=dc-west` where `STORES` is the service name/id and `dc-west` is the datacenter
+you use property `spring.cloud.consul.discovery.datacenters.STORES=dc-west` where `STORES` is the service name/id and `dc-west` is the datacenter
 where the stores service lives.
 
 ==== Using the DiscoveryClient
