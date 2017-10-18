@@ -16,9 +16,15 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
+import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.serviceregistry.Registration;
 
 import com.ecwid.consul.v1.agent.model.NewService;
+import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.discovery.ConsulServerUtils;
+
+import java.net.URI;
+import java.util.Map;
 
 /**
  * @author Spencer Gibb
@@ -26,13 +32,19 @@ import com.ecwid.consul.v1.agent.model.NewService;
 public class ConsulRegistration implements Registration {
 
 	private final NewService service;
+	private ConsulDiscoveryProperties properties;
 
-	public ConsulRegistration(NewService service) {
+	public ConsulRegistration(NewService service, ConsulDiscoveryProperties properties) {
 		this.service = service;
+		this.properties = properties;
 	}
 
 	public NewService getService() {
 		return service;
+	}
+
+	protected ConsulDiscoveryProperties getProperties() {
+		return properties;
 	}
 
 	public String getInstanceId() {
@@ -43,4 +55,28 @@ public class ConsulRegistration implements Registration {
 		return getService().getName();
 	}
 
+	@Override
+	public String getHost() {
+		return getService().getAddress();
+	}
+
+	@Override
+	public int getPort() {
+		return getService().getPort();
+	}
+
+	@Override
+	public boolean isSecure() {
+		return this.properties.getScheme().equalsIgnoreCase("https");
+	}
+
+	@Override
+	public URI getUri() {
+		return DefaultServiceInstance.getUri(this);
+	}
+
+	@Override
+	public Map<String, String> getMetadata() {
+		return ConsulServerUtils.getMetadata(getService().getTags());
+	}
 }
