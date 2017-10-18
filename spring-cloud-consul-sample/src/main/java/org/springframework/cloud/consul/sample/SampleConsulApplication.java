@@ -18,8 +18,6 @@ package org.springframework.cloud.consul.sample;
 
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -27,9 +25,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +38,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author Spencer Gibb
@@ -67,12 +67,15 @@ public class SampleConsulApplication /*implements ApplicationListener<SimpleRemo
 	@Autowired
 	private RestTemplate restTemplate;
 
+	@Autowired
+	private Registration registration;
+
 	@Value("${spring.application.name:testConsulApp}")
 	private String appName;
 
 	@RequestMapping("/me")
 	public ServiceInstance me() {
-		return discoveryClient.getLocalServiceInstance();
+		return this.registration;
 	}
 
 	@RequestMapping("/")

@@ -89,28 +89,6 @@ public class ConsulDiscoveryClientTests {
 				Character.isDigit(instance.getHost().charAt(0)));
 	}
 
-	@Test
-	public void getLocalInstance() {
-		ServiceInstance instance = discoveryClient.getLocalServiceInstance();
-		assertNotNull("instance was null", instance);
-		assertIpAddress(instance);
-	}
-
-	@Test
-	public void getLocalInstanceNotRegistered() {
-		ConsulClient mockConsulClient = mock(ConsulClient.class);
-		ConsulDiscoveryProperties properties = new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties()));
-		ConsulDiscoveryClient.LocalResolver localResolver = mock(ConsulDiscoveryClient.LocalResolver.class);
-		ConsulDiscoveryClient discoveryClient = new ConsulDiscoveryClient(mockConsulClient, properties, localResolver);
-
-		Response<Map<String, Service>> response = new Response<>(Collections.<String, Service>emptyMap(), null, null, null);
-
-		when(mockConsulClient.getAgentServices()).thenReturn(response);
-		when(localResolver.getPort()).thenReturn(null);
-
-		ServiceInstance serviceInstance = discoveryClient.getLocalServiceInstance();
-	}
-
 	@Configuration
 	@EnableAutoConfiguration
 	@EnableDiscoveryClient
