@@ -39,13 +39,11 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 	public static final char SEPARATOR = '-';
 
-	private final ConsulDiscoveryProperties properties;
 	private final ApplicationContext context;
 	private final HeartbeatProperties heartbeatProperties;
 
 	public ConsulAutoRegistration(NewService service, ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
-		super(service);
-		this.properties = properties;
+		super(service, properties);
 		this.context = context;
 		this.heartbeatProperties = heartbeatProperties;
 	}
@@ -58,11 +56,11 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		// we might not have a port until now, so this is the earliest we
 		// can create a check
 
-		setCheck(getService(), this.properties, this.context, this.heartbeatProperties);
+		setCheck(getService(), getProperties(), this.context, this.heartbeatProperties);
 	}
 
 	public ConsulAutoRegistration managementRegistration() {
-		return managementRegistration(this.properties, this.context, this.heartbeatProperties);
+		return managementRegistration(getProperties(), this.context, this.heartbeatProperties);
 	}
 
 	public static ConsulAutoRegistration registration(ConsulDiscoveryProperties properties, ApplicationContext context,
