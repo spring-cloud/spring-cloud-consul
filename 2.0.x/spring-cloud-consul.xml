@@ -68,6 +68,7 @@ public class Application {
 </caution>
 <simpara>The default service name, instance id and port, taken from the <literal>Environment</literal>, are <literal>${spring.application.name}</literal>, the Spring Context ID and <literal>${server.port}</literal> respectively.</simpara>
 <simpara>To disable the Consul Discovery Client you can set <literal>spring.cloud.consul.discovery.enabled</literal> to <literal>false</literal>.</simpara>
+<simpara>To disable the service registration you can set <literal>spring.cloud.consul.discovery.register</literal> to <literal>false</literal>.</simpara>
 </section>
 <section xml:id="_http_health_check">
 <title>HTTP Health Check</title>
@@ -138,7 +139,7 @@ config/testApp/
 config/application,dev/
 config/application/</screen>
 <simpara>The most specific property source is at the top, with the least specific at the bottom.  Properties in the <literal>config/application</literal> folder are applicable to all applications using consul for configuration.  Properties in the <literal>config/testApp</literal> folder are only available to the instances of the service named "testApp".</simpara>
-<simpara>Configuration is currently read on startup of the application.  Sending a HTTP POST to <literal>/refresh</literal> will cause the configuration to be reloaded.  Watching the key value store (which Consul supports) is not currently possible, but will be a future addition to this project.</simpara>
+<simpara>Configuration is currently read on startup of the application.  Sending a HTTP POST to <literal>/refresh</literal> will cause the configuration to be reloaded. <xref linkend="spring-cloud-consul-config-watch"/> will also automatically detect changes and reload the application context.</simpara>
 <section xml:id="_how_to_activate_2">
 <title>How to activate</title>
 <simpara>To get started with Consul Configuration use the starter with group <literal>org.springframework.cloud</literal> and artifact id <literal>spring-cloud-starter-consul-config</literal>. See the <link xl:href="http://projects.spring.io/spring-cloud/">Spring Cloud Project page</link> for details on setting up your build system with the current Spring Cloud Release Train.</simpara>
