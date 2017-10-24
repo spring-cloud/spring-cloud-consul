@@ -51,8 +51,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @Deprecated
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestPropsConfig.class,
-	properties = { "spring.application.name=myTestService-B",
-		"spring.cloud.consul.discovery.instanceId=myTestService1-B",
+	properties = { "spring.application.name=myTestService-Z",
+		"spring.cloud.consul.discovery.instanceId=myTestService1-Z",
 		"spring.cloud.consul.discovery.port=4452",
 		"spring.cloud.consul.discovery.hostname=myhost",
 		"spring.cloud.consul.discovery.ipAddress=10.0.0.1",
@@ -71,16 +71,16 @@ public class ConsulLifecycleCustomizedPropsTests {
 	public void contextLoads() {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
-		Service service = services.get("myTestService1-B");
+		Service service = services.get("myTestService1-Z");
 		assertThat("service was null", service, is(notNullValue()));
 		assertThat("service port is discovery port", service.getPort(), equalTo(4452));
-		assertThat("service id was wrong", "myTestService1-B", equalTo(service.getId()));
-		assertThat("service name was wrong", "myTestService-B", equalTo(service.getService()));
+		assertThat("service id was wrong", "myTestService1-Z", equalTo(service.getId()));
+		assertThat("service name was wrong", "myTestService-Z", equalTo(service.getService()));
 		assertThat("property hostname was wrong", "myhost", equalTo(this.properties.getHostname()));
 		assertThat("property ipAddress was wrong", "10.0.0.1", equalTo(this.properties.getIpAddress()));
 		assertThat("service address was wrong", "myhost", equalTo(service.getAddress()));
 
-		Response<List<Check>> checkResponse = consul.getHealthChecksForService("myTestService-B", QueryParams.DEFAULT);
+		Response<List<Check>> checkResponse = consul.getHealthChecksForService("myTestService-Z", QueryParams.DEFAULT);
 		List<Check> checks = checkResponse.getValue();
 		assertThat("checks was wrong size", checks, hasSize(0));
 	}

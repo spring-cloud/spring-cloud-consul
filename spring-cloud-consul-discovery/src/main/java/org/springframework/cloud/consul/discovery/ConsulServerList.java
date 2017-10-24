@@ -29,6 +29,7 @@ import com.netflix.loadbalancer.AbstractServerList;
 
 /**
  * @author Spencer Gibb
+ * @author Richard Kettelerij
  */
 public class ConsulServerList extends AbstractServerList<ConsulServer> {
 
@@ -103,16 +104,25 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	}
 
 	/**
-	 * This method will create teh {@link QueryParams} to use when retrieving the
-	 * services from Consul. By default {@link QueryParams#DEFAULT} is used.
+	 * This method will create the {@link QueryParams} to use when retrieving the
+	 * services from Consul. By default {@link QueryParams#DEFAULT} is used. In case
+	 * a datacenter is specified for the current serviceId {@link QueryParams#datacenter} is set.
 	 * @return an instance of {@link QueryParams}
 	 */
 	protected QueryParams createQueryParamsForClientRequest() {
+		String datacenter = getDatacenter();
+		if (datacenter != null) {
+			return new QueryParams(datacenter);
+		}
 		return QueryParams.DEFAULT;
 	}
 
 	protected String getTag() {
 		return this.properties.getQueryTagForService(this.serviceId);
+	}
+
+	protected String getDatacenter() {
+		return this.properties.getDatacenters().get(this.serviceId);
 	}
 
 	@Override
