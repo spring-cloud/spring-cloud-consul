@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Consul</title>
-<date>2017-10-23</date>
+<date>2017-10-24</date>
 </info>
 <preface>
 <title></title>
@@ -115,9 +115,31 @@ public class Application {
 <simpara>With this metadata, and multiple service instances deployed on localhost, the random value will kick in there to make the instance unique. In Cloudfoundry the <literal>vcap.application.instance_id</literal> will be populated automatically in a Spring Boot application, so the random value will not be needed.</simpara>
 </section>
 </section>
+<section xml:id="_looking_up_services">
+<title>Looking up services</title>
+<section xml:id="_using_ribbon">
+<title>Using Ribbon</title>
+<simpara>Spring Cloud has support for <link xl:href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign">Feign</link> (a REST client builder) and also <link xl:href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-ribbon">Spring <literal>RestTemplate</literal></link>
+for looking up services using the logical service names/ids instead of physical URLs. Both Feign and the discovery-aware RestTemplate utilize <link xl:href="http://cloud.spring.io/spring-cloud-netflix/single/spring-cloud-netflix.html#spring-cloud-ribbon">Ribbon</link> for client-side load balancing.</simpara>
+<simpara>If you want to access service STORES using the RestTemplate simply declare:</simpara>
+<screen>@LoadBalanced
+@Bean
+public RestTemplate loadbalancedRestTemplate() {
+     new RestTemplate();
+}</screen>
+<simpara>and use it like this (notice how we use the STORES service name/id from Consul instead of a fully qualified domainname):</simpara>
+<screen>@Autowired
+RestTemplate restTemplate;
+
+public String getFirstProduct() {
+   return this.restTemplate.getForObject("https://STORES/products/1", String.class);
+}</screen>
+<simpara>If you have Consul clusters in multiple datacenters and you want to access a service in another datacenter a service name/id alone is not enough. In that case
+you use property <literal>spring.cloud.consul.discovery.datacenters.STORES=dc-west</literal> where <literal>STORES</literal> is the service name/id and <literal>dc-west</literal> is the datacenter
+where the STORES service lives.</simpara>
+</section>
 <section xml:id="_using_the_discoveryclient">
 <title>Using the DiscoveryClient</title>
-<simpara>Spring Cloud has support for <link xl:href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign">Feign</link> (a REST client builder) and also <link xl:href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-ribbon">Spring <literal>RestTemplate</literal></link> using the logical service names instead of physical URLs.</simpara>
 <simpara>You can also use the <literal>org.springframework.cloud.client.discovery.DiscoveryClient</literal> which provides a simple API for discovery clients that is not specific to Netflix, e.g.</simpara>
 <screen>@Autowired
 private DiscoveryClient discoveryClient;
@@ -129,6 +151,7 @@ public String serviceUrl() {
     }
     return null;
 }</screen>
+</section>
 </section>
 </chapter>
 <chapter xml:id="spring-cloud-consul-config">
