@@ -93,7 +93,7 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 
 	@Override
 	protected void deregister() {
-		if (!this.properties.isRegister()) {
+		if (!this.properties.isRegister() || !this.properties.isDeregister()) {
 			return;
 		}
 		super.deregister();
@@ -101,7 +101,7 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 
 	@Override
 	protected void deregisterManagement() {
-		if (!this.properties.isRegister()) {
+		if (!this.properties.isRegister() || !this.properties.isDeregister()) {
 			return;
 		}
 		super.deregisterManagement();
