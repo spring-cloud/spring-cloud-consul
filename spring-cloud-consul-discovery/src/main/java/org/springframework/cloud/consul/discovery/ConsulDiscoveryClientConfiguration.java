@@ -17,10 +17,13 @@
 package org.springframework.cloud.consul.discovery;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.client.CommonsClientAutoConfiguration;
+import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +38,8 @@ import com.ecwid.consul.v1.ConsulClient;
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty(value = "spring.cloud.consul.discovery.enabled", matchIfMissing = true)
 @EnableConfigurationProperties
+@AutoConfigureBefore({ SimpleDiscoveryClientAutoConfiguration.class,
+		CommonsClientAutoConfiguration.class })
 public class ConsulDiscoveryClientConfiguration {
 
 	@Autowired
