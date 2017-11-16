@@ -19,8 +19,6 @@ package org.springframework.cloud.consul.serviceregistry;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cloud.client.discovery.ManagementServerPortUtils;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
@@ -64,7 +62,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	}
 
 	public static ConsulAutoRegistration registration(ConsulDiscoveryProperties properties, ApplicationContext context,
-													  ServletContext servletContext, HeartbeatProperties heartbeatProperties) {
+			List<ConsulRegistrationCustomizer> registrationCustomizers,
+			HeartbeatProperties heartbeatProperties) {
 		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(context.getEnvironment());
 
 		NewService service = new NewService();
@@ -74,7 +73,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 			service.setAddress(properties.getHostname());
 		}
 		service.setName(normalizeForDns(appName));
-		service.setTags(createTags(properties, servletContext));
+		service.setTags(createTags(properties, registrationCustomizers));
 
 		if (properties.getPort() != null) {
 			service.setPort(properties.getPort());
@@ -87,7 +86,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 	@Deprecated //TODO: do I need this here, or should I just copy what I need back into lifecycle?
 	public static ConsulAutoRegistration lifecycleRegistration(Integer port, String instanceId, ConsulDiscoveryProperties properties, ApplicationContext context,
-															   ServletContext servletContext, HeartbeatProperties heartbeatProperties) {
+			List<ConsulRegistrationCustomizer> registrationCustomizers,
+			HeartbeatProperties heartbeatProperties) {
 		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(context.getEnvironment());
 
 		NewService service = new NewService();
@@ -97,7 +97,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 			service.setAddress(properties.getHostname());
 		}
 		service.setName(normalizeForDns(appName));
-		service.setTags(createTags(properties, servletContext));
+		service.setTags(createTags(properties, registrationCustomizers));
 
 		// If an alternate external port is specified, register using it instead
 		if (properties.getPort() != null) {
@@ -173,19 +173,20 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		return normalized.toString();
 	}
 
-
-	public static List<String> createTags(ConsulDiscoveryProperties properties, ServletContext servletContext) {
+	public static List<String> createTags(ConsulDiscoveryProperties properties,
+			List<ConsulRegistrationCustomizer> registrationCustomizers) {
 		List<String> tags = new LinkedList<>(properties.getTags());
-		if(servletContext != null
-				&& StringUtils.hasText(servletContext.getContextPath())
-				&& StringUtils.hasText(servletContext.getContextPath().replaceAll("/", ""))) {
-			tags.add("contextPath=" + servletContext.getContextPath());
-		}
+
 		if (!StringUtils.isEmpty(properties.getInstanceZone())) {
 			tags.add(properties.getDefaultZoneMetadataName() + "=" + properties.getInstanceZone());
 		}
 		if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
 			tags.add("group=" + properties.getInstanceGroup());
+		}
+		if (registrationCustomizers != null) {
+			for (ConsulRegistrationCustomizer customizer : registrationCustomizers) {
+				customizer.customizeTags(tags);
+			}
 		}
 		return tags;
 	}
