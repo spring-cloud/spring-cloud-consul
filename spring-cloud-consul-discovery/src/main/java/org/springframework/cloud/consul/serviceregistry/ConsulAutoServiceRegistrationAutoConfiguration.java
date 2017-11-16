@@ -18,10 +18,13 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import javax.servlet.ServletContext;
 
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
@@ -41,6 +44,9 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureAfter(ConsulServiceRegistryAutoConfiguration.class)
 public class ConsulAutoServiceRegistrationAutoConfiguration {
 
+	@Autowired(required = false)
+	private ServerProperties serverProperties;
+
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulAutoServiceRegistration consulAutoServiceRegistration(ConsulServiceRegistry registry, ConsulDiscoveryProperties properties, ConsulAutoRegistration consulRegistration) {
@@ -50,8 +56,13 @@ public class ConsulAutoServiceRegistrationAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulAutoRegistration consulRegistration(ConsulDiscoveryProperties properties, ApplicationContext applicationContext,
-												 ServletContext servletContext, HeartbeatProperties heartbeatProperties) {
-		return ConsulAutoRegistration.registration(properties, applicationContext, servletContext, heartbeatProperties);
+													 ObjectProvider<ServletContext> servletContext, HeartbeatProperties heartbeatProperties) {
+		ConsulAutoRegistration registration = ConsulAutoRegistration.registration(properties, applicationContext, servletContext.getIfAvailable(), heartbeatProperties);
+
+		if (serverProperties != null && serverProperties.getPort() != null && serverProperties.getPort() > 0) {
+			registration.initializePort(serverProperties.getPort());
+		}
+		return registration;
 	}
 
 }
