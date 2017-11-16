@@ -41,19 +41,13 @@ public class ConsulHealthIndicator extends AbstractHealthIndicator {
 
 	@Override
 	protected void doHealthCheck(Health.Builder builder) throws Exception {
-		try {
-			Response<Self> self = consul.getAgentSelf();
-			Config config = self.getValue().getConfig();
+		try {  
+			Response<String> leaderStatus = consul.getStatusLeader();
 			Response<Map<String, List<String>>> services = consul
 					.getCatalogServices(QueryParams.DEFAULT);
 			builder.up()
-					.withDetail("services", services.getValue())
-					.withDetail("advertiseAddress", config.getAdvertiseAddress())
-					.withDetail("datacenter", config.getDatacenter())
-					.withDetail("domain", config.getDomain())
-					.withDetail("nodeName", config.getNodeName())
-					.withDetail("bindAddress", config.getBindAddress())
-					.withDetail("clientAddress", config.getClientAddress());
+                                       .withDetail("leader", leaderStatus.getValue())
+					.withDetail("services", services.getValue());
 		}
 		catch (Exception e) {
 			builder.down(e);
