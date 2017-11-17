@@ -31,10 +31,7 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
@@ -44,7 +41,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedServletContextTests.TestConfig.class,
 	properties = { "spring.application.name=myTestService-WithServletContext",
 			"spring.cloud.consul.discovery.instanceId=myTestService1-WithServletContext",
-		"server.contextPath=/customContext"},
+		"server.servlet.context-path=/customContext"},
 		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedServletContextTests {
 
@@ -56,10 +53,10 @@ public class ConsulAutoServiceRegistrationCustomizedServletContextTests {
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
 		Service service = services.get("myTestService1-WithServletContext");
-		assertNotNull("service was null", service);
-		assertNotEquals("service port is 0", 0, service.getPort().intValue());
-		assertEquals("service id was wrong", "myTestService1-WithServletContext", service.getId());
-		assertTrue("service context was wrong", service.getTags().contains("contextPath=/customContext"));
+		assertThat(service).as("service was null").isNotNull();
+		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
+		assertThat(service.getId()).as("service id was wrong").isEqualTo("myTestService1-WithServletContext");
+		assertThat(service.getTags()).as("contextPath tag missing").contains("contextPath=/customContext");
 	}
 
 	@EnableDiscoveryClient
