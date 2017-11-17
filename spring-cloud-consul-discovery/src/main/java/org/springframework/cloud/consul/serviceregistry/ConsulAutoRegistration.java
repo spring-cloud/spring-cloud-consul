@@ -19,8 +19,6 @@ package org.springframework.cloud.consul.serviceregistry;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import org.springframework.cloud.client.discovery.ManagementServerPortUtils;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
@@ -64,7 +62,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	}
 
 	public static ConsulAutoRegistration registration(ConsulDiscoveryProperties properties, ApplicationContext context,
-													  ServletContext servletContext, HeartbeatProperties heartbeatProperties) {
+			List<ConsulRegistrationCustomizer> registrationCustomizers,
+			HeartbeatProperties heartbeatProperties) {
 
 		NewService service = new NewService();
 		String appName = getAppName(properties, context.getEnvironment());
@@ -73,7 +72,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 			service.setAddress(properties.getHostname());
 		}
 		service.setName(normalizeForDns(appName));
-		service.setTags(createTags(properties, servletContext));
+		service.setTags(createTags(properties));
 
 		if (properties.getPort() != null) {
 			service.setPort(properties.getPort());
@@ -81,12 +80,23 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 			setCheck(service, properties, context, heartbeatProperties);
 		}
 
-		return new ConsulAutoRegistration(service, properties, context, heartbeatProperties);
+		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, properties, context, heartbeatProperties);
+		customize(registrationCustomizers, registration);
+		return registration;
+	}
+
+	public static void customize(List<ConsulRegistrationCustomizer> registrationCustomizers, ConsulAutoRegistration registration) {
+		if (registrationCustomizers != null) {
+			for (ConsulRegistrationCustomizer customizer : registrationCustomizers) {
+				customizer.customize(registration);
+			}
+		}
 	}
 
 	@Deprecated //TODO: do I need this here, or should I just copy what I need back into lifecycle?
 	public static ConsulAutoRegistration lifecycleRegistration(Integer port, String instanceId, ConsulDiscoveryProperties properties, ApplicationContext context,
-															   ServletContext servletContext, HeartbeatProperties heartbeatProperties) {
+			List<ConsulRegistrationCustomizer> registrationCustomizers,
+			HeartbeatProperties heartbeatProperties) {
 		NewService service = new NewService();
 		String appName = getAppName(properties, context.getEnvironment());
 		service.setId(instanceId);
@@ -94,7 +104,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 			service.setAddress(properties.getHostname());
 		}
 		service.setName(normalizeForDns(appName));
-		service.setTags(createTags(properties, servletContext));
+		service.setTags(createTags(properties));
 
 		// If an alternate external port is specified, register using it instead
 		if (properties.getPort() != null) {
@@ -107,7 +117,9 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 		setCheck(service, properties, context, heartbeatProperties);
 
-		return new ConsulAutoRegistration(service, properties, context, heartbeatProperties);
+		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, properties, context, heartbeatProperties);
+		customize(registrationCustomizers, registration);
+		return registration;
 	}
 
 	public static void setCheck(NewService service, ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
@@ -169,20 +181,16 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		return normalized.toString();
 	}
 
-
-	public static List<String> createTags(ConsulDiscoveryProperties properties, ServletContext servletContext) {
+	public static List<String> createTags(ConsulDiscoveryProperties properties) {
 		List<String> tags = new LinkedList<>(properties.getTags());
-		if(servletContext != null
-				&& StringUtils.hasText(servletContext.getContextPath())
-				&& StringUtils.hasText(servletContext.getContextPath().replaceAll("/", ""))) {
-			tags.add("contextPath=" + servletContext.getContextPath());
-		}
+
 		if (!StringUtils.isEmpty(properties.getInstanceZone())) {
 			tags.add(properties.getDefaultZoneMetadataName() + "=" + properties.getInstanceZone());
 		}
 		if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
 			tags.add("group=" + properties.getInstanceGroup());
 		}
+
 		return tags;
 	}
 
