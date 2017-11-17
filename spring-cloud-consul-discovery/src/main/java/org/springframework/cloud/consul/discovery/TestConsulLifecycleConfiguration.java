@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.discovery;
 
 import javax.servlet.ServletContext;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.annotation.Bean;
@@ -37,7 +38,7 @@ public class TestConsulLifecycleConfiguration {
 	private TtlScheduler ttlScheduler;
 
 	@Autowired(required = false)
-	private ServletContext servletContext;
+	private ObjectProvider<ServletContext> servletContext;
 
 	@Bean
 	public ConsulLifecycle consulLifecycle(ConsulClient consulClient, ConsulDiscoveryProperties discoveryProperties,

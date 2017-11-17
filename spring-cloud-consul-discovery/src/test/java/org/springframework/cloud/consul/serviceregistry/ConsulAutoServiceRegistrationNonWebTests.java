@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,35 +31,33 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.junit.Assert.assertNull;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 /**
- * @author Piotr Wielgolaski
+ * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedServletContextTests.TestConfig.class,
-	properties = { "spring.application.name=myTestService-WithServletContext",
-			"spring.cloud.consul.discovery.instanceId=myTestService1-WithServletContext",
-		"server.contextPath=/customContext"},
-		webEnvironment = RANDOM_PORT)
-public class ConsulAutoServiceRegistrationCustomizedServletContextTests {
+@SpringBootTest(classes = ConsulAutoServiceRegistrationNonWebTests.TestConfig.class,
+		properties = { "spring.application.name=consulNonWebTest", "server.port=32111" },
+		webEnvironment = NONE)
+public class ConsulAutoServiceRegistrationNonWebTests {
 
 	@Autowired
 	private ConsulClient consul;
 
+	@Autowired(required = false)
+	private ConsulAutoServiceRegistration autoServiceRegistration;
+
 	@Test
 	public void contextLoads() {
+		assertNotNull("ConsulAutoServiceRegistration was created", autoServiceRegistration);
+
 		Response<Map<String, Service>> response = consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
-		Service service = services.get("myTestService1-WithServletContext");
-		assertNotNull("service was null", service);
-		assertNotEquals("service port is 0", 0, service.getPort().intValue());
-		assertEquals("service id was wrong", "myTestService1-WithServletContext", service.getId());
-		assertTrue("service context was wrong", service.getTags().contains("contextPath=/customContext"));
+		Service service = services.get("consulNonWebTest");
+		assertNull("service was registered", service); //no port to listen, hence no registration
 	}
 
 	@EnableDiscoveryClient

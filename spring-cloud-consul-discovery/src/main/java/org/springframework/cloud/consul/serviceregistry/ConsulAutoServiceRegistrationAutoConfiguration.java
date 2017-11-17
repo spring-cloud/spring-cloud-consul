@@ -16,8 +16,9 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import javax.servlet.ServletContext;
 import java.util.List;
+
+import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -61,7 +62,7 @@ public class ConsulAutoServiceRegistrationAutoConfiguration {
 	@ConditionalOnClass(ServletContext.class)
 	protected static class ConsulServletConfiguration {
 		@Bean
-		public ConsulRegistrationCustomizer servletConsulCustomizer(final ServletContext servletContext) {
+		public ConsulRegistrationCustomizer servletConsulCustomizer(ObjectProvider<ServletContext> servletContext) {
 			return new ConsulServletRegistrationCustomizer(servletContext);
 		}
 	}

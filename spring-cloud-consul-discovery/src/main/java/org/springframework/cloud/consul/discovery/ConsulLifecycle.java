@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cloud.client.discovery.AbstractDiscoveryLifecycle;
 import org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistration;
@@ -59,7 +60,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 
 	private TtlScheduler ttlScheduler;
 
-	private ServletContext servletContext;
+	private ObjectProvider<ServletContext> servletContext;
 
 	private NewService service = new NewService();
 
@@ -76,7 +77,7 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		this.ttlScheduler = ttlScheduler;
 	}
 
-	public void setServletContext(ServletContext servletContext) {
+	public void setServletContext(ObjectProvider<ServletContext> servletContext) {
 		this.servletContext = servletContext;
 	}
 

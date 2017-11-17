@@ -73,7 +73,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 			service.setAddress(properties.getHostname());
 		}
 		service.setName(normalizeForDns(appName));
-		service.setTags(createTags(properties, registrationCustomizers));
+		service.setTags(createTags(properties));
 
 		if (properties.getPort() != null) {
 			service.setPort(properties.getPort());
@@ -81,7 +81,17 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 			setCheck(service, properties, context, heartbeatProperties);
 		}
 
-		return new ConsulAutoRegistration(service, properties, context, heartbeatProperties);
+		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, properties, context, heartbeatProperties);
+		customize(registrationCustomizers, registration);
+		return registration;
+	}
+
+	public static void customize(List<ConsulRegistrationCustomizer> registrationCustomizers, ConsulAutoRegistration registration) {
+		if (registrationCustomizers != null) {
+			for (ConsulRegistrationCustomizer customizer : registrationCustomizers) {
+				customizer.customize(registration);
+			}
+		}
 	}
 
 	@Deprecated //TODO: do I need this here, or should I just copy what I need back into lifecycle?
@@ -97,7 +107,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 			service.setAddress(properties.getHostname());
 		}
 		service.setName(normalizeForDns(appName));
-		service.setTags(createTags(properties, registrationCustomizers));
+		service.setTags(createTags(properties));
 
 		// If an alternate external port is specified, register using it instead
 		if (properties.getPort() != null) {
@@ -110,7 +120,9 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 		setCheck(service, properties, context, heartbeatProperties);
 
-		return new ConsulAutoRegistration(service, properties, context, heartbeatProperties);
+		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, properties, context, heartbeatProperties);
+		customize(registrationCustomizers, registration);
+		return registration;
 	}
 
 	public static void setCheck(NewService service, ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
@@ -173,8 +185,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		return normalized.toString();
 	}
 
-	public static List<String> createTags(ConsulDiscoveryProperties properties,
-			List<ConsulRegistrationCustomizer> registrationCustomizers) {
+	public static List<String> createTags(ConsulDiscoveryProperties properties) {
 		List<String> tags = new LinkedList<>(properties.getTags());
 
 		if (!StringUtils.isEmpty(properties.getInstanceZone())) {
@@ -183,11 +194,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
 			tags.add("group=" + properties.getInstanceGroup());
 		}
-		if (registrationCustomizers != null) {
-			for (ConsulRegistrationCustomizer customizer : registrationCustomizers) {
-				customizer.customizeTags(tags);
-			}
-		}
+
 		return tags;
 	}
 

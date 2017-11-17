@@ -16,11 +16,9 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import java.util.List;
-
 /**
  * @author Piotr Wielgolaski
  */
 public interface ConsulRegistrationCustomizer {
-	void customizeTags(List<String> tags);
+	void customize(ConsulRegistration registration);
 }

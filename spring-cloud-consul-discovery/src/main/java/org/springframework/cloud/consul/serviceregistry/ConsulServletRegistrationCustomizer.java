@@ -17,26 +17,37 @@
 package org.springframework.cloud.consul.serviceregistry;
 
 import javax.servlet.ServletContext;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.util.StringUtils;
 
 /**
  * @author Piotr Wielgolaski
  */
 public class ConsulServletRegistrationCustomizer implements ConsulRegistrationCustomizer {
-	private ServletContext servletContext;
+	private ObjectProvider<ServletContext> servletContext;
 
-	public ConsulServletRegistrationCustomizer(ServletContext servletContext) {
+	public ConsulServletRegistrationCustomizer(ObjectProvider<ServletContext> servletContext) {
 		this.servletContext = servletContext;
 	}
 
 	@Override
-	public void customizeTags(List<String> tags) {
-		if(servletContext != null
-				&& StringUtils.hasText(servletContext.getContextPath())
-				&& StringUtils.hasText(servletContext.getContextPath().replaceAll("/", ""))) {
-			tags.add("contextPath=" + servletContext.getContextPath());
+	public void customize(ConsulRegistration registration) {
+		if (servletContext == null) {
+			return;
+		}
+		ServletContext sc = servletContext.getIfAvailable();
+		if(sc != null
+				&& StringUtils.hasText(sc.getContextPath())
+				&& StringUtils.hasText(sc.getContextPath().replaceAll("/", ""))) {
+			List<String> tags = registration.getService().getTags();
+			if (tags == null) {
+				tags = new ArrayList<>();
+			}
+			tags.add("contextPath=" + sc.getContextPath());
+			registration.getService().setTags(tags);
 		}
 	}
 }
