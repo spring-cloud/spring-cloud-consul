@@ -43,7 +43,7 @@ import lombok.extern.apachecommons.CommonsLog;
 public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Deprecated
-	interface LocalResolver {
+	public interface LocalResolver {
 		String getInstanceId();
 		Integer getPort();
 	}
