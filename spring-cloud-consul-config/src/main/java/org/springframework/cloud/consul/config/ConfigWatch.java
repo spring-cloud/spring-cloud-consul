@@ -19,10 +19,16 @@ package org.springframework.cloud.consul.config;
 import java.io.Closeable;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 
+import com.netflix.servo.DefaultMonitorRegistry;
+import com.netflix.servo.monitor.BasicTimer;
+import com.netflix.servo.monitor.MonitorConfig;
+import com.netflix.servo.monitor.Stopwatch;
+import com.netflix.servo.monitor.Timer;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -52,6 +58,7 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 	private final AtomicBoolean running = new AtomicBoolean(false);
 	private ApplicationEventPublisher publisher;
 	private boolean firstTime = true;
+	private Timer consulConfigTimer;
 
 	@Deprecated
 	public ConfigWatch(ConsulConfigProperties properties, List<String> contexts, ConsulClient consul) {
@@ -72,13 +79,16 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 	@PostConstruct
 	public void start() {
 		this.running.compareAndSet(false, true);
+		consulConfigTimer = new BasicTimer(MonitorConfig.builder("consul.watch-config-keys").build(), TimeUnit.SECONDS);
+		DefaultMonitorRegistry.getInstance().register(consulConfigTimer);
 	}
 
 	@Scheduled(fixedDelayString = "${spring.cloud.consul.config.watch.delay:1000}")
 	public void watchConfigKeyValues() {
 		if (this.running.get()) {
 			for (String context : this.consulIndexes.keySet()) {
-
+				Timer timer = consulConfigTimer;
+				Stopwatch stopwatch = timer.start();
 				// turn the context into a Consul folder path (unless our config format are FILES)
 				if (properties.getFormat() != FILES && !context.endsWith("/")) {
 					context = context + "/";
@@ -126,6 +136,8 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 						// simplified one line log message in the event of an agent failure
 						log.warn("Error querying consul Key/Values for context '" + context + "'. Message: " + e.getMessage());
 					}
+				} finally {
+					stopwatch.stop();
 				}
 			}
 		}
