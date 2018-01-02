@@ -71,8 +71,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.netflix.servo</groupId>
-			<artifactId>servo-core</artifactId>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-spring-legacy</artifactId>
 			<optional>true</optional>
 		</dependency>
 	</dependencies>
