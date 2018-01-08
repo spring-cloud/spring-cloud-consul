@@ -19,12 +19,12 @@ package org.springframework.cloud.consul.serviceregistry;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.cloud.client.discovery.ManagementServerPortUtils;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -64,10 +64,9 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	public static ConsulAutoRegistration registration(ConsulDiscoveryProperties properties, ApplicationContext context,
 			List<ConsulRegistrationCustomizer> registrationCustomizers,
 			HeartbeatProperties heartbeatProperties) {
-		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(context.getEnvironment());
 
 		NewService service = new NewService();
-		String appName = getAppName(properties, propertyResolver);
+		String appName = getAppName(properties, context.getEnvironment());
 		service.setId(getInstanceId(properties, context));
 		if(!properties.isPreferAgentAddress()) {
 			service.setAddress(properties.getHostname());
@@ -98,10 +97,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	public static ConsulAutoRegistration lifecycleRegistration(Integer port, String instanceId, ConsulDiscoveryProperties properties, ApplicationContext context,
 			List<ConsulRegistrationCustomizer> registrationCustomizers,
 			HeartbeatProperties heartbeatProperties) {
-		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(context.getEnvironment());
-
 		NewService service = new NewService();
-		String appName = getAppName(properties, propertyResolver);
+		String appName = getAppName(properties, context.getEnvironment());
 		service.setId(instanceId);
 		if(!properties.isPreferAgentAddress()) {
 			service.setAddress(properties.getHostname());
@@ -140,11 +137,10 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 	public static ConsulAutoRegistration managementRegistration(ConsulDiscoveryProperties properties, ApplicationContext context,
 																HeartbeatProperties heartbeatProperties) {
-		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(context.getEnvironment());
 		NewService management = new NewService();
 		management.setId(getManagementServiceId(properties, context));
 		management.setAddress(properties.getHostname());
-		management.setName(getManagementServiceName(properties, propertyResolver));
+		management.setName(getManagementServiceName(properties, context.getEnvironment()));
 		management.setPort(getManagementPort(properties, context));
 		management.setTags(properties.getManagementTags());
 		if (properties.isRegisterHealthCheck()) {
@@ -228,12 +224,12 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	/**
 	 * @return the app name, currently the spring.application.name property
 	 */
-	public static String getAppName(ConsulDiscoveryProperties properties, RelaxedPropertyResolver propertyResolver) {
+	public static String getAppName(ConsulDiscoveryProperties properties, Environment env) {
 		String appName = properties.getServiceName();
 		if (!StringUtils.isEmpty(appName)) {
 			return appName;
 		}
-		return propertyResolver.getProperty("spring.application.name", "application");
+		return env.getProperty("spring.application.name", "application");
 	}
 
 	/**
@@ -253,8 +249,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	/**
 	 * @return the service name of the Management Service
 	 */
-	public static String getManagementServiceName(ConsulDiscoveryProperties properties, RelaxedPropertyResolver propertyResolver) {
-		return normalizeForDns(getAppName(properties, propertyResolver)) + SEPARATOR + properties.getManagementSuffix();
+	public static String getManagementServiceName(ConsulDiscoveryProperties properties, Environment env) {
+		return normalizeForDns(getAppName(properties, env)) + SEPARATOR + properties.getManagementSuffix();
 	}
 
 	/**

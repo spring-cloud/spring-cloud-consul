@@ -62,7 +62,7 @@ public class ConsulDiscoveryProperties {
 	private List<String> managementTags = Arrays.asList(MANAGEMENT);
 
 	/** Alternate server path to invoke for health checking */
-	private String healthCheckPath = "/health";
+	private String healthCheckPath = "/actuator/health";
 
 	/** Custom health check url to override default */
 	private String healthCheckUrl;

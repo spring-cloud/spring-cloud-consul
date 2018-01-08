@@ -6,10 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -19,8 +17,7 @@ import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.health.model.Check;
 
 import static com.ecwid.consul.v1.health.model.Check.CheckStatus.PASSING;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
@@ -29,9 +26,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TtlSchedulerTest.TtlSchedulerTestConfig.class,
 	properties = { "spring.application.name=ttlScheduler",
-		"spring.cloud.consul.discovery.instanceId=ttlScheduler-id",
+		"spring.cloud.consul.discovery.instance-id=ttlScheduler-id",
 		"spring.cloud.consul.discovery.heartbeat.enabled=true",
-		"spring.cloud.consul.discovery.heartbeat.ttlValue=2", "management.port=0" },
+		"spring.cloud.consul.discovery.heartbeat.ttlValue=2", "management.server.port=0" },
 		webEnvironment = RANDOM_PORT)
 public class TtlSchedulerTest {
 
@@ -44,11 +41,13 @@ public class TtlSchedulerTest {
 		Thread.sleep(2100); // Wait for TTL to expired (TTL is set to 2 seconds)
 
 		Check serviceCheck = getCheckForService("ttlScheduler");
-		assertThat("Service check is in wrong state", serviceCheck.getStatus(),
-				equalTo(PASSING));
+		assertThat(serviceCheck).isNotNull();
+		assertThat(serviceCheck.getStatus()).isEqualTo(PASSING)
+				.as("Service check is in wrong state");
 		Check serviceManagementCheck = getCheckForService("ttlScheduler-management");
-		assertThat("Service management heck in wrong state",
-				serviceManagementCheck.getStatus(), equalTo(PASSING));
+		assertThat(serviceManagementCheck).isNotNull();
+		assertThat(serviceManagementCheck.getStatus()).isEqualTo(PASSING)
+				.as("Service management check is in wrong state");
 	}
 
 	private Check getCheckForService(String serviceId) {
@@ -61,9 +60,8 @@ public class TtlSchedulerTest {
 	}
 
 	@Configuration
-	@EnableDiscoveryClient(autoRegister = false) //FIXME:
+	@EnableDiscoveryClient
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
 	public static class TtlSchedulerTestConfig { }
 }
 

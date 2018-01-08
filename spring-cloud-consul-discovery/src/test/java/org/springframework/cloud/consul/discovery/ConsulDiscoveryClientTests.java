@@ -29,9 +29,7 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtilsProperties;
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -52,7 +50,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = { "spring.application.name=testConsulDiscovery",
-		"spring.cloud.consul.discovery.preferIpAddress=true"},
+		"spring.cloud.consul.discovery.prefer-ip-address=true"},
 		classes = ConsulDiscoveryClientTests.MyTestConfig.class,
 		webEnvironment = RANDOM_PORT)
 public class ConsulDiscoveryClientTests {
@@ -91,31 +89,9 @@ public class ConsulDiscoveryClientTests {
 				Character.isDigit(instance.getHost().charAt(0)));
 	}
 
-	@Test
-	public void getLocalInstance() {
-		ServiceInstance instance = discoveryClient.getLocalServiceInstance();
-		assertNotNull("instance was null", instance);
-		assertIpAddress(instance);
-	}
-
-	@Test
-	public void getLocalInstanceNotRegistered() {
-		ConsulClient mockConsulClient = mock(ConsulClient.class);
-		ConsulDiscoveryProperties properties = new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties()));
-		ConsulDiscoveryClient.LocalResolver localResolver = mock(ConsulDiscoveryClient.LocalResolver.class);
-		ConsulDiscoveryClient discoveryClient = new ConsulDiscoveryClient(mockConsulClient, properties, localResolver);
-
-		Response<Map<String, Service>> response = new Response<>(Collections.<String, Service>emptyMap(), null, null, null);
-
-		when(mockConsulClient.getAgentServices()).thenReturn(response);
-		when(localResolver.getPort()).thenReturn(null);
-
-		ServiceInstance serviceInstance = discoveryClient.getLocalServiceInstance();
-	}
-
 	@Configuration
 	@EnableAutoConfiguration
-	@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+	@EnableDiscoveryClient
 	public static class MyTestConfig {
 
 	}

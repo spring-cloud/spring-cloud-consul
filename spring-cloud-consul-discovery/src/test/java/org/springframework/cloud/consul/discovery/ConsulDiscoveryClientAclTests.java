@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,12 +26,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -73,7 +71,7 @@ public class ConsulDiscoveryClientAclTests {
 
 	@Configuration
 	@EnableAutoConfiguration
-	@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+	@EnableDiscoveryClient
 	public static class MyTestConfig {
 
 	}

@@ -27,9 +27,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
@@ -90,19 +88,9 @@ public class ConsulDiscoveryClientCustomizedTests {
 		assertEquals("metadata key foo2 was wrong", "bar2=baz2", foo2);
 	}
 
-	@Test
-	public void getLocalInstance() {
-		ServiceInstance instance = discoveryClient.getLocalServiceInstance();
-		assertNotNull("instance was null", instance);
-		assertNotIpAddress(instance);
-		assertEquals("instance id was wrong", "testConsulDiscovery2Id",
-				instance.getServiceId());
-		assertInstance(instance);
-	}
-
 	@Configuration
 	@EnableAutoConfiguration
-	@Import({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+	@EnableDiscoveryClient
 	public static class MyTestConfig {
 
 	}

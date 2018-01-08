@@ -21,7 +21,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.ManagementServerProperties;
+import org.springframework.boot.actuate.autoconfigure.web.server.ManagementServerProperties;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,7 +50,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 	properties = {"spring.application.name=myTestService-GG",
 		"spring.cloud.consul.discovery.instanceId=myTestService1-GG",
 		"spring.cloud.consul.discovery.registerHealthCheck=false",
-		"spring.cloud.consul.discovery.managementPort=4452", "management.port=0"},
+		"spring.cloud.consul.discovery.managementPort=4452", "management.server.port=0"},
 		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedManagementServicePortTests {
 

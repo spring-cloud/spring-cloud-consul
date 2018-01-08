@@ -49,13 +49,7 @@ public class HeartbeatProperties {
 	@DecimalMax("0.9")
 	private double intervalRatio = 2.0 / 3.0;
 
-	private Period heartbeatInterval;
-
-	@PostConstruct
-	public void init() {
-        this.heartbeatInterval = computeHearbeatInterval();
-        log.debug("Computed heartbeatInterval: " + heartbeatInterval);
-	}
+	//TODO: did heartbeatInterval need to be a field?
 
     protected Period computeHearbeatInterval() {
         // heartbeat rate at ratio * ttl, but no later than ttl -1s and, (under lesser
@@ -64,7 +58,9 @@ public class HeartbeatProperties {
         double max = Math.max(interval, 1);
         int ttlMinus1 = ttlValue - 1;
         double min = Math.min(ttlMinus1, max);
-        return new Period(Math.round(1000 * min));
+		Period heartbeatInterval = new Period(Math.round(1000 * min));
+		log.debug("Computed heartbeatInterval: " + heartbeatInterval);
+		return heartbeatInterval;
     }
 
     public String getTtl() {

@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -103,7 +104,7 @@ public class ConfigWatchTests {
 		}
 
 		Response<List<GetValue>> response = new Response<>(getValues, 1L, false, 1L);
-		when(consul.getKVValues(eq(context), anyString(), any(QueryParams.class))).thenReturn(response);
+		when(consul.getKVValues(eq(context), nullable(String.class), any(QueryParams.class))).thenReturn(response);
 
 		if (StringUtils.hasText(aclToken)) {
 			configProperties.setAclToken(aclToken);

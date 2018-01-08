@@ -30,7 +30,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TtlSchedulerRemoveTest.TtlSchedulerRemoveTestConfig.class,
 	properties = { "spring.application.name=ttlSchedulerRemove",
-		"spring.cloud.consul.discovery.instanceId=ttlSchedulerRemove-id",
+		"spring.cloud.consul.discovery.instance-id=ttlSchedulerRemove-id",
 		"spring.cloud.consul.discovery.heartbeat.enabled=true",
 		"spring.cloud.consul.discovery.heartbeat.ttlValue=2" },
 		webEnvironment = RANDOM_PORT)
@@ -67,9 +67,9 @@ public class TtlSchedulerRemoveTest {
 	}
 
 	@Configuration
-	@EnableDiscoveryClient(autoRegister = false) //FIXME: this is weird because we're testing the deprecated lifecycle, not autoconfiguration
+	@EnableDiscoveryClient
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+	@ImportAutoConfiguration({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
 	public static class TtlSchedulerRemoveTestConfig { }
 }
 

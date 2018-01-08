@@ -97,7 +97,11 @@ public class EventService {
 		if (lastIndex != null) {
 			index = lastIndex;
 		}
-		Response<List<Event>> watch = consul.eventList(new QueryParams(properties.getEventTimeout(), index));
+		int eventTimeout = 5;
+		if (properties != null) {
+			eventTimeout = properties.getEventTimeout();
+		}
+		Response<List<Event>> watch = consul.eventList(new QueryParams(eventTimeout, index));
 		return filterEvents(readEvents(watch), lastIndex);
 	}
 
