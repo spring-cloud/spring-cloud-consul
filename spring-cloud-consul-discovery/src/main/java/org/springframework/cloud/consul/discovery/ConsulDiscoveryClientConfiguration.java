@@ -80,7 +80,7 @@ public class ConsulDiscoveryClientConfiguration {
 		return discoveryClient;
 	}
 
-	class LifecycleRegistrationResolver implements ConsulDiscoveryClient.LocalResolver {
+	public class LifecycleRegistrationResolver implements ConsulDiscoveryClient.LocalResolver {
 		private ApplicationContext context;
 
 		public LifecycleRegistrationResolver(ApplicationContext context) {
