@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.PostConstruct;
 
+import io.micrometer.core.annotation.Timed;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -75,6 +76,7 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 	}
 
 	@Scheduled(fixedDelayString = "${spring.cloud.consul.config.watch.delay:1000}")
+	@Timed(value ="consul.watch-config-keys")
 	public void watchConfigKeyValues() {
 		if (this.running.get()) {
 			for (String context : this.consulIndexes.keySet()) {
