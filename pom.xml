@@ -26,8 +26,6 @@
 		<spring-cloud-netflix.version>2.0.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
 		<spring-cloud-deployer.version>1.0.3.RELEASE</spring-cloud-deployer.version>
 		<spring-cloud-stream.version>Elmhurst.BUILD-SNAPSHOT</spring-cloud-stream.version>
-		<!--<httpclient.version>4.5.2</httpclient.version>
-		<httpcore.version>4.4.5</httpcore.version>-->
 	</properties>
 
 	<scm>
