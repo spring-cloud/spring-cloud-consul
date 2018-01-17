@@ -20,9 +20,9 @@ import java.util.Arrays;
 
 import org.junit.After;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
-import org.springframework.boot.test.util.EnvironmentTestUtils;
+import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.commons.util.UtilAutoConfiguration;
@@ -32,17 +32,23 @@ import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.test.ClassPathExclusions;
+import org.springframework.cloud.test.ModifiedClassPathRunner;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Dave Syer
  */
+@RunWith(ModifiedClassPathRunner.class)
+@ClassPathExclusions({ "spring-retry-*.jar", "spring-boot-starter-aop-*.jar" })
 public class DiscoveryClientConfigServiceAutoConfigurationTests {
 
 	private AnnotationConfigApplicationContext context;
@@ -62,12 +68,12 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 		setup("server.port=7000", "spring.cloud.config.discovery.enabled=true",
 				"spring.cloud.consul.discovery.port:7001",
 				"spring.cloud.consul.discovery.hostname:foo",
-				"spring.cloud.config.discovery.serviceId=configserver");
+				"spring.cloud.config.discovery.service-id:configserver");
 		assertEquals( 1, this.context
 						.getBeanNamesForType(ConsulConfigServerAutoConfiguration.class).length);
 		ConsulDiscoveryClient client = this.context.getParent().getBean(
 				ConsulDiscoveryClient.class);
-		Mockito.verify(client, times(2)).getInstances("configserver");
+		verify(client, times(2)).getInstances("configserver");
 		ConfigClientProperties locator = this.context
 				.getBean(ConfigClientProperties.class);
 		assertEquals("http://foo:7001/", locator.getRawUri());
@@ -75,7 +81,7 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 
 	private void setup(String... env) {
 		AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext();
-		EnvironmentTestUtils.addEnvironment(parent, env);
+		TestPropertyValues.of(env).applyTo(parent);
 		parent.register(UtilAutoConfiguration.class,
 				PropertyPlaceholderAutoConfiguration.class, EnvironmentKnobbler.class,
 				ConsulDiscoveryClientConfigServiceBootstrapConfiguration.class,
@@ -96,7 +102,7 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 		@Bean
 		public ConsulDiscoveryClient consulDiscoveryClient(
 				ConsulDiscoveryProperties properties) {
-			ConsulDiscoveryClient client = Mockito.mock(ConsulDiscoveryClient.class);
+			ConsulDiscoveryClient client = mock(ConsulDiscoveryClient.class);
 			ServiceInstance instance = new DefaultServiceInstance("configserver",
 					properties.getHostname(), properties.getPort(), false);
 			given(client.getInstances("configserver"))

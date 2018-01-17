@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.springframework.cloud.client.discovery.ManagementServerPortUtils;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
+import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.context.ApplicationContext;
@@ -151,7 +152,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 	public static String getInstanceId(ConsulDiscoveryProperties properties, ApplicationContext context) {
 		if (!StringUtils.hasText(properties.getInstanceId())) {
-			return normalizeForDns(context.getId());
+			return normalizeForDns(IdUtils.getDefaultInstanceId(context.getEnvironment(), false));
 		} else {
 			return normalizeForDns(properties.getInstanceId());
 		}
@@ -160,7 +161,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	public static String normalizeForDns(String s) {
 		if (s == null || !Character.isLetter(s.charAt(0))
 				|| !Character.isLetterOrDigit(s.charAt(s.length()-1))) {
-			throw new IllegalArgumentException("Consul service ids must not be empty, must start with a letter, end with a letter or digit, and have as interior characters only letters, digits, and hyphen");
+			throw new IllegalArgumentException("Consul service ids must not be empty, must start with a letter, end with a letter or digit, and have as interior characters only letters, digits, and hyphen: "+s);
 		}
 
 		StringBuilder normalized = new StringBuilder();
@@ -243,7 +244,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	 * @return the serviceId of the Management Service
 	 */
 	public static String getManagementServiceId(ConsulDiscoveryProperties properties, ApplicationContext context) {
-		return normalizeForDns(context.getId()) + SEPARATOR + properties.getManagementSuffix();
+		return normalizeForDns(IdUtils.getDefaultInstanceId(context.getEnvironment(), false)) + SEPARATOR + properties.getManagementSuffix();
 	}
 
 	/**

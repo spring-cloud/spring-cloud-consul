@@ -113,6 +113,7 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	protected String getAppName() {
 		String appName = properties.getServiceName();
 		return StringUtils.isEmpty(appName) ? super.getAppName() : appName;
