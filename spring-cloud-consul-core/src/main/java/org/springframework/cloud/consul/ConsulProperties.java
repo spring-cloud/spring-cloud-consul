@@ -18,8 +18,6 @@ package org.springframework.cloud.consul;
 
 import javax.validation.constraints.NotNull;
 
-import lombok.Data;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -27,7 +25,6 @@ import org.springframework.validation.annotation.Validated;
  * @author Spencer Gibb
  */
 @ConfigurationProperties("spring.cloud.consul")
-@Data
 @Validated
 public class ConsulProperties {
 	/** Consul agent hostname. Defaults to 'localhost'. */
@@ -40,4 +37,37 @@ public class ConsulProperties {
 
 	/** Is spring cloud consul enabled */
 	private boolean enabled = true;
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	@Override
+	public String toString() {
+		return "ConsulProperties{" +
+				"host='" + host + '\'' +
+				", port=" + port +
+				", enabled=" + enabled +
+				'}';
+	}
 }

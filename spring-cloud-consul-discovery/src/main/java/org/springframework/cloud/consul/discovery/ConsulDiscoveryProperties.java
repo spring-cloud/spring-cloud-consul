@@ -16,20 +16,16 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.commons.util.InetUtils;
+import org.springframework.cloud.commons.util.InetUtils.HostInfo;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.cloud.commons.util.InetUtils;
-
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Defines configuration for service discovery and registration.
@@ -40,14 +36,11 @@ import lombok.Setter;
  * @author Richard Kettelerij
  */
 @ConfigurationProperties("spring.cloud.consul.discovery")
-@Data
 public class ConsulDiscoveryProperties {
 
 	protected static final String MANAGEMENT = "management";
 
-	@Getter(AccessLevel.PRIVATE)
-	@Setter(AccessLevel.PRIVATE)
-	private InetUtils.HostInfo hostInfo;
+	private HostInfo hostInfo;
 
 	@Value("${consul.token:${CONSUL_TOKEN:${spring.cloud.consul.token:${SPRING_CLOUD_CONSUL_TOKEN:}}}}")
 	private String aclToken;
@@ -201,8 +194,331 @@ public class ConsulDiscoveryProperties {
 		this.hostInfo.override = true;
 	}
 
-	@Data
+	private HostInfo getHostInfo() {
+		return hostInfo;
+	}
+
+	private void setHostInfo(HostInfo hostInfo) {
+		this.hostInfo = hostInfo;
+	}
+
+	public String getAclToken() {
+		return aclToken;
+	}
+
+	public void setAclToken(String aclToken) {
+		this.aclToken = aclToken;
+	}
+
+	public List<String> getTags() {
+		return tags;
+	}
+
+	public void setTags(List<String> tags) {
+		this.tags = tags;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public List<String> getManagementTags() {
+		return managementTags;
+	}
+
+	public void setManagementTags(List<String> managementTags) {
+		this.managementTags = managementTags;
+	}
+
+	public String getHealthCheckPath() {
+		return healthCheckPath;
+	}
+
+	public void setHealthCheckPath(String healthCheckPath) {
+		this.healthCheckPath = healthCheckPath;
+	}
+
+	public String getHealthCheckUrl() {
+		return healthCheckUrl;
+	}
+
+	public void setHealthCheckUrl(String healthCheckUrl) {
+		this.healthCheckUrl = healthCheckUrl;
+	}
+
+	public String getHealthCheckInterval() {
+		return healthCheckInterval;
+	}
+
+	public void setHealthCheckInterval(String healthCheckInterval) {
+		this.healthCheckInterval = healthCheckInterval;
+	}
+
+	public String getHealthCheckTimeout() {
+		return healthCheckTimeout;
+	}
+
+	public void setHealthCheckTimeout(String healthCheckTimeout) {
+		this.healthCheckTimeout = healthCheckTimeout;
+	}
+
+	public String getHealthCheckCriticalTimeout() {
+		return healthCheckCriticalTimeout;
+	}
+
+	public void setHealthCheckCriticalTimeout(String healthCheckCriticalTimeout) {
+		this.healthCheckCriticalTimeout = healthCheckCriticalTimeout;
+	}
+
+	public String getIpAddress() {
+		return ipAddress;
+	}
+
+	public Integer getPort() {
+		return port;
+	}
+
+	public void setPort(Integer port) {
+		this.port = port;
+	}
+
+	public Integer getManagementPort() {
+		return managementPort;
+	}
+
+	public void setManagementPort(Integer managementPort) {
+		this.managementPort = managementPort;
+	}
+
+	public Lifecycle getLifecycle() {
+		return lifecycle;
+	}
+
+	public void setLifecycle(Lifecycle lifecycle) {
+		this.lifecycle = lifecycle;
+	}
+
+	public boolean isPreferIpAddress() {
+		return preferIpAddress;
+	}
+
+	public void setPreferIpAddress(boolean preferIpAddress) {
+		this.preferIpAddress = preferIpAddress;
+	}
+
+	public boolean isPreferAgentAddress() {
+		return preferAgentAddress;
+	}
+
+	public void setPreferAgentAddress(boolean preferAgentAddress) {
+		this.preferAgentAddress = preferAgentAddress;
+	}
+
+	public int getCatalogServicesWatchDelay() {
+		return catalogServicesWatchDelay;
+	}
+
+	public void setCatalogServicesWatchDelay(int catalogServicesWatchDelay) {
+		this.catalogServicesWatchDelay = catalogServicesWatchDelay;
+	}
+
+	public int getCatalogServicesWatchTimeout() {
+		return catalogServicesWatchTimeout;
+	}
+
+	public void setCatalogServicesWatchTimeout(int catalogServicesWatchTimeout) {
+		this.catalogServicesWatchTimeout = catalogServicesWatchTimeout;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
+	public String getInstanceId() {
+		return instanceId;
+	}
+
+	public void setInstanceId(String instanceId) {
+		this.instanceId = instanceId;
+	}
+
+	public String getInstanceZone() {
+		return instanceZone;
+	}
+
+	public void setInstanceZone(String instanceZone) {
+		this.instanceZone = instanceZone;
+	}
+
+	public String getInstanceGroup() {
+		return instanceGroup;
+	}
+
+	public void setInstanceGroup(String instanceGroup) {
+		this.instanceGroup = instanceGroup;
+	}
+
+	public String getDefaultZoneMetadataName() {
+		return defaultZoneMetadataName;
+	}
+
+	public void setDefaultZoneMetadataName(String defaultZoneMetadataName) {
+		this.defaultZoneMetadataName = defaultZoneMetadataName;
+	}
+
+	public String getScheme() {
+		return scheme;
+	}
+
+	public void setScheme(String scheme) {
+		this.scheme = scheme;
+	}
+
+	public String getManagementSuffix() {
+		return managementSuffix;
+	}
+
+	public void setManagementSuffix(String managementSuffix) {
+		this.managementSuffix = managementSuffix;
+	}
+
+	public Map<String, String> getServerListQueryTags() {
+		return serverListQueryTags;
+	}
+
+	public void setServerListQueryTags(Map<String, String> serverListQueryTags) {
+		this.serverListQueryTags = serverListQueryTags;
+	}
+
+	public Map<String, String> getDatacenters() {
+		return datacenters;
+	}
+
+	public void setDatacenters(Map<String, String> datacenters) {
+		this.datacenters = datacenters;
+	}
+
+	public String getDefaultQueryTag() {
+		return defaultQueryTag;
+	}
+
+	public void setDefaultQueryTag(String defaultQueryTag) {
+		this.defaultQueryTag = defaultQueryTag;
+	}
+
+	public boolean isQueryPassing() {
+		return queryPassing;
+	}
+
+	public void setQueryPassing(boolean queryPassing) {
+		this.queryPassing = queryPassing;
+	}
+
+	public boolean isRegister() {
+		return register;
+	}
+
+	public void setRegister(boolean register) {
+		this.register = register;
+	}
+
+	public boolean isDeregister() {
+		return deregister;
+	}
+
+	public void setDeregister(boolean deregister) {
+		this.deregister = deregister;
+	}
+
+	public boolean isRegisterHealthCheck() {
+		return registerHealthCheck;
+	}
+
+	public void setRegisterHealthCheck(boolean registerHealthCheck) {
+		this.registerHealthCheck = registerHealthCheck;
+	}
+
+	public boolean isFailFast() {
+		return failFast;
+	}
+
+	public void setFailFast(boolean failFast) {
+		this.failFast = failFast;
+	}
+
+	public Boolean getHealthCheckTlsSkipVerify() {
+		return healthCheckTlsSkipVerify;
+	}
+
+	public void setHealthCheckTlsSkipVerify(Boolean healthCheckTlsSkipVerify) {
+		this.healthCheckTlsSkipVerify = healthCheckTlsSkipVerify;
+	}
+
+	@Override
+	public String toString() {
+		return "ConsulDiscoveryProperties{" +
+				"hostInfo=" + hostInfo +
+				", aclToken='" + aclToken + '\'' +
+				", tags=" + tags +
+				", enabled=" + enabled +
+				", managementTags=" + managementTags +
+				", healthCheckPath='" + healthCheckPath + '\'' +
+				", healthCheckUrl='" + healthCheckUrl + '\'' +
+				", healthCheckInterval='" + healthCheckInterval + '\'' +
+				", healthCheckTimeout='" + healthCheckTimeout + '\'' +
+				", healthCheckCriticalTimeout='" + healthCheckCriticalTimeout + '\'' +
+				", ipAddress='" + ipAddress + '\'' +
+				", hostname='" + hostname + '\'' +
+				", port=" + port +
+				", managementPort=" + managementPort +
+				", lifecycle=" + lifecycle +
+				", preferIpAddress=" + preferIpAddress +
+				", preferAgentAddress=" + preferAgentAddress +
+				", catalogServicesWatchDelay=" + catalogServicesWatchDelay +
+				", catalogServicesWatchTimeout=" + catalogServicesWatchTimeout +
+				", serviceName='" + serviceName + '\'' +
+				", instanceId='" + instanceId + '\'' +
+				", instanceZone='" + instanceZone + '\'' +
+				", instanceGroup='" + instanceGroup + '\'' +
+				", defaultZoneMetadataName='" + defaultZoneMetadataName + '\'' +
+				", scheme='" + scheme + '\'' +
+				", managementSuffix='" + managementSuffix + '\'' +
+				", serverListQueryTags=" + serverListQueryTags +
+				", datacenters=" + datacenters +
+				", defaultQueryTag='" + defaultQueryTag + '\'' +
+				", queryPassing=" + queryPassing +
+				", register=" + register +
+				", deregister=" + deregister +
+				", registerHealthCheck=" + registerHealthCheck +
+				", failFast=" + failFast +
+				", healthCheckTlsSkipVerify=" + healthCheckTlsSkipVerify +
+				'}';
+	}
+
 	public static class Lifecycle {
 		private boolean enabled = true;
+
+		public boolean isEnabled() {
+			return enabled;
+		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+		}
+
+		@Override
+		public String toString() {
+			return "Lifecycle{" +
+					"enabled=" + enabled +
+					'}';
+		}
 	}
 }
