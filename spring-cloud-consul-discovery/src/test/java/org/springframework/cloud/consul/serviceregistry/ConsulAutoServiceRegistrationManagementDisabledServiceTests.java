@@ -49,7 +49,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(classes = ConsulAutoServiceRegistrationManagementDisabledServiceTests.TestConfig.class,
         properties = {"spring.application.name=myTestService-NM",
                 "spring.cloud.consul.discovery.instanceId=myTestService1-NM",
-                "spring.cloud.consul.discovery.registerManagement=false",
+                "spring.cloud.service-registry.auto-registration.register-management=false",
                 "spring.cloud.consul.discovery.managementPort=4453",
                 "management.port=0" },
         webEnvironment = RANDOM_PORT)
@@ -61,10 +61,6 @@ public class ConsulAutoServiceRegistrationManagementDisabledServiceTests {
     @Autowired
     private ConsulDiscoveryProperties discoveryProperties;
 
-    @Ignore("Can be enabled after " +
-            "org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistration.shouldRegisterManagement() " +
-            "will start taking autoServiceRegistrationProperties.isRegisterManagement() into account. " +
-            "See https://github.com/spring-cloud/spring-cloud-commons/pull/221")
     @Test
     public void contextLoads() {
         Response<Map<String, Service>> response = consul.getAgentServices();

@@ -39,7 +39,6 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	public static final char SEPARATOR = '-';
 
 	private final AutoServiceRegistrationProperties autoServiceRegistrationProperties;
-	private final ConsulDiscoveryProperties properties;
 	private final ApplicationContext context;
 	private final HeartbeatProperties heartbeatProperties;
 
