@@ -44,6 +44,9 @@ public class TestConsulLifecycleConfiguration {
 	@Autowired(required = false)
 	AutoServiceRegistrationProperties autoServiceRegistrationProperties;
 
+	@Autowired(required = false)
+	AutoServiceRegistrationProperties autoServiceRegistrationProperties;
+
 	@Bean
 	public ConsulLifecycle consulLifecycle(ConsulClient consulClient,
 			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
