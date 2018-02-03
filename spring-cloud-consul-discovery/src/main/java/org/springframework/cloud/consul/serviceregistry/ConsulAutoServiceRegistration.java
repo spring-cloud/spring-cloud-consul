@@ -32,15 +32,13 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 
 	private static Log log = LogFactory.getLog(ConsulAutoServiceRegistration.class);
 
-	private AutoServiceRegistrationProperties autoServiceRegistrationProperties;
 	private ConsulDiscoveryProperties properties;
 	private ConsulAutoRegistration registration;
 
 	public ConsulAutoServiceRegistration(ConsulServiceRegistry serviceRegistry,
 			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
 			ConsulDiscoveryProperties properties, ConsulAutoRegistration registration) {
-		super(serviceRegistry);
-		this.autoServiceRegistrationProperties = autoServiceRegistrationProperties;
+		super(serviceRegistry, autoServiceRegistrationProperties);
 		this.properties = properties;
 		this.registration = registration;
 	}
@@ -84,12 +82,6 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 		}
 
 		super.register();
-	}
-
-	@Override
-	protected boolean shouldRegisterManagement() {
-		return ConsulAutoRegistration.shouldRegisterManagement(
-				autoServiceRegistrationProperties, properties, getContext());
 	}
 
 	@Override
