@@ -6,11 +6,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -61,9 +61,10 @@ public class TtlSchedulerTest {
 	}
 
 	@Configuration
-	@EnableDiscoveryClient(autoRegister = false) //FIXME:
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+	@Import({ AutoServiceRegistrationConfiguration.class,
+			TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class,
+			ConsulDiscoveryClientConfiguration.class })
 	public static class TtlSchedulerTestConfig { }
 }
 
