@@ -43,9 +43,9 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	private final HeartbeatProperties heartbeatProperties;
 
 	public ConsulAutoRegistration(NewService service, AutoServiceRegistrationProperties autoServiceRegistrationProperties,
-        ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
+		ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
 		super(service, properties);
-        this.autoServiceRegistrationProperties = autoServiceRegistrationProperties;
+		this.autoServiceRegistrationProperties = autoServiceRegistrationProperties;
 		this.context = context;
 		this.heartbeatProperties = heartbeatProperties;
 	}
@@ -59,16 +59,16 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		// can create a check
 
 		setCheck(getService(), this.autoServiceRegistrationProperties, getProperties(),
-            this.context, this.heartbeatProperties);
+			this.context, this.heartbeatProperties);
 	}
 
 	public ConsulAutoRegistration managementRegistration() {
 		return managementRegistration(this.autoServiceRegistrationProperties, getProperties(),
-            this.context, this.heartbeatProperties);
+			this.context, this.heartbeatProperties);
 	}
 
 	public static ConsulAutoRegistration registration(AutoServiceRegistrationProperties autoServiceRegistrationProperties,
-            ConsulDiscoveryProperties properties, ApplicationContext context,
+			ConsulDiscoveryProperties properties, ApplicationContext context,
 			List<ConsulRegistrationCustomizer> registrationCustomizers,
 			HeartbeatProperties heartbeatProperties) {
 		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(context.getEnvironment());
@@ -89,7 +89,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		}
 
 		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, autoServiceRegistrationProperties,
-            properties, context, heartbeatProperties);
+			properties, context, heartbeatProperties);
 		customize(registrationCustomizers, registration);
 		return registration;
 	}
@@ -104,7 +104,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 	@Deprecated //TODO: do I need this here, or should I just copy what I need back into lifecycle?
 	public static ConsulAutoRegistration lifecycleRegistration(Integer port, String instanceId, AutoServiceRegistrationProperties autoServiceRegistrationProperties,
-            ConsulDiscoveryProperties properties, ApplicationContext context,
+			ConsulDiscoveryProperties properties, ApplicationContext context,
 			List<ConsulRegistrationCustomizer> registrationCustomizers,
 			HeartbeatProperties heartbeatProperties) {
 		RelaxedPropertyResolver propertyResolver = new RelaxedPropertyResolver(context.getEnvironment());
@@ -130,7 +130,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		setCheck(service, autoServiceRegistrationProperties, properties, context, heartbeatProperties);
 
 		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, autoServiceRegistrationProperties,
-            properties, context, heartbeatProperties);
+			properties, context, heartbeatProperties);
 		customize(registrationCustomizers, registration);
 		return registration;
 	}

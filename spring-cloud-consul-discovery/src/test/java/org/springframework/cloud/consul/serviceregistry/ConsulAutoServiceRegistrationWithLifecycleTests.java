@@ -55,9 +55,6 @@ public class ConsulAutoServiceRegistrationWithLifecycleTests {
 	@Autowired(required = false)
 	private ConsulServiceRegistry consulServiceRegistry;
 
-	@Autowired(required = false)
-	private AutoServiceRegistrationProperties autoServiceRegistrationProperties;
-
 	@Test
 	public void contextLoads() {
 		assertNull("consulRegistration was created by mistake", consulRegistration);

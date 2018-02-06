@@ -16,10 +16,10 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import javax.servlet.ServletContext;
-
 import java.util.Collections;
 import java.util.List;
+
+import javax.servlet.ServletContext;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
@@ -121,10 +121,11 @@ public class ConsulLifecycle extends AbstractDiscoveryLifecycle {
 		}
 		Assert.notNull(service.getPort(), "service.port has not been set");
 		List<ConsulRegistrationCustomizer> registrationCustomizers = Collections
-				.<ConsulRegistrationCustomizer>singletonList(new ConsulServletRegistrationCustomizer(servletContext));
-        ConsulAutoRegistration registration = ConsulAutoRegistration.lifecycleRegistration(service.getPort(),
-                getServiceId(), this.autoServiceRegistrationProperties, this.properties,
-                getContext(), registrationCustomizers, this.ttlConfig);
+				.<ConsulRegistrationCustomizer> singletonList(new ConsulServletRegistrationCustomizer(servletContext));
+		ConsulAutoRegistration registration = ConsulAutoRegistration
+				.lifecycleRegistration(service.getPort(), getServiceId(),
+						this.autoServiceRegistrationProperties, this.properties,
+						getContext(), registrationCustomizers, this.ttlConfig);
 		if (registration.getService().getPort() == null) { // not set by properties
 			registration.initializePort(service.getPort());
 		}

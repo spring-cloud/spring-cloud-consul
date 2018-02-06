@@ -27,7 +27,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationAutoConfiguration;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
@@ -65,10 +64,10 @@ public class ConsulAutoServiceRegistrationAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulAutoRegistration consulRegistration(AutoServiceRegistrationProperties autoServiceRegistrationProperties,
-            ConsulDiscoveryProperties properties, ApplicationContext applicationContext,
+			ConsulDiscoveryProperties properties, ApplicationContext applicationContext,
 			ObjectProvider<List<ConsulRegistrationCustomizer>> registrationCustomizers, HeartbeatProperties heartbeatProperties) {
 		return ConsulAutoRegistration.registration(autoServiceRegistrationProperties, properties,
-            applicationContext, registrationCustomizers.getIfAvailable(), heartbeatProperties);
+			applicationContext, registrationCustomizers.getIfAvailable(), heartbeatProperties);
 	}
 
 	@Configuration

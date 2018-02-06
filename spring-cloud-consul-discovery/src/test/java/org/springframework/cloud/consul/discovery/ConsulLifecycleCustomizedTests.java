@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,8 +53,6 @@ public class ConsulLifecycleCustomizedTests {
 	private ConsulLifecycle lifecycle1;
 	@Autowired
 	private CustomConsulLifecycle lifecycle2;
-	@Autowired
-	AutoServiceRegistrationProperties autoServiceRegistrationProperties;
 	@Autowired
 	private ConsulDiscoveryProperties properties;
 

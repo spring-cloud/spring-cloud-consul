@@ -18,6 +18,7 @@ import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.health.model.Check;
 
+import static com.ecwid.consul.v1.health.model.Check.CheckStatus.CRITICAL;
 import static com.ecwid.consul.v1.health.model.Check.CheckStatus.PASSING;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -27,28 +28,33 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Stéphane Leroy
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TtlSchedulerTest.TtlSchedulerTestConfig.class,
-	properties = { "spring.application.name=ttlScheduler",
-		"spring.cloud.consul.discovery.instanceId=ttlScheduler-id",
+@SpringBootTest(classes = TtlSchedulerRemoveTests.TtlSchedulerRemoveTestConfig.class,
+	properties = { "spring.application.name=ttlSchedulerRemove",
+		"spring.cloud.consul.discovery.instanceId=ttlSchedulerRemove-id",
 		"spring.cloud.consul.discovery.heartbeat.enabled=true",
-		"spring.cloud.consul.discovery.heartbeat.ttlValue=2", "management.port=0" },
+		"spring.cloud.consul.discovery.heartbeat.ttlValue=2" },
 		webEnvironment = RANDOM_PORT)
-public class TtlSchedulerTest {
+public class TtlSchedulerRemoveTests {
 
 	@Autowired
 	private ConsulClient consul;
 
-	@Test
-	public void should_send_a_check_before_ttl_for_all_services()
-			throws InterruptedException {
-		Thread.sleep(2100); // Wait for TTL to expired (TTL is set to 2 seconds)
+	@Autowired
+	private TtlScheduler ttlScheduler;
 
-		Check serviceCheck = getCheckForService("ttlScheduler");
+	@Test
+	public void should_not_send_check_if_service_removed() throws InterruptedException {
+		Thread.sleep(1000); // wait for Ttlscheduler to send a check to consul.
+		Check serviceCheck = getCheckForService("ttlSchedulerRemove");
 		assertThat("Service check is in wrong state", serviceCheck.getStatus(),
 				equalTo(PASSING));
-		Check serviceManagementCheck = getCheckForService("ttlScheduler-management");
-		assertThat("Service management heck in wrong state",
-				serviceManagementCheck.getStatus(), equalTo(PASSING));
+
+		// Remove service from TtlScheduler and wait for TTL to expired.
+		ttlScheduler.remove("ttlSchedulerRemove-id");
+		Thread.sleep(2100);
+		serviceCheck = getCheckForService("ttlSchedulerRemove");
+		assertThat("Service check is in wrong state", serviceCheck.getStatus(),
+				equalTo(CRITICAL));
 	}
 
 	private Check getCheckForService(String serviceId) {
@@ -65,7 +71,6 @@ public class TtlSchedulerTest {
 	@Import({ AutoServiceRegistrationConfiguration.class,
 			TestConsulLifecycleConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulDiscoveryClientConfiguration.class })
-	public static class TtlSchedulerTestConfig { }
+	public static class TtlSchedulerRemoveTestConfig { }
 }
-
 
