@@ -7,8 +7,10 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
+import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -24,13 +26,13 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Stéphane Leroy
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TtlSchedulerTest.TtlSchedulerTestConfig.class,
+@SpringBootTest(classes = TtlSchedulerTests.TtlSchedulerTestConfig.class,
 	properties = { "spring.application.name=ttlScheduler",
 		"spring.cloud.consul.discovery.instance-id=ttlScheduler-id",
 		"spring.cloud.consul.discovery.heartbeat.enabled=true",
 		"spring.cloud.consul.discovery.heartbeat.ttlValue=2", "management.server.port=0" },
 		webEnvironment = RANDOM_PORT)
-public class TtlSchedulerTest {
+public class TtlSchedulerTests {
 
 	@Autowired
 	private ConsulClient consul;
@@ -60,8 +62,10 @@ public class TtlSchedulerTest {
 	}
 
 	@Configuration
-	@EnableDiscoveryClient
 	@EnableAutoConfiguration
+	@Import({ AutoServiceRegistrationConfiguration.class,
+			ConsulAutoConfiguration.class,
+			ConsulDiscoveryClientConfiguration.class })
 	public static class TtlSchedulerTestConfig { }
 }
 

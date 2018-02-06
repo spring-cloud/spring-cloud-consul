@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.cloud.client.discovery.ManagementServerPortUtils;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
 import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
@@ -38,11 +39,14 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 	public static final char SEPARATOR = '-';
 
+	private final AutoServiceRegistrationProperties autoServiceRegistrationProperties;
 	private final ApplicationContext context;
 	private final HeartbeatProperties heartbeatProperties;
 
-	public ConsulAutoRegistration(NewService service, ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
+	public ConsulAutoRegistration(NewService service, AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+		ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
 		super(service, properties);
+		this.autoServiceRegistrationProperties = autoServiceRegistrationProperties;
 		this.context = context;
 		this.heartbeatProperties = heartbeatProperties;
 	}
@@ -55,14 +59,17 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		// we might not have a port until now, so this is the earliest we
 		// can create a check
 
-		setCheck(getService(), getProperties(), this.context, this.heartbeatProperties);
+		setCheck(getService(), this.autoServiceRegistrationProperties, getProperties(),
+			this.context, this.heartbeatProperties);
 	}
 
 	public ConsulAutoRegistration managementRegistration() {
-		return managementRegistration(getProperties(), this.context, this.heartbeatProperties);
+		return managementRegistration(this.autoServiceRegistrationProperties, getProperties(),
+			this.context, this.heartbeatProperties);
 	}
 
-	public static ConsulAutoRegistration registration(ConsulDiscoveryProperties properties, ApplicationContext context,
+	public static ConsulAutoRegistration registration(AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+			ConsulDiscoveryProperties properties, ApplicationContext context,
 			List<ConsulRegistrationCustomizer> registrationCustomizers,
 			HeartbeatProperties heartbeatProperties) {
 
@@ -78,10 +85,11 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		if (properties.getPort() != null) {
 			service.setPort(properties.getPort());
 			// we know the port and can set the check
-			setCheck(service, properties, context, heartbeatProperties);
+			setCheck(service, autoServiceRegistrationProperties, properties, context, heartbeatProperties);
 		}
 
-		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, properties, context, heartbeatProperties);
+		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, autoServiceRegistrationProperties,
+			properties, context, heartbeatProperties);
 		customize(registrationCustomizers, registration);
 		return registration;
 	}
@@ -95,7 +103,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	}
 
 	@Deprecated //TODO: do I need this here, or should I just copy what I need back into lifecycle?
-	public static ConsulAutoRegistration lifecycleRegistration(Integer port, String instanceId, ConsulDiscoveryProperties properties, ApplicationContext context,
+	public static ConsulAutoRegistration lifecycleRegistration(Integer port, String instanceId, AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+			ConsulDiscoveryProperties properties, ApplicationContext context,
 			List<ConsulRegistrationCustomizer> registrationCustomizers,
 			HeartbeatProperties heartbeatProperties) {
 		NewService service = new NewService();
@@ -116,17 +125,21 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 		Assert.notNull(service.getPort(), "service.port may not be null");
 
-		setCheck(service, properties, context, heartbeatProperties);
+		setCheck(service, autoServiceRegistrationProperties, properties, context, heartbeatProperties);
 
-		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, properties, context, heartbeatProperties);
+		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, autoServiceRegistrationProperties,
+			properties, context, heartbeatProperties);
 		customize(registrationCustomizers, registration);
 		return registration;
 	}
 
-	public static void setCheck(NewService service, ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
+	public static void setCheck(NewService service,
+			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+			ConsulDiscoveryProperties properties, ApplicationContext context,
+			HeartbeatProperties heartbeatProperties) {
 		if (properties.isRegisterHealthCheck() && service.getCheck() == null) {
 			Integer checkPort;
-			if (shouldRegisterManagement(properties, context)) {
+			if (shouldRegisterManagement(autoServiceRegistrationProperties, properties, context)) {
 				checkPort = getManagementPort(properties, context);
 			} else {
 				checkPort = service.getPort();
@@ -136,8 +149,10 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		}
 	}
 
-	public static ConsulAutoRegistration managementRegistration(ConsulDiscoveryProperties properties, ApplicationContext context,
-																HeartbeatProperties heartbeatProperties) {
+	public static ConsulAutoRegistration managementRegistration(
+			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+			ConsulDiscoveryProperties properties, ApplicationContext context,
+			HeartbeatProperties heartbeatProperties) {
 		NewService management = new NewService();
 		management.setId(getManagementServiceId(properties, context));
 		management.setAddress(properties.getHostname());
@@ -147,7 +162,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		if (properties.isRegisterHealthCheck()) {
 			management.setCheck(createCheck(getManagementPort(properties, context), heartbeatProperties, properties));
 		}
-		return new ConsulAutoRegistration(management, properties, context, heartbeatProperties);
+		return new ConsulAutoRegistration(management, autoServiceRegistrationProperties, properties, context, heartbeatProperties);
 	}
 
 	public static String getInstanceId(ConsulDiscoveryProperties properties, ApplicationContext context) {
@@ -236,8 +251,10 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	/**
 	 * @return if the management service should be registered with the {@link ServiceRegistry}
 	 */
-	public static boolean shouldRegisterManagement(ConsulDiscoveryProperties properties, ApplicationContext context) {
-		return getManagementPort(properties, context) != null && ManagementServerPortUtils.isDifferent(context);
+	public static boolean shouldRegisterManagement(AutoServiceRegistrationProperties autoServiceRegistrationProperties, ConsulDiscoveryProperties properties, ApplicationContext context) {
+		return autoServiceRegistrationProperties.isRegisterManagement()
+				&& getManagementPort(properties, context) != null
+				&& ManagementServerPortUtils.isDifferent(context);
 	}
 
 	/**

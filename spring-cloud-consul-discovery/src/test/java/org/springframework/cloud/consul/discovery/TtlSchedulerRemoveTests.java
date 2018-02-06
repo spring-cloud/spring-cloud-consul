@@ -6,11 +6,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -28,13 +28,13 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Stéphane Leroy
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TtlSchedulerRemoveTest.TtlSchedulerRemoveTestConfig.class,
+@SpringBootTest(classes = TtlSchedulerRemoveTests.TtlSchedulerRemoveTestConfig.class,
 	properties = { "spring.application.name=ttlSchedulerRemove",
 		"spring.cloud.consul.discovery.instance-id=ttlSchedulerRemove-id",
 		"spring.cloud.consul.discovery.heartbeat.enabled=true",
 		"spring.cloud.consul.discovery.heartbeat.ttlValue=2" },
 		webEnvironment = RANDOM_PORT)
-public class TtlSchedulerRemoveTest {
+public class TtlSchedulerRemoveTests {
 
 	@Autowired
 	private ConsulClient consul;
@@ -67,9 +67,10 @@ public class TtlSchedulerRemoveTest {
 	}
 
 	@Configuration
-	@EnableDiscoveryClient
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class })
+	@Import({ AutoServiceRegistrationConfiguration.class,
+			ConsulAutoConfiguration.class,
+			ConsulDiscoveryClientConfiguration.class })
 	public static class TtlSchedulerRemoveTestConfig { }
 }
 
