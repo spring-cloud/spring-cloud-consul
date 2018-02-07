@@ -35,7 +35,6 @@ import lombok.Data;
 public class ConsulConfigProperties {
 	private boolean enabled = true;
 
-	@NotEmpty
 	private String prefix = "config";
 
 	@NotEmpty
