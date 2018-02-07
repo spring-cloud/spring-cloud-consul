@@ -96,7 +96,14 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 				suffixes.add(".properties");
 			}
 
-			String defaultContext = prefix + "/" + this.properties.getDefaultContext();
+			String defaultContext;
+			if (prefix == null || prefix.isEmpty()) {
+				defaultContext = this.properties.getDefaultContext();
+			}
+			else {
+				defaultContext = prefix + "/" + this.properties.getDefaultContext();
+			}
+
 			for (String suffix : suffixes) {
 				this.contexts.add(defaultContext + suffix);
 			}
@@ -104,7 +111,14 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 				addProfiles(this.contexts, defaultContext, profiles, suffix);
 			}
 
-			String baseContext = prefix + "/" + appName;
+			String baseContext;
+			if (prefix == null || prefix.isEmpty()) {
+				baseContext = appName;
+			}
+			else {
+				baseContext = prefix + "/" + appName;
+			}
+
 			for (String suffix : suffixes) {
 				this.contexts.add(baseContext + suffix);
 			}
