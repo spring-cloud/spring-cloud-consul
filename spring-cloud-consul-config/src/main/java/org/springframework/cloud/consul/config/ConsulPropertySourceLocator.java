@@ -32,6 +32,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
@@ -96,7 +97,8 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 				suffixes.add(".properties");
 			}
 
-			String defaultContext = prefix + "/" + this.properties.getDefaultContext();
+			String defaultContext = getContext(prefix, this.properties.getDefaultContext());
+
 			for (String suffix : suffixes) {
 				this.contexts.add(defaultContext + suffix);
 			}
@@ -104,7 +106,8 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 				addProfiles(this.contexts, defaultContext, profiles, suffix);
 			}
 
-			String baseContext = prefix + "/" + appName;
+			String baseContext = getContext(prefix, appName);
+
 			for (String suffix : suffixes) {
 				this.contexts.add(baseContext + suffix);
 			}
@@ -146,6 +149,14 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 			return composite;
 		}
 		return null;
+	}
+
+	private String getContext(String prefix, String context) {
+		if (StringUtils.isEmpty(prefix)) {
+			return context;
+		} else {
+			return prefix + "/" + context;
+		}
 	}
 
 	private void addIndex(String propertySourceContext, Long consulIndex) {
