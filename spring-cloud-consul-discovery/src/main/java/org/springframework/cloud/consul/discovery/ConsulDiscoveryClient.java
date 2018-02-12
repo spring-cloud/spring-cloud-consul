@@ -54,12 +54,14 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	private final ConsulClient client;
 	private final ConsulDiscoveryProperties properties;
 	private final LocalResolver localResolver;
+	private final ConsulDiscoveryFilter consulDiscoveryFilter;
 
 	private ServerProperties serverProperties;
 
 	@Deprecated
 	public ConsulDiscoveryClient(ConsulClient client, final ConsulLifecycle lifecycle,
-								 ConsulDiscoveryProperties properties) {
+								 ConsulDiscoveryProperties properties,
+								 ConsulDiscoveryFilter consulDiscoveryFilter) {
 		this(client, properties, new LocalResolver() {
 			@Override
 			public String getInstanceId() {
@@ -70,14 +72,15 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 			public Integer getPort() {
 				return lifecycle.getConfiguredPort();
 			}
-		});
+		}, consulDiscoveryFilter);
 	}
 
 	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties,
-				LocalResolver localResolver) {
+				LocalResolver localResolver, ConsulDiscoveryFilter consulDiscoveryFilter) {
 		this.client = client;
 		this.properties = properties;
 		this.localResolver = localResolver;
+		this.consulDiscoveryFilter = consulDiscoveryFilter;
 	}
 
 	public void setServerProperties(ServerProperties serverProperties) {
@@ -186,11 +189,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	public List<ServiceInstance> getAllInstances() {
-		List<ServiceInstance> instances = new ArrayList<>();
-
-		Response<Map<String, List<String>>> services = client
-				.getCatalogServices(QueryParams.DEFAULT);
-		for (String serviceId : services.getValue().keySet()) {
+		for (String serviceId : getServices()) {
 			addInstancesToList(instances, serviceId, QueryParams.DEFAULT);
 		}
 		return instances;
@@ -199,13 +198,15 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	@Override
 	public List<String> getServices() {
 		String aclToken = properties.getAclToken();
-
+		Map<String, List<String>> services;
 		if (StringUtils.hasText(aclToken)) {
-			return new ArrayList<>(client.getCatalogServices(QueryParams.DEFAULT, aclToken).getValue()
-					.keySet());
+			services = client.getCatalogServices(QueryParams.DEFAULT, aclToken).getValue();
 		} else {
-			return new ArrayList<>(client.getCatalogServices(QueryParams.DEFAULT).getValue()
-					.keySet());
+			services = client.getCatalogServices(QueryParams.DEFAULT).getValue();
 		}
+		if (consulDiscoveryFilter != null) {
+			services = consulDiscoveryFilter.filter(services);
+		}
+		return new ArrayList<>(services.keySet());
 	}
 }

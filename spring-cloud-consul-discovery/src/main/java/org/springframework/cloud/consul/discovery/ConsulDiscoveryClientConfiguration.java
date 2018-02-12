@@ -51,6 +51,9 @@ public class ConsulDiscoveryClientConfiguration {
 	@Autowired(required = false)
 	private ServerProperties serverProperties;
 
+	@Autowired(required = false)
+	private ConsulDiscoveryFilter consulDiscoveryFilter;
+
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
@@ -75,7 +78,7 @@ public class ConsulDiscoveryClientConfiguration {
 	@ConditionalOnMissingBean
 	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties discoveryProperties, final ApplicationContext context) {
 		ConsulDiscoveryClient discoveryClient = new ConsulDiscoveryClient(consulClient,
-				discoveryProperties, new LifecycleRegistrationResolver(context));
+				discoveryProperties, new LifecycleRegistrationResolver(context), consulDiscoveryFilter);
 		discoveryClient.setServerProperties(serverProperties); //null ok
 		return discoveryClient;
 	}
