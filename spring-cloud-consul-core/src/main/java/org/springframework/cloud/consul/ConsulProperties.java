@@ -18,6 +18,7 @@ package org.springframework.cloud.consul;
 
 import javax.validation.constraints.NotNull;
 
+import com.ecwid.consul.transport.TLSConfig.KeyStoreInstanceType;
 import lombok.Data;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -40,4 +41,25 @@ public class ConsulProperties {
 
 	/** Is spring cloud consul enabled */
 	private boolean enabled = true;
+
+	/** configuration for TLS */
+	private TLSConfig tls;
+
+	@Data
+	public static class TLSConfig {
+		/** Type of key framework to use. */
+		private KeyStoreInstanceType keyStoreInstanceType;
+
+		/** Path to an external keystore */
+		private String keyStorePath;
+
+		/** Password to an external keystore */
+		private String keyStorePassword;
+
+		/**File path to the certificate. */
+		private String certificatePath;
+
+		/** Password to open the certificate. */
+		private String certificatePassword;
+	}
 }
