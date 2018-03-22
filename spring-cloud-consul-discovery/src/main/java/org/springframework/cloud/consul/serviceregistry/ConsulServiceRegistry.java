@@ -83,7 +83,7 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 		if (log.isInfoEnabled()) {
 			log.info("Deregistering service with consul: " + reg.getInstanceId());
 		}
-		client.agentServiceDeregister(reg.getInstanceId());
+		client.agentServiceDeregister(reg.getInstanceId(), properties.getAclToken());
 	}
 
 	@Override
