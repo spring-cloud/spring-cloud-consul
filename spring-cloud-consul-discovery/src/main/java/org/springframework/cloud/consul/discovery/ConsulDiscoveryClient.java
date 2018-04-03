@@ -98,8 +98,14 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		}
 		for (HealthService service : services.getValue()) {
 			String host = findHost(service);
+			
+			Map<String,String> metadata = getMetadata(service);
+			boolean secure = false;
+			if(metadata.containsKey("secure")) {
+			    secure = Boolean.parseBoolean(metadata.get("secure"));
+			}
 			instances.add(new DefaultServiceInstance(serviceId, host, service
-					.getService().getPort(), false, getMetadata(service)));
+					.getService().getPort(), secure, metadata));
 		}
 	}
 

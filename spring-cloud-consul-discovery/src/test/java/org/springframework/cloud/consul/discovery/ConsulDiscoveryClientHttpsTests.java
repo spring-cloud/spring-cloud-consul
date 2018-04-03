@@ -33,54 +33,28 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-
 /**
- * @author Spencer Gibb
- * @author Joe Athman
+ * @author Glen Lockhart
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = { "spring.application.name=testConsulDiscovery",
-		"spring.cloud.consul.discovery.prefer-ip-address=true"},
-		classes = ConsulDiscoveryClientTests.MyTestConfig.class,
+@SpringBootTest(properties = { "spring.application.name=testConsulDiscoveryHttps",
+        "spring.cloud.consul.discovery.prefer-ip-address=true",
+		"spring.cloud.consul.discovery.scheme=https"},
+		classes = ConsulDiscoveryClientHttpsTests.MyTestConfig.class,
 		webEnvironment = RANDOM_PORT)
-public class ConsulDiscoveryClientTests {
+public class ConsulDiscoveryClientHttpsTests {
 
 	@Autowired
 	private ConsulDiscoveryClient discoveryClient;
-	@Autowired
-	private ConsulClient consulClient;
 
 	@Test
 	public void getInstancesForServiceWorks() {
-		List<ServiceInstance> instances = discoveryClient.getInstances("testConsulDiscovery");
+		List<ServiceInstance> instances = discoveryClient.getInstances("testConsulDiscoveryHttps");
 		assertNotNull("instances was null", instances);
 		assertFalse("instances was empty", instances.isEmpty());
 
 		ServiceInstance instance = instances.get(0);
-		assertFalse("instance was secure (https)", instance.isSecure());
-		assertIpAddress(instance);
-	}
-
-	@Test
-	public void getInstancesForServiceRespectsQueryParams() {
-		Response<List<String>> catalogDatacenters = consulClient.getCatalogDatacenters();
-
-		List<String> dataCenterList = catalogDatacenters.getValue();
-		assertFalse("no data centers found", dataCenterList.isEmpty());
-		List<ServiceInstance> instances = discoveryClient.getInstances("testConsulDiscovery",
-				new QueryParams(dataCenterList.get(0)));
-		assertFalse("instances was empty", instances.isEmpty());
-
-		ServiceInstance instance = instances.get(0);
-		assertIpAddress(instance);
-	}
-
-	private void assertIpAddress(ServiceInstance instance) {
-		assertTrue("host isn't an ip address",
-				Character.isDigit(instance.getHost().charAt(0)));
+		assertTrue("instance was not secure (https)", instance.isSecure());
 	}
 
 	@Configuration
