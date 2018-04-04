@@ -33,6 +33,7 @@ import org.springframework.retry.interceptor.RetryInterceptorBuilder;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 
 import com.ecwid.consul.v1.ConsulClient;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Spencer Gibb
@@ -51,7 +52,12 @@ public class ConsulAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulClient consulClient(ConsulProperties consulProperties) {
-		return new ConsulClient(consulProperties.getHost(), consulProperties.getPort());
+		final int agentPort = consulProperties.getPort();
+		final String agentHost = !StringUtils.isEmpty(consulProperties.getScheme())
+				? consulProperties.getScheme() + "://" + consulProperties.getHost()
+				: consulProperties.getHost();
+
+		return new ConsulClient(agentHost, agentPort);
 	}
 
 	@Configuration
