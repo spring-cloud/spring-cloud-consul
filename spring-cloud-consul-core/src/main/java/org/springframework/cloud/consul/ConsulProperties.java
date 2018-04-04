@@ -31,6 +31,12 @@ public class ConsulProperties {
 	@NotNull
 	private String host = "localhost";
 
+	/**
+         * Consul agent scheme (HTTP/HTTPS).
+         * If there is no scheme in address - client will use HTTP.
+         */
+	private String scheme;
+
 	/** Consul agent port. Defaults to '8500'. */
 	@NotNull
 	private int port = 8500;
@@ -62,11 +68,20 @@ public class ConsulProperties {
 		this.enabled = enabled;
 	}
 
+        public String getScheme() {
+		return scheme;
+        }
+
+        public void setScheme(String scheme) {
+		this.scheme = scheme;
+        }
+
 	@Override
 	public String toString() {
 		return "ConsulProperties{" +
 				"host='" + host + '\'' +
 				", port=" + port +
+				", scheme=" + scheme +
 				", enabled=" + enabled +
 				'}';
 	}
