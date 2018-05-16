@@ -1,4 +1,5 @@
 #!/bin/bash
+ps -ef | grep consul
 killall consul
 BASEDIR=`dirname $0`/../../..
 ${BASEDIR}/consul agent -server -bootstrap-expect 1 -advertise 127.0.0.1 -data-dir /tmp/consul -ui-dir ${BASEDIR}/src/test/resources/consul_ui -config-dir ${BASEDIR}/src/test/resources/consul_config &
