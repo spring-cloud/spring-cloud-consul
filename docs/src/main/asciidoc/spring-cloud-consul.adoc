@@ -78,7 +78,7 @@ To disable the service registration you can set `spring.cloud.consul.discovery.r
 
 === HTTP Health Check
 
-The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. `server.servletPath=/foo`) or management endpoint path (e.g. `management.context-path=/admin`). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectively.  Example:
+The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. `server.servletPath=/foo`) or management endpoint path (e.g. `management.server.servlet.context-path=/admin`). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectively.  Example:
 
 .application.yml
 ----
@@ -86,7 +86,7 @@ spring:
   cloud:
     consul:
       discovery:
-        healthCheckPath: ${management.context-path}/health
+        healthCheckPath: ${management.server.servlet.context-path}/health
         healthCheckInterval: 15s
 ----
 
