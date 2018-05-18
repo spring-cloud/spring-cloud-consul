@@ -15,7 +15,7 @@ public class ConsulDiscoveryClientConfig {
 	private int order = Ordered.LOWEST_PRECEDENCE;
 
 	public int getOrder() {
-		return order;
+		return this.order;
 	}
 
 	public void setOrder(int order) {
