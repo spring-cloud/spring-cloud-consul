@@ -33,6 +33,7 @@ import com.ecwid.consul.v1.ConsulClient;
 
 /**
  * @author Spencer Gibb
+ * @author Olga Maciaszek-Sharma
  */
 @Configuration
 @ConditionalOnConsulEnabled
@@ -66,9 +67,15 @@ public class ConsulDiscoveryClientConfiguration {
 	}
 
 	@Bean
+	public ConsulDiscoveryClientConfig consulDiscoveryClientConfig(){
+		return new ConsulDiscoveryClientConfig();
+	}
+
+	@Bean
 	@ConditionalOnMissingBean
-	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties discoveryProperties) {
-		return new ConsulDiscoveryClient(consulClient, discoveryProperties);
+	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties discoveryProperties,
+	                                                   ConsulDiscoveryClientConfig consulDiscoveryClientConfig) {
+		return new ConsulDiscoveryClient(consulClient, discoveryProperties, consulDiscoveryClientConfig);
 	}
 
 	@Bean

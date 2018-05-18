@@ -50,16 +50,21 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	private final ConsulClient client;
 	private final ConsulDiscoveryProperties properties;
+	private final ConsulDiscoveryClientConfig discoveryClientConfig;
 
-	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties) {
+	public ConsulDiscoveryClient(ConsulClient client,
+			ConsulDiscoveryProperties properties,
+			ConsulDiscoveryClientConfig discoveryClientConfig) {
 		this.client = client;
 		this.properties = properties;
+		this.discoveryClientConfig = discoveryClientConfig;
 	}
 
 	@Deprecated
 	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties,
-				LocalResolver localResolver) {
-		this(client, properties);
+			LocalResolver localResolver,
+			ConsulDiscoveryClientConfig discoveryClientConfig) {
+		this(client, properties, discoveryClientConfig);
 	}
 
 	@Override
@@ -131,5 +136,10 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 			return new ArrayList<>(client.getCatalogServices(QueryParams.DEFAULT).getValue()
 					.keySet());
 		}
+	}
+
+	@Override
+	public int getOrder() {
+		return discoveryClientConfig.getOrder();
 	}
 }
