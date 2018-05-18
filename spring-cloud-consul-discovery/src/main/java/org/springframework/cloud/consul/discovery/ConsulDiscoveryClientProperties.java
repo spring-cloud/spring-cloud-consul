@@ -10,7 +10,7 @@ import org.springframework.core.Ordered;
  * @author Olga Maciaszek-Sharma
  */
 @ConfigurationProperties("spring.cloud.discovery.client.consul")
-public class ConsulDiscoveryClientConfig {
+public class ConsulDiscoveryClientProperties {
 
 	private int order = Ordered.LOWEST_PRECEDENCE;
 

@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.CommonsClientAutoConfiguration;
 import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
@@ -67,15 +66,15 @@ public class ConsulDiscoveryClientConfiguration {
 	}
 
 	@Bean
-	public ConsulDiscoveryClientConfig consulDiscoveryClientConfig(){
-		return new ConsulDiscoveryClientConfig();
+	public ConsulDiscoveryClientProperties consulDiscoveryClientProperties(){
+		return new ConsulDiscoveryClientProperties();
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties discoveryProperties,
-	                                                   ConsulDiscoveryClientConfig consulDiscoveryClientConfig) {
-		return new ConsulDiscoveryClient(consulClient, discoveryProperties, consulDiscoveryClientConfig);
+	                                                   ConsulDiscoveryClientProperties consulDiscoveryClientProperties) {
+		return new ConsulDiscoveryClient(consulClient, discoveryProperties, consulDiscoveryClientProperties);
 	}
 
 	@Bean
