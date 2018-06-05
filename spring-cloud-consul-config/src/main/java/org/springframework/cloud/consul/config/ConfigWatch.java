@@ -54,11 +54,6 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 	private ApplicationEventPublisher publisher;
 	private boolean firstTime = true;
 
-	@Deprecated
-	public ConfigWatch(ConsulConfigProperties properties, List<String> contexts, ConsulClient consul) {
-		this(properties, consul, new LinkedHashMap<>());
-	}
-
 	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul, LinkedHashMap<String, Long> initialIndexes) {
 		this.properties = properties;
 		this.consul = consul;
