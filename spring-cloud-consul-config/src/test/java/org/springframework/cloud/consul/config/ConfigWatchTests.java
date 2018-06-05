@@ -35,6 +35,7 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -60,7 +61,7 @@ public class ConfigWatchTests {
 
 		setupWatch(eventPublisher, new GetValue(), "/app/", "2ee647bd-bd69-4118-9f34-b9a6e9e60746");
 
-		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
+		verify(eventPublisher, atLeastOnce()).publishEvent(any(RefreshEvent.class));
 	}
 
 	@Test

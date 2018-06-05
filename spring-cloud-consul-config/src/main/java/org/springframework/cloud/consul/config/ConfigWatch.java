@@ -16,6 +16,12 @@
 
 package org.springframework.cloud.consul.config;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
@@ -23,41 +29,51 @@ import com.ecwid.consul.v1.kv.model.GetValue;
 import io.micrometer.core.annotation.Timed;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.core.style.ToStringCreator;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
-
-import javax.annotation.PostConstruct;
-import java.io.Closeable;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
 
 /**
  * @author Spencer Gibb
  */
-public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
+public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecycle {
 
 	private static final Log log = LogFactory.getLog(ConfigWatch.class);
 
 	private final ConsulConfigProperties properties;
 	private final ConsulClient consul;
 	private LinkedHashMap<String, Long> consulIndexes;
+	private final TaskScheduler taskScheduler;
 	private final AtomicBoolean running = new AtomicBoolean(false);
 	private ApplicationEventPublisher publisher;
 	private boolean firstTime = true;
+	private ScheduledFuture<?> watchFuture;
 
 	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul, LinkedHashMap<String, Long> initialIndexes) {
+		this(properties, consul, initialIndexes, getTaskScheduler());
+    }
+
+	private static ThreadPoolTaskScheduler getTaskScheduler() {
+		ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+		taskScheduler.initialize();
+		return taskScheduler;
+	}
+
+	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul, LinkedHashMap<String, Long> initialIndexes,
+					   TaskScheduler taskScheduler) {
 		this.properties = properties;
 		this.consul = consul;
 		this.consulIndexes = new LinkedHashMap<>(initialIndexes);
+		this.taskScheduler = taskScheduler;
 	}
 
 	@Override
@@ -65,12 +81,42 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 		this.publisher = publisher;
 	}
 
-	@PostConstruct
+	@Override
 	public void start() {
-		this.running.compareAndSet(false, true);
+		if (this.running.compareAndSet(false, true)) {
+			this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(this::watchConfigKeyValues,
+					this.properties.getWatch().getDelay());
+		}
 	}
 
-	@Scheduled(fixedDelayString = "${spring.cloud.consul.config.watch.delay:1000}")
+	@Override
+	public boolean isAutoStartup() {
+		return true;
+	}
+
+	@Override
+	public void stop(Runnable callback) {
+		this.stop();
+		callback.run();
+	}
+
+	@Override
+	public int getPhase() {
+		return 0;
+	}
+
+	@Override
+	public void stop() {
+		if (this.running.compareAndSet(true, false) && this.watchFuture != null) {
+			this.watchFuture.cancel(true);
+		}
+	}
+
+	@Override
+	public boolean isRunning() {
+		return this.running.get();
+	}
+
 	@Timed(value ="consul.watch-config-keys")
 	public void watchConfigKeyValues() {
 		if (this.running.get()) {
@@ -136,11 +182,6 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 			}
 		}
 		firstTime = false;
-	}
-
-	@Override
-	public void close() {
-		this.running.compareAndSet(true, false);
 	}
 
 	static class RefreshEventData {

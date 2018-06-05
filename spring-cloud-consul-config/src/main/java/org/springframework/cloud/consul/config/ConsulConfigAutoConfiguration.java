@@ -18,12 +18,15 @@ package org.springframework.cloud.consul.config;
 
 import com.ecwid.consul.v1.ConsulClient;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.endpoint.RefreshEndpoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
  * @author Spencer Gibb
@@ -33,14 +36,23 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(name = "spring.cloud.consul.config.enabled", matchIfMissing = true)
 public class ConsulConfigAutoConfiguration {
 
+	public static final String CONFIG_WATCH_TASK_SCHEDULER_NAME = "configWatchTaskScheduler";
+
 	@Configuration
 	@ConditionalOnClass(RefreshEndpoint.class)
 	protected static class ConsulRefreshConfiguration {
 		@Bean
 		@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled", matchIfMissing = true)
 		public ConfigWatch configWatch(ConsulConfigProperties properties,
-				ConsulPropertySourceLocator locator, ConsulClient consul) {
-			return new ConfigWatch(properties, consul, locator.getContextIndexes());
+				ConsulPropertySourceLocator locator, ConsulClient consul,
+			    @Qualifier(CONFIG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
+			return new ConfigWatch(properties, consul, locator.getContextIndexes(), taskScheduler);
+		}
+
+		@Bean(name = CONFIG_WATCH_TASK_SCHEDULER_NAME)
+		@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled", matchIfMissing = true)
+        public TaskScheduler configWatchTaskScheduler() {
+			return new ThreadPoolTaskScheduler();
 		}
 	}
 }
