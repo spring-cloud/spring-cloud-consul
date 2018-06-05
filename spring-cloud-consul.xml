@@ -4,7 +4,7 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Consul</title>
-<date>2018-05-29</date>
+<date>2018-06-05</date>
 </info>
 <preface>
 <title></title>
@@ -153,6 +153,13 @@ public String serviceUrl() {
 }</screen>
 </section>
 </section>
+<section xml:id="_consul_catalog_watch">
+<title>Consul Catalog Watch</title>
+<simpara>The Consul Catalog Watch takes advantage of the ability of consul to <link xl:href="https://www.consul.io/docs/agent/watches.html#services">watch services</link>. The Catalog Watch makes a blocking Consul HTTP API call to determine if any services have changed. If there is new service data a Heartbeat Event is published.</simpara>
+<simpara>To change the frequency of when the Config Watch is called change <literal>spring.cloud.consul.config.discovery.catalog-services-watch-delay</literal>. The default value is 1000, which is in milliseconds. The delay is the amount of time after the end of the previous invocation and the start of the next.</simpara>
+<simpara>To disable the Catalog Watch set <literal>spring.cloud.consul.discovery.catalog-services-watch.enabled=false</literal>.</simpara>
+<simpara>The watch uses a Spring <literal>TaskScheduler</literal> to schedule the call to consul. By default it is a <literal>ThreadPoolTaskScheduler</literal> with a <literal>poolSize</literal> of 1. To change the <literal>TaskScheduler</literal>, create a bean of type <literal>TaskScheduler</literal> named with the <literal>ConsulDiscoveryClientConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME</literal> constant.</simpara>
+</section>
 </chapter>
 <chapter xml:id="spring-cloud-consul-config">
 <title>Distributed Configuration with Consul</title>
@@ -202,8 +209,9 @@ config/application/</screen>
 <section xml:id="spring-cloud-consul-config-watch">
 <title>Config Watch</title>
 <simpara>The Consul Config Watch takes advantage of the ability of consul to <link xl:href="https://www.consul.io/docs/agent/watches.html#keyprefix">watch a key prefix</link>. The Config Watch makes a blocking Consul HTTP API call to determine if any relevant configuration data has changed for the current application. If there is new configuration data a Refresh Event is published. This is equivalent to calling the <literal>/refresh</literal> actuator endpoint.</simpara>
-<simpara>To change the frequency of when the Config Watch is called change <literal>spring.cloud.consul.config.watch.delay</literal>. The default value is 1000, which is in milliseconds.</simpara>
+<simpara>To change the frequency of when the Config Watch is called change <literal>spring.cloud.consul.config.watch.delay</literal>. The default value is 1000, which is in milliseconds. The delay is the amount of time after the end of the previous invocation and the start of the next.</simpara>
 <simpara>To disable the Config Watch set <literal>spring.cloud.consul.config.watch.enabled=false</literal>.</simpara>
+<simpara>The watch uses a Spring <literal>TaskScheduler</literal> to schedule the call to consul. By default it is a <literal>ThreadPoolTaskScheduler</literal> with a <literal>poolSize</literal> of 1. To change the <literal>TaskScheduler</literal>, create a bean of type <literal>TaskScheduler</literal> named with the <literal>ConsulConfigAutoConfiguration.CONFIG_WATCH_TASK_SCHEDULER_NAME</literal> constant.</simpara>
 </section>
 <section xml:id="spring-cloud-consul-config-format">
 <title>YAML or Properties with Config</title>
