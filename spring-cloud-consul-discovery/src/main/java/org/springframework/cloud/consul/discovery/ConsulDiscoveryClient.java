@@ -20,27 +20,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.QueryParams;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.health.model.HealthService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.util.StringUtils;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.health.model.HealthService;
-
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.getMetadata;
-
-import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * @author Spencer Gibb
  * @author Joe Athman
  */
-@CommonsLog
 public class ConsulDiscoveryClient implements DiscoveryClient {
+
+	private static final Log log = LogFactory.getLog(ConsulDiscoveryClient.class);
 
 	@Deprecated
 	public interface LocalResolver {

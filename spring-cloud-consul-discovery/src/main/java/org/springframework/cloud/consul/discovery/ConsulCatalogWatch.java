@@ -27,7 +27,8 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import io.micrometer.core.annotation.Timed;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
 import org.springframework.context.ApplicationEventPublisher;
@@ -39,8 +40,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 /**
  * @author Spencer Gibb
  */
-@Slf4j
 public class ConsulCatalogWatch implements ApplicationEventPublisherAware, SmartLifecycle {
+	private static final Log log = LogFactory.getLog(ConsulDiscoveryClient.class);
 
 	private final ConsulDiscoveryProperties properties;
 	private final ConsulClient consul;
@@ -123,8 +124,10 @@ public class ConsulCatalogWatch implements ApplicationEventPublisherAware, Smart
 				catalogServicesIndex.set(BigInteger.valueOf(consulIndex));
 			}
 
-			log.trace("Received services update from consul: {}, index: {}",
-					response.getValue(), consulIndex);
+			if (log.isTraceEnabled()) {
+				log.trace("Received services update from consul: "+response.getValue()
+								+", index: "+ consulIndex);
+			}
 			publisher.publishEvent(new HeartbeatEvent(this, consulIndex));
 		}
 		catch (Exception e) {

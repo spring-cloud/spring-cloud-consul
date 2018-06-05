@@ -21,20 +21,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.NewService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
 /**
  * Created by nicu on 11.03.2015.
  * @author Stéphane LEROY
  */
-@Slf4j
 public class TtlScheduler {
+	private static final Log log = LogFactory.getLog(ConsulDiscoveryClient.class);
 
 	private final Map<String, ScheduledFuture> serviceHeartbeats = new ConcurrentHashMap<>();
 
@@ -89,7 +89,9 @@ public class TtlScheduler {
 		@Override
 		public void run() {
 			client.agentCheckPass(checkId);
-			log.debug("Sending consul heartbeat for: " + checkId);
+			if (log.isDebugEnabled()) {
+				log.debug("Sending consul heartbeat for: " + checkId);
+			}
 		}
 	}
 }
