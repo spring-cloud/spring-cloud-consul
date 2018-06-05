@@ -16,11 +16,13 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import com.ecwid.consul.v1.ConsulClient;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.CommonsClientAutoConfiguration;
 import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
@@ -28,8 +30,8 @@ import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.ecwid.consul.v1.ConsulClient;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
  * @author Spencer Gibb
@@ -41,6 +43,8 @@ import com.ecwid.consul.v1.ConsulClient;
 @AutoConfigureBefore({ SimpleDiscoveryClientAutoConfiguration.class,
 		CommonsClientAutoConfiguration.class })
 public class ConsulDiscoveryClientConfiguration {
+
+	public static final String CATALOG_WATCH_TASK_SCHEDULER_NAME = "catalogWatchTaskScheduler";
 
 	@Autowired
 	private ConsulClient consulClient;
@@ -75,7 +79,14 @@ public class ConsulDiscoveryClientConfiguration {
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty(name = "spring.cloud.consul.discovery.catalog-services-watch.enabled", matchIfMissing = true)
 	public ConsulCatalogWatch consulCatalogWatch(
-			ConsulDiscoveryProperties discoveryProperties) {
-		return new ConsulCatalogWatch(discoveryProperties, consulClient);
+			ConsulDiscoveryProperties discoveryProperties,
+			@Qualifier(CATALOG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
+		return new ConsulCatalogWatch(discoveryProperties, consulClient, taskScheduler);
+	}
+
+	@Bean(name = CATALOG_WATCH_TASK_SCHEDULER_NAME)
+	@ConditionalOnProperty(name = "spring.cloud.consul.discovery.catalog-services-watch.enabled", matchIfMissing = true)
+	public TaskScheduler catalogWatchTaskScheduler() {
+		return new ThreadPoolTaskScheduler();
 	}
 }
