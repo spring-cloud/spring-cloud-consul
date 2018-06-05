@@ -76,7 +76,7 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 		verify(client, times(2)).getInstances("configserver");
 		ConfigClientProperties locator = this.context
 				.getBean(ConfigClientProperties.class);
-		assertEquals("http://foo:7001/", locator.getRawUri());
+		assertEquals("http://foo:7001/", locator.getUri()[0]);
 	}
 
 	private void setup(String... env) {

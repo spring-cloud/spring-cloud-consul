@@ -16,36 +16,36 @@
 
 package org.springframework.cloud.consul.config;
 
-import java.io.Closeable;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.annotation.PostConstruct;
-
-import io.micrometer.core.annotation.Timed;
-import org.springframework.cloud.endpoint.event.RefreshEvent;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
+import io.micrometer.core.annotation.Timed;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.springframework.cloud.endpoint.event.RefreshEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.core.style.ToStringCreator;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
+
+import javax.annotation.PostConstruct;
+import java.io.Closeable;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
-
-import lombok.Data;
-import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * @author Spencer Gibb
  */
-@CommonsLog
 public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
+
+	private static final Log log = LogFactory.getLog(ConfigWatch.class);
 
 	private final ConsulConfigProperties properties;
 	private final ConsulClient consul;
@@ -56,7 +56,7 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 
 	@Deprecated
 	public ConfigWatch(ConsulConfigProperties properties, List<String> contexts, ConsulClient consul) {
-		this(properties, consul, new LinkedHashMap<String, Long>());
+		this(properties, consul, new LinkedHashMap<>());
 	}
 
 	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul, LinkedHashMap<String, Long> initialIndexes) {
@@ -92,6 +92,8 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 						currentIndex = -1L;
 					}
 
+					log.trace("watching consul for context '"+context+"' with index "+ currentIndex);
+
 					// use the consul ACL token if found
 					String aclToken = properties.getAclToken();
 					if (StringUtils.isEmpty(aclToken)) {
@@ -110,11 +112,18 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 						if (newIndex != null && !newIndex.equals(currentIndex)) {
 							// don't publish the same index again, don't publish the first time (-1) so index can be primed
 							if (!this.consulIndexes.containsValue(newIndex) && !currentIndex.equals(-1L)) {
+								log.trace("Context "+context + " has new index " + newIndex);
 								RefreshEventData data = new RefreshEventData(context, currentIndex, newIndex);
 								this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
+							} else if (log.isTraceEnabled()) {
+								log.trace("Event for index already published for context "+context);
 							}
 							this.consulIndexes.put(context, newIndex);
+						} else if (log.isTraceEnabled()) {
+							log.trace("Same index for context "+context);
 						}
+					} else if (log.isTraceEnabled()) {
+						log.trace("No value for context "+context);
 					}
 
 				} catch (Exception e) {
@@ -139,10 +148,51 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 		this.running.compareAndSet(true, false);
 	}
 
-	@Data
 	static class RefreshEventData {
 		private final String context;
 		private final Long prevIndex;
 		private final Long newIndex;
+
+		public RefreshEventData(String context, Long prevIndex, Long newIndex) {
+			this.context = context;
+			this.prevIndex = prevIndex;
+			this.newIndex = newIndex;
+		}
+
+		public String getContext() {
+			return this.context;
+		}
+
+		public Long getPrevIndex() {
+			return this.prevIndex;
+		}
+
+		public Long getNewIndex() {
+			return this.newIndex;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			RefreshEventData that = (RefreshEventData) o;
+			return Objects.equals(context, that.context) &&
+					Objects.equals(prevIndex, that.prevIndex) &&
+					Objects.equals(newIndex, that.newIndex);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(context, prevIndex, newIndex);
+		}
+
+		@Override
+		public String toString() {
+			return new ToStringCreator(this)
+					.append("context", context)
+					.append("prevIndex", prevIndex)
+					.append("newIndex", newIndex)
+					.toString();
+		}
 	}
 }

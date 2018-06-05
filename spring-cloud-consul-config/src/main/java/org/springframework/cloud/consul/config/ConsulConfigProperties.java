@@ -16,21 +16,19 @@
 
 package org.springframework.cloud.consul.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.style.ToStringCreator;
+import org.springframework.validation.annotation.Validated;
+
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.validation.annotation.Validated;
-
-import lombok.Data;
 
 /**
  * @author Spencer Gibb
  */
 @ConfigurationProperties("spring.cloud.consul.config")
-@Data
 @Validated
 public class ConsulConfigProperties {
 	private boolean enabled = true;
@@ -68,6 +66,9 @@ public class ConsulConfigProperties {
 	 */
 	private String name;
 
+	public ConsulConfigProperties() {
+	}
+
 	@PostConstruct
 	public void init() {
 		if (this.format == Format.FILES) {
@@ -75,7 +76,102 @@ public class ConsulConfigProperties {
 		}
 	}
 
-	@Data
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+
+	public String getPrefix() {
+		return this.prefix;
+	}
+
+	public @NotEmpty String getDefaultContext() {
+		return this.defaultContext;
+	}
+
+	public @NotEmpty String getProfileSeparator() {
+		return this.profileSeparator;
+	}
+
+	public @NotNull Format getFormat() {
+		return this.format;
+	}
+
+	public @NotEmpty String getDataKey() {
+		return this.dataKey;
+	}
+
+	public String getAclToken() {
+		return this.aclToken;
+	}
+
+	public Watch getWatch() {
+		return this.watch;
+	}
+
+	public boolean isFailFast() {
+		return this.failFast;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
+	}
+
+	public void setDefaultContext(@NotEmpty String defaultContext) {
+		this.defaultContext = defaultContext;
+	}
+
+	public void setProfileSeparator(@NotEmpty String profileSeparator) {
+		this.profileSeparator = profileSeparator;
+	}
+
+	public void setFormat(@NotNull Format format) {
+		this.format = format;
+	}
+
+	public void setDataKey(@NotEmpty String dataKey) {
+		this.dataKey = dataKey;
+	}
+
+	public void setAclToken(String aclToken) {
+		this.aclToken = aclToken;
+	}
+
+	public void setWatch(Watch watch) {
+		this.watch = watch;
+	}
+
+	public void setFailFast(boolean failFast) {
+		this.failFast = failFast;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringCreator(this)
+				.append("enabled", enabled)
+				.append("prefix", prefix)
+				.append("defaultContext", defaultContext)
+				.append("profileSeparator", profileSeparator)
+				.append("format", format)
+				.append("dataKey", dataKey)
+				.append("aclToken", aclToken)
+				.append("watch", watch)
+				.append("failFast", failFast)
+				.append("name", name)
+				.toString();
+	}
+
 	public static class Watch {
 		/** The number of seconds to wait (or block) for watch query, defaults to 55.
 		 * Needs to be less than default ConsulClient (defaults to 60). To increase ConsulClient
@@ -88,6 +184,42 @@ public class ConsulConfigProperties {
 
 		/** The value of the fixed delay for the watch in millis. Defaults to 1000. */
 		private int delay = 1000;
+
+		public Watch() {
+		}
+
+		public int getWaitTime() {
+			return this.waitTime;
+		}
+
+		public boolean isEnabled() {
+			return this.enabled;
+		}
+
+		public int getDelay() {
+			return this.delay;
+		}
+
+		public void setWaitTime(int waitTime) {
+			this.waitTime = waitTime;
+		}
+
+		public void setEnabled(boolean enabled) {
+			this.enabled = enabled;
+		}
+
+		public void setDelay(int delay) {
+			this.delay = delay;
+		}
+
+		@Override
+		public String toString() {
+			return new ToStringCreator(this)
+					.append("waitTime", waitTime)
+					.append("enabled", enabled)
+					.append("delay", delay)
+					.toString();
+		}
 	}
 
 	/**
