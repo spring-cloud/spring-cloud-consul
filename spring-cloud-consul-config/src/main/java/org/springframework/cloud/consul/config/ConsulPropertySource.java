@@ -100,6 +100,9 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 			if (!StringUtils.endsWithIgnoreCase(key, "/")) {
 				key = key.replace(context, "").replace('/', '.');
 				String value = getValue.getDecodedValue();
+				if (value == null) {
+					value = "";
+				}
 				properties.put(key, value);
 			}
 		}

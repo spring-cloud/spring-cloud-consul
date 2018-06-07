@@ -107,6 +107,15 @@ public class ConsulPropertySourceTests {
 		source.init();
 	}
 
+	@Test
+	public void testEmptyValue() {
+		kvContext = prefix + "/kv";
+		client.setKVValue(kvContext + "/emptyValue", "");
+		ConsulPropertySource source = new ConsulPropertySource(kvContext, client, new ConsulConfigProperties());
+		source.init();
+		assertThat("emptyValue was wrong", source.getProperty("emptyValue"), is(equalTo("")));
+	}
+
 	private ConsulPropertySource getConsulPropertySource(ConsulConfigProperties configProperties, String context) {
 		ConsulPropertySource source = new ConsulPropertySource(context, client, configProperties);
 		source.init();
