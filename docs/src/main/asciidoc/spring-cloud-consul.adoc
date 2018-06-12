@@ -177,7 +177,7 @@ The Consul Catalog Watch takes advantage of the ability of consul to https://www
 
 To change the frequency of when the Config Watch is called change `spring.cloud.consul.config.discovery.catalog-services-watch-delay`. The default value is 1000, which is in milliseconds. The delay is the amount of time after the end of the previous invocation and the start of the next.
 
-To disable the Catalog Watch set `sspring.cloud.consul.discovery.catalogServicesWatch.enabled=false`.
+To disable the Catalog Watch set `spring.cloud.consul.discovery.catalogServicesWatch.enabled=false`.
 
 
 The watch uses a Spring `TaskScheduler` to schedule the call to consul. By default it is a `ThreadPoolTaskScheduler` with a `poolSize` of 1. To change the `TaskScheduler`, create a bean of type `TaskScheduler` named with the `ConsulDiscoveryClientConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME` constant.
