@@ -84,6 +84,7 @@ public class Application {
         healthCheckInterval: 15s</screen>
 </para>
 </formalpara>
+<simpara>You can disable the health check by setting <literal>management.health.consul.enabled=false</literal>.</simpara>
 <section xml:id="_metadata_and_consul_tags">
 <title>Metadata and Consul tags</title>
 <simpara>Consul does not yet support metadata on services. Spring Cloud&#8217;s <literal>ServiceInstance</literal> has a <literal>Map&lt;String, String&gt; metadata</literal> field. Spring Cloud Consul uses Consul tags to approximate metadata until Consul officially supports metadata. Tags with the form <literal>key=value</literal> will be split and used as a <literal>Map</literal> key and value respectively. Tags without the equal <literal>=</literal> sign, will be used as both the key and value.</simpara>
@@ -157,7 +158,7 @@ public String serviceUrl() {
 <title>Consul Catalog Watch</title>
 <simpara>The Consul Catalog Watch takes advantage of the ability of consul to <link xl:href="https://www.consul.io/docs/agent/watches.html#services">watch services</link>. The Catalog Watch makes a blocking Consul HTTP API call to determine if any services have changed. If there is new service data a Heartbeat Event is published.</simpara>
 <simpara>To change the frequency of when the Config Watch is called change <literal>spring.cloud.consul.config.discovery.catalog-services-watch-delay</literal>. The default value is 1000, which is in milliseconds. The delay is the amount of time after the end of the previous invocation and the start of the next.</simpara>
-<simpara>To disable the Catalog Watch set <literal>spring.cloud.consul.discovery.catalog-services-watch.enabled=false</literal>.</simpara>
+<simpara>To disable the Catalog Watch set <literal>spring.cloud.consul.discovery.catalogServicesWatch.enabled=false</literal>.</simpara>
 <simpara>The watch uses a Spring <literal>TaskScheduler</literal> to schedule the call to consul. By default it is a <literal>ThreadPoolTaskScheduler</literal> with a <literal>poolSize</literal> of 1. To change the <literal>TaskScheduler</literal>, create a bean of type <literal>TaskScheduler</literal> named with the <literal>ConsulDiscoveryClientConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME</literal> constant.</simpara>
 </section>
 </chapter>
