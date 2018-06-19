@@ -4,11 +4,11 @@
 <book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Consul</title>
-<date>2018-06-18</date>
+<date>2018-06-19</date>
 </info>
 <preface>
 <title></title>
-<simpara><emphasis role="strong">2.0.0.BUILD-SNAPSHOT</emphasis></simpara>
+<simpara><emphasis role="strong">2.0.1.BUILD-SNAPSHOT</emphasis></simpara>
 <simpara>This project provides Consul integrations for Spring Boot apps through autoconfiguration
 and binding to the Spring Environment and other Spring programming model idioms. With a few
 simple annotations you can quickly enable and configure the common patterns inside your
