@@ -32,6 +32,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.interceptor.RetryInterceptorBuilder;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 
+import com.ecwid.consul.transport.TLSConfig;
 import com.ecwid.consul.v1.ConsulClient;
 
 /**
@@ -51,6 +52,17 @@ public class ConsulAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulClient consulClient(ConsulProperties consulProperties) {
+		if (null != consulProperties.getTlsConfig()) {
+			final ConsulProperties.TLSConfig ourTlsConfig = consulProperties.getTlsConfig();
+			final TLSConfig tlsConfig = new TLSConfig(
+					TLSConfig.KeyStoreInstanceType.valueOf(ourTlsConfig.getKeyStoreInstanceType().name()),
+					ourTlsConfig.getCertificatePath(),
+					ourTlsConfig.getCertificatePassword(),
+					ourTlsConfig.getKeyStorePath(),
+					ourTlsConfig.getKeyStorePassword()
+			);
+			return new ConsulClient(consulProperties.getHost(), consulProperties.getPort(), tlsConfig);
+		}
 		return new ConsulClient(consulProperties.getHost(), consulProperties.getPort());
 	}
 

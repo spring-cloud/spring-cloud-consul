@@ -40,4 +40,29 @@ public class ConsulProperties {
 
 	/** Is spring cloud consul enabled */
 	private boolean enabled = true;
+
+	/** configuration for TLS */
+	private TLSConfig tlsConfig;
+
+	@Data
+	static class TLSConfig {
+		public enum KeyStoreInstanceType {
+			JKS, JCEKS, PKCS12, PKCS11, DKS
+		}
+
+		/** Type of key framework to use. */
+		private final KeyStoreInstanceType keyStoreInstanceType;
+
+		/**File path to the certificate. */
+		private final String certificatePath;
+
+		/** Password to open the certificate. */
+		private final String certificatePassword;
+
+		/** Path to an external keystore */
+		private final String keyStorePath;
+
+		/** Password to an external keystore */
+		private final String keyStorePassword;
+	}
 }
