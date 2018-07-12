@@ -16,7 +16,10 @@
 
 package org.springframework.cloud.consul;
 
+import com.ecwid.consul.transport.TLSConfig;
+import com.ecwid.consul.v1.ConsulClient;
 import org.aspectj.lang.annotation.Aspect;
+
 import org.springframework.boot.actuate.autoconfigure.ConditionalOnEnabledHealthIndicator;
 import org.springframework.boot.actuate.condition.ConditionalOnEnabledEndpoint;
 import org.springframework.boot.actuate.endpoint.Endpoint;
@@ -31,8 +34,6 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.interceptor.RetryInterceptorBuilder;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
-
-import com.ecwid.consul.v1.ConsulClient;
 
 /**
  * @author Spencer Gibb
@@ -51,6 +52,17 @@ public class ConsulAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulClient consulClient(ConsulProperties consulProperties) {
+		if (consulProperties.getTls() != null) {
+			ConsulProperties.TLSConfig tls = consulProperties.getTls();
+			TLSConfig tlsConfig = new TLSConfig(
+					tls.getKeyStoreInstanceType(),
+					tls.getCertificatePath(),
+					tls.getCertificatePassword(),
+					tls.getKeyStorePath(),
+					tls.getKeyStorePassword()
+			);
+			return new ConsulClient(consulProperties.getHost(), consulProperties.getPort(), tlsConfig);
+		}
 		return new ConsulClient(consulProperties.getHost(), consulProperties.getPort());
 	}
 

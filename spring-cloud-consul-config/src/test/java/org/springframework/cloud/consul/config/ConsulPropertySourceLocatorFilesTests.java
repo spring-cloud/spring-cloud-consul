@@ -95,7 +95,9 @@ public class ConsulPropertySourceLocatorFilesTests {
 	@After
 	public void teardown() {
 		this.client.deleteKVValues(PREFIX);
-		this.context.close();
+		if (this.context != null) {
+			this.context.close();
+		}
 	}
 
 	@Test
