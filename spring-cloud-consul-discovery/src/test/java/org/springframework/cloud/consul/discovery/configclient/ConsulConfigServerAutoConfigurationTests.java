@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.discovery.configclient;
 
 import org.junit.After;
 import org.junit.Test;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.config.server.config.ConfigServerProperties;
@@ -64,7 +65,7 @@ public class ConsulConfigServerAutoConfigurationTests {
 		this.context = new SpringApplicationBuilder(
 				PropertyPlaceholderAutoConfiguration.class,
 				ConsulConfigServerAutoConfiguration.class,
-				ConfigServerProperties.class, ConsulDiscoveryProperties.class).web(false)
+				ConfigServerProperties.class, ConsulDiscoveryProperties.class).web(WebApplicationType.NONE)
 				.properties(env).run();
 	}
 

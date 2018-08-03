@@ -24,6 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.consul.ConsulProperties;
@@ -102,7 +103,7 @@ public class ConsulPropertySourceLocatorTests {
 
 
 		this.context = new SpringApplicationBuilder(Config.class)
-				.web(false)
+				.web(WebApplicationType.NONE)
 				.run("--SPRING_APPLICATION_NAME="+ APP_NAME,
 						"--spring.cloud.consul.config.prefix="+ROOT,
 						"spring.cloud.consul.config.watch.delay=10");

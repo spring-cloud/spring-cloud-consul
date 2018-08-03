@@ -21,6 +21,7 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.consul.ConsulProperties;
@@ -72,7 +73,7 @@ public class ConsulPropertySourceLocatorAppNameCustomizedTests {
 
 
 		this.context = new SpringApplicationBuilder(Config.class)
-				.web(false)
+				.web(WebApplicationType.NONE)
 				.run("--spring.application.name=testConsulPropertySourceLocatorAppNameCustomized",
 						"--spring.cloud.consul.config.name="+CONFIG_NAME,
 						"--spring.cloud.consul.config.prefix="+ROOT);
