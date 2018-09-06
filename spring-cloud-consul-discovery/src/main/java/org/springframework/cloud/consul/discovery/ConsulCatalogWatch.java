@@ -118,7 +118,7 @@ public class ConsulCatalogWatch implements ApplicationEventPublisherAware, Smart
 
 			Response<Map<String, List<String>>> response = consul
 					.getCatalogServices(new QueryParams(properties
-							.getCatalogServicesWatchTimeout(), index));
+							.getCatalogServicesWatchTimeout(), index), properties.getAclToken());
 			Long consulIndex = response.getConsulIndex();
 			if (consulIndex != null) {
 				catalogServicesIndex.set(BigInteger.valueOf(consulIndex));
