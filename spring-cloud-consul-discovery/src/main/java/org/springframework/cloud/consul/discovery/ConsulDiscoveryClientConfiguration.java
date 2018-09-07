@@ -71,15 +71,9 @@ public class ConsulDiscoveryClientConfiguration {
 	}
 
 	@Bean
-	public ConsulDiscoveryClientProperties consulDiscoveryClientProperties(){
-		return new ConsulDiscoveryClientProperties();
-	}
-
-	@Bean
 	@ConditionalOnMissingBean
-	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties discoveryProperties,
-	                                                   ConsulDiscoveryClientProperties consulDiscoveryClientProperties) {
-		return new ConsulDiscoveryClient(consulClient, discoveryProperties, consulDiscoveryClientProperties);
+	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties discoveryProperties) {
+		return new ConsulDiscoveryClient(consulClient, discoveryProperties);
 	}
 
 	@Bean

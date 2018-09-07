@@ -51,21 +51,16 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	private final ConsulClient client;
 	private final ConsulDiscoveryProperties properties;
-	private final ConsulDiscoveryClientProperties consulDiscoveryClientProperties;
 
-	public ConsulDiscoveryClient(ConsulClient client,
-			ConsulDiscoveryProperties properties,
-			ConsulDiscoveryClientProperties consulDiscoveryClientProperties) {
+	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties) {
 		this.client = client;
 		this.properties = properties;
-		this.consulDiscoveryClientProperties = consulDiscoveryClientProperties;
 	}
 
 	@Deprecated
 	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties,
-			LocalResolver localResolver,
-			ConsulDiscoveryClientProperties consulDiscoveryClientProperties) {
-		this(client, properties, consulDiscoveryClientProperties);
+	                             LocalResolver localResolver) {
+		this(client, properties);
 	}
 
 	@Override
@@ -79,7 +74,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	public List<ServiceInstance> getInstances(final String serviceId,
-			final QueryParams queryParams) {
+	                                          final QueryParams queryParams) {
 		List<ServiceInstance> instances = new ArrayList<>();
 
 		addInstancesToList(instances, serviceId, queryParams);
@@ -88,7 +83,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	private void addInstancesToList(List<ServiceInstance> instances, String serviceId,
-			QueryParams queryParams) {
+	                                QueryParams queryParams) {
 
 		String aclToken = properties.getAclToken();
 		Response<List<HealthService>> services;
@@ -104,11 +99,11 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		}
 		for (HealthService service : services.getValue()) {
 			String host = findHost(service);
-			
-			Map<String,String> metadata = getMetadata(service);
+
+			Map<String, String> metadata = getMetadata(service);
 			boolean secure = false;
-			if(metadata.containsKey("secure")) {
-			    secure = Boolean.parseBoolean(metadata.get("secure"));
+			if (metadata.containsKey("secure")) {
+				secure = Boolean.parseBoolean(metadata.get("secure"));
 			}
 			instances.add(new DefaultServiceInstance(serviceId, host, service
 					.getService().getPort(), secure, metadata));
@@ -141,6 +136,6 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public int getOrder() {
-		return this.consulDiscoveryClientProperties.getOrder();
+		return this.properties.getOrder();
 	}
 }
