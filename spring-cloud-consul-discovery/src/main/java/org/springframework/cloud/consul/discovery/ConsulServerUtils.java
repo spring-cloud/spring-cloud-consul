@@ -25,17 +25,18 @@ import java.util.List;
 import java.util.Map;
 
 import com.ecwid.consul.v1.health.model.HealthService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.springframework.util.StringUtils;
-
-import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * @author Spencer Gibb
  * @author Semenkov Alexey
  */
-@CommonsLog
 public class ConsulServerUtils {
+
+	private static final Log log = LogFactory.getLog(ConsulServerUtils.class);
 
 	public static String findHost(HealthService healthService) {
 		HealthService.Service service = healthService.getService();

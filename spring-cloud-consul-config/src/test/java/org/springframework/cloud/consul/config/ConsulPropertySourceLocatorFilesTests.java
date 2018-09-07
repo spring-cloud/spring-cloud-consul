@@ -23,6 +23,7 @@ import java.util.UUID;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.consul.ConsulProperties;
@@ -80,7 +81,7 @@ public class ConsulPropertySourceLocatorFilesTests {
 		this.client.setKVValue(ROOT+APP_NAME_DEV_PROPS, "foo: bar-app-dev\nmy.baz: ${foo}");
 
 		this.context = new SpringApplicationBuilder(Config.class)
-				.web(false)
+				.web(WebApplicationType.NONE)
 				.run("--spring.application.name="+ APP_NAME,
 						"--spring.cloud.consul.config.prefix="+ROOT,
 						"--spring.cloud.consul.config.format=FILES",
@@ -95,7 +96,9 @@ public class ConsulPropertySourceLocatorFilesTests {
 	@After
 	public void teardown() {
 		this.client.deleteKVValues(PREFIX);
-		this.context.close();
+		if (this.context != null) {
+			this.context.close();
+		}
 	}
 
 	@Test

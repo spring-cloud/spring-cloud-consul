@@ -16,53 +16,64 @@
 
 package org.springframework.cloud.consul.config;
 
-import java.io.Closeable;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.annotation.PostConstruct;
-
-import io.micrometer.core.annotation.Timed;
-import org.springframework.cloud.endpoint.event.RefreshEvent;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
+import io.micrometer.core.annotation.Timed;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.springframework.cloud.endpoint.event.RefreshEvent;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.SmartLifecycle;
+import org.springframework.core.style.ToStringCreator;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
-
-import lombok.Data;
-import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * @author Spencer Gibb
  */
-@CommonsLog
-public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
+public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecycle {
+
+	private static final Log log = LogFactory.getLog(ConfigWatch.class);
 
 	private final ConsulConfigProperties properties;
 	private final ConsulClient consul;
 	private LinkedHashMap<String, Long> consulIndexes;
+	private final TaskScheduler taskScheduler;
 	private final AtomicBoolean running = new AtomicBoolean(false);
 	private ApplicationEventPublisher publisher;
 	private boolean firstTime = true;
-
-	@Deprecated
-	public ConfigWatch(ConsulConfigProperties properties, List<String> contexts, ConsulClient consul) {
-		this(properties, consul, new LinkedHashMap<String, Long>());
-	}
+	private ScheduledFuture<?> watchFuture;
 
 	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul, LinkedHashMap<String, Long> initialIndexes) {
+		this(properties, consul, initialIndexes, getTaskScheduler());
+    }
+
+	private static ThreadPoolTaskScheduler getTaskScheduler() {
+		ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+		taskScheduler.initialize();
+		return taskScheduler;
+	}
+
+	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul, LinkedHashMap<String, Long> initialIndexes,
+					   TaskScheduler taskScheduler) {
 		this.properties = properties;
 		this.consul = consul;
 		this.consulIndexes = new LinkedHashMap<>(initialIndexes);
+		this.taskScheduler = taskScheduler;
 	}
 
 	@Override
@@ -70,12 +81,42 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 		this.publisher = publisher;
 	}
 
-	@PostConstruct
+	@Override
 	public void start() {
-		this.running.compareAndSet(false, true);
+		if (this.running.compareAndSet(false, true)) {
+			this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(this::watchConfigKeyValues,
+					this.properties.getWatch().getDelay());
+		}
 	}
 
-	@Scheduled(fixedDelayString = "${spring.cloud.consul.config.watch.delay:1000}")
+	@Override
+	public boolean isAutoStartup() {
+		return true;
+	}
+
+	@Override
+	public void stop(Runnable callback) {
+		this.stop();
+		callback.run();
+	}
+
+	@Override
+	public int getPhase() {
+		return 0;
+	}
+
+	@Override
+	public void stop() {
+		if (this.running.compareAndSet(true, false) && this.watchFuture != null) {
+			this.watchFuture.cancel(true);
+		}
+	}
+
+	@Override
+	public boolean isRunning() {
+		return this.running.get();
+	}
+
 	@Timed(value ="consul.watch-config-keys")
 	public void watchConfigKeyValues() {
 		if (this.running.get()) {
@@ -91,6 +132,8 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 					if (currentIndex == null) {
 						currentIndex = -1L;
 					}
+
+					log.trace("watching consul for context '"+context+"' with index "+ currentIndex);
 
 					// use the consul ACL token if found
 					String aclToken = properties.getAclToken();
@@ -110,11 +153,18 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 						if (newIndex != null && !newIndex.equals(currentIndex)) {
 							// don't publish the same index again, don't publish the first time (-1) so index can be primed
 							if (!this.consulIndexes.containsValue(newIndex) && !currentIndex.equals(-1L)) {
+								log.trace("Context "+context + " has new index " + newIndex);
 								RefreshEventData data = new RefreshEventData(context, currentIndex, newIndex);
 								this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
+							} else if (log.isTraceEnabled()) {
+								log.trace("Event for index already published for context "+context);
 							}
 							this.consulIndexes.put(context, newIndex);
+						} else if (log.isTraceEnabled()) {
+							log.trace("Same index for context "+context);
 						}
+					} else if (log.isTraceEnabled()) {
+						log.trace("No value for context "+context);
 					}
 
 				} catch (Exception e) {
@@ -134,15 +184,51 @@ public class ConfigWatch implements Closeable, ApplicationEventPublisherAware {
 		firstTime = false;
 	}
 
-	@Override
-	public void close() {
-		this.running.compareAndSet(true, false);
-	}
-
-	@Data
 	static class RefreshEventData {
 		private final String context;
 		private final Long prevIndex;
 		private final Long newIndex;
+
+		public RefreshEventData(String context, Long prevIndex, Long newIndex) {
+			this.context = context;
+			this.prevIndex = prevIndex;
+			this.newIndex = newIndex;
+		}
+
+		public String getContext() {
+			return this.context;
+		}
+
+		public Long getPrevIndex() {
+			return this.prevIndex;
+		}
+
+		public Long getNewIndex() {
+			return this.newIndex;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			RefreshEventData that = (RefreshEventData) o;
+			return Objects.equals(context, that.context) &&
+					Objects.equals(prevIndex, that.prevIndex) &&
+					Objects.equals(newIndex, that.newIndex);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(context, prevIndex, newIndex);
+		}
+
+		@Override
+		public String toString() {
+			return new ToStringCreator(this)
+					.append("context", context)
+					.append("prevIndex", prevIndex)
+					.append("newIndex", newIndex)
+					.toString();
+		}
 	}
 }

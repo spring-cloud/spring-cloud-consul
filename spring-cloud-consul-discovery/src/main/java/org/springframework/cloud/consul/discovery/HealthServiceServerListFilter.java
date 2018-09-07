@@ -21,15 +21,16 @@ import java.util.List;
 
 import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerListFilter;
-
-import lombok.extern.apachecommons.CommonsLog;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * ServerList implementaion that filters ConsulServers based on if all their Health Checks are PASSING.
  * @author Spencer Gibb
  */
-@CommonsLog
 public class HealthServiceServerListFilter implements ServerListFilter<Server> {
+	private static final Log log = LogFactory.getLog(HealthServiceServerListFilter.class);
+
 	@Override
 	public List<Server> getFilteredListOfServers(List<Server> servers) {
 		List<Server> filtered = new ArrayList<>();
@@ -43,7 +44,9 @@ public class HealthServiceServerListFilter implements ServerListFilter<Server> {
 				}
 
 			} else {
-				log.debug("Unable to determine aliveness of server type "+server.getClass()+", "+server);
+			    if (log.isDebugEnabled()) {
+					log.debug("Unable to determine aliveness of server type " + server.getClass() + ", " + server);
+				}
 				filtered.add(server);
 			}
 		}

@@ -16,14 +16,31 @@
 
 package org.springframework.cloud.consul.binder.config;
 
-import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.style.ToStringCreator;
 
 /**
  * @author Spencer Gibb
  */
 @ConfigurationProperties("spring.cloud.stream.consul.binder")
-@Data
 public class ConsulBinderProperties {
 	private int eventTimeout = 5;
+
+	public ConsulBinderProperties() {
+	}
+
+	public int getEventTimeout() {
+		return this.eventTimeout;
+	}
+
+	public void setEventTimeout(int eventTimeout) {
+		this.eventTimeout = eventTimeout;
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringCreator(this)
+				.append("eventTimeout", eventTimeout)
+				.toString();
+	}
 }

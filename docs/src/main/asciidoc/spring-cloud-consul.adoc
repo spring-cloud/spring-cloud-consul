@@ -90,6 +90,7 @@ spring:
         healthCheckInterval: 15s
 ----
 
+You can disable the health check by setting `management.health.consul.enabled=false`.
 
 ==== Metadata and Consul tags
 
@@ -170,6 +171,17 @@ public String serviceUrl() {
 }
 ----
 
+=== Consul Catalog Watch
+
+The Consul Catalog Watch takes advantage of the ability of consul to https://www.consul.io/docs/agent/watches.html#services[watch services]. The Catalog Watch makes a blocking Consul HTTP API call to determine if any services have changed. If there is new service data a Heartbeat Event is published.
+
+To change the frequency of when the Config Watch is called change `spring.cloud.consul.config.discovery.catalog-services-watch-delay`. The default value is 1000, which is in milliseconds. The delay is the amount of time after the end of the previous invocation and the start of the next.
+
+To disable the Catalog Watch set `spring.cloud.consul.discovery.catalogServicesWatch.enabled=false`.
+
+
+The watch uses a Spring `TaskScheduler` to schedule the call to consul. By default it is a `ThreadPoolTaskScheduler` with a `poolSize` of 1. To change the `TaskScheduler`, create a bean of type `TaskScheduler` named with the `ConsulDiscoveryClientConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME` constant.
+
 [[spring-cloud-consul-config]]
 == Distributed Configuration with Consul
 
@@ -218,9 +230,11 @@ spring:
 
 The Consul Config Watch takes advantage of the ability of consul to https://www.consul.io/docs/agent/watches.html#keyprefix[watch a key prefix]. The Config Watch makes a blocking Consul HTTP API call to determine if any relevant configuration data has changed for the current application. If there is new configuration data a Refresh Event is published. This is equivalent to calling the `/refresh` actuator endpoint.
 
-To change the frequency of when the Config Watch is called change `spring.cloud.consul.config.watch.delay`. The default value is 1000, which is in milliseconds.
+To change the frequency of when the Config Watch is called change `spring.cloud.consul.config.watch.delay`. The default value is 1000, which is in milliseconds. The delay is the amount of time after the end of the previous invocation and the start of the next.
 
 To disable the Config Watch set `spring.cloud.consul.config.watch.enabled=false`.
+
+The watch uses a Spring `TaskScheduler` to schedule the call to consul. By default it is a `ThreadPoolTaskScheduler` with a `poolSize` of 1. To change the `TaskScheduler`, create a bean of type `TaskScheduler` named with the `ConsulConfigAutoConfiguration.CONFIG_WATCH_TASK_SCHEDULER_NAME` constant.
 
 [[spring-cloud-consul-config-format]]
 === YAML or Properties with Config

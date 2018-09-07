@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul;
 
+import com.ecwid.consul.transport.TLSConfig;
+import com.ecwid.consul.v1.ConsulClient;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnEnabledEndpoint;
 import org.springframework.boot.actuate.autoconfigure.health.ConditionalOnEnabledHealthIndicator;
@@ -57,6 +59,17 @@ public class ConsulAutoConfiguration {
 				? consulProperties.getScheme() + "://" + consulProperties.getHost()
 				: consulProperties.getHost();
 
+		if (consulProperties.getTls() != null) {
+			ConsulProperties.TLSConfig tls = consulProperties.getTls();
+			TLSConfig tlsConfig = new TLSConfig(
+					tls.getKeyStoreInstanceType(),
+					tls.getCertificatePath(),
+					tls.getCertificatePassword(),
+					tls.getKeyStorePath(),
+					tls.getKeyStorePassword()
+			);
+			return new ConsulClient(agentHost, agentPort, tlsConfig);
+		}
 		return new ConsulClient(agentHost, agentPort);
 	}
 

@@ -17,14 +17,12 @@
 package org.springframework.cloud.consul;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-
-import lombok.Data;
+import org.springframework.core.style.ToStringCreator;
 
 /**
  * @author Spencer Gibb
  */
 @ConfigurationProperties("spring.cloud.consul.retry")
-@Data
 public class RetryProperties {
 
 	/** Initial retry interval in milliseconds. */
@@ -38,4 +36,49 @@ public class RetryProperties {
 
 	/** Maximum number of attempts. */
 	private int maxAttempts = 6;
+
+	public RetryProperties() {
+	}
+
+	public long getInitialInterval() {
+		return this.initialInterval;
+	}
+
+	public double getMultiplier() {
+		return this.multiplier;
+	}
+
+	public long getMaxInterval() {
+		return this.maxInterval;
+	}
+
+	public int getMaxAttempts() {
+		return this.maxAttempts;
+	}
+
+	public void setInitialInterval(long initialInterval) {
+		this.initialInterval = initialInterval;
+	}
+
+	public void setMultiplier(double multiplier) {
+		this.multiplier = multiplier;
+	}
+
+	public void setMaxInterval(long maxInterval) {
+		this.maxInterval = maxInterval;
+	}
+
+	public void setMaxAttempts(int maxAttempts) {
+		this.maxAttempts = maxAttempts;
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringCreator(this)
+				.append("initialInterval", initialInterval)
+				.append("multiplier", multiplier)
+				.append("maxInterval", maxInterval)
+				.append("maxAttempts", maxAttempts)
+				.toString();
+	}
 }

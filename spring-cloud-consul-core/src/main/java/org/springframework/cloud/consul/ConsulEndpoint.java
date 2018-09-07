@@ -20,9 +20,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
-import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
@@ -30,7 +27,9 @@ import com.ecwid.consul.v1.agent.model.Service;
 import com.ecwid.consul.v1.catalog.model.CatalogService;
 import com.ecwid.consul.v1.catalog.model.Node;
 
-import lombok.Data;
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+import org.springframework.core.style.ToStringCreator;
 
 /**
  * @author Spencer Gibb
@@ -66,7 +65,6 @@ public class ConsulEndpoint {
 		return data;
 	}
 
-	@Data
 	public static class ConsulData {
 		Map<String, List<CatalogService>> catalogServices = new LinkedHashMap<>();
 
@@ -74,6 +72,40 @@ public class ConsulEndpoint {
 
 		List<Node> catalogNodes;
 
-		// List<KeyValue> keyValues;
+		public ConsulData() {
+		}
+
+		public Map<String, List<CatalogService>> getCatalogServices() {
+			return this.catalogServices;
+		}
+
+		public Map<String, Service> getAgentServices() {
+			return this.agentServices;
+		}
+
+		public List<Node> getCatalogNodes() {
+			return this.catalogNodes;
+		}
+
+		public void setCatalogServices(Map<String, List<CatalogService>> catalogServices) {
+			this.catalogServices = catalogServices;
+		}
+
+		public void setAgentServices(Map<String, Service> agentServices) {
+			this.agentServices = agentServices;
+		}
+
+		public void setCatalogNodes(List<Node> catalogNodes) {
+			this.catalogNodes = catalogNodes;
+		}
+
+		@Override
+		public String toString() {
+			return new ToStringCreator(this)
+					.append("catalogServices", catalogServices)
+					.append("agentServices", agentServices)
+					.append("catalogNodes", catalogNodes)
+					.toString();
+		}
 	}
 }

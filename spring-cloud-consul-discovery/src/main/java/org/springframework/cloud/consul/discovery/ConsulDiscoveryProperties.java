@@ -91,9 +91,11 @@ public class ConsulDiscoveryProperties {
 	
 	/** Source of how we will determine the address to use */
 	private boolean preferAgentAddress = false;
-	
-	private int catalogServicesWatchDelay = 10;
 
+	/** The delay between calls to watch consul catalog in millis, default is 1000. */
+	private int catalogServicesWatchDelay = 1000;
+
+	/** The number of seconds to block while watching consul catalog, default is 2. */
 	private int catalogServicesWatchTimeout = 2;
 
 	/** Service name */

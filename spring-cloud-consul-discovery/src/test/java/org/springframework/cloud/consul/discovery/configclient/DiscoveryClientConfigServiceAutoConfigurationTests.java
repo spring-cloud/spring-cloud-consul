@@ -21,6 +21,7 @@ import java.util.Arrays;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.cloud.client.DefaultServiceInstance;
@@ -40,8 +41,8 @@ import org.springframework.context.annotation.Configuration;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -73,10 +74,10 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 						.getBeanNamesForType(ConsulConfigServerAutoConfiguration.class).length);
 		ConsulDiscoveryClient client = this.context.getParent().getBean(
 				ConsulDiscoveryClient.class);
-		verify(client, times(2)).getInstances("configserver");
+		verify(client, atLeast(2)).getInstances("configserver");
 		ConfigClientProperties locator = this.context
 				.getBean(ConfigClientProperties.class);
-		assertEquals("http://foo:7001/", locator.getRawUri());
+		assertEquals("http://foo:7001/", locator.getUri()[0]);
 	}
 
 	private void setup(String... env) {

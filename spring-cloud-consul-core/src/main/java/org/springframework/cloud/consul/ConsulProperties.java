@@ -18,7 +18,10 @@ package org.springframework.cloud.consul;
 
 import javax.validation.constraints.NotNull;
 
+import com.ecwid.consul.transport.TLSConfig.KeyStoreInstanceType;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.style.ToStringCreator;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -40,6 +43,10 @@ public class ConsulProperties {
 
 	/** Is spring cloud consul enabled */
 	private boolean enabled = true;
+
+	/** configuration for TLS */
+	private TLSConfig tls;
+
 
 	public String getHost() {
 		return host;
@@ -73,13 +80,101 @@ public class ConsulProperties {
 		this.scheme = scheme;
 	}
 
+	public TLSConfig getTls() {
+		return tls;
+	}
+
+	public void setTls(TLSConfig tls) {
+		this.tls = tls;
+	}
+
 	@Override
 	public String toString() {
 		return "ConsulProperties{" +
 				"host='" + host + '\'' +
 				", port=" + port +
 				", scheme=" + scheme +
+				", tls=" + tls +
 				", enabled=" + enabled +
 				'}';
+	}
+
+	public static class TLSConfig {
+		/** Type of key framework to use. */
+		private KeyStoreInstanceType keyStoreInstanceType;
+
+		/** Path to an external keystore */
+		private String keyStorePath;
+
+		/** Password to an external keystore */
+		private String keyStorePassword;
+
+		/**File path to the certificate. */
+		private String certificatePath;
+
+		/** Password to open the certificate. */
+		private String certificatePassword;
+
+		public TLSConfig() {
+		}
+
+		public TLSConfig(KeyStoreInstanceType keyStoreInstanceType, String keyStorePath, String keyStorePassword, String certificatePath, String certificatePassword) {
+			this.keyStoreInstanceType = keyStoreInstanceType;
+			this.keyStorePath = keyStorePath;
+			this.keyStorePassword = keyStorePassword;
+			this.certificatePath = certificatePath;
+			this.certificatePassword = certificatePassword;
+		}
+
+		public KeyStoreInstanceType getKeyStoreInstanceType() {
+			return keyStoreInstanceType;
+		}
+
+		public void setKeyStoreInstanceType(KeyStoreInstanceType keyStoreInstanceType) {
+			this.keyStoreInstanceType = keyStoreInstanceType;
+		}
+
+		public String getKeyStorePath() {
+			return keyStorePath;
+		}
+
+		public void setKeyStorePath(String keyStorePath) {
+			this.keyStorePath = keyStorePath;
+		}
+
+		public String getKeyStorePassword() {
+			return keyStorePassword;
+		}
+
+		public void setKeyStorePassword(String keyStorePassword) {
+			this.keyStorePassword = keyStorePassword;
+		}
+
+		public String getCertificatePath() {
+			return certificatePath;
+		}
+
+		public void setCertificatePath(String certificatePath) {
+			this.certificatePath = certificatePath;
+		}
+
+		public String getCertificatePassword() {
+			return certificatePassword;
+		}
+
+		public void setCertificatePassword(String certificatePassword) {
+			this.certificatePassword = certificatePassword;
+		}
+
+		@Override
+		public String toString() {
+			return new ToStringCreator(this)
+					.append("keyStoreInstanceType", keyStoreInstanceType)
+					.append("keyStorePath", keyStorePath)
+					.append("keyStorePassword", keyStorePassword)
+					.append("certificatePath", certificatePath)
+					.append("certificatePassword", certificatePassword)
+					.toString();
+		}
 	}
 }

@@ -23,6 +23,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.kv.model.GetValue;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.CompositePropertySource;
@@ -33,21 +39,15 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.kv.model.GetValue;
-
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
-
-import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * @author Spencer Gibb
  */
 @Order(0)
-@CommonsLog
 public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
+	private static final Log log = LogFactory.getLog(ConsulPropertySourceLocator.class);
 	private final ConsulClient consul;
 
 	private final ConsulConfigProperties properties;

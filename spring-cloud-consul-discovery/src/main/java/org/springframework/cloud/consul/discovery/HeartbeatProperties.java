@@ -16,25 +16,23 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-import lombok.Data;
-
-import lombok.extern.apachecommons.CommonsLog;
+import org.apache.commons.logging.Log;
 import org.joda.time.Period;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.core.style.ToStringCreator;
 import org.springframework.validation.annotation.Validated;
 
 @ConfigurationProperties(prefix = "spring.cloud.consul.discovery.heartbeat")
-@Data
-@CommonsLog
 @Validated
 public class HeartbeatProperties {
 
+	private static final Log log = org.apache.commons.logging.LogFactory.getLog(HeartbeatProperties.class);
 	// TODO: change enabled to default to true when I stop seeing messages like
 	// [WARN] agent: Check 'service:testConsulApp:xtest:8080' missed TTL, is now critical
 	boolean enabled = false;
@@ -65,5 +63,47 @@ public class HeartbeatProperties {
 
     public String getTtl() {
 		return ttlValue + ttlUnit;
+	}
+
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+
+	public @Min(1) int getTtlValue() {
+		return this.ttlValue;
+	}
+
+	public @NotNull String getTtlUnit() {
+		return this.ttlUnit;
+	}
+
+	public @DecimalMin("0.1") @DecimalMax("0.9") double getIntervalRatio() {
+		return this.intervalRatio;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public void setTtlValue(@Min(1) int ttlValue) {
+		this.ttlValue = ttlValue;
+	}
+
+	public void setTtlUnit(@NotNull String ttlUnit) {
+		this.ttlUnit = ttlUnit;
+	}
+
+	public void setIntervalRatio(@DecimalMin("0.1") @DecimalMax("0.9") double intervalRatio) {
+		this.intervalRatio = intervalRatio;
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringCreator(this)
+				.append("enabled", enabled)
+				.append("ttlValue", ttlValue)
+				.append("ttlUnit", ttlUnit)
+				.append("intervalRatio", intervalRatio)
+				.toString();
 	}
 }
