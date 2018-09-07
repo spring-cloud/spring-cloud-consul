@@ -515,6 +515,7 @@ public class ConsulDiscoveryProperties {
 				", registerHealthCheck=" + registerHealthCheck +
 				", failFast=" + failFast +
 				", healthCheckTlsSkipVerify=" + healthCheckTlsSkipVerify +
+				", order=" + order +
 				'}';
 	}
 
