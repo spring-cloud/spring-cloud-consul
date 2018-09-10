@@ -164,6 +164,11 @@ public class ConsulDiscoveryProperties {
 	 */
 	private Boolean healthCheckTlsSkipVerify;
 
+	/**
+	 * Order of the discovery client used by `CompositeDiscoveryClient` for sorting available clients.
+	 */
+	private int order = 0;
+
 	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {}
 
@@ -464,6 +469,14 @@ public class ConsulDiscoveryProperties {
 		this.healthCheckTlsSkipVerify = healthCheckTlsSkipVerify;
 	}
 
+	public int getOrder() {
+		return order;
+	}
+
+	public void setOrder(int order) {
+		this.order = order;
+	}
+
 	@Override
 	public String toString() {
 		return "ConsulDiscoveryProperties{" +
@@ -502,6 +515,7 @@ public class ConsulDiscoveryProperties {
 				", registerHealthCheck=" + registerHealthCheck +
 				", failFast=" + failFast +
 				", healthCheckTlsSkipVerify=" + healthCheckTlsSkipVerify +
+				", order=" + order +
 				'}';
 	}
 
