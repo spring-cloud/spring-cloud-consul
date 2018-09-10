@@ -57,12 +57,6 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		this.properties = properties;
 	}
 
-	@Deprecated
-	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties,
-	                             LocalResolver localResolver) {
-		this(client, properties);
-	}
-
 	@Override
 	public String description() {
 		return "Spring Cloud Consul Discovery Client";
@@ -74,7 +68,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	public List<ServiceInstance> getInstances(final String serviceId,
-	                                          final QueryParams queryParams) {
+			final QueryParams queryParams) {
 		List<ServiceInstance> instances = new ArrayList<>();
 
 		addInstancesToList(instances, serviceId, queryParams);
@@ -83,7 +77,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	private void addInstancesToList(List<ServiceInstance> instances, String serviceId,
-	                                QueryParams queryParams) {
+			QueryParams queryParams) {
 
 		String aclToken = properties.getAclToken();
 		Response<List<HealthService>> services;
