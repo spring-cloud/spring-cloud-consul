@@ -60,6 +60,9 @@ public class ConsulDiscoveryProperties {
 	/** Custom health check url to override default */
 	private String healthCheckUrl;
 
+	/** Headers to be applied to the Health Check calls */
+	private Map<String, List<String>> healthCheckHeaders = new HashMap<>();
+
 	/** How often to perform the health check (e.g. 10s), defaults to 10s. */
 	private String healthCheckInterval = "10s";
 
@@ -88,7 +91,7 @@ public class ConsulDiscoveryProperties {
 
 	/** Use ip address rather than hostname during registration */
 	private boolean preferIpAddress = false;
-	
+
 	/** Source of how we will determine the address to use */
 	private boolean preferAgentAddress = false;
 
@@ -109,6 +112,7 @@ public class ConsulDiscoveryProperties {
 
 	/** Service instance group*/
 	private String instanceGroup;
+
 
 	/**
 	 * Service instance zone comes from metadata.
@@ -181,7 +185,7 @@ public class ConsulDiscoveryProperties {
 	/**
 	 * @param serviceId The service who's filtering tag is being looked up
 	 * @return The tag the given service id should be filtered by, or null.
-     */
+	 */
 	public String getQueryTagForService(String serviceId){
 		String tag = serverListQueryTags.get(serviceId);
 		return tag != null ? tag : defaultQueryTag;
@@ -255,6 +259,14 @@ public class ConsulDiscoveryProperties {
 
 	public void setHealthCheckUrl(String healthCheckUrl) {
 		this.healthCheckUrl = healthCheckUrl;
+	}
+
+	public Map<String, List<String>> getHealthCheckHeaders() {
+		return healthCheckHeaders;
+	}
+
+	public void setHealthCheckHeaders(Map<String, List<String>> healthCheckHeaders) {
+		this.healthCheckHeaders = healthCheckHeaders;
 	}
 
 	public String getHealthCheckInterval() {
@@ -487,6 +499,7 @@ public class ConsulDiscoveryProperties {
 				", managementTags=" + managementTags +
 				", healthCheckPath='" + healthCheckPath + '\'' +
 				", healthCheckUrl='" + healthCheckUrl + '\'' +
+				", healthCheckHeaders='" + healthCheckHeaders + '\'' +
 				", healthCheckInterval='" + healthCheckInterval + '\'' +
 				", healthCheckTimeout='" + healthCheckTimeout + '\'' +
 				", healthCheckCriticalTimeout='" + healthCheckCriticalTimeout + '\'' +

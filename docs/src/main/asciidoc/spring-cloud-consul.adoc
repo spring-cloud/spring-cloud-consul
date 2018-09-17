@@ -122,6 +122,34 @@ spring:
 
 With this metadata, and multiple service instances deployed on localhost, the random value will kick in there to make the instance unique. In Cloudfoundry the `vcap.application.instance_id` will be populated automatically in a Spring Boot application, so the random value will not be needed.
 
+==== Applying Headers to Health Check Requests
+
+Headers can be applied to health check requests. For example, if you're trying to register a https://cloud.spring.io/spring-cloud-config/[Spring Cloud Config] server that uses https://github.com/spring-cloud/spring-cloud-config/blob/master/docs/src/main/asciidoc/spring-cloud-config.adoc#vault-backend[Vault Backend]:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        health-check-headers:
+          X-Config-Token: 6442e58b-d1ea-182e-cfa5-cf9cddef0722
+----
+
+According to the HTTP standard, each header can have more than one values, in which case, an array can be supplied:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        health-check-headers:
+          X-Config-Token:
+            - "6442e58b-d1ea-182e-cfa5-cf9cddef0722"
+            - "Some other value"
+----
+
 === Looking up services
 
 ==== Using Ribbon
