@@ -73,7 +73,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 			List<ConsulRegistrationCustomizer> registrationCustomizers,
 			HeartbeatProperties heartbeatProperties) {
 
-		NewService service = new NewService();
+		final NewService service = new NewService();
 		String appName = getAppName(properties, context.getEnvironment());
 		service.setId(getInstanceId(properties, context));
 		if(!properties.isPreferAgentAddress()) {
@@ -88,7 +88,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 			setCheck(service, autoServiceRegistrationProperties, properties, context, heartbeatProperties);
 		}
 
-		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, autoServiceRegistrationProperties,
+		final ConsulAutoRegistration registration = new ConsulAutoRegistration(service, autoServiceRegistrationProperties,
 			properties, context, heartbeatProperties);
 		customize(registrationCustomizers, registration);
 		return registration;
@@ -206,10 +206,10 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
 			tags.add("group=" + properties.getInstanceGroup());
 		}
-        
+
 		//store the secure flag in the tags so that clients will be able to figure out whether to use http or https automatically
 		tags.add("secure=" + Boolean.toString(properties.getScheme().equalsIgnoreCase("https")));
-		
+
 		return tags;
 	}
 
@@ -231,6 +231,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 					properties.getHostname(), port,
 					properties.getHealthCheckPath()));
 		}
+		check.setHeader(properties.getHealthCheckHeaders());
 		check.setInterval(properties.getHealthCheckInterval());
 		check.setTimeout(properties.getHealthCheckTimeout());
 		if (StringUtils.hasText(properties.getHealthCheckCriticalTimeout())) {
