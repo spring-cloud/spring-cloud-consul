@@ -132,7 +132,7 @@ spring:
   cloud:
     consul:
       discovery:
-        healthCheckHeaders:
+        health-check-headers:
           X-Config-Token: 6442e58b-d1ea-182e-cfa5-cf9cddef0722
 ----
 
@@ -144,7 +144,7 @@ spring:
   cloud:
     consul:
       discovery:
-        healthCheckHeaders:
+        health-check-headers:
           X-Config-Token:
             - "6442e58b-d1ea-182e-cfa5-cf9cddef0722"
             - "Some other value"
