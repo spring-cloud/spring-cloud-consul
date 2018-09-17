@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtils.HostInfo;
+import org.springframework.core.style.ToStringCreator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -491,45 +492,45 @@ public class ConsulDiscoveryProperties {
 
 	@Override
 	public String toString() {
-		return "ConsulDiscoveryProperties{" +
-				"hostInfo=" + hostInfo +
-				", aclToken='" + aclToken + '\'' +
-				", tags=" + tags +
-				", enabled=" + enabled +
-				", managementTags=" + managementTags +
-				", healthCheckPath='" + healthCheckPath + '\'' +
-				", healthCheckUrl='" + healthCheckUrl + '\'' +
-				", healthCheckHeaders='" + healthCheckHeaders + '\'' +
-				", healthCheckInterval='" + healthCheckInterval + '\'' +
-				", healthCheckTimeout='" + healthCheckTimeout + '\'' +
-				", healthCheckCriticalTimeout='" + healthCheckCriticalTimeout + '\'' +
-				", ipAddress='" + ipAddress + '\'' +
-				", hostname='" + hostname + '\'' +
-				", port=" + port +
-				", managementPort=" + managementPort +
-				", lifecycle=" + lifecycle +
-				", preferIpAddress=" + preferIpAddress +
-				", preferAgentAddress=" + preferAgentAddress +
-				", catalogServicesWatchDelay=" + catalogServicesWatchDelay +
-				", catalogServicesWatchTimeout=" + catalogServicesWatchTimeout +
-				", serviceName='" + serviceName + '\'' +
-				", instanceId='" + instanceId + '\'' +
-				", instanceZone='" + instanceZone + '\'' +
-				", instanceGroup='" + instanceGroup + '\'' +
-				", defaultZoneMetadataName='" + defaultZoneMetadataName + '\'' +
-				", scheme='" + scheme + '\'' +
-				", managementSuffix='" + managementSuffix + '\'' +
-				", serverListQueryTags=" + serverListQueryTags +
-				", datacenters=" + datacenters +
-				", defaultQueryTag='" + defaultQueryTag + '\'' +
-				", queryPassing=" + queryPassing +
-				", register=" + register +
-				", deregister=" + deregister +
-				", registerHealthCheck=" + registerHealthCheck +
-				", failFast=" + failFast +
-				", healthCheckTlsSkipVerify=" + healthCheckTlsSkipVerify +
-				", order=" + order +
-				'}';
+		return new ToStringCreator(this)
+				.append("hostInfo", hostInfo)
+				.append("aclToken", aclToken)
+				.append("tags", tags)
+				.append("enabled", enabled)
+				.append("managementTags", managementTags)
+				.append("healthCheckPath", healthCheckPath)
+				.append("healthCheckUrl", healthCheckUrl)
+				.append("healthCheckHeaders", healthCheckHeaders)
+				.append("healthCheckInterval", healthCheckInterval)
+				.append("healthCheckTimeout", healthCheckTimeout)
+				.append("healthCheckCriticalTimeout", healthCheckCriticalTimeout)
+				.append("ipAddress", ipAddress)
+				.append("hostname", hostname)
+				.append("port", port)
+				.append("managementPort", managementPort)
+				.append("lifecycle", lifecycle)
+				.append("preferIpAddress", preferIpAddress)
+				.append("preferAgentAddress", preferAgentAddress)
+				.append("catalogServicesWatchDelay", catalogServicesWatchDelay)
+				.append("catalogServicesWatchTimeout", catalogServicesWatchTimeout)
+				.append("serviceName", serviceName)
+				.append("instanceId", instanceId)
+				.append("instanceZone", instanceZone)
+				.append("instanceGroup", instanceGroup)
+				.append("defaultZoneMetadataName", defaultZoneMetadataName)
+				.append("scheme", scheme)
+				.append("managementSuffix", managementSuffix)
+				.append("serverListQueryTags", serverListQueryTags)
+				.append("datacenters", datacenters)
+				.append("defaultQueryTag", defaultQueryTag)
+				.append("queryPassing", queryPassing)
+				.append("register", register)
+				.append("deregister", deregister)
+				.append("registerHealthCheck", registerHealthCheck)
+				.append("failFast", failFast)
+				.append("healthCheckTlsSkipVerify", healthCheckTlsSkipVerify)
+				.append("order", order)
+				.toString();
 	}
 
 	public static class Lifecycle {
