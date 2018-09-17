@@ -102,37 +102,6 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		}
 	}
 
-	@Deprecated //TODO: do I need this here, or should I just copy what I need back into lifecycle?
-	public static ConsulAutoRegistration lifecycleRegistration(Integer port, String instanceId, AutoServiceRegistrationProperties autoServiceRegistrationProperties,
-			ConsulDiscoveryProperties properties, ApplicationContext context,
-			List<ConsulRegistrationCustomizer> registrationCustomizers,
-			HeartbeatProperties heartbeatProperties) {
-		NewService service = new NewService();
-		String appName = getAppName(properties, context.getEnvironment());
-		service.setId(instanceId);
-		if(!properties.isPreferAgentAddress()) {
-			service.setAddress(properties.getHostname());
-		}
-		service.setName(normalizeForDns(appName));
-		service.setTags(createTags(properties));
-
-		// If an alternate external port is specified, register using it instead
-		if (properties.getPort() != null) {
-			service.setPort(properties.getPort());
-		} else {
-			service.setPort(port);
-		}
-
-		Assert.notNull(service.getPort(), "service.port may not be null");
-
-		setCheck(service, autoServiceRegistrationProperties, properties, context, heartbeatProperties);
-
-		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, autoServiceRegistrationProperties,
-			properties, context, heartbeatProperties);
-		customize(registrationCustomizers, registration);
-		return registration;
-	}
-
 	public static void setCheck(NewService service,
 			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
 			ConsulDiscoveryProperties properties, ApplicationContext context,
