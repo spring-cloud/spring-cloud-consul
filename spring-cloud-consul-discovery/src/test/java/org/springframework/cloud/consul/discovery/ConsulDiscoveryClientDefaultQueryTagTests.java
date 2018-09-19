@@ -84,6 +84,18 @@ public class ConsulDiscoveryClientDefaultQueryTagTests {
 		assertThat("instance is not intg", instances.get(0).getMetadata(), hasEntry("intg", "intg"));
 	}
 
+	@Test
+	public void shouldReturnOnlyIntgService() {
+		List<String> services = discoveryClient.getServices();
+		assertThat("instances was wrong size", services, hasSize(1));
+		assertThat("instance is not intg", services.get(0).equals(NAME));
+	}
+
+	@Test
+	public void returnAllServicesIfTagNotSet() {
+
+	}
+
 	private NewService serviceForEnvironment(String env, int port) {
 		NewService service = new NewService();
 		service.setAddress("localhost");
