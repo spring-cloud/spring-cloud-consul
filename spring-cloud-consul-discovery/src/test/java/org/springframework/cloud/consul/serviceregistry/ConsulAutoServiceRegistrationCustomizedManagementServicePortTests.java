@@ -16,7 +16,10 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 import java.util.Map;
@@ -72,7 +75,8 @@ public class ConsulAutoServiceRegistrationCustomizedManagementServicePortTests {
 		assertNotNull("service was null", service);
 		assertNotEquals("service port was 0", 0, service.getPort().intValue());
 		assertEquals("service id was wrong", "myTestService1-GG", service.getId());
-		assertEquals("service name was wrong", "myprefix-myTestService-GG", service.getService());
+		assertEquals("service name was wrong", "myprefix-myTestService-GG",
+				service.getService());
 		assertFalse("service address must not be empty",
 				StringUtils.isEmpty(service.getAddress()));
 		assertEquals("service address must equals hostname from discovery properties",
@@ -86,8 +90,8 @@ public class ConsulAutoServiceRegistrationCustomizedManagementServicePortTests {
 				managementServerProperties.getPort().intValue());
 		assertEquals("management service id was wrong", "myTestService1-GG-management",
 				managementService.getId());
-		assertEquals("management service name was wrong", "myprefix-myTestService-GG-management",
-				managementService.getService());
+		assertEquals("management service name was wrong",
+				"myprefix-myTestService-GG-management", managementService.getService());
 		assertFalse("management service address must not be empty",
 				StringUtils.isEmpty(managementService.getAddress()));
 		assertEquals(
