@@ -137,9 +137,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	public static String getInstanceId(ConsulDiscoveryProperties properties, ApplicationContext context) {
 		if (!StringUtils.hasText(properties.getInstanceId())) {
 			return normalizeForDns(IdUtils.getDefaultInstanceId(context.getEnvironment(), false));
-		} else {
-			return normalizeForDns(properties.getInstanceId());
 		}
+		return normalizeForDns(properties.getInstanceId());
 	}
 
 	public static String normalizeForDns(String s) {
@@ -214,8 +213,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	 * @return the app name, currently the spring.application.name property
 	 */
 	public static String getAppName(ConsulDiscoveryProperties properties, Environment env) {
-		String appName = properties.getServiceName();
-		if (!StringUtils.isEmpty(appName)) {
+		final String appName = properties.getServiceName();
+		if (StringUtils.hasText(appName)) {
 			return appName;
 		}
 		return env.getProperty("spring.application.name", "application");
@@ -234,6 +233,10 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	 * @return the serviceId of the Management Service
 	 */
 	public static String getManagementServiceId(ConsulDiscoveryProperties properties, ApplicationContext context) {
+		final String instanceId = properties.getInstanceId();
+		if (StringUtils.hasText(instanceId)) {
+			return normalizeForDns(instanceId + SEPARATOR + properties.getManagementSuffix());
+		}
 		return normalizeForDns(IdUtils.getDefaultInstanceId(context.getEnvironment(), false)) + SEPARATOR + properties.getManagementSuffix();
 	}
 
@@ -241,6 +244,10 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	 * @return the service name of the Management Service
 	 */
 	public static String getManagementServiceName(ConsulDiscoveryProperties properties, Environment env) {
+		final String appName = properties.getServiceName();
+		if (StringUtils.hasText(appName)) {
+			return normalizeForDns(appName + SEPARATOR + properties.getManagementSuffix());
+		}
 		return normalizeForDns(getAppName(properties, env)) + SEPARATOR + properties.getManagementSuffix();
 	}
 
