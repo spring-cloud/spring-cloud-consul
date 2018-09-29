@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 /**
  * @author Spencer Gibb
+ * @author Tim Ysewyn
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulDiscoveryClientCustomizedTests.MyTestConfig.class,
@@ -75,6 +76,9 @@ public class ConsulDiscoveryClientCustomizedTests {
 	}
 
 	private void assertInstance(ServiceInstance instance) {
+		assertEquals("instance id was wrong", "testConsulDiscovery2Id", instance.getInstanceId());
+		assertEquals("service id was wrong", "testConsulDiscovery2", instance.getServiceId());
+
 		Map<String, String> metadata = instance.getMetadata();
 		assertNotNull("metadata was null", metadata);
 
