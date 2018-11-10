@@ -59,12 +59,14 @@ public class ConsulDiscoveryClientConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	//TODO: move to service-registry for Edgware
 	public HeartbeatProperties heartbeatProperties() {
 		return new HeartbeatProperties();
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	//TODO: Split appropriate values to service-registry for Edgware
 	public ConsulDiscoveryProperties consulDiscoveryProperties(InetUtils inetUtils) {
 		return new ConsulDiscoveryProperties(inetUtils);
