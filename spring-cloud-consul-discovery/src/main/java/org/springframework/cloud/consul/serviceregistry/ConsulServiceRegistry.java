@@ -31,6 +31,7 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.health.model.Check;
+import com.ecwid.consul.v1.agent.model.NewService;
 
 import static org.springframework.boot.actuate.health.Status.OUT_OF_SERVICE;
 import static org.springframework.boot.actuate.health.Status.UP;
@@ -62,7 +63,8 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 		log.info("Registering service with consul: " + reg.getService());
 		try {
 			client.agentServiceRegister(reg.getService(), properties.getAclToken());
-			if (heartbeatProperties.isEnabled() && ttlScheduler != null) {
+			NewService service = reg.getService();
+			if (heartbeatProperties.isEnabled() && ttlScheduler != null && service.getCheck() != null && service.getCheck().getTtl() != null) {
 				ttlScheduler.add(reg.getInstanceId());
 			}
 		}
