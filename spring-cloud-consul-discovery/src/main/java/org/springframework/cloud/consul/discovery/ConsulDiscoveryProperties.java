@@ -52,7 +52,7 @@ public class ConsulDiscoveryProperties {
 	private boolean enabled = true;
 
 	/** Tags to use when registering management service */
-	private List<String> managementTags = Arrays.asList(MANAGEMENT);
+	private List<String> managementTags = new ArrayList<>();
 
 	/** Alternate server path to invoke for health checking */
 	private String healthCheckPath = "/actuator/health";
@@ -165,9 +165,12 @@ public class ConsulDiscoveryProperties {
 	private Boolean healthCheckTlsSkipVerify;
 
 	@SuppressWarnings("unused")
-	private ConsulDiscoveryProperties() {}
+	private ConsulDiscoveryProperties() {
+		this.managementTags.add(MANAGEMENT);
+	}
 
 	public ConsulDiscoveryProperties(InetUtils inetUtils) {
+		this();
 		this.hostInfo = inetUtils.findFirstNonLoopbackHostInfo();
 		this.ipAddress = this.hostInfo.getIpAddress();
 		this.hostname = this.hostInfo.getHostname();
