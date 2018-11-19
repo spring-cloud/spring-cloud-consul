@@ -73,6 +73,7 @@ public class ConsulRibbonClientConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
 	public ServerListFilter<Server> ribbonServerListFilter() {
 		return new HealthServiceServerListFilter();
 	}
@@ -81,6 +82,12 @@ public class ConsulRibbonClientConfiguration {
 	@ConditionalOnMissingBean
 	public IPing ribbonPing() {
 		return new ConsulPing();
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public ConsulServerIntrospector serverIntrospector() {
+		return new ConsulServerIntrospector();
 	}
 
 	@PostConstruct
