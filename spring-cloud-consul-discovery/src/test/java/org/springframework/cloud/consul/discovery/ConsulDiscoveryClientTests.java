@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -43,7 +44,8 @@ import com.ecwid.consul.v1.Response;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = { "spring.application.name=testConsulDiscovery",
-		"spring.cloud.consul.discovery.prefer-ip-address=true"},
+		"spring.cloud.consul.discovery.prefer-ip-address=true",
+		"spring.cloud.consul.discovery.tags=foo=bar", },
 		classes = ConsulDiscoveryClientTests.MyTestConfig.class,
 		webEnvironment = RANDOM_PORT)
 public class ConsulDiscoveryClientTests {
@@ -62,6 +64,8 @@ public class ConsulDiscoveryClientTests {
 		ServiceInstance instance = instances.get(0);
 		assertFalse("instance was secure (https)", instance.isSecure());
 		assertIpAddress(instance);
+		assertThat(instance.getMetadata())
+				.containsEntry("foo", "bar");
 	}
 
 	@Test

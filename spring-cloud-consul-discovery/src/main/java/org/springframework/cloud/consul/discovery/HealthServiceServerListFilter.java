@@ -25,7 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * ServerList implementaion that filters ConsulServers based on if all their Health Checks are PASSING.
+ * ServerList implementation that filters ConsulServers based on if all their Health Checks are PASSING.
  * @author Spencer Gibb
  */
 public class HealthServiceServerListFilter implements ServerListFilter<Server> {
