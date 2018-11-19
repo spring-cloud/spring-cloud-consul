@@ -1,13 +1,15 @@
 package org.springframework.cloud.consul.discovery;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.cloud.commons.util.InetUtils;
-import org.springframework.cloud.commons.util.InetUtilsProperties;
-
 import java.util.Collections;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import org.springframework.cloud.commons.util.InetUtils;
+import org.springframework.cloud.commons.util.InetUtilsProperties;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -55,5 +57,12 @@ public class ConsulDiscoveryPropertiesTests {
 	@Test
 	public void testGetDcReturnsMapValueWhenInMap() {
 		assertEquals(MAP_DC, properties.getDatacenters().get(SERVICE_NAME_IN_MAP));
+	}
+
+	@Test
+	public void testAddManagementTag() {
+		properties.getManagementTags().add("newTag");
+		assertThat(properties.getManagementTags())
+				.containsOnly(ConsulDiscoveryProperties.MANAGEMENT, "newTag");
 	}
 }
