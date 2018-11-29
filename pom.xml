@@ -20,7 +20,7 @@
 	</parent>
 
 	<properties>
-		<spring-cloud-bus.version>2.0.0.BUILD-SNAPSHOT</spring-cloud-bus.version>
+		<spring-cloud-bus.version>2.1.0.BUILD-SNAPSHOT</spring-cloud-bus.version>
 		<spring-cloud-commons.version>2.1.0.BUILD-SNAPSHOT</spring-cloud-commons.version>
 		<spring-cloud-config.version>2.1.0.BUILD-SNAPSHOT</spring-cloud-config.version>
 		<spring-cloud-netflix.version>2.1.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
