@@ -1,0 +1,3 @@
+org.springframework.cloud.bootstrap.BootstrapConfiguration=\
+org.springframework.cloud.consul.discovery.configclient.TestConsulDiscoveryClientBootstrapConfiguration
+

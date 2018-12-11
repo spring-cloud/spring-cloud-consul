@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,24 @@
 
 package org.springframework.cloud.consul.discovery.configclient;
 
-import java.util.Arrays;
-
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
-import org.springframework.boot.test.util.TestPropertyValues;
-import org.springframework.cloud.client.DefaultServiceInstance;
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.commons.util.UtilAutoConfiguration;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.config.client.ConfigClientProperties;
-import org.springframework.cloud.config.client.DiscoveryClientConfigServiceBootstrapConfiguration;
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
-import org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration;
-import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.test.ClassPathExclusions;
 import org.springframework.cloud.test.ModifiedClassPathRunner;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.AbstractApplicationContext;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -52,13 +43,19 @@ import static org.mockito.Mockito.verify;
 @ClassPathExclusions({ "spring-retry-*.jar", "spring-boot-starter-aop-*.jar" })
 public class DiscoveryClientConfigServiceAutoConfigurationTests {
 
-	private AnnotationConfigApplicationContext context;
+	private ConfigurableApplicationContext context;
+
+	@Before
+	public void init() {
+		//FIXME: why do I need to do this? (fails in maven build without it.
+		TomcatURLStreamHandlerFactory.disable();
+	}
 
 	@After
 	public void close() {
 		if (this.context != null) {
 			if (this.context.getParent() != null) {
-				((AnnotationConfigApplicationContext) this.context.getParent()).close();
+				((AbstractApplicationContext) this.context.getParent()).close();
 			}
 			this.context.close();
 		}
@@ -66,10 +63,14 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 
 	@Test
 	public void onWhenRequested() throws Exception {
-		setup("server.port=7000", "spring.cloud.config.discovery.enabled=true",
+		setup("server.port=0", "spring.cloud.config.discovery.enabled=true",
+				"logging.level.org.springframework.cloud.config.client=DEBUG",
+				"spring.cloud.consul.discovery.test.enabled:true",
+				"spring.application.name=discoveryclientconfigservicetest",
 				"spring.cloud.consul.discovery.port:7001",
 				"spring.cloud.consul.discovery.hostname:foo",
 				"spring.cloud.config.discovery.service-id:configserver");
+
 		assertEquals( 1, this.context
 						.getBeanNamesForType(ConsulConfigServerAutoConfiguration.class).length);
 		ConsulDiscoveryClient client = this.context.getParent().getBean(
@@ -81,36 +82,13 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 	}
 
 	private void setup(String... env) {
-		AnnotationConfigApplicationContext parent = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of(env).applyTo(parent);
-		parent.register(UtilAutoConfiguration.class,
-				PropertyPlaceholderAutoConfiguration.class, EnvironmentKnobbler.class,
-				ConsulDiscoveryClientConfigServiceBootstrapConfiguration.class,
-				DiscoveryClientConfigServiceBootstrapConfiguration.class,
-				ConfigClientProperties.class);
-		parent.refresh();
-		this.context = new AnnotationConfigApplicationContext();
-		this.context.setParent(parent);
-		this.context.register(PropertyPlaceholderAutoConfiguration.class,
-				ConsulConfigServerAutoConfiguration.class, ConsulAutoConfiguration.class,
-				ConsulDiscoveryClientConfiguration.class);
-		this.context.refresh();
+		this.context = new SpringApplicationBuilder(TestConfig.class)
+				.properties(env)
+				.run();
 	}
 
 	@Configuration
-	protected static class EnvironmentKnobbler {
-
-		@Bean
-		public ConsulDiscoveryClient consulDiscoveryClient(
-				ConsulDiscoveryProperties properties) {
-			ConsulDiscoveryClient client = mock(ConsulDiscoveryClient.class);
-			ServiceInstance instance = new DefaultServiceInstance("configserver",
-					properties.getHostname(), properties.getPort(), false);
-			given(client.getInstances("configserver"))
-					.willReturn(Arrays.asList(instance));
-			return client;
-		}
-
-	}
+	@EnableAutoConfiguration
+	protected static class TestConfig { }
 
 }
