@@ -67,6 +67,7 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 				"logging.level.org.springframework.cloud.config.client=DEBUG",
 				"spring.cloud.consul.discovery.test.enabled:true",
 				"spring.application.name=discoveryclientconfigservicetest",
+				"spring.jmx.enabled=false",
 				"spring.cloud.consul.discovery.port:7001",
 				"spring.cloud.consul.discovery.hostname:foo",
 				"spring.cloud.config.discovery.service-id:configserver");
