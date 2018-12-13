@@ -69,6 +69,78 @@ public class Application {
 <simpara>The default service name, instance id and port, taken from the <literal>Environment</literal>, are <literal>${spring.application.name}</literal>, the Spring Context ID and <literal>${server.port}</literal> respectively.</simpara>
 <simpara>To disable the Consul Discovery Client you can set <literal>spring.cloud.consul.discovery.enabled</literal> to <literal>false</literal>.</simpara>
 <simpara>To disable the service registration you can set <literal>spring.cloud.consul.discovery.register</literal> to <literal>false</literal>.</simpara>
+<section xml:id="_registering_management_as_a_separate_service">
+<title>Registering Management as a Separate Service</title>
+<simpara>When management server port is set to something different than the application port, by setting <literal>management.server.port</literal> property, management service will be registered as a separate service than the application service. For example:</simpara>
+<formalpara>
+<title>application.yml</title>
+<para>
+<screen>spring:
+  application:
+    name: myApp
+management:
+  server:
+    port: 4452</screen>
+</para>
+</formalpara>
+<simpara>Above configuration will register following 2 services:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Application Service:</simpara>
+</listitem>
+</itemizedlist>
+<screen>ID: myApp
+Name: myApp</screen>
+<itemizedlist>
+<listitem>
+<simpara>Management Service:</simpara>
+</listitem>
+</itemizedlist>
+<screen>ID: myApp-management
+Name: myApp-management</screen>
+<simpara>Management service will inherit its <literal>instanceId</literal> and <literal>serviceName</literal> from the application service. For example:</simpara>
+<formalpara>
+<title>application.yml</title>
+<para>
+<screen>spring:
+  application:
+    name: myApp
+management:
+  server:
+    port: 4452
+spring:
+  cloud:
+    consul:
+      discovery:
+        instance-id: custom-service-id
+        serviceName: myprefix-${spring.application.name}</screen>
+</para>
+</formalpara>
+<simpara>Above configuration will register following 2 services:</simpara>
+<itemizedlist>
+<listitem>
+<simpara>Application Service:</simpara>
+</listitem>
+</itemizedlist>
+<screen>ID: custom-service-id
+Name: myprefix-myApp</screen>
+<itemizedlist>
+<listitem>
+<simpara>Management Service:</simpara>
+</listitem>
+</itemizedlist>
+<screen>ID: custom-service-id-management
+Name: myprefix-myApp-management</screen>
+<simpara>Further customization is possible via following properties:</simpara>
+<screen>/** Port to register the management service under (defaults to management port) */
+spring.cloud.consul.discovery.management-port
+
+/** Suffix to use when registering management service (defaults to "management" */
+spring.cloud.consul.discovery.management-suffix
+
+/** Tags to use when registering management service (defaults to "management" */
+spring.cloud.consul.discovery.management-tags</screen>
+</section>
 </section>
 <section xml:id="_http_health_check">
 <title>HTTP Health Check</title>
