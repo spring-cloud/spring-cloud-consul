@@ -16,6 +16,12 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
 import java.util.Map;
 
 import org.junit.Test;
@@ -35,21 +41,15 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-
 /**
  * @author Aleksandr Tarasov (aatarasov)
+ * @author Lomesh Patel (lomeshpatel)
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationManagementServiceTests.TestConfig.class, properties =
-		{"spring.application.name=myTestService-EE",
-				"spring.cloud.consul.discovery.instanceId=myTestService1-EE",
-				"spring.cloud.consul.discovery.registerHealthCheck=false",
-				"management.server.port=0"},
-		webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = ConsulAutoServiceRegistrationManagementServiceTests.TestConfig.class, properties = {
+		"spring.application.name=myTestService-EE",
+		"spring.cloud.consul.discovery.registerHealthCheck=false",
+		"management.server.port=4452" }, webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationManagementServiceTests {
 
 	@Autowired
@@ -60,19 +60,39 @@ public class ConsulAutoServiceRegistrationManagementServiceTests {
 
 	@Test
 	public void contextLoads() {
-		Response<Map<String, Service>> response = consul.getAgentServices();
-		Map<String, Service> services = response.getValue();
-		Service service = services.get("myTestService-EE-0-management");
+		final Response<Map<String, Service>> response = consul.getAgentServices();
+		final Map<String, Service> services = response.getValue();
+
+		final Service service = services.get("myTestService-EE-0");
 		assertNotNull("service was null", service);
-		assertEquals("service port is not 0", 0, service.getPort().intValue());
-		assertEquals("service id was wrong", "myTestService-EE-0-management", service.getId());
-		assertEquals("service name was wrong", "myTestService-EE-management", service.getService());
-		assertFalse("service address must not be empty", StringUtils.isEmpty(service.getAddress()));
-		assertEquals("service address must equals hostname from discovery properties", discoveryProperties.getHostname(), service.getAddress());
+		assertNotEquals("service port was 0", 0, service.getPort().intValue());
+		assertEquals("service id was wrong", "myTestService-EE-0", service.getId());
+		assertEquals("service name was wrong", "myTestService-EE", service.getService());
+		assertFalse("service address must not be empty",
+				StringUtils.isEmpty(service.getAddress()));
+		assertEquals("service address must equals hostname from discovery properties",
+				discoveryProperties.getHostname(), service.getAddress());
+
+		final Service managementService = services.get("myTestService-EE-0-management");
+		assertNotNull("management service was null", managementService);
+		assertEquals("management service port was wrong", 4452,
+				managementService.getPort().intValue());
+		assertEquals("management service id was wrong", "myTestService-EE-0-management",
+				managementService.getId());
+		assertEquals("management service name was wrong", "myTestService-EE-management",
+				managementService.getService());
+		assertFalse("management service address must not be empty",
+				StringUtils.isEmpty(managementService.getAddress()));
+		assertEquals(
+				"management service address must equals hostname from discovery properties",
+				discoveryProperties.getHostname(), managementService.getAddress());
 	}
 
 	@Configuration
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
-	public static class TestConfig { }
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
+			ConsulAutoConfiguration.class,
+			ConsulAutoServiceRegistrationAutoConfiguration.class })
+	public static class TestConfig {
+	}
 }

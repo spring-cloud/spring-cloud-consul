@@ -76,6 +76,83 @@ To disable the Consul Discovery Client you can set `spring.cloud.consul.discover
 
 To disable the service registration you can set `spring.cloud.consul.discovery.register` to `false`.
 
+==== Registering Management as a Separate Service
+
+When management server port is set to something different than the application port, by setting `management.server.port` property, management service will be registered as a separate service than the application service. For example:
+
+.application.yml
+----
+spring:
+  application:
+    name: myApp
+management:
+  server:
+    port: 4452
+----
+
+Above configuration will register following 2 services:
+
+* Application Service:
+
+----
+ID: myApp
+Name: myApp
+----
+
+* Management Service:
+
+----
+ID: myApp-management
+Name: myApp-management
+----
+
+Management service will inherit its `instanceId` and `serviceName` from the application service. For example:
+
+.application.yml
+----
+spring:
+  application:
+    name: myApp
+management:
+  server:
+    port: 4452
+spring:
+  cloud:
+    consul:
+      discovery:
+        instance-id: custom-service-id
+        serviceName: myprefix-${spring.application.name}
+----
+
+Above configuration will register following 2 services:
+
+* Application Service:
+
+----
+ID: custom-service-id
+Name: myprefix-myApp
+----
+
+* Management Service:
+
+----
+ID: custom-service-id-management
+Name: myprefix-myApp-management
+----
+
+Further customization is possible via following properties:
+
+----
+/** Port to register the management service under (defaults to management port) */
+spring.cloud.consul.discovery.management-port
+
+/** Suffix to use when registering management service (defaults to "management" */
+spring.cloud.consul.discovery.management-suffix
+
+/** Tags to use when registering management service (defaults to "management" */
+spring.cloud.consul.discovery.management-tags
+----
+
 === HTTP Health Check
 
 The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. `server.servletPath=/foo`) or management endpoint path (e.g. `management.server.servlet.context-path=/admin`). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectively.  Example:
