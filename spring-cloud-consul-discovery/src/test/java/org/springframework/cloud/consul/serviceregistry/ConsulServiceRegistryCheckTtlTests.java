@@ -35,6 +35,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Alexey Savchuk
@@ -61,8 +62,7 @@ public class ConsulServiceRegistryCheckTtlTests {
     @Autowired
     private TtlScheduler ttlScheduler;
 
-    @Test
-    public void contextLoads() throws NoSuchFieldException, IllegalAccessException {
+    private ConsulRegistration createHttpRegistration() {
         NewService service = registration.getService();
         NewService.Check httpCheck = new NewService.Check();
         httpCheck.setHttp(String.format(
@@ -77,12 +77,17 @@ public class ConsulServiceRegistryCheckTtlTests {
         httpService.setId(service.getId() + "-http");
         httpService.setName(service.getName() + "-http");
         httpService.setCheck(httpCheck);
-        ConsulRegistration httpRegistration = new ConsulRegistration(httpService, discoveryProperties);
-        consulServiceRegistry.register(httpRegistration);
+        return new ConsulRegistration(httpService, discoveryProperties);
+    }
 
-        Field shf = TtlScheduler.class.getDeclaredField("serviceHeartbeats");
-        shf.setAccessible(true);
-        Map serviceHeartbeats = (Map) shf.get(ttlScheduler);
+    @Test
+    public void contextLoads() throws NoSuchFieldException, IllegalAccessException {
+        ConsulRegistration httpRegistration = createHttpRegistration();
+        consulServiceRegistry.register(httpRegistration);
+        Field serviceHeartbeatsField = TtlScheduler.class.getDeclaredField("serviceHeartbeats");
+        serviceHeartbeatsField.setAccessible(true);
+        Map serviceHeartbeats = (Map) serviceHeartbeatsField.get(ttlScheduler);
+        assertTrue("Service with heartbeat check not registered in TTL scheduler", serviceHeartbeats.keySet().contains(registration.getInstanceId()));
         assertFalse("Service with HTTP check registered in TTL scheduler", serviceHeartbeats.keySet().contains(httpRegistration.getInstanceId()));
     }
 
