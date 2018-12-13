@@ -22,8 +22,8 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
@@ -46,8 +46,8 @@ import static org.junit.Assert.assertFalse;
 }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ConsulServiceRegistryCheckTtlTests {
 
-    @Autowired
-    private ServerProperties serverProperties;
+    @LocalServerPort
+    private int randomServerPort;
 
     @Autowired
     private ConsulDiscoveryProperties discoveryProperties;
@@ -69,7 +69,7 @@ public class ConsulServiceRegistryCheckTtlTests {
                 "%s://%s:%s%s",
                 discoveryProperties.getScheme(),
                 discoveryProperties.getHostname(),
-                serverProperties.getPort(),
+                randomServerPort,
                 discoveryProperties.getHealthCheckPath()
         ));
         httpCheck.setInterval(discoveryProperties.getHealthCheckInterval());
