@@ -20,6 +20,7 @@ import com.ecwid.consul.v1.ConsulClient;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
@@ -29,6 +30,7 @@ import org.springframework.context.annotation.Import;
 
 /**
  * @author Spencer Gibb
+ * @author Edvin Eriksson
  */
 @Configuration
 @ConditionalOnConsulEnabled
@@ -43,6 +45,7 @@ public class ConsulConfigBootstrapConfiguration {
 		private ConsulClient consul;
 
 		@Bean
+		@ConditionalOnMissingBean
 		public ConsulConfigProperties consulConfigProperties() {
 			return new ConsulConfigProperties();
 		}
