@@ -42,13 +42,16 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	private final AutoServiceRegistrationProperties autoServiceRegistrationProperties;
 	private final ApplicationContext context;
 	private final HeartbeatProperties heartbeatProperties;
+	private final List<ConsulManagementRegistrationCustomizer> managementRegistrationCustomizers;
 
 	public ConsulAutoRegistration(NewService service, AutoServiceRegistrationProperties autoServiceRegistrationProperties,
-		ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
+		ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties,
+		List<ConsulManagementRegistrationCustomizer> managementRegistrationCustomizers) {
 		super(service, properties);
 		this.autoServiceRegistrationProperties = autoServiceRegistrationProperties;
 		this.context = context;
 		this.heartbeatProperties = heartbeatProperties;
+		this.managementRegistrationCustomizers = managementRegistrationCustomizers;
 	}
 
 	public void initializePort(int knownPort) {
@@ -65,12 +68,13 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 	public ConsulAutoRegistration managementRegistration() {
 		return managementRegistration(this.autoServiceRegistrationProperties, getProperties(),
-			this.context, this.heartbeatProperties);
+			this.context, this.managementRegistrationCustomizers, this.heartbeatProperties);
 	}
 
 	public static ConsulAutoRegistration registration(AutoServiceRegistrationProperties autoServiceRegistrationProperties,
 			ConsulDiscoveryProperties properties, ApplicationContext context,
 			List<ConsulRegistrationCustomizer> registrationCustomizers,
+			List<ConsulManagementRegistrationCustomizer> managementRegistrationCustomizers,
 			HeartbeatProperties heartbeatProperties) {
 
 		NewService service = new NewService();
@@ -89,7 +93,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		}
 
 		ConsulAutoRegistration registration = new ConsulAutoRegistration(service, autoServiceRegistrationProperties,
-			properties, context, heartbeatProperties);
+			properties, context, heartbeatProperties, managementRegistrationCustomizers);
 		customize(registrationCustomizers, registration);
 		return registration;
 	}
@@ -121,6 +125,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	public static ConsulAutoRegistration managementRegistration(
 			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
 			ConsulDiscoveryProperties properties, ApplicationContext context,
+			List<ConsulManagementRegistrationCustomizer> managementRegistrationCustomizers,
 			HeartbeatProperties heartbeatProperties) {
 		NewService management = new NewService();
 		management.setId(getManagementServiceId(properties, context));
@@ -131,7 +136,17 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		if (properties.isRegisterHealthCheck()) {
 			management.setCheck(createCheck(getManagementPort(properties, context), heartbeatProperties, properties));
 		}
-		return new ConsulAutoRegistration(management, autoServiceRegistrationProperties, properties, context, heartbeatProperties);
+		ConsulAutoRegistration registration = new ConsulAutoRegistration(management, autoServiceRegistrationProperties, properties, context, heartbeatProperties, managementRegistrationCustomizers);
+		managementCustomize(managementRegistrationCustomizers, registration);
+		return registration;
+	}
+
+	public static void managementCustomize(List<ConsulManagementRegistrationCustomizer> registrationCustomizers, ConsulAutoRegistration registration) {
+		if (registrationCustomizers != null) {
+			for (ConsulManagementRegistrationCustomizer customizer : registrationCustomizers) {
+				customizer.customize(registration);
+			}
+		}
 	}
 
 	public static String getInstanceId(ConsulDiscoveryProperties properties, ApplicationContext context) {
