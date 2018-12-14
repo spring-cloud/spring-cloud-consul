@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.cloud.client.serviceregistry.AbstractAutoServiceRegistration;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
@@ -46,6 +47,10 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 	@Deprecated
 	public void setPort(int port) {
 		getPort().set(port);
+	}
+
+	void setPortIfNeeded(int port) {
+		getPort().compareAndSet(0, port);
 	}
 
 	@Override
@@ -120,6 +125,9 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 		return StringUtils.isEmpty(appName) ? super.getAppName() : appName;
 	}
 
-
-
+	@Override
+	public void bind(WebServerInitializedEvent event) {
+		// do nothing so we can listen for this event in a different class
+		// this ensures start() can be retried if spring-retry is available
+	}
 }

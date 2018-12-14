@@ -62,6 +62,11 @@ public class ConsulAutoServiceRegistrationAutoConfiguration {
 	}
 
 	@Bean
+	public ConsulAutoServiceRegistrationListener consulAutoServiceRegistrationListener(ConsulAutoServiceRegistration registration) {
+		return new ConsulAutoServiceRegistrationListener(registration);
+	}
+
+	@Bean
 	@ConditionalOnMissingBean
 	public ConsulAutoRegistration consulRegistration(AutoServiceRegistrationProperties autoServiceRegistrationProperties,
 			ConsulDiscoveryProperties properties, ApplicationContext applicationContext,
