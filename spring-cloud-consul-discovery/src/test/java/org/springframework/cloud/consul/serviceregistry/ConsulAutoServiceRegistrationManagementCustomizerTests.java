@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
+import com.ecwid.consul.v1.agent.model.NewService;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,10 @@ import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -47,26 +53,42 @@ public class ConsulAutoServiceRegistrationManagementCustomizerTests {
     @Autowired
     private ConsulRegistration registration;
 
+    @Autowired
+    private ConsulAutoRegistration autoRegistration;
+
     @Test
     public void contextLoads() {
-        //
+        ConsulAutoRegistration managementRegistration = autoRegistration.managementRegistration();
+        List<NewService.Check> checks = managementRegistration.getService().getChecks();
+        List<String> ttls = checks.stream().map(NewService.Check::getTtl).collect(Collectors.toList());
+        Assert.assertTrue("Management registration not customized with 'foo' customizer", ttls.contains("39s"));
+        Assert.assertTrue("Management registration not customized with 'bar' customizer", ttls.contains("36s"));
     }
 
     @Configuration
     public static class ManagementConfig {
 
         @Bean
-        public ConsulManagementRegistrationCustomizer managementCustomizer() {
+        public ConsulManagementRegistrationCustomizer fooManagementCustomizer() {
             return managementRegistration -> {
-                //
+                addCheck(managementRegistration, "39s");
             };
         }
 
         @Bean
-        public ConsulManagementRegistrationCustomizer managementCustomizer2() {
+        public ConsulManagementRegistrationCustomizer barManagementCustomizer() {
             return managementRegistration -> {
-                //
+                addCheck(managementRegistration, "36s");
             };
+        }
+
+        private void addCheck(ConsulRegistration managementRegistration, String ttl) {
+            NewService managementService = managementRegistration.getService();
+            NewService.Check check = new NewService.Check();
+            check.setTtl(ttl);
+            List<NewService.Check> checks = managementService.getChecks() != null ? new ArrayList<>(managementService.getChecks()) : new ArrayList<>();
+            checks.add(check);
+            managementRegistration.getService().setChecks(checks);
         }
 
     }
