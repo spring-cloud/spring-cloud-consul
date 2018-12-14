@@ -60,7 +60,6 @@ public class ConsulAutoServiceRegistrationManagementServiceTests {
 
 	@Test
 	public void contextLoads() {
-		// trigger rebuid...
 		final Response<Map<String, Service>> response = consul.getAgentServices();
 		final Map<String, Service> services = response.getValue();
 
