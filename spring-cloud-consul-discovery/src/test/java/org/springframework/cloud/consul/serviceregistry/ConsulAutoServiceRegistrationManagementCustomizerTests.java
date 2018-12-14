@@ -46,7 +46,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 }, properties = {
         "spring.application.name=myTestService-SS",
         "spring.cloud.consul.discovery.registerHealthCheck=false",
-        "management.server.port=4452"
+        "management.server.port=4453"
 }, webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationManagementCustomizerTests {
 
