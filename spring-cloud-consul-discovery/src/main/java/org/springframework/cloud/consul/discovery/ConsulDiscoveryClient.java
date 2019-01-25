@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.discovery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -120,12 +121,24 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	public List<String> getServices() {
 		String aclToken = properties.getAclToken();
 
+		Map<String, List<String>> services;
 		if (StringUtils.hasText(aclToken)) {
-			return new ArrayList<>(client.getCatalogServices(QueryParams.DEFAULT, aclToken).getValue()
-					.keySet());
+			services = client.getCatalogServices(QueryParams.DEFAULT, aclToken).getValue();
 		} else {
-			return new ArrayList<>(client.getCatalogServices(QueryParams.DEFAULT).getValue()
-					.keySet());
+			services = client.getCatalogServices(QueryParams.DEFAULT).getValue();
+		}
+
+		return services.entrySet().stream()
+				.filter(e -> defaultQueryTagFilter(e.getValue()))
+				.map(Map.Entry::getKey)
+				.collect(Collectors.toList());
+	}
+
+	private boolean defaultQueryTagFilter(List<String> tags) {
+		if (StringUtils.isEmpty(properties.getDefaultQueryTag())) {
+			return true;
+		} else {
+			return tags.contains(properties.getDefaultQueryTag());
 		}
 	}
 

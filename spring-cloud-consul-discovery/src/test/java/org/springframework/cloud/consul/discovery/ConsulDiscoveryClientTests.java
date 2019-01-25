@@ -82,6 +82,13 @@ public class ConsulDiscoveryClientTests {
 		assertIpAddress(instance);
 	}
 
+	@Test
+	public void getServicesWorks() {
+		List<String> services = discoveryClient.getServices();
+		assertNotNull("services was null", services);
+		assertFalse("services was empty", services.isEmpty());
+	}
+
 	private void assertIpAddress(ServiceInstance instance) {
 		assertTrue("host isn't an ip address",
 				Character.isDigit(instance.getHost().charAt(0)));
