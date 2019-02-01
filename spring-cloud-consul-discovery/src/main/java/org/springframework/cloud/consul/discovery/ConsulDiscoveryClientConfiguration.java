@@ -68,7 +68,6 @@ public class ConsulDiscoveryClientConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	//TODO: Split appropriate values to service-registry for Edgware
-	@ConditionalOnMissingBean
 	public ConsulDiscoveryProperties consulDiscoveryProperties(InetUtils inetUtils) {
 		return new ConsulDiscoveryProperties(inetUtils);
 	}
