@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,6 +44,12 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	private final ApplicationContext context;
 	private final HeartbeatProperties heartbeatProperties;
 	private final List<ConsulManagementRegistrationCustomizer> managementRegistrationCustomizers;
+
+	@Deprecated
+	public ConsulAutoRegistration(NewService service, AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+		ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
+		this(service, autoServiceRegistrationProperties, properties, context, heartbeatProperties, Collections.emptyList());
+	}
 
 	public ConsulAutoRegistration(NewService service, AutoServiceRegistrationProperties autoServiceRegistrationProperties,
 		ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties,
