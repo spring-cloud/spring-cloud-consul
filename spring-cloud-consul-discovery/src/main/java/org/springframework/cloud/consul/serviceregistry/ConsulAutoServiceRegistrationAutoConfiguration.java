@@ -70,9 +70,13 @@ public class ConsulAutoServiceRegistrationAutoConfiguration {
 	@ConditionalOnMissingBean
 	public ConsulAutoRegistration consulRegistration(AutoServiceRegistrationProperties autoServiceRegistrationProperties,
 			ConsulDiscoveryProperties properties, ApplicationContext applicationContext,
-			ObjectProvider<List<ConsulRegistrationCustomizer>> registrationCustomizers, HeartbeatProperties heartbeatProperties) {
+			ObjectProvider<List<ConsulRegistrationCustomizer>> registrationCustomizers,
+			ObjectProvider<List<ConsulManagementRegistrationCustomizer>> managementRegistrationCustomizers,
+			HeartbeatProperties heartbeatProperties) {
 		return ConsulAutoRegistration.registration(autoServiceRegistrationProperties, properties,
-			applicationContext, registrationCustomizers.getIfAvailable(), heartbeatProperties);
+			applicationContext, registrationCustomizers.getIfAvailable(),
+			managementRegistrationCustomizers.getIfAvailable(),
+			heartbeatProperties);
 	}
 
 	@Configuration
