@@ -42,59 +42,59 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulServiceRegistryCheckTtlTests.TestConfig.class, properties = {
-        "spring.application.name=myTestService-S",
-        "spring.cloud.consul.discovery.heartbeat.enabled=true"
+		"spring.application.name=myTestService-S",
+		"spring.cloud.consul.discovery.heartbeat.enabled=true"
 }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ConsulServiceRegistryCheckTtlTests {
 
-    @LocalServerPort
-    private int randomServerPort;
+	@LocalServerPort
+	private int randomServerPort;
 
-    @Autowired
-    private ConsulDiscoveryProperties discoveryProperties;
+	@Autowired
+	private ConsulDiscoveryProperties discoveryProperties;
 
-    @Autowired
-    private ConsulServiceRegistry consulServiceRegistry;
+	@Autowired
+	private ConsulServiceRegistry consulServiceRegistry;
 
-    @Autowired
-    private ConsulRegistration registration;
+	@Autowired
+	private ConsulRegistration registration;
 
-    @Autowired
-    private TtlScheduler ttlScheduler;
+	@Autowired
+	private TtlScheduler ttlScheduler;
 
-    private ConsulRegistration createHttpRegistration() {
-        NewService service = registration.getService();
-        NewService.Check httpCheck = new NewService.Check();
-        httpCheck.setHttp(String.format(
-                "%s://%s:%s%s",
-                discoveryProperties.getScheme(),
-                discoveryProperties.getHostname(),
-                randomServerPort,
-                discoveryProperties.getHealthCheckPath()
-        ));
-        httpCheck.setInterval(discoveryProperties.getHealthCheckInterval());
-        NewService httpService = new NewService();
-        httpService.setId(service.getId() + "-http");
-        httpService.setName(service.getName() + "-http");
-        httpService.setCheck(httpCheck);
-        return new ConsulRegistration(httpService, discoveryProperties);
-    }
+	private ConsulRegistration createHttpRegistration() {
+		NewService service = registration.getService();
+		NewService.Check httpCheck = new NewService.Check();
+		httpCheck.setHttp(String.format(
+				"%s://%s:%s%s",
+				discoveryProperties.getScheme(),
+				discoveryProperties.getHostname(),
+				randomServerPort,
+				discoveryProperties.getHealthCheckPath()
+		));
+		httpCheck.setInterval(discoveryProperties.getHealthCheckInterval());
+		NewService httpService = new NewService();
+		httpService.setId(service.getId() + "-http");
+		httpService.setName(service.getName() + "-http");
+		httpService.setCheck(httpCheck);
+		return new ConsulRegistration(httpService, discoveryProperties);
+	}
 
-    @Test
-    public void contextLoads() throws NoSuchFieldException, IllegalAccessException {
-        ConsulRegistration httpRegistration = createHttpRegistration();
-        consulServiceRegistry.register(httpRegistration);
-        Field serviceHeartbeatsField = TtlScheduler.class.getDeclaredField("serviceHeartbeats");
-        serviceHeartbeatsField.setAccessible(true);
-        Map serviceHeartbeats = (Map) serviceHeartbeatsField.get(ttlScheduler);
-        assertTrue("Service with heartbeat check not registered in TTL scheduler", serviceHeartbeats.keySet().contains(registration.getInstanceId()));
-        assertFalse("Service with HTTP check registered in TTL scheduler", serviceHeartbeats.keySet().contains(httpRegistration.getInstanceId()));
-    }
+	@Test
+	public void contextLoads() throws NoSuchFieldException, IllegalAccessException {
+		ConsulRegistration httpRegistration = createHttpRegistration();
+		consulServiceRegistry.register(httpRegistration);
+		Field serviceHeartbeatsField = TtlScheduler.class.getDeclaredField("serviceHeartbeats");
+		serviceHeartbeatsField.setAccessible(true);
+		Map serviceHeartbeats = (Map) serviceHeartbeatsField.get(ttlScheduler);
+		assertTrue("Service with heartbeat check not registered in TTL scheduler", serviceHeartbeats.keySet().contains(registration.getInstanceId()));
+		assertFalse("Service with HTTP check registered in TTL scheduler", serviceHeartbeats.keySet().contains(httpRegistration.getInstanceId()));
+	}
 
-    @Configuration
-    @EnableAutoConfiguration
-    @ImportAutoConfiguration({AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class})
-    protected static class TestConfig {
-    }
+	@Configuration
+	@EnableAutoConfiguration
+	@ImportAutoConfiguration({AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class})
+	protected static class TestConfig {
+	}
 
 }
