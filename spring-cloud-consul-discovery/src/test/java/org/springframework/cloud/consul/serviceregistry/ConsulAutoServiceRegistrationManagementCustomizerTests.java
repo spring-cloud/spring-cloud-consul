@@ -41,65 +41,65 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
-        ConsulAutoServiceRegistrationManagementCustomizerTests.TestConfig.class,
-        ConsulAutoServiceRegistrationManagementCustomizerTests.ManagementConfig.class
+		ConsulAutoServiceRegistrationManagementCustomizerTests.TestConfig.class,
+		ConsulAutoServiceRegistrationManagementCustomizerTests.ManagementConfig.class
 }, properties = {
-        "spring.application.name=myTestService-SS",
-        "spring.cloud.consul.discovery.registerHealthCheck=false",
-        "management.server.port=4453"
+		"spring.application.name=myTestService-SS",
+		"spring.cloud.consul.discovery.registerHealthCheck=false",
+		"management.server.port=4453"
 }, webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationManagementCustomizerTests {
 
-    @Autowired
-    private ConsulRegistration registration;
+	@Autowired
+	private ConsulRegistration registration;
 
-    @Autowired
-    private ConsulAutoRegistration autoRegistration;
+	@Autowired
+	private ConsulAutoRegistration autoRegistration;
 
-    @Test
-    public void contextLoads() {
-        ConsulAutoRegistration managementRegistration = autoRegistration.managementRegistration();
-        List<NewService.Check> checks = managementRegistration.getService().getChecks();
-        List<String> ttls = checks.stream().map(NewService.Check::getTtl).collect(Collectors.toList());
-        Assert.assertTrue("Management registration not customized with 'foo' customizer", ttls.contains("39s"));
-        Assert.assertTrue("Management registration not customized with 'bar' customizer", ttls.contains("36s"));
-    }
+	@Test
+	public void contextLoads() {
+		ConsulAutoRegistration managementRegistration = autoRegistration.managementRegistration();
+		List<NewService.Check> checks = managementRegistration.getService().getChecks();
+		List<String> ttls = checks.stream().map(NewService.Check::getTtl).collect(Collectors.toList());
+		Assert.assertTrue("Management registration not customized with 'foo' customizer", ttls.contains("39s"));
+		Assert.assertTrue("Management registration not customized with 'bar' customizer", ttls.contains("36s"));
+	}
 
-    @Configuration
-    public static class ManagementConfig {
+	@Configuration
+	public static class ManagementConfig {
 
-        @Bean
-        public ConsulManagementRegistrationCustomizer fooManagementCustomizer() {
-            return managementRegistration -> {
-                addCheck(managementRegistration, "39s");
-            };
-        }
+		@Bean
+		public ConsulManagementRegistrationCustomizer fooManagementCustomizer() {
+			return managementRegistration -> {
+				addCheck(managementRegistration, "39s");
+			};
+		}
 
-        @Bean
-        public ConsulManagementRegistrationCustomizer barManagementCustomizer() {
-            return managementRegistration -> {
-                addCheck(managementRegistration, "36s");
-            };
-        }
+		@Bean
+		public ConsulManagementRegistrationCustomizer barManagementCustomizer() {
+			return managementRegistration -> {
+				addCheck(managementRegistration, "36s");
+			};
+		}
 
-        private void addCheck(ConsulRegistration managementRegistration, String ttl) {
-            NewService managementService = managementRegistration.getService();
-            NewService.Check check = new NewService.Check();
-            check.setTtl(ttl);
-            List<NewService.Check> checks = managementService.getChecks() != null ? new ArrayList<>(managementService.getChecks()) : new ArrayList<>();
-            checks.add(check);
-            managementRegistration.getService().setChecks(checks);
-        }
+		private void addCheck(ConsulRegistration managementRegistration, String ttl) {
+			NewService managementService = managementRegistration.getService();
+			NewService.Check check = new NewService.Check();
+			check.setTtl(ttl);
+			List<NewService.Check> checks = managementService.getChecks() != null ? new ArrayList<>(managementService.getChecks()) : new ArrayList<>();
+			checks.add(check);
+			managementRegistration.getService().setChecks(checks);
+		}
 
-    }
+	}
 
-    @Configuration
-    @EnableAutoConfiguration
-    @ImportAutoConfiguration({
-            AutoServiceRegistrationConfiguration.class,
-            ConsulAutoConfiguration.class,
-            ConsulAutoServiceRegistrationAutoConfiguration.class
-    })
-    public static class TestConfig {
-    }
+	@Configuration
+	@EnableAutoConfiguration
+	@ImportAutoConfiguration({
+			AutoServiceRegistrationConfiguration.class,
+			ConsulAutoConfiguration.class,
+			ConsulAutoServiceRegistrationAutoConfiguration.class
+	})
+	public static class TestConfig {
+	}
 }
