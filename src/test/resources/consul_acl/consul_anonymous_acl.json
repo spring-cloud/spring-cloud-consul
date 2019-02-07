@@ -1,31 +1,28 @@
 {
-	"ID": "anonymous",
-	"Name": "anonymous",
-	"Type": "client",
-	"Rules": "{
-	\
-	"key\": {
-	\
-	"\": {
-	\
-	"policy\": \"write\"
-}
-},
-\"event\": {
-\"\": {
-\"policy\": \"write\"
-}
-},
-\"service\": {
-\"\": {
-\"policy\": \"write\"
-},
-\"testConsulDiscoveryAcl\": {
-\"policy\": \"deny\"
-},
-\"testConsulDiscoveryAcl\": {
-\"policy\": \"deny\"
-}
-}
-}"
+  "ID": "anonymous",
+  "Name": "anonymous",
+  "Type": "client",
+  "Rules": "{
+    \"key\": {
+      \"\": {
+        \"policy\": \"write\"
+      }
+    },
+    \"event\": {
+      \"\": {
+        \"policy\": \"write\"
+      }
+    },
+    \"service\": {
+      \"\": {
+        \"policy\": \"write\"
+      },
+      \"testConsulDiscoveryAcl\": {
+        \"policy\": \"deny\"
+      },
+      \"testConsulDiscoveryAcl\": {
+        \"policy\": \"deny\"
+      }
+    }
+  }"
 }

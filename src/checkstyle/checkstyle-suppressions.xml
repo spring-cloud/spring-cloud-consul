@@ -14,4 +14,7 @@
 			  checks="LineLengthCheck"/>
 	<suppress files=".*ConsulConfigAutoConfiguration.*"
 			  checks="HideUtilityClassConstructorCheck"/>
+	<suppress files="[\\/]src[\\/]test[\\/]resources[\\/]consul_*[\\/]" checks="[a-zA-Z0-9]*"/>
+	<suppress files="[\\/]src[\\/]test[\\/]resources[\\/]etc" checks="[a-zA-Z0-9]*"/>
+
 </suppressions>
