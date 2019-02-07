@@ -112,8 +112,7 @@ public class ConsulPropertySourceLocatorFilesTests {
 		PropertySource<?> bootstrapProperties = propertySources
 				.get("bootstrapProperties");
 		assertThat(bootstrapProperties).as("bootstrapProperties was null").isNotNull();
-		assertThat(bootstrapProperties.getClass())
-				.as("bootstrapProperties was wrong type")
+		assertThat(bootstrapProperties).as("bootstrapProperties was wrong type")
 				.isInstanceOf(CompositePropertySource.class);
 
 		Collection<PropertySource<?>> consulSources = ((CompositePropertySource) bootstrapProperties)
@@ -121,7 +120,7 @@ public class ConsulPropertySourceLocatorFilesTests {
 		assertThat(consulSources).as("consulSources was wrong size").hasSize(1);
 
 		PropertySource<?> consulSource = consulSources.iterator().next();
-		assertThat(consulSource.getClass()).as("consulSource was wrong type")
+		assertThat(consulSource).as("consulSource was wrong type")
 				.isInstanceOf(CompositePropertySource.class);
 		Collection<PropertySource<?>> fileSources = ((CompositePropertySource) consulSource)
 				.getPropertySources();
