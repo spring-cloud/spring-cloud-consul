@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.cloud.consul.binder.test.consumer.TestConsumer;
 import org.springframework.cloud.consul.binder.test.producer.TestProducer;
 import org.springframework.cloud.deployer.spi.app.AppDeployer;
@@ -40,8 +41,7 @@ import org.springframework.util.SocketUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link org.springframework.cloud.consul.binder.ConsulBinder}.
@@ -49,12 +49,6 @@ import static org.junit.Assert.assertTrue;
  * @author Spencer Gibb
  */
 public class ConsulBinderTests {
-	private static final Logger logger = LoggerFactory.getLogger(ConsulBinderTests.class);
-
-	/**
-	 * Timeout value in milliseconds for operations to complete.
-	 */
-	private static final long TIMEOUT = 30000;
 
 	/**
 	 * Payload of test message.
@@ -66,6 +60,13 @@ public class ConsulBinderTests {
 	 */
 	public static final String BINDING_NAME = "test";
 
+	private static final Logger logger = LoggerFactory.getLogger(ConsulBinderTests.class);
+
+	/**
+	 * Timeout value in milliseconds for operations to complete.
+	 */
+	private static final long TIMEOUT = 30000;
+
 	/**
 	 * Deployer to launch producer and consumer test applications.
 	 */
@@ -76,7 +77,6 @@ public class ConsulBinderTests {
 	 */
 	private final RestTemplate restTemplate = new RestTemplate();
 
-
 	public ConsulBinderTests() {
 		LocalDeployerProperties properties = new LocalDeployerProperties();
 		properties.setDeleteFilesOnExit(false);
@@ -85,43 +85,38 @@ public class ConsulBinderTests {
 
 	/**
 	 * Test basic message sending functionality.
-	 *
-	 * @throws Exception
+	 * @throws InterruptedException when waiting for message was interrupted
 	 */
 	@Test
-	@Ignore //FIXME: 2.0.0 need stream fix
-	public void testMessageSendReceive() throws Exception {
+	@Ignore // FIXME: 2.0.0 need stream fix
+	public void testMessageSendReceive() throws InterruptedException {
 		testMessageSendReceive(null);
 	}
 
 	/**
 	 * Test usage of partition selector.
-	 *
 	 * @throws Exception
 	 */
-	/*@Test
-	public void testPartitionedMessageSendReceive() throws Exception {
-		testMessageSendReceive(null, true);
-	}*/
+	/*
+	 * @Test public void testPartitionedMessageSendReceive() throws Exception {
+	 * testMessageSendReceive(null, true); }
+	 */
 
 	/**
 	 * Test consumer group functionality.
-	 *
 	 * @throws Exception
 	 */
-	/*@Test
-	public void testMessageSendReceiveConsumerGroups() throws Exception {
-		testMessageSendReceive(new String[]{"a", "b"}, false);
-	}*/
+	/*
+	 * @Test public void testMessageSendReceiveConsumerGroups() throws Exception {
+	 * testMessageSendReceive(new String[]{"a", "b"}, false); }
+	 */
 
 	/**
 	 * Test message sending functionality.
-	 *
 	 * @param groups consumer groups; may be {@code null}
-	 * @param partitioned if true, execute test with a partition selector
-	 * @throws Exception
+	 * @throws InterruptedException when waiting for message was interrupted
 	 */
-	private void testMessageSendReceive(String[] groups) throws Exception {
+	private void testMessageSendReceive(String[] groups) throws InterruptedException {
 		Set<AppId> consumers = null;
 		AppId producer = null;
 
@@ -130,7 +125,7 @@ public class ConsulBinderTests {
 			producer = launchProducer();
 
 			for (AppId consumer : consumers) {
-				assertEquals(MESSAGE_PAYLOAD, waitForMessage(consumer.port));
+				assertThat(waitForMessage(consumer.port)).isEqualTo(MESSAGE_PAYLOAD);
 			}
 		}
 		finally {
@@ -146,12 +141,11 @@ public class ConsulBinderTests {
 	}
 
 	/**
-	 * Launch one or more consumers based on the number of consumer groups.
-	 * Blocks execution until the consumers are bound.
-	 *
+	 * Launch one or more consumers based on the number of consumer groups. Blocks
+	 * execution until the consumers are bound.
 	 * @param groups consumer groups; may be {@code null}
 	 * @return a set of {@link AppId}s for the consumers
-	 * @throws InterruptedException
+	 * @throws InterruptedException when waiting for message was interrupted
 	 */
 	private Set<AppId> launchConsumers(String[] groups) throws InterruptedException {
 		Set<AppId> consumers = new HashSet<>();
@@ -170,7 +164,9 @@ public class ConsulBinderTests {
 			if (groups != null) {
 				args.add(String.format("--group=%s", groups[i]));
 			}
-			consumers.add(new AppId(launchApplication(TestConsumer.class, appProperties, args), consumerPort));
+			consumers.add(
+					new AppId(launchApplication(TestConsumer.class, appProperties, args),
+							consumerPort));
 		}
 		for (AppId app : consumers) {
 			waitForConsumer(app.port);
@@ -181,7 +177,6 @@ public class ConsulBinderTests {
 
 	/**
 	 * Launch a producer that publishes a test message.
-	 *
 	 * @return {@link AppId} for producer
 	 */
 	private AppId launchProducer() {
@@ -196,16 +191,16 @@ public class ConsulBinderTests {
 		args.add(String.format("--partitioned=%b", false));
 		args.add("--debug");
 
-		return new AppId(launchApplication(TestProducer.class, appProperties, args), producerPort);
+		return new AppId(launchApplication(TestProducer.class, appProperties, args),
+				producerPort);
 	}
 
 	/**
 	 * Block the executing thread until the consumer is bound.
-	 *
 	 * @param port server port of the consumer application
 	 * @throws InterruptedException if the thread is interrupted
-	 * @throws AssertionError if the consumer is not bound after
-	 * {@value #TIMEOUT} milliseconds
+	 * @throws AssertionError if the consumer is not bound after {@value #TIMEOUT}
+	 * milliseconds
 	 */
 	private void waitForConsumer(int port) throws InterruptedException {
 		long start = System.currentTimeMillis();
@@ -217,18 +212,17 @@ public class ConsulBinderTests {
 				Thread.sleep(1000);
 			}
 		}
-		assertTrue("Consumer not bound", isConsumerBound(port));
+		assertThat(isConsumerBound(port)).as("Consumer not bound").isTrue();
 	}
 
 	/**
 	 * Return {@code true} if the consumer at the provided port is bound.
-	 *
 	 * @param port http port for consumer
 	 * @return true if consumer is bound
 	 */
 	private boolean isConsumerBound(int port) {
 		try {
-			return restTemplate.getForObject(
+			return this.restTemplate.getForObject(
 					String.format("http://localhost:%d/is-bound", port), Boolean.class);
 		}
 		catch (ResourceAccessException e) {
@@ -239,15 +233,14 @@ public class ConsulBinderTests {
 
 	/**
 	 * Return the most recent payload message a consumer received.
-	 *
 	 * @param port http port for consumer
-	 * @return the most recent payload message a consumer received;
-	 *         may be {@code null}
+	 * @return the most recent payload message a consumer received; may be {@code null}
 	 */
 	private String getConsumerMessagePayload(int port) {
 		try {
-			return restTemplate.getForObject(
-					String.format("http://localhost:%d/message-payload", port), String.class);
+			return this.restTemplate.getForObject(
+					String.format("http://localhost:%d/message-payload", port),
+					String.class);
 		}
 		catch (ResourceAccessException e) {
 			logger.debug("getConsumerMessagePayload", e);
@@ -257,13 +250,12 @@ public class ConsulBinderTests {
 
 	/**
 	 * Return {@code true} if the producer made use of a custom partition selector.
-	 *
 	 * @param port http port for producer
 	 * @return true if the producer used a custom partition selector
 	 */
-	private boolean partitionSelectorUsed(int port) throws InterruptedException {
+	private boolean partitionSelectorUsed(int port) {
 		try {
-			return restTemplate.getForObject(
+			return this.restTemplate.getForObject(
 					String.format("http://localhost:%d/partition-strategy-invoked", port),
 					Boolean.class);
 		}
@@ -274,9 +266,8 @@ public class ConsulBinderTests {
 	}
 
 	/**
-	 * Block the executing thread until a message is received by the
-	 * consumer application, or until {@value #TIMEOUT} milliseconds elapses.
-	 *
+	 * Block the executing thread until a message is received by the consumer application,
+	 * or until {@value #TIMEOUT} milliseconds elapses.
 	 * @param port server port of the consumer application
 	 * @return the message payload that was received
 	 * @throws InterruptedException if the thread is interrupted
@@ -298,29 +289,31 @@ public class ConsulBinderTests {
 
 	/**
 	 * Launch an application in a separate JVM.
-	 *
 	 * @param clz the main class to launch
 	 * @param properties the properties to pass to the application
 	 * @param args the command line arguments for the application
 	 * @return a string identifier for the application
 	 */
-	private String launchApplication(Class<?> clz, Map<String, String> properties, List<String> args) {
-		Resource resource = new UrlResource(clz.getProtectionDomain().getCodeSource().getLocation());
+	private String launchApplication(Class<?> clz, Map<String, String> properties,
+			List<String> args) {
+		Resource resource = new UrlResource(
+				clz.getProtectionDomain().getCodeSource().getLocation());
 
 		properties.put(AppDeployer.GROUP_PROPERTY_KEY, "test-group");
 		properties.put("main", clz.getName());
 		properties.put("classpath", System.getProperty("java.class.path"));
 
-		String appName = String.format("%s-%s", clz.getSimpleName(), properties.get("server.port"));
+		String appName = String.format("%s-%s", clz.getSimpleName(),
+				properties.get("server.port"));
 		AppDefinition definition = new AppDefinition(appName, properties);
 
-		AppDeploymentRequest request = new AppDeploymentRequest(definition, resource, properties, args);
+		AppDeploymentRequest request = new AppDeploymentRequest(definition, resource,
+				properties, args);
 		return this.deployer.deploy(request);
 	}
 
 	/**
 	 * Shut down the application with the provided id.
-	 *
 	 * @param id id of application to shut down
 	 */
 	private void shutdownApplication(String id) {
@@ -331,7 +324,6 @@ public class ConsulBinderTests {
 
 		/**
 		 * Instantiates a new local app deployer.
-		 *
 		 * @param properties the properties
 		 */
 		ClasspathDeployer(LocalDeployerProperties properties) {
@@ -340,12 +332,12 @@ public class ConsulBinderTests {
 
 		/**
 		 * Builds the jar execution command.
-		 *
 		 * @param jarPath the jar path
 		 * @param request the request
 		 * @return the string[]
 		 */
-		protected String[] buildJarExecutionCommand(String jarPath, AppDeploymentRequest request) {
+		protected String[] buildJarExecutionCommand(String jarPath,
+				AppDeploymentRequest request) {
 
 			ArrayList<String> commands = new ArrayList<>();
 			commands.add(super.getLocalDeployerProperties().getJavaCmd());
@@ -356,14 +348,16 @@ public class ConsulBinderTests {
 
 			return commands.toArray(new String[commands.size()]);
 		}
-	}
 
+	}
 
 	/**
 	 * String identification and http port for a launched application.
 	 */
 	private static class AppId {
+
 		final String id;
+
 		final int port;
 
 		AppId(String id, int port) {
@@ -381,15 +375,16 @@ public class ConsulBinderTests {
 			}
 
 			AppId appId = (AppId) o;
-			return port == appId.port && id.equals(appId.id);
+			return this.port == appId.port && this.id.equals(appId.id);
 		}
 
 		@Override
 		public int hashCode() {
-			int result = id.hashCode();
-			result = 31 * result + port;
+			int result = this.id.hashCode();
+			result = 31 * result + this.port;
 			return result;
 		}
+
 	}
 
 }

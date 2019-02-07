@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package org.springframework.cloud.consul.binder;
 
-import static org.springframework.util.Base64Utils.decodeFromString;
-
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -25,24 +23,31 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.ecwid.consul.v1.OperationException;
+import com.ecwid.consul.v1.event.model.Event;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.integration.endpoint.MessageProducerSupport;
 
-import com.ecwid.consul.v1.event.model.Event;
+import static org.springframework.util.Base64Utils.decodeFromString;
 
 /**
  * Adapter that receives Messages from Consul Events, converts them into Spring
  * Integration Messages, and sends the results to a Message Channel.
+ *
  * @author Spencer Gibb
  */
 public class ConsulInboundMessageProducer extends MessageProducerSupport {
 
-	protected static final Log logger = LogFactory.getLog(ConsulInboundMessageProducer.class);
+	protected static final Log logger = LogFactory
+			.getLog(ConsulInboundMessageProducer.class);
+
+	private final ScheduledExecutorService scheduler;
+
+	private final Runnable eventsRunnable;
 
 	private EventService eventService;
-	private final ScheduledExecutorService scheduler;
-	private final Runnable eventsRunnable;
+
 	private ScheduledFuture<?> eventsHandle;
 
 	public ConsulInboundMessageProducer(EventService eventService) {
@@ -75,8 +80,9 @@ public class ConsulInboundMessageProducer extends MessageProducerSupport {
 
 	@Override
 	protected void doStart() {
-		//TODO: make configurable
-		eventsHandle = this.scheduler.scheduleWithFixedDelay(eventsRunnable, 500, 500, TimeUnit.MILLISECONDS);
+		// TODO: make configurable
+		this.eventsHandle = this.scheduler.scheduleWithFixedDelay(this.eventsRunnable,
+				500, 500, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
@@ -90,20 +96,22 @@ public class ConsulInboundMessageProducer extends MessageProducerSupport {
 	// @Scheduled(fixedDelayString = "${spring.cloud.consul.binder.eventDelay:30000}")
 	public void getEvents() {
 		try {
-			List<Event> events = eventService.watch();
+			List<Event> events = this.eventService.watch();
 			for (Event event : events) {
 				// Map<String, Object> headers = new HashMap<>();
 				// headers.put(MessageHeaders.REPLY_CHANNEL, outputChannel.)
 				String decoded = new String(decodeFromString(event.getPayload()));
 				sendMessage(getMessageBuilderFactory().withPayload(decoded)
-				// TODO: support headers
+						// TODO: support headers
 						.build());
 			}
-		} catch (OperationException e) {
+		}
+		catch (OperationException e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("Error getting consul events: " + e);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			if (logger.isErrorEnabled()) {
 				logger.error("Error getting consul events: " + e.getMessage());
 			}
@@ -112,4 +120,5 @@ public class ConsulInboundMessageProducer extends MessageProducerSupport {
 			}
 		}
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.binder.test.producer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -40,8 +41,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Producer application that binds a channel to a {@link ConsulBinder}
- * and sends a test message.
+ * Producer application that binds a channel to a {@link ConsulBinder} and sends a test
+ * message.
  */
 @RestController
 @Import(ConsulBinderConfiguration.class)
@@ -60,17 +61,20 @@ public class TestProducer implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
-		/*if (args.containsOption("partitioned")
-				&& Boolean.valueOf(args.getOptionValues("partitioned").get(0))) {
-			binder.setPartitionSelector(stubPartitionSelectorStrategy());
-		}*/
+		/*
+		 * if (args.containsOption("partitioned") &&
+		 * Boolean.valueOf(args.getOptionValues("partitioned").get(0))) {
+		 * binder.setPartitionSelector(stubPartitionSelectorStrategy()); }
+		 */
 		SubscribableChannel producerChannel = producerChannel();
 		ProducerProperties properties = new ProducerProperties();
-		properties.setPartitionKeyExpression(new SpelExpressionParser().parseExpression("payload"));
-		binder.bindProducer(ConsulBinderTests.BINDING_NAME, producerChannel, properties);
+		properties.setPartitionKeyExpression(
+				new SpelExpressionParser().parseExpression("payload"));
+		this.binder.bindProducer(ConsulBinderTests.BINDING_NAME, producerChannel,
+				properties);
 
 		Message<String> message = new GenericMessage<>(ConsulBinderTests.MESSAGE_PAYLOAD);
-		logger.info("Writing message to binder {}", binder);
+		logger.info("Writing message to binder {}", this.binder);
 		producerChannel.send(message);
 	}
 
@@ -89,16 +93,19 @@ public class TestProducer implements ApplicationRunner {
 		return stubPartitionSelectorStrategy().invoked;
 	}
 
+	public static class StubPartitionSelectorStrategy
+			implements PartitionSelectorStrategy {
 
-	public static class StubPartitionSelectorStrategy implements PartitionSelectorStrategy {
 		public volatile boolean invoked = false;
 
 		@Override
 		public int selectPartition(Object key, int partitionCount) {
-			logger.info("Selecting partition for key {}; partition count: {}", key, partitionCount);
-			invoked = true;
+			logger.info("Selecting partition for key {}; partition count: {}", key,
+					partitionCount);
+			this.invoked = true;
 			return 1;
 		}
+
 	}
 
 }

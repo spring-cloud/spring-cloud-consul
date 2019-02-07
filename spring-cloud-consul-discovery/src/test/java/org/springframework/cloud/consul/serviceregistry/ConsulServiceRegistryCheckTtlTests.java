@@ -16,9 +16,13 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+
 import com.ecwid.consul.v1.agent.model.NewService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -31,11 +35,7 @@ import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Alexey Savchuk
@@ -43,8 +43,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulServiceRegistryCheckTtlTests.TestConfig.class, properties = {
 		"spring.application.name=myTestService-S",
-		"spring.cloud.consul.discovery.heartbeat.enabled=true"
-}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+		"spring.cloud.consul.discovery.heartbeat.enabled=true" }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ConsulServiceRegistryCheckTtlTests {
 
 	@LocalServerPort
@@ -63,38 +62,42 @@ public class ConsulServiceRegistryCheckTtlTests {
 	private TtlScheduler ttlScheduler;
 
 	private ConsulRegistration createHttpRegistration() {
-		NewService service = registration.getService();
+		NewService service = this.registration.getService();
 		NewService.Check httpCheck = new NewService.Check();
-		httpCheck.setHttp(String.format(
-				"%s://%s:%s%s",
-				discoveryProperties.getScheme(),
-				discoveryProperties.getHostname(),
-				randomServerPort,
-				discoveryProperties.getHealthCheckPath()
-		));
-		httpCheck.setInterval(discoveryProperties.getHealthCheckInterval());
+		httpCheck.setHttp(
+				String.format("%s://%s:%s%s", this.discoveryProperties.getScheme(),
+						this.discoveryProperties.getHostname(), this.randomServerPort,
+						this.discoveryProperties.getHealthCheckPath()));
+		httpCheck.setInterval(this.discoveryProperties.getHealthCheckInterval());
 		NewService httpService = new NewService();
 		httpService.setId(service.getId() + "-http");
 		httpService.setName(service.getName() + "-http");
 		httpService.setCheck(httpCheck);
-		return new ConsulRegistration(httpService, discoveryProperties);
+		return new ConsulRegistration(httpService, this.discoveryProperties);
 	}
 
 	@Test
 	public void contextLoads() throws NoSuchFieldException, IllegalAccessException {
 		ConsulRegistration httpRegistration = createHttpRegistration();
-		consulServiceRegistry.register(httpRegistration);
-		Field serviceHeartbeatsField = TtlScheduler.class.getDeclaredField("serviceHeartbeats");
+		this.consulServiceRegistry.register(httpRegistration);
+		Field serviceHeartbeatsField = TtlScheduler.class
+				.getDeclaredField("serviceHeartbeats");
 		serviceHeartbeatsField.setAccessible(true);
-		Map serviceHeartbeats = (Map) serviceHeartbeatsField.get(ttlScheduler);
-		assertTrue("Service with heartbeat check not registered in TTL scheduler", serviceHeartbeats.keySet().contains(registration.getInstanceId()));
-		assertFalse("Service with HTTP check registered in TTL scheduler", serviceHeartbeats.keySet().contains(httpRegistration.getInstanceId()));
+		Map serviceHeartbeats = (Map) serviceHeartbeatsField.get(this.ttlScheduler);
+		assertThat(serviceHeartbeats.keySet().contains(this.registration.getInstanceId()))
+				.as("Service with heartbeat check not registered in TTL scheduler")
+				.isTrue();
+		assertThat(serviceHeartbeats.keySet().contains(httpRegistration.getInstanceId()))
+				.as("Service with HTTP check registered in TTL scheduler").isFalse();
 	}
 
 	@Configuration
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class})
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
+			ConsulAutoConfiguration.class,
+			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	protected static class TestConfig {
+
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package org.springframework.cloud.consul.config;
 import com.ecwid.consul.v1.ConsulClient;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
@@ -41,6 +41,7 @@ public class ConsulConfigBootstrapConfiguration {
 	@Import(ConsulAutoConfiguration.class)
 	@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled", matchIfMissing = true)
 	protected static class ConsulPropertySourceConfiguration {
+
 		@Autowired
 		private ConsulClient consul;
 
@@ -53,7 +54,9 @@ public class ConsulConfigBootstrapConfiguration {
 		@Bean
 		public ConsulPropertySourceLocator consulPropertySourceLocator(
 				ConsulConfigProperties consulConfigProperties) {
-			return new ConsulPropertySourceLocator(consul, consulConfigProperties);
+			return new ConsulPropertySourceLocator(this.consul, consulConfigProperties);
 		}
+
 	}
+
 }

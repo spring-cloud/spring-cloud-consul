@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,16 +44,12 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	private static final Log log = LogFactory.getLog(ConsulDiscoveryClient.class);
 
-	@Deprecated
-	public interface LocalResolver {
-		String getInstanceId();
-		Integer getPort();
-	}
-
 	private final ConsulClient client;
+
 	private final ConsulDiscoveryProperties properties;
 
-	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties) {
+	public ConsulDiscoveryClient(ConsulClient client,
+			ConsulDiscoveryProperties properties) {
 		this.client = client;
 		this.properties = properties;
 	}
@@ -80,15 +76,15 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	private void addInstancesToList(List<ServiceInstance> instances, String serviceId,
 			QueryParams queryParams) {
 
-		String aclToken = properties.getAclToken();
+		String aclToken = this.properties.getAclToken();
 		Response<List<HealthService>> services;
 		if (StringUtils.hasText(aclToken)) {
-			services = client.getHealthServices(serviceId,
+			services = this.client.getHealthServices(serviceId,
 					this.properties.getDefaultQueryTag(),
 					this.properties.isQueryPassing(), queryParams, aclToken);
 		}
 		else {
-			services = client.getHealthServices(serviceId,
+			services = this.client.getHealthServices(serviceId,
 					this.properties.getDefaultQueryTag(),
 					this.properties.isQueryPassing(), queryParams);
 		}
@@ -100,15 +96,15 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 			if (metadata.containsKey("secure")) {
 				secure = Boolean.parseBoolean(metadata.get("secure"));
 			}
-			instances.add(new DefaultServiceInstance(service.getService().getId(), serviceId, host, service
-					.getService().getPort(), secure, metadata));
+			instances.add(new DefaultServiceInstance(service.getService().getId(),
+					serviceId, host, service.getService().getPort(), secure, metadata));
 		}
 	}
 
 	public List<ServiceInstance> getAllInstances() {
 		List<ServiceInstance> instances = new ArrayList<>();
 
-		Response<Map<String, List<String>>> services = client
+		Response<Map<String, List<String>>> services = this.client
 				.getCatalogServices(QueryParams.DEFAULT);
 		for (String serviceId : services.getValue().keySet()) {
 			addInstancesToList(instances, serviceId, QueryParams.DEFAULT);
@@ -118,14 +114,16 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<String> getServices() {
-		String aclToken = properties.getAclToken();
+		String aclToken = this.properties.getAclToken();
 
 		if (StringUtils.hasText(aclToken)) {
-			return new ArrayList<>(client.getCatalogServices(QueryParams.DEFAULT, aclToken).getValue()
-					.keySet());
-		} else {
-			return new ArrayList<>(client.getCatalogServices(QueryParams.DEFAULT).getValue()
-					.keySet());
+			return new ArrayList<>(
+					this.client.getCatalogServices(QueryParams.DEFAULT, aclToken)
+							.getValue().keySet());
+		}
+		else {
+			return new ArrayList<>(this.client.getCatalogServices(QueryParams.DEFAULT)
+					.getValue().keySet());
 		}
 	}
 
@@ -133,4 +131,17 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	public int getOrder() {
 		return this.properties.getOrder();
 	}
+
+	/**
+	 * Depreacted local resolver.
+	 */
+	@Deprecated
+	public interface LocalResolver {
+
+		String getInstanceId();
+
+		Integer getPort();
+
+	}
+
 }

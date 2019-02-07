@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,15 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
-import org.springframework.core.env.EnumerablePropertySource;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.util.StringUtils;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
+
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.core.env.EnumerablePropertySource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.util.StringUtils;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.PROPERTIES;
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.YAML;
@@ -43,10 +43,11 @@ import static org.springframework.util.Base64Utils.decodeFromString;
  */
 public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient> {
 
-	private String context;
-	private ConsulConfigProperties configProperties;
-
 	private final Map<String, Object> properties = new LinkedHashMap<>();
+
+	private String context;
+
+	private ConsulConfigProperties configProperties;
 
 	private Long initialIndex;
 
@@ -63,13 +64,13 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 			this.context = this.context + "/";
 		}
 
-		Response<List<GetValue>> response = source.getKVValues(context,
-				configProperties.getAclToken(), QueryParams.DEFAULT);
+		Response<List<GetValue>> response = this.source.getKVValues(this.context,
+				this.configProperties.getAclToken(), QueryParams.DEFAULT);
 
-		initialIndex = response.getConsulIndex();
+		this.initialIndex = response.getConsulIndex();
 
 		final List<GetValue> values = response.getValue();
-		ConsulConfigProperties.Format format = configProperties.getFormat();
+		ConsulConfigProperties.Format format = this.configProperties.getFormat();
 		switch (format) {
 		case KEY_VALUE:
 			parsePropertiesInKeyValueFormat(values);
@@ -81,14 +82,13 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 	}
 
 	public Long getInitialIndex() {
-		return initialIndex;
+		return this.initialIndex;
 	}
 
 	/**
 	 * Parses the properties in key value style i.e., values are expected to be either a
-	 * sub key or a constant
-	 *
-	 * @param values
+	 * sub key or a constant.
+	 * @param values values to parse
 	 */
 	protected void parsePropertiesInKeyValueFormat(List<GetValue> values) {
 		if (values == null) {
@@ -98,18 +98,18 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		for (GetValue getValue : values) {
 			String key = getValue.getKey();
 			if (!StringUtils.endsWithIgnoreCase(key, "/")) {
-				key = key.replace(context, "").replace('/', '.');
+				key = key.replace(this.context, "").replace('/', '.');
 				String value = getValue.getDecodedValue();
-				properties.put(key, value);
+				this.properties.put(key, value);
 			}
 		}
 	}
 
 	/**
 	 * Parses the properties using the format which is not a key value style i.e., either
-	 * java properties style or YAML style
-	 *
-	 * @param values
+	 * java properties style or YAML style.
+	 * @param values values to parse
+	 * @param format format in which the values should be parsed
 	 */
 	protected void parsePropertiesWithNonKeyValueFormat(List<GetValue> values,
 			ConsulConfigProperties.Format format) {
@@ -118,8 +118,8 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		}
 
 		for (GetValue getValue : values) {
-			String key = getValue.getKey().replace(context, "");
-			if (configProperties.getDataKey().equals(key)) {
+			String key = getValue.getKey().replace(this.context, "");
+			if (this.configProperties.getDataKey().equals(key)) {
 				parseValue(getValue, format);
 			}
 		}
@@ -134,8 +134,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		Properties props = generateProperties(value, format);
 
 		for (Map.Entry entry : props.entrySet()) {
-			properties
-					.put(entry.getKey().toString(), entry.getValue());
+			this.properties.put(entry.getKey().toString(), entry.getValue());
 		}
 	}
 
@@ -150,8 +149,8 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 				props.load(new ByteArrayInputStream(value.getBytes("ISO-8859-1")));
 			}
 			catch (IOException e) {
-				throw new IllegalArgumentException(value
-						+ " can't be encoded using ISO-8859-1");
+				throw new IllegalArgumentException(
+						value + " can't be encoded using ISO-8859-1");
 			}
 
 			return props;
@@ -168,34 +167,38 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 	/**
 	 * @deprecated As of 1.1.0 use {@link GetValue#getDecodedValue()}.
+	 * @param value encoded value
+	 * @return the decoded string
 	 */
 	@Deprecated
 	public String getDecoded(String value) {
-		if (value == null)
+		if (value == null) {
 			return null;
+		}
 		return new String(decodeFromString(value));
 	}
 
 	protected Map<String, Object> getProperties() {
-		return properties;
+		return this.properties;
 	}
 
 	protected ConsulConfigProperties getConfigProperties() {
-		return configProperties;
+		return this.configProperties;
 	}
 
 	protected String getContext() {
-		return context;
+		return this.context;
 	}
 
 	@Override
 	public Object getProperty(String name) {
-		return properties.get(name);
+		return this.properties.get(name);
 	}
 
 	@Override
 	public String[] getPropertyNames() {
-		Set<String> strings = properties.keySet();
+		Set<String> strings = this.properties.keySet();
 		return strings.toArray(new String[strings.size()]);
 	}
+
 }

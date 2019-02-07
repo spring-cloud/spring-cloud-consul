@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,13 @@ import com.netflix.loadbalancer.IPing;
 import com.netflix.loadbalancer.Server;
 
 /**
- * "Ping" Consul
- * i.e. we dont do a real "ping". We just assume that the server is up if Consul says so
+ * "Ping" Consul i.e. we dont do a real "ping". We just assume that the server is up if
+ * Consul says so
+ *
  * @author Spencer Gibb
  */
 public class ConsulPing implements IPing {
+
 	@Override
 	public boolean isAlive(Server server) {
 		boolean isAlive = true;
@@ -36,4 +38,5 @@ public class ConsulPing implements IPing {
 
 		return isAlive;
 	}
+
 }

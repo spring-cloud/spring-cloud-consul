@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package org.springframework.cloud.consul.sample;
 
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,8 +41,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import lombok.extern.slf4j.Slf4j;
-
 /**
  * @author Spencer Gibb
  */
@@ -50,7 +50,10 @@ import lombok.extern.slf4j.Slf4j;
 @EnableConfigurationProperties
 @EnableFeignClients
 @Slf4j
-public class SampleConsulApplication /*implements ApplicationListener<SimpleRemoteEvent>*/ {
+public class SampleConsulApplication /*
+										 * implements
+										 * ApplicationListener<SimpleRemoteEvent>
+										 */ {
 
 	@Autowired
 	private LoadBalancerClient loadBalancer;
@@ -73,6 +76,10 @@ public class SampleConsulApplication /*implements ApplicationListener<SimpleRemo
 	@Value("${spring.application.name:testConsulApp}")
 	private String appName;
 
+	public static void main(String[] args) {
+		SpringApplication.run(SampleConsulApplication.class, args);
+	}
+
 	@RequestMapping("/me")
 	public ServiceInstance me() {
 		return this.registration;
@@ -80,22 +87,23 @@ public class SampleConsulApplication /*implements ApplicationListener<SimpleRemo
 
 	@RequestMapping("/")
 	public ServiceInstance lb() {
-		return loadBalancer.choose(appName);
+		return this.loadBalancer.choose(this.appName);
 	}
 
 	@RequestMapping("/rest")
 	public String rest() {
-		return this.restTemplate.getForObject("http://"+appName+"/me", String.class);
+		return this.restTemplate.getForObject("http://" + this.appName + "/me",
+				String.class);
 	}
 
 	@RequestMapping("/choose")
 	public String choose() {
-		return loadBalancer.choose(appName).getUri().toString();
+		return this.loadBalancer.choose(this.appName).getUri().toString();
 	}
 
 	@RequestMapping("/myenv")
 	public String env(@RequestParam("prop") String prop) {
-		return env.getProperty(prop, "Not Found");
+		return this.env.getProperty(prop, "Not Found");
 	}
 
 	@RequestMapping("/prop")
@@ -105,18 +113,18 @@ public class SampleConsulApplication /*implements ApplicationListener<SimpleRemo
 
 	@RequestMapping("/instances")
 	public List<ServiceInstance> instances() {
-		return discoveryClient.getInstances(appName);
+		return this.discoveryClient.getInstances(this.appName);
 	}
+
+	/*
+	 * @Bean public SubtypeModule sampleSubtypeModule() { return new
+	 * SubtypeModule(SimpleRemoteEvent.class); }
+	 */
 
 	@RequestMapping("/feign")
 	public String feign() {
-		return sampleClient.choose();
+		return this.sampleClient.choose();
 	}
-
-	/*@Bean
-	public SubtypeModule sampleSubtypeModule() {
-		return new SubtypeModule(SimpleRemoteEvent.class);
-	}*/
 
 	@Bean
 	public SampleProperties sampleProperties() {
@@ -129,20 +137,17 @@ public class SampleConsulApplication /*implements ApplicationListener<SimpleRemo
 		return new RestTemplate();
 	}
 
-
-	public static void main(String[] args) {
-		SpringApplication.run(SampleConsulApplication.class, args);
-	}
-
-	/*@Override
-	public void onApplicationEvent(SimpleRemoteEvent event) {
-		log.info("Received event: {}", event);
-	}*/
+	/*
+	 * @Override public void onApplicationEvent(SimpleRemoteEvent event) {
+	 * log.info("Received event: {}", event); }
+	 */
 
 	@FeignClient("testConsulApp")
 	public interface SampleClient {
 
 		@RequestMapping(value = "/choose", method = RequestMethod.GET)
 		String choose();
+
 	}
+
 }

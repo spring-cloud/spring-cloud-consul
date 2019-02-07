@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,25 +47,30 @@ public class ConsulEndpoint {
 	public ConsulData invoke() {
 		ConsulData data = new ConsulData();
 		// data.setKeyValues(kvClient.getKeyValueRecurse());
-		Response<Map<String, Service>> agentServices = consul.getAgentServices();
+		Response<Map<String, Service>> agentServices = this.consul.getAgentServices();
 		data.setAgentServices(agentServices.getValue());
 
-		Response<Map<String, List<String>>> catalogServices = consul
+		Response<Map<String, List<String>>> catalogServices = this.consul
 				.getCatalogServices(QueryParams.DEFAULT);
 
 		for (String serviceId : catalogServices.getValue().keySet()) {
-			Response<List<CatalogService>> response = consul.getCatalogService(serviceId,
-					QueryParams.DEFAULT);
+			Response<List<CatalogService>> response = this.consul
+					.getCatalogService(serviceId, QueryParams.DEFAULT);
 			data.getCatalogServices().put(serviceId, response.getValue());
 		}
 
-		Response<List<Node>> catalogNodes = consul.getCatalogNodes(QueryParams.DEFAULT);
+		Response<List<Node>> catalogNodes = this.consul
+				.getCatalogNodes(QueryParams.DEFAULT);
 		data.setCatalogNodes(catalogNodes.getValue());
 
 		return data;
 	}
 
+	/**
+	 * Represents Consul data related to catalog entries and agent servies.
+	 */
 	public static class ConsulData {
+
 		Map<String, List<CatalogService>> catalogServices = new LinkedHashMap<>();
 
 		Map<String, Service> agentServices;
@@ -79,20 +84,21 @@ public class ConsulEndpoint {
 			return this.catalogServices;
 		}
 
+		public void setCatalogServices(
+				Map<String, List<CatalogService>> catalogServices) {
+			this.catalogServices = catalogServices;
+		}
+
 		public Map<String, Service> getAgentServices() {
 			return this.agentServices;
 		}
 
-		public List<Node> getCatalogNodes() {
-			return this.catalogNodes;
-		}
-
-		public void setCatalogServices(Map<String, List<CatalogService>> catalogServices) {
-			this.catalogServices = catalogServices;
-		}
-
 		public void setAgentServices(Map<String, Service> agentServices) {
 			this.agentServices = agentServices;
+		}
+
+		public List<Node> getCatalogNodes() {
+			return this.catalogNodes;
 		}
 
 		public void setCatalogNodes(List<Node> catalogNodes) {
@@ -102,10 +108,11 @@ public class ConsulEndpoint {
 		@Override
 		public String toString() {
 			return new ToStringCreator(this)
-					.append("catalogServices", catalogServices)
-					.append("agentServices", agentServices)
-					.append("catalogNodes", catalogNodes)
-					.toString();
+					.append("catalogServices", this.catalogServices)
+					.append("agentServices", this.agentServices)
+					.append("catalogNodes", this.catalogNodes).toString();
 		}
+
 	}
+
 }

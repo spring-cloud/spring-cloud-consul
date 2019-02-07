@@ -16,10 +16,14 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.ecwid.consul.v1.agent.model.NewService;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -30,10 +34,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
@@ -42,12 +43,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
 		ConsulAutoServiceRegistrationManagementCustomizerTests.TestConfig.class,
-		ConsulAutoServiceRegistrationManagementCustomizerTests.ManagementConfig.class
-}, properties = {
-		"spring.application.name=myTestService-SS",
-		"spring.cloud.consul.discovery.registerHealthCheck=false",
-		"management.server.port=4453"
-}, webEnvironment = RANDOM_PORT)
+		ConsulAutoServiceRegistrationManagementCustomizerTests.ManagementConfig.class }, properties = {
+				"spring.application.name=myTestService-SS",
+				"spring.cloud.consul.discovery.registerHealthCheck=false",
+				"management.server.port=4453" }, webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationManagementCustomizerTests {
 
 	@Autowired
@@ -58,11 +57,17 @@ public class ConsulAutoServiceRegistrationManagementCustomizerTests {
 
 	@Test
 	public void contextLoads() {
-		ConsulAutoRegistration managementRegistration = autoRegistration.managementRegistration();
+		ConsulAutoRegistration managementRegistration = this.autoRegistration
+				.managementRegistration();
 		List<NewService.Check> checks = managementRegistration.getService().getChecks();
-		List<String> ttls = checks.stream().map(NewService.Check::getTtl).collect(Collectors.toList());
-		Assert.assertTrue("Management registration not customized with 'foo' customizer", ttls.contains("39s"));
-		Assert.assertTrue("Management registration not customized with 'bar' customizer", ttls.contains("36s"));
+		List<String> ttls = checks.stream().map(NewService.Check::getTtl)
+				.collect(Collectors.toList());
+		assertThat(ttls.contains("39s"))
+				.as("Management registration not customized with 'foo' customizer")
+				.isTrue();
+		assertThat(ttls.contains("36s"))
+				.as("Management registration not customized with 'bar' customizer")
+				.isTrue();
 	}
 
 	@Configuration
@@ -86,7 +91,8 @@ public class ConsulAutoServiceRegistrationManagementCustomizerTests {
 			NewService managementService = managementRegistration.getService();
 			NewService.Check check = new NewService.Check();
 			check.setTtl(ttl);
-			List<NewService.Check> checks = managementService.getChecks() != null ? new ArrayList<>(managementService.getChecks()) : new ArrayList<>();
+			List<NewService.Check> checks = managementService.getChecks() != null
+					? new ArrayList<>(managementService.getChecks()) : new ArrayList<>();
 			checks.add(check);
 			managementRegistration.getService().setChecks(checks);
 		}
@@ -95,11 +101,11 @@ public class ConsulAutoServiceRegistrationManagementCustomizerTests {
 
 	@Configuration
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({
-			AutoServiceRegistrationConfiguration.class,
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,
-			ConsulAutoServiceRegistrationAutoConfiguration.class
-	})
+			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestConfig {
+
 	}
+
 }

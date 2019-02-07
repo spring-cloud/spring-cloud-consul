@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.discovery.configclient;
 
+import java.util.Arrays;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
@@ -23,8 +25,6 @@ import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.Arrays;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -39,8 +39,8 @@ public class TestConsulDiscoveryClientBootstrapConfiguration {
 		ConsulDiscoveryClient client = mock(ConsulDiscoveryClient.class);
 		ServiceInstance instance = new DefaultServiceInstance("configserver",
 				properties.getHostname(), properties.getPort(), false);
-		given(client.getInstances("configserver"))
-				.willReturn(Arrays.asList(instance));
+		given(client.getInstances("configserver")).willReturn(Arrays.asList(instance));
 		return client;
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 
 package org.springframework.cloud.consul.binder.config;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.binder.ConsulBinder;
 import org.springframework.cloud.consul.binder.EventService;
@@ -28,9 +30,6 @@ import org.springframework.cloud.stream.binder.Binder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-
-import com.ecwid.consul.v1.ConsulClient;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Configures the Consul binder.
@@ -42,7 +41,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Import({ PropertyPlaceholderAutoConfiguration.class })
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty(name = "spring.cloud.consul.binder.enabled", matchIfMissing = true)
-//FIXME: boot 2.0.0 @EnableConfigurationProperties({ConsulBinderProperties.class})
+// FIXME: boot 2.0.0 @EnableConfigurationProperties({ConsulBinderProperties.class})
 public class ConsulBinderConfiguration {
 
 	// @Autowired
@@ -54,7 +53,8 @@ public class ConsulBinderConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public EventService eventService(ConsulClient consulClient) {
-		return new EventService(null/*consulBinderProperties*/, consulClient, objectMapper);
+		return new EventService(null/* consulBinderProperties */, consulClient,
+				this.objectMapper);
 	}
 
 	@Bean
@@ -63,5 +63,6 @@ public class ConsulBinderConfiguration {
 		return new ConsulBinder(eventService);
 	}
 
-	//TODO: create consul client if needed
+	// TODO: create consul client if needed
+
 }

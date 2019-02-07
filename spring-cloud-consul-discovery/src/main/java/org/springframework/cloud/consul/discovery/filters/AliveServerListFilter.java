@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.cloud.consul.discovery.ConsulServer;
-
 import com.netflix.loadbalancer.Server;
 import com.netflix.loadbalancer.ServerListFilter;
+
+import org.springframework.cloud.consul.discovery.ConsulServer;
 
 /**
  * Server filter: returns only alive servers. Each consul agent runs a serf agent which is
@@ -31,10 +31,12 @@ import com.netflix.loadbalancer.ServerListFilter;
  * consul APIs: in the agent API and in the catalog API. We prefer the agent API because
  * it is most up to date (or perhaps we should intersect them and pick members that are
  * live in both).
+ *
  * @author nicu marasoiu on 10.03.2015.
  */
 @Deprecated
 public class AliveServerListFilter implements ServerListFilter<Server> {
+
 	private FilteringAgentClient filteringAgentClient;
 
 	public AliveServerListFilter(FilteringAgentClient filteringAgentClient) {
@@ -43,14 +45,16 @@ public class AliveServerListFilter implements ServerListFilter<Server> {
 
 	@Override
 	public List<Server> getFilteredListOfServers(List<Server> servers) {
-		Set<String> liveNodes = filteringAgentClient.getAliveAgentsAddresses();
+		Set<String> liveNodes = this.filteringAgentClient.getAliveAgentsAddresses();
 		List<Server> filteredServers = new ArrayList<>();
 		for (Server server : servers) {
 			ConsulServer consulServer = ConsulServer.class.cast(server);
-			if (liveNodes.contains(consulServer.getHealthService().getService().getAddress())) {
+			if (liveNodes.contains(
+					consulServer.getHealthService().getService().getAddress())) {
 				filteredServers.add(server);
 			}
 		}
 		return filteredServers;
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -29,19 +30,17 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulDiscoveryClientAclTests.MyTestConfig.class,
-		properties = {"spring.application.name=testConsulDiscoveryAcl",
-			"spring.cloud.consul.discovery.preferIpAddress=true",
-			"consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304"},
-		webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = ConsulDiscoveryClientAclTests.MyTestConfig.class, properties = {
+		"spring.application.name=testConsulDiscoveryAcl",
+		"spring.cloud.consul.discovery.preferIpAddress=true",
+		"consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304" }, webEnvironment = RANDOM_PORT)
 public class ConsulDiscoveryClientAclTests {
 
 	@Autowired
@@ -49,24 +48,25 @@ public class ConsulDiscoveryClientAclTests {
 
 	@Test
 	public void getInstancesForThisServiceWorks() {
-		List<ServiceInstance> instances = discoveryClient.getInstances("testConsulDiscoveryAcl");
-		assertNotNull("instances was null", instances);
-		assertFalse("instances was empty", instances.isEmpty());
+		List<ServiceInstance> instances = this.discoveryClient
+				.getInstances("testConsulDiscoveryAcl");
+		assertThat(instances).as("instances was null").isNotNull();
+		assertThat(instances.isEmpty()).as("instances was empty").isFalse();
 	}
-
 
 	@Test
 	public void getInstancesForSecondServiceWorks() throws Exception {
 
-		new SpringApplicationBuilder(MyTestConfig.class)
-				.run("--spring.application.name=testSecondServiceAcl",
-						"--server.port=0",
-						"--spring.cloud.consul.discovery.preferIpAddress=true",
-						"--consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304");
+		new SpringApplicationBuilder(MyTestConfig.class).run(
+				"--spring.application.name=testSecondServiceAcl", "--server.port=0",
+				"--spring.cloud.consul.discovery.preferIpAddress=true",
+				"--consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304");
 
-		List<ServiceInstance> instances = discoveryClient.getInstances("testSecondServiceAcl");
-		assertNotNull("second service instances was null", instances);
-		assertFalse("second service instances was empty", instances.isEmpty());
+		List<ServiceInstance> instances = this.discoveryClient
+				.getInstances("testSecondServiceAcl");
+		assertThat(instances).as("second service instances was null").isNotNull();
+		assertThat(instances.isEmpty()).as("second service instances was empty")
+				.isFalse();
 	}
 
 	@Configuration
@@ -75,4 +75,5 @@ public class ConsulDiscoveryClientAclTests {
 	public static class MyTestConfig {
 
 	}
+
 }

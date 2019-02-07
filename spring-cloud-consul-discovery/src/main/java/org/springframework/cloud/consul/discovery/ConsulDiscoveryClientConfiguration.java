@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 		CommonsClientAutoConfiguration.class })
 public class ConsulDiscoveryClientConfiguration {
 
+	/**
+	 * Name of the catalog watch task scheduler bean.
+	 */
 	public static final String CATALOG_WATCH_TASK_SCHEDULER_NAME = "catalogWatchTaskScheduler";
 
 	@Autowired
@@ -53,29 +56,30 @@ public class ConsulDiscoveryClientConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
-	//TODO: move to service-registry for Edgware
+	// TODO: move to service-registry for Edgware
 	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties) {
-		return new TtlScheduler(heartbeatProperties, consulClient);
+		return new TtlScheduler(heartbeatProperties, this.consulClient);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	//TODO: move to service-registry for Edgware
+	// TODO: move to service-registry for Edgware
 	public HeartbeatProperties heartbeatProperties() {
 		return new HeartbeatProperties();
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	//TODO: Split appropriate values to service-registry for Edgware
+	// TODO: Split appropriate values to service-registry for Edgware
 	public ConsulDiscoveryProperties consulDiscoveryProperties(InetUtils inetUtils) {
 		return new ConsulDiscoveryProperties(inetUtils);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties discoveryProperties) {
-		return new ConsulDiscoveryClient(consulClient, discoveryProperties);
+	public ConsulDiscoveryClient consulDiscoveryClient(
+			ConsulDiscoveryProperties discoveryProperties) {
+		return new ConsulDiscoveryClient(this.consulClient, discoveryProperties);
 	}
 
 	@Bean
@@ -84,7 +88,8 @@ public class ConsulDiscoveryClientConfiguration {
 	public ConsulCatalogWatch consulCatalogWatch(
 			ConsulDiscoveryProperties discoveryProperties,
 			@Qualifier(CATALOG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
-		return new ConsulCatalogWatch(discoveryProperties, consulClient, taskScheduler);
+		return new ConsulCatalogWatch(discoveryProperties, this.consulClient,
+				taskScheduler);
 	}
 
 	@Bean(name = CATALOG_WATCH_TASK_SCHEDULER_NAME)
@@ -92,4 +97,5 @@ public class ConsulDiscoveryClientConfiguration {
 	public TaskScheduler catalogWatchTaskScheduler() {
 		return new ThreadPoolTaskScheduler();
 	}
+
 }

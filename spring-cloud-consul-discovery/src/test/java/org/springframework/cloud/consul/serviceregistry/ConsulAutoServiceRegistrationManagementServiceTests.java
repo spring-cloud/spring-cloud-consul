@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,14 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertFalse;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-
 import java.util.Map;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.Service;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -37,9 +35,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Aleksandr Tarasov (aatarasov)
@@ -60,32 +57,35 @@ public class ConsulAutoServiceRegistrationManagementServiceTests {
 
 	@Test
 	public void contextLoads() {
-		final Response<Map<String, Service>> response = consul.getAgentServices();
+		final Response<Map<String, Service>> response = this.consul.getAgentServices();
 		final Map<String, Service> services = response.getValue();
 
 		final Service service = services.get("myTestService-EE-0");
-		assertNotNull("service was null", service);
-		assertNotEquals("service port was 0", 0, service.getPort().intValue());
-		assertEquals("service id was wrong", "myTestService-EE-0", service.getId());
-		assertEquals("service name was wrong", "myTestService-EE", service.getService());
-		assertFalse("service address must not be empty",
-				StringUtils.isEmpty(service.getAddress()));
-		assertEquals("service address must equals hostname from discovery properties",
-				discoveryProperties.getHostname(), service.getAddress());
+		assertThat(service).as("service was null").isNotNull();
+		assertThat(service.getPort().intValue()).as("service port was 0").isNotEqualTo(0);
+		assertThat(service.getId()).as("service id was wrong")
+				.isEqualTo("myTestService-EE-0");
+		assertThat(service.getService()).as("service name was wrong")
+				.isEqualTo("myTestService-EE");
+		assertThat(StringUtils.isEmpty(service.getAddress()))
+				.as("service address must not be empty").isFalse();
+		assertThat(service.getAddress())
+				.as("service address must equals hostname from discovery properties")
+				.isEqualTo(this.discoveryProperties.getHostname());
 
 		final Service managementService = services.get("myTestService-EE-0-management");
-		assertNotNull("management service was null", managementService);
-		assertEquals("management service port was wrong", 4452,
-				managementService.getPort().intValue());
-		assertEquals("management service id was wrong", "myTestService-EE-0-management",
-				managementService.getId());
-		assertEquals("management service name was wrong", "myTestService-EE-management",
-				managementService.getService());
-		assertFalse("management service address must not be empty",
-				StringUtils.isEmpty(managementService.getAddress()));
-		assertEquals(
-				"management service address must equals hostname from discovery properties",
-				discoveryProperties.getHostname(), managementService.getAddress());
+		assertThat(managementService).as("management service was null").isNotNull();
+		assertThat(managementService.getPort().intValue())
+				.as("management service port was wrong").isEqualTo(4452);
+		assertThat(managementService.getId()).as("management service id was wrong")
+				.isEqualTo("myTestService-EE-0-management");
+		assertThat(managementService.getService()).as("management service name was wrong")
+				.isEqualTo("myTestService-EE-management");
+		assertThat(StringUtils.isEmpty(managementService.getAddress()))
+				.as("management service address must not be empty").isFalse();
+		assertThat(managementService.getAddress()).as(
+				"management service address must equals hostname from discovery properties")
+				.isEqualTo(this.discoveryProperties.getHostname());
 	}
 
 	@Configuration
@@ -94,5 +94,7 @@ public class ConsulAutoServiceRegistrationManagementServiceTests {
 			ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestConfig {
+
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ import com.netflix.loadbalancer.ServerListFilter;
 
 /**
  * Created by nicu on 12.03.2015.
+ *
+ * @author Nicu Marasoiu
  */
 @Deprecated
 public class ServiceCheckServerListFilter implements ServerListFilter<Server> {
@@ -44,9 +46,9 @@ public class ServiceCheckServerListFilter implements ServerListFilter<Server> {
 		for (Server server : servers) {
 			String appName = server.getMetaInfo().getAppName();
 			String instanceId = server.getMetaInfo().getInstanceId();
-			//TODO: cache getHealthChecks? this is hit often
-			List<Check> serviceChecks = client.getHealthChecksForService(appName,
-					QueryParams.DEFAULT).getValue();
+			// TODO: cache getHealthChecks? this is hit often
+			List<Check> serviceChecks = this.client
+					.getHealthChecksForService(appName, QueryParams.DEFAULT).getValue();
 			boolean serviceOk = true;
 			for (Check check : serviceChecks) {
 				if (check.getServiceId().equals(instanceId)

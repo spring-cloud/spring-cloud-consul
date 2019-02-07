@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.cloud.client.serviceregistry.AbstractAutoServiceRegistration;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
@@ -29,11 +30,13 @@ import org.springframework.util.StringUtils;
 /**
  * @author Spencer Gibb
  */
-public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistration<ConsulRegistration> {
+public class ConsulAutoServiceRegistration
+		extends AbstractAutoServiceRegistration<ConsulRegistration> {
 
 	private static Log log = LogFactory.getLog(ConsulAutoServiceRegistration.class);
 
 	private ConsulDiscoveryProperties properties;
+
 	private ConsulAutoRegistration registration;
 
 	public ConsulAutoServiceRegistration(ConsulServiceRegistry serviceRegistry,
@@ -50,10 +53,12 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 
 	@Override
 	protected ConsulAutoRegistration getRegistration() {
-		if (this.registration.getService().getPort() == null && this.getPort().get() > 0) {
+		if (this.registration.getService().getPort() == null
+				&& this.getPort().get() > 0) {
 			this.registration.initializePort(this.getPort().get());
 		}
-		Assert.notNull(this.registration.getService().getPort(), "service.port has not been set");
+		Assert.notNull(this.registration.getService().getPort(),
+				"service.port has not been set");
 		return this.registration;
 	}
 
@@ -89,7 +94,7 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 
 	@Override
 	protected Object getConfiguration() {
-		return properties;
+		return this.properties;
 	}
 
 	@Override
@@ -116,7 +121,7 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 	@Override
 	@SuppressWarnings("deprecation")
 	protected String getAppName() {
-		String appName = properties.getServiceName();
+		String appName = this.properties.getServiceName();
 		return StringUtils.isEmpty(appName) ? super.getAppName() : appName;
 	}
 
@@ -125,4 +130,5 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 		// do nothing so we can listen for this event in a different class
 		// this ensures start() can be retried if spring-retry is available
 	}
+
 }

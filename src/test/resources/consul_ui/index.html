@@ -1,40 +1,43 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=0.7, user-scalable=no">
-  <title>Consul by HashiCorp</title>
-  <link rel="stylesheet" href="static/bootstrap.min.css">
-  <link rel="stylesheet" href="static/base.css">
-  <link rel="shortcut icon" href="static/favicon.png">
+	<meta charset="utf-8">
+	<meta content="IE=edge" http-equiv="X-UA-Compatible">
+	<meta content="width=device-width, initial-scale=0.7, user-scalable=no"
+		  name="viewport">
+	<title>Consul by HashiCorp</title>
+	<link href="static/bootstrap.min.css" rel="stylesheet">
+	<link href="static/base.css" rel="stylesheet">
+	<link href="static/favicon.png" rel="shortcut icon">
 
 </head>
 <body>
 
-  <div class="wrapper">
-    <div class="container">
-      <div class="col-md-12">
-        <div id="app">
-        </div>
-      </div>
-    </div>
+<div class="wrapper">
+	<div class="container">
+		<div class="col-md-12">
+			<div id="app">
+			</div>
+		</div>
+	</div>
 
-    <div class="push"></div>
-  </div>
+	<div class="push"></div>
+</div>
 
-    <div class="footer">
-        <div class="container">
-          <div class="col-md-12">
-          </div>
-        </div>
-    </div>
+<div class="footer">
+	<div class="container">
+		<div class="col-md-12">
+		</div>
+	</div>
+</div>
 
-  <script type="text/x-handlebars">
+<script type="text/x-handlebars">
     {{outlet}}
-  </script>
 
-  <script type="text/x-handlebars" data-template-name="error">
+
+</script>
+
+<script data-template-name="error" type="text/x-handlebars">
     <div class="row">
       <div class="col-md-8 col-md-offset-2 col-sm-12 col-xs-12">
         <div class="text-center vertical-center">
@@ -48,9 +51,11 @@
         </div>
       </div>
     </div>
-  </script>
 
-  <script type="text/x-handlebars" data-template-name="dc/unauthorized">
+
+</script>
+
+<script data-template-name="dc/unauthorized" type="text/x-handlebars">
     <div class="row">
       <div class="col-md-8 col-md-offset-2 col-sm-12 col-xs-12">
         <div class="text-center vertical-center">
@@ -66,9 +71,11 @@
         </div>
       </div>
     </div>
-  </script>
 
-  <script type="text/x-handlebars" data-template-name="dc/aclsdisabled">
+
+</script>
+
+<script data-template-name="dc/aclsdisabled" type="text/x-handlebars">
     <div class="row">
       <div class="col-md-8 col-md-offset-2 col-sm-12 col-xs-12">
         <div class="text-center vertical-center">
@@ -78,9 +85,11 @@
         </div>
       </div>
     </div>
-  </script>
 
-  <script type="text/x-handlebars" data-template-name="loading">
+
+</script>
+
+<script data-template-name="loading" type="text/x-handlebars">
     <div class="row">
       <div class="col-md-8 col-md-offset-2 col-sm-12 col-xs-12">
         <div class="text-center vertical-center">
@@ -89,9 +98,11 @@
         </div>
       </div>
     </div>
-  </script>
 
-  <script type="text/x-handlebars" id="actionbar">
+
+</script>
+
+<script id="actionbar" type="text/x-handlebars">
     <div class="row">
       <div class="action-bar">
         <div {{ bind-attr class="searchBar:col-md-10:col-md-5" }} >
@@ -122,9 +133,11 @@
         {{/if}}
       </div>
     </div>
-  </script>
 
-  <script type="text/x-handlebars" data-template-name="dc">
+
+</script>
+
+<script data-template-name="dc" type="text/x-handlebars">
     <div class="row">
       <div {{ bind-attr class=":col-md-12 :col-sm-12 :col-xs-12 :topbar" }}>
 
@@ -171,9 +184,11 @@
     </div>
 
     {{outlet}}
-  </script>
 
-  <script type="text/x-handlebars" data-template-name="kv/show">
+
+</script>
+
+<script data-template-name="kv/show" type="text/x-handlebars">
     <div class="row">
       <div class="col-md-6 col-lg-5 padded-right-middle">
         <h4 class="breadcrumbs"><a href="" {{action 'linkToKey' grandParentKey }}>{{parentKey}}</a> <a href="" {{action 'linkToKey' parentKey }}>+</a></h4>
@@ -243,9 +258,11 @@
         </div>
       </div>
     </div>
-  </script>
 
-  <script type="text/x-handlebars" data-template-name="kv/edit">
+
+</script>
+
+<script data-template-name="kv/edit" type="text/x-handlebars">
     <div class="row">
       <div class="col-md-6 col-lg-5 padded-right-middle">
         <h4 class="breadcrumbs"><a href="" {{action 'linkToKey' grandParentKey }}>{{parentKey}}</a> <a href="" {{action 'linkToKey' parentKey }}>+</a></h4>
@@ -320,9 +337,11 @@
       </div>
 
     </div>
-  </script>
 
-  <script type="text/x-handlebars" data-template-name="item/loading">
+
+</script>
+
+<script data-template-name="item/loading" type="text/x-handlebars">
     <div class="row">
       <div class="col-md-8 col-md-offset-2 col-sm-12 col-xs-12">
         <div class="text-center vertical-center">
@@ -331,9 +350,11 @@
         </div>
       </div>
     </div>
-  </script>
 
-  <script type="text/x-handlebars" id="services">
+
+</script>
+
+<script id="services" type="text/x-handlebars">
     <div class="row">
       <div {{ bind-attr class=":col-md-6 :col-lg-5 :padded-right-middle isShowingItem:hidden-xs isShowingItem:hidden-sm" }}>
         {{view App.ActionBarView }}
@@ -394,9 +415,11 @@
         </div>
       </div>
     </div>
-  </script>
 
-  <script type="text/x-handlebars" id="service">
+
+</script>
+
+<script id="service" type="text/x-handlebars">
       <div class="col-xs-12 col-sm-12 visible-xs visible-sm">
         {{#link-to "services" class="btn btn-default btn-block" }}Back to all services{{/link-to}}
         <hr>
@@ -445,9 +468,11 @@
         {{/link-to}}
 
       {{/each}}
-  </script>
 
-  <script type="text/x-handlebars" id="nodes">
+
+</script>
+
+<script id="nodes" type="text/x-handlebars">
     <div class="row">
       <div {{ bind-attr class=":col-md-6 :col-lg-5 :padded-right-middle isShowingItem:hidden-xs isShowingItem:hidden-sm" }}>
         {{view App.ActionBarView }}
@@ -503,9 +528,11 @@
         </div>
       </div>
     </div>
-  </script>
 
-  <script type="text/x-handlebars" id="node">
+
+</script>
+
+<script id="node" type="text/x-handlebars">
       <div class="col-xs-12 col-sm-12 visible-xs visible-sm">
         {{#link-to "nodes" class="btn btn-default btn-block" }}Back to all nodes{{/link-to}}
         <hr>
@@ -587,9 +614,11 @@
       {{else}}
         <p class="light small">No sessions</p>
       {{/if}}
-  </script>
 
-  <script type="text/x-handlebars" id="acls">
+
+</script>
+
+<script id="acls" type="text/x-handlebars">
     <div class="row">
       <div {{ bind-attr class=":col-md-6 :col-lg-5 :padded-right-middle isShowingItem:hidden-xs isShowingItem:hidden-sm" }}>
         {{view App.ActionBarView }}
@@ -656,9 +685,11 @@
         </div>
       {{/if}}
     </div>
-  </script>
 
-  <script type="text/x-handlebars" id="acl">
+
+</script>
+
+<script id="acl" type="text/x-handlebars">
     <div class="row">
       <div class="col-xs-12 col-sm-12 visible-xs visible-sm">
         {{#link-to "acls" class="btn btn-default btn-block" }}Back to all ACLs{{/link-to}}
@@ -705,9 +736,11 @@
             </div>
           </div>
       <hr>
-  </script>
 
-  <script type="text/x-handlebars" id="index">
+
+</script>
+
+<script id="index" type="text/x-handlebars">
     <div class="col-md-8 col-md-offset-2 col-xs-offset-0 col-sm-offset-0 col-xs-12 col-sm-12 vertical-center">
       <h5>Select a datacenter</h5>
       {{#each item in model}}
@@ -724,9 +757,11 @@
         {{/link-to}}
       {{/each}}
     </div>
-  </script>
 
-  <script type="text/x-handlebars" id="settings">
+
+</script>
+
+<script id="settings" type="text/x-handlebars">
     <div class="col-md-8 col-md-offset-2 col-xs-offset-0 col-sm-offset-0 col-xs-12 col-sm-12">
       <h3>Settings</h3>
       <p>These settings allow you to configure your browser for the Consul Web UI. Everything is saved to localstorage,
@@ -742,14 +777,17 @@
         <button {{ action "reset" }} {{ bind-attr class=":btn :btn-danger" }}>Reset Defaults</button>
       </div>
     </div>
-  </script>
 
 
-  <script>
-  // Enable query params, must be loaded before ember is
-  EmberENV = {FEATURES: {'query-params-new': true}};
-  </script>
+</script>
 
 
-<script src="static/application.min.js"></script></body>
+<script>
+	// Enable query params, must be loaded before ember is
+	EmberENV = {FEATURES: {'query-params-new': true}};
+</script>
+
+
+<script src="static/application.min.js"></script>
+</body>
 </html>

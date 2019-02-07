@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,10 @@
 
 package org.springframework.cloud.consul.binder;
 
+import com.ecwid.consul.v1.OperationException;
 import org.junit.Test;
 
-import com.ecwid.consul.v1.OperationException;
-
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,15 +33,16 @@ public class ConsulInboundMessageProducerTests {
 		EventService eventService = mock(EventService.class);
 		when(eventService.watch()).thenThrow(new OperationException(500, "error", ""));
 
-		ConsulInboundMessageProducer producer = new ConsulInboundMessageProducer(eventService);
+		ConsulInboundMessageProducer producer = new ConsulInboundMessageProducer(
+				eventService);
 
 		try {
 			producer.getEvents();
-		} catch (Exception e) {
-			fail("ConsulInboundMessageProducer threw unexpected exception: "+e);
+		}
+		catch (Exception e) {
+			fail("ConsulInboundMessageProducer threw unexpected exception: " + e);
 		}
 
 	}
-
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ import java.util.List;
 import com.ecwid.consul.v1.health.model.Check;
 import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.loadbalancer.Server;
-
 import org.junit.Test;
 
-import static com.ecwid.consul.v1.health.model.Check.CheckStatus.*;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static com.ecwid.consul.v1.health.model.Check.CheckStatus.CRITICAL;
+import static com.ecwid.consul.v1.health.model.Check.CheckStatus.PASSING;
+import static com.ecwid.consul.v1.health.model.Check.CheckStatus.WARNING;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Spencer Gibb
@@ -45,20 +45,20 @@ public class HealthServiceServerListFilterTests {
 		servers.add(newServer(WARNING));
 
 		List<Server> filtered = filter.getFilteredListOfServers(servers);
-		assertThat("wrong # of filtered servers", filtered, hasSize(2));
+		assertThat(filtered).as("wrong # of filtered servers").hasSize(2);
 	}
 
 	private ConsulServer newServer(Check.CheckStatus checkStatus) {
 		HealthService healthService = new HealthService();
 		HealthService.Node node = new HealthService.Node();
-		node.setAddress("nodeaddr"+checkStatus.name());
-		node.setNode("nodenode"+checkStatus.name());
+		node.setAddress("nodeaddr" + checkStatus.name());
+		node.setNode("nodenode" + checkStatus.name());
 		healthService.setNode(node);
 		HealthService.Service service = new HealthService.Service();
-		service.setAddress("serviceaddr"+checkStatus.name());
-		service.setId("serviceid"+checkStatus.name());
+		service.setAddress("serviceaddr" + checkStatus.name());
+		service.setId("serviceid" + checkStatus.name());
 		service.setPort(8080);
-		service.setService("serviceservice"+checkStatus.name());
+		service.setService("serviceservice" + checkStatus.name());
 		healthService.setService(service);
 		ArrayList<Check> checks = new ArrayList<>();
 		Check check = new Check();
@@ -67,4 +67,5 @@ public class HealthServiceServerListFilterTests {
 		healthService.setChecks(checks);
 		return new ConsulServer(healthService);
 	}
+
 }

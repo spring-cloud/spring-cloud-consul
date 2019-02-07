@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,14 @@ package org.springframework.cloud.consul.binder;
 
 import java.util.concurrent.TimeUnit;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,19 +39,17 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
-
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
+
 /**
  * @author Spencer Gibb
  */
@@ -56,33 +57,35 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER
 @SpringBootTest(classes = ConsulBinderApplicationTests.Application.class)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class ConsulBinderApplicationTests {
-	@Autowired
-	private Events events;
 
 	@Rule
 	public final WireMockRule wireMock = new WireMockRule(18500);
 
+	@Autowired
+	private Events events;
+
 	@Before
 	public void setUp() throws Exception {
 
-		wireMock.stubFor(put(urlPathMatching("/v1/event/fire/purchases"))
+		this.wireMock.stubFor(put(urlPathMatching("/v1/event/fire/purchases"))
 				.willReturn(aResponse().withStatus(200)));
 
-		/*wireMock.stubFor(get(urlPathMatching("/v1/event/list"))
-				.willReturn(aResponse().withBody("[]")
-						.withStatus(200)
-						.withHeader("X-Consul-Index", "1")));*/
+		/*
+		 * wireMock.stubFor(get(urlPathMatching("/v1/event/list"))
+		 * .willReturn(aResponse().withBody("[]") .withStatus(200)
+		 * .withHeader("X-Consul-Index", "1")));
+		 */
 	}
 
 	@Test
-	@Ignore //FIXME: 2.0.0 need stream fix
+	@Ignore // FIXME: 2.0.0 need stream fix
 	public void shouldInitializeConsulSource() {
 
-		assertNotNull(events);
+		assertThat(this.events).isNotNull();
 	}
 
 	@Test
-	@Ignore //FIXME: 2.0.0 need stream fix
+	@Ignore // FIXME: 2.0.0 need stream fix
 	public void shouldPublishTextConsulMessage() {
 
 		// given
@@ -90,7 +93,7 @@ public class ConsulBinderApplicationTests {
 				.build();
 
 		// when
-		events.purchases().send(message);
+		this.events.purchases().send(message);
 
 		// then
 		await().atMost(1, TimeUnit.SECONDS);
@@ -101,12 +104,14 @@ public class ConsulBinderApplicationTests {
 
 		@Output
 		MessageChannel purchases();
+
 	}
 
 	@Configuration
 	@EnableAutoConfiguration
 	@EnableBinding(Events.class)
 	public static class Application {
+
 		@Bean
 		public ConsulClient consulClient() {
 			return new ConsulClient("localhost", 18500);
@@ -118,5 +123,7 @@ public class ConsulBinderApplicationTests {
 			when(eventService.getConsulClient()).thenReturn(consulClient);
 			return eventService;
 		}
+
 	}
+
 }

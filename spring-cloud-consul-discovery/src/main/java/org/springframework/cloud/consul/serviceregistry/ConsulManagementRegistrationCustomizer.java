@@ -20,5 +20,11 @@ package org.springframework.cloud.consul.serviceregistry;
  * @author Alexey Savchuk (devpreview)
  */
 public interface ConsulManagementRegistrationCustomizer {
+
+	/**
+	 * Customizes a registration.
+	 * @param managementRegistration registration to customize
+	 */
 	void customize(ConsulRegistration managementRegistration);
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.cloud.consul.model.SerfStatusEnum;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.Member;
 
+import org.springframework.cloud.consul.model.SerfStatusEnum;
+
+/**
+ * @author Nicu Marasoiu
+ */
 @Deprecated
 public class FilteringAgentClient {
 
@@ -38,7 +41,7 @@ public class FilteringAgentClient {
 	}
 
 	public List<Member> getAliveAgents() {
-		List<Member> members = client.getAgentMembers().getValue();
+		List<Member> members = this.client.getAgentMembers().getValue();
 		List<Member> liveMembers = new ArrayList<>(members.size());
 		for (Member peer : members) {
 			if (peer.getStatus() == ALIVE_STATUS) {
@@ -55,4 +58,5 @@ public class FilteringAgentClient {
 		}
 		return addresses;
 	}
+
 }

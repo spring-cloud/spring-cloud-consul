@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,23 +36,30 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @ConditionalOnProperty(name = "spring.cloud.consul.config.enabled", matchIfMissing = true)
 public class ConsulConfigAutoConfiguration {
 
+	/**
+	 * Name of the config watch task scheduler bean.
+	 */
 	public static final String CONFIG_WATCH_TASK_SCHEDULER_NAME = "configWatchTaskScheduler";
 
 	@Configuration
 	@ConditionalOnClass(RefreshEndpoint.class)
 	protected static class ConsulRefreshConfiguration {
+
 		@Bean
 		@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled", matchIfMissing = true)
 		public ConfigWatch configWatch(ConsulConfigProperties properties,
 				ConsulPropertySourceLocator locator, ConsulClient consul,
-			    @Qualifier(CONFIG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
-			return new ConfigWatch(properties, consul, locator.getContextIndexes(), taskScheduler);
+				@Qualifier(CONFIG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
+			return new ConfigWatch(properties, consul, locator.getContextIndexes(),
+					taskScheduler);
 		}
 
 		@Bean(name = CONFIG_WATCH_TASK_SCHEDULER_NAME)
 		@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled", matchIfMissing = true)
-        public TaskScheduler configWatchTaskScheduler() {
+		public TaskScheduler configWatchTaskScheduler() {
 			return new ThreadPoolTaskScheduler();
 		}
+
 	}
+
 }

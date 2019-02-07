@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
+import com.ecwid.consul.ConsulException;
+import com.ecwid.consul.v1.ConsulClient;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -27,9 +30,6 @@ import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationC
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.DirtiesContext;
-
-import com.ecwid.consul.ConsulException;
-import com.ecwid.consul.v1.ConsulClient;
 
 /**
  * @author Spencer Gibb
@@ -44,20 +44,25 @@ public class ConsulAutoServiceRegistrationFailFastTests {
 	@Test
 	public void testFailFastEnabled() {
 		this.exception.expect(ConsulException.class);
-		new SpringApplicationBuilder(TestConfig.class).properties("spring.application.name=testregistrationfails-fast",
-				"spring.jmx.default-domain=testautoregfailfast",
-				"server.port=0", "spring.cloud.consul.discovery.failFast=true").run();
+		new SpringApplicationBuilder(TestConfig.class)
+				.properties("spring.application.name=testregistrationfails-fast",
+						"spring.jmx.default-domain=testautoregfailfast", "server.port=0",
+						"spring.cloud.consul.discovery.failFast=true")
+				.run();
 	}
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
+			ConsulAutoConfiguration.class,
+			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	protected static class TestConfig {
 
 		@Bean
 		public ConsulClient consulClient() {
 			return new ConsulClient("localhost", 4321);
 		}
-	}
-}
 
+	}
+
+}

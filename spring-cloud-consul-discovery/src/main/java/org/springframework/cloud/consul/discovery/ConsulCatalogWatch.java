@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,31 +40,40 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 /**
  * @author Spencer Gibb
  */
-public class ConsulCatalogWatch implements ApplicationEventPublisherAware, SmartLifecycle {
+public class ConsulCatalogWatch
+		implements ApplicationEventPublisherAware, SmartLifecycle {
+
 	private static final Log log = LogFactory.getLog(ConsulDiscoveryClient.class);
 
 	private final ConsulDiscoveryProperties properties;
+
 	private final ConsulClient consul;
+
 	private final TaskScheduler taskScheduler;
+
 	private final AtomicReference<BigInteger> catalogServicesIndex = new AtomicReference<>();
+
 	private final AtomicBoolean running = new AtomicBoolean(false);
+
 	private ApplicationEventPublisher publisher;
+
 	private ScheduledFuture<?> watchFuture;
 
 	public ConsulCatalogWatch(ConsulDiscoveryProperties properties, ConsulClient consul) {
 		this(properties, consul, getTaskScheduler());
-    }
+	}
+
+	public ConsulCatalogWatch(ConsulDiscoveryProperties properties, ConsulClient consul,
+			TaskScheduler taskScheduler) {
+		this.properties = properties;
+		this.consul = consul;
+		this.taskScheduler = taskScheduler;
+	}
 
 	private static ThreadPoolTaskScheduler getTaskScheduler() {
 		ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
 		taskScheduler.initialize();
 		return taskScheduler;
-	}
-
-	public ConsulCatalogWatch(ConsulDiscoveryProperties properties, ConsulClient consul, TaskScheduler taskScheduler) {
-		this.properties = properties;
-		this.consul = consul;
-		this.taskScheduler = taskScheduler;
 	}
 
 	@Override
@@ -86,7 +95,8 @@ public class ConsulCatalogWatch implements ApplicationEventPublisherAware, Smart
 	@Override
 	public void start() {
 		if (this.running.compareAndSet(false, true)) {
-			this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(this::catalogServicesWatch,
+			this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(
+					this::catalogServicesWatch,
 					this.properties.getCatalogServicesWatchDelay());
 		}
 	}
@@ -108,30 +118,32 @@ public class ConsulCatalogWatch implements ApplicationEventPublisherAware, Smart
 		return 0;
 	}
 
-	@Timed(value ="consul.watch-catalog-services")
+	@Timed("consul.watch-catalog-services")
 	public void catalogServicesWatch() {
 		try {
 			long index = -1;
-			if (catalogServicesIndex.get() != null) {
-				index = catalogServicesIndex.get().longValue();
+			if (this.catalogServicesIndex.get() != null) {
+				index = this.catalogServicesIndex.get().longValue();
 			}
 
-			Response<Map<String, List<String>>> response = consul
-					.getCatalogServices(new QueryParams(properties
-							.getCatalogServicesWatchTimeout(), index), properties.getAclToken());
+			Response<Map<String, List<String>>> response = this.consul.getCatalogServices(
+					new QueryParams(this.properties.getCatalogServicesWatchTimeout(),
+							index),
+					this.properties.getAclToken());
 			Long consulIndex = response.getConsulIndex();
 			if (consulIndex != null) {
-				catalogServicesIndex.set(BigInteger.valueOf(consulIndex));
+				this.catalogServicesIndex.set(BigInteger.valueOf(consulIndex));
 			}
 
 			if (log.isTraceEnabled()) {
-				log.trace("Received services update from consul: "+response.getValue()
-								+", index: "+ consulIndex);
+				log.trace("Received services update from consul: " + response.getValue()
+						+ ", index: " + consulIndex);
 			}
-			publisher.publishEvent(new HeartbeatEvent(this, consulIndex));
+			this.publisher.publishEvent(new HeartbeatEvent(this, consulIndex));
 		}
 		catch (Exception e) {
 			log.error("Error watching Consul CatalogServices", e);
 		}
 	}
+
 }

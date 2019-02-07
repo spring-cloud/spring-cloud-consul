@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -38,31 +39,33 @@ public class ConsulBinderConfigurationTests {
 	public ExpectedException exception = ExpectedException.none();
 
 	@Test
-	@Ignore //FIXME 2.0.0 need stream fix
+	@Ignore // FIXME 2.0.0 need stream fix
 	public void consulBinderDisabledWorks() {
 		this.exception.expectMessage(containsString("no proper implementation found"));
 		new SpringApplicationBuilder(Application.class)
-				.properties("spring.cloud.consul.binder.enabled=false")
-				.run();
+				.properties("spring.cloud.consul.binder.enabled=false").run();
 	}
 
 	@Test
-	@Ignore //FIXME 2.0.0 need stream fix
+	@Ignore // FIXME 2.0.0 need stream fix
 	public void consulDisabledDisablesBinder() {
 		this.exception.expectMessage(containsString("no proper implementation found"));
 		new SpringApplicationBuilder(Application.class)
-				.properties("spring.cloud.consul.enabled=false")
-				.run();
+				.properties("spring.cloud.consul.enabled=false").run();
 	}
 
 	interface Events {
+
 		@Output
 		MessageChannel purchases();
+
 	}
 
 	@Configuration
 	@EnableAutoConfiguration
 	@EnableBinding(Events.class)
 	public static class Application {
+
 	}
+
 }

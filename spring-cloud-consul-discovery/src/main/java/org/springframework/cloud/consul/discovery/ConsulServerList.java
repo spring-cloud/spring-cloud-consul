@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ import com.netflix.loadbalancer.AbstractServerList;
 public class ConsulServerList extends AbstractServerList<ConsulServer> {
 
 	private final ConsulClient client;
+
 	private final ConsulDiscoveryProperties properties;
 
 	private String serviceId;
@@ -44,15 +45,15 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	}
 
 	protected ConsulClient getClient() {
-		return client;
+		return this.client;
 	}
 
 	protected ConsulDiscoveryProperties getProperties() {
-		return properties;
+		return this.properties;
 	}
 
 	protected String getServiceId() {
-		return serviceId;
+		return this.serviceId;
 	}
 
 	@Override
@@ -86,8 +87,8 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 
 	/**
 	 * Transforms the response from Consul in to a list of usable {@link ConsulServer}s.
-	 *
-	 * @param healthServices the initial list of servers from Consul. Guaranteed to be non-empty list
+	 * @param healthServices the initial list of servers from Consul. Guaranteed to be
+	 * non-empty list
 	 * @return ConsulServer instances
 	 * @see ConsulServer#ConsulServer(HealthService)
 	 */
@@ -95,8 +96,10 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		List<ConsulServer> servers = new ArrayList<>();
 		for (HealthService service : healthServices) {
 			ConsulServer server = new ConsulServer(service);
-			if (server.getMetadata().containsKey(this.properties.getDefaultZoneMetadataName())) {
-				server.setZone(server.getMetadata().get(this.properties.getDefaultZoneMetadataName()));
+			if (server.getMetadata()
+					.containsKey(this.properties.getDefaultZoneMetadataName())) {
+				server.setZone(server.getMetadata()
+						.get(this.properties.getDefaultZoneMetadataName()));
 			}
 			servers.add(server);
 		}
@@ -104,9 +107,9 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	}
 
 	/**
-	 * This method will create the {@link QueryParams} to use when retrieving the
-	 * services from Consul. By default {@link QueryParams#DEFAULT} is used. In case
-	 * a datacenter is specified for the current serviceId {@link QueryParams#datacenter} is set.
+	 * This method will create the {@link QueryParams} to use when retrieving the services
+	 * from Consul. By default {@link QueryParams#DEFAULT} is used. In case a datacenter
+	 * is specified for the current serviceId {@link QueryParams#datacenter} is set.
 	 * @return an instance of {@link QueryParams}
 	 */
 	protected QueryParams createQueryParamsForClientRequest() {
@@ -128,9 +131,10 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder("ConsulServerList{");
-		sb.append("serviceId='").append(serviceId).append('\'');
+		sb.append("serviceId='").append(this.serviceId).append('\'');
 		sb.append(", tag=").append(getTag());
 		sb.append('}');
 		return sb.toString();
 	}
+
 }

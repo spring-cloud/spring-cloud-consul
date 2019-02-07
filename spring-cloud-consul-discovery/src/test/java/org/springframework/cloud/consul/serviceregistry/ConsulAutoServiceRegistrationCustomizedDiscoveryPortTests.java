@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2017 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
+import com.ecwid.consul.v1.agent.model.NewService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -31,8 +33,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.SocketUtils;
 
-import com.ecwid.consul.v1.agent.model.NewService;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
 
@@ -40,9 +40,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedDiscoveryPortTests.TestConfig.class,
-	properties = { "spring.application.name=myTestService-DiscoveryPort", },
-		webEnvironment = DEFINED_PORT)
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedDiscoveryPortTests.TestConfig.class, properties = {
+		"spring.application.name=myTestService-DiscoveryPort" }, webEnvironment = DEFINED_PORT)
 public class ConsulAutoServiceRegistrationCustomizedDiscoveryPortTests {
 
 	@Autowired
@@ -73,17 +72,21 @@ public class ConsulAutoServiceRegistrationCustomizedDiscoveryPortTests {
 		NewService.Check check = service.getCheck();
 		assertThat(check).as("check was null").isNotNull();
 
-		String httpCheck = String.format("%s://%s:%s%s", properties.getScheme(),
-				properties.getHostname(), properties.getPort(),
-				properties.getHealthCheckPath());
+		String httpCheck = String.format("%s://%s:%s%s", this.properties.getScheme(),
+				this.properties.getHostname(), this.properties.getPort(),
+				this.properties.getHealthCheckPath());
 		assertThat(check.getHttp()).as("http check was wrong").isEqualTo(httpCheck);
 
 		// unable to call consul api to get health check details
 	}
 
-
 	@Configuration
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
-	public static class TestConfig { }
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
+			ConsulAutoConfiguration.class,
+			ConsulAutoServiceRegistrationAutoConfiguration.class })
+	public static class TestConfig {
+
+	}
+
 }

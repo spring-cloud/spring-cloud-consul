@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package org.springframework.cloud.consul.discovery.configclient;
 
 import javax.annotation.PostConstruct;
 
+import com.ecwid.consul.v1.ConsulClient;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -25,8 +27,6 @@ import org.springframework.cloud.config.server.config.ConfigServerProperties;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
-
-import com.ecwid.consul.v1.ConsulClient;
 
 /**
  * Extra configuration for config server if it happens to be registered with Consul.
@@ -52,7 +52,7 @@ public class ConsulConfigServerAutoConfiguration {
 		}
 		String prefix = this.server.getPrefix();
 		if (StringUtils.hasText(prefix)) {
-			this.properties.getTags().add("configPath="+prefix);
+			this.properties.getTags().add("configPath=" + prefix);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,24 +50,30 @@ public class ConsulAutoServiceRegistrationRetryTests {
 	@Test
 	public void testRetry() {
 		this.exception.expect(ConsulException.class);
-		try (ConfigurableApplicationContext context = new SpringApplicationBuilder(TestConfig.class).properties("spring.application.name=testregistrationretry",
-				"spring.jmx.default-domain=testautoregretry",
-				"spring.cloud.consul.retry.max-attempts=2",
-				"logging.level.org.springframework.retry=DEBUG",
-				"server.port=0").run()) {
-			output.expect(Matchers.containsString("Retry: count="));
+		try (ConfigurableApplicationContext context = new SpringApplicationBuilder(
+				TestConfig.class)
+						.properties("spring.application.name=testregistrationretry",
+								"spring.jmx.default-domain=testautoregretry",
+								"spring.cloud.consul.retry.max-attempts=2",
+								"logging.level.org.springframework.retry=DEBUG",
+								"server.port=0")
+						.run()) {
+			this.output.expect(Matchers.containsString("Retry: count="));
 		}
 	}
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
+			ConsulAutoConfiguration.class,
+			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	protected static class TestConfig {
 
 		@Bean
 		public ConsulClient consulClient() {
 			return new ConsulClient("localhost", 4321);
 		}
-	}
-}
 
+	}
+
+}
