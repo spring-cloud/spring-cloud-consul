@@ -409,6 +409,17 @@ The value of each key needs to be a properly formatted YAML or Properties file.
 
 It may be convenient in certain circumstances (like local development or certain test scenarios) to not fail if consul isn't available for configuration. Setting `spring.cloud.consul.config.failFast=false` in `bootstrap.yml` will cause the configuration module to log a warning rather than throw an exception. This will allow the application to continue startup normally.
 
+[[spring-cloud-consul-local]]
+=== Local Overrides
+
+The consul config is given the highest priority by default. 
+
+You can set `spring.cloud.config.override-none=true` and it will make external config the lowest priority. 
+
+You can set `spring.cloud.config.override-system-properties=false` which will put them below system properties, which will also make cli args higher priority.
+
+These properties will need to be set in Consul itself.
+
 [[spring-cloud-consul-retry]]
 == Consul Retry
 
