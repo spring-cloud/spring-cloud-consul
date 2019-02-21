@@ -25,6 +25,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.CommonsClientAutoConfiguration;
+import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
@@ -40,6 +41,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 @Configuration
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty(value = "spring.cloud.consul.discovery.enabled", matchIfMissing = true)
+@ConditionalOnDiscoveryEnabled
 @EnableConfigurationProperties
 @AutoConfigureBefore({ SimpleDiscoveryClientAutoConfiguration.class,
 		CommonsClientAutoConfiguration.class })
