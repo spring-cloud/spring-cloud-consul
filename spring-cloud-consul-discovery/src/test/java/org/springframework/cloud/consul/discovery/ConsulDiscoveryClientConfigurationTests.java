@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package org.springframework.cloud.consul.discovery;
 
 import org.junit.After;
@@ -57,8 +56,7 @@ public class ConsulDiscoveryClientConfigurationTests {
 	private void setupContext(Class<?>... config) {
 		ConfigurationPropertySources.attach(this.context.getEnvironment());
 		this.context.register(UtilAutoConfiguration.class,
-				PropertyPlaceholderAutoConfiguration.class,
-				ConsulAutoConfiguration.class,
+				PropertyPlaceholderAutoConfiguration.class, ConsulAutoConfiguration.class,
 				ConsulDiscoveryClientConfiguration.class);
 		for (Class<?> value : config) {
 			this.context.register(value);
