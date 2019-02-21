@@ -67,7 +67,7 @@ public class Application {
 <simpara>If you use <link linkend="spring-cloud-consul-config">Spring Cloud Consul Config</link>, the above values will need to be placed in <literal>bootstrap.yml</literal> instead of <literal>application.yml</literal>.</simpara>
 </caution>
 <simpara>The default service name, instance id and port, taken from the <literal>Environment</literal>, are <literal>${spring.application.name}</literal>, the Spring Context ID and <literal>${server.port}</literal> respectively.</simpara>
-<simpara>To disable the Consul Discovery Client you can set <literal>spring.cloud.consul.discovery.enabled</literal> to <literal>false</literal>.</simpara>
+<simpara>To disable the Consul Discovery Client you can set <literal>spring.cloud.consul.discovery.enabled</literal> to <literal>false</literal>. Consul Discovery Client will also be disabled when <literal>spring.cloud.discovery.enabled</literal> is set to <literal>false</literal>.</simpara>
 <simpara>To disable the service registration you can set <literal>spring.cloud.consul.discovery.register</literal> to <literal>false</literal>.</simpara>
 <section xml:id="_registering_management_as_a_separate_service">
 <title>Registering Management as a Separate Service</title>
