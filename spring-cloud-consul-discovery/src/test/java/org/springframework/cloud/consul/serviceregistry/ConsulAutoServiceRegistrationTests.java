@@ -45,7 +45,10 @@ import static org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistr
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = {
-		"spring.application.name=myTestService1-FF::something" }, webEnvironment = RANDOM_PORT)
+	"spring.application.name=myTestService1-FF::something",
+	"spring.cloud.consul.discovery.include-hostname-in-instance-id=true",
+    "spring.cloud.client.hostname=localhost"
+}, webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationTests {
 
 	@Autowired
@@ -69,6 +72,8 @@ public class ConsulAutoServiceRegistrationTests {
 				.isFalse();
 		assertThat(service.getId()).as("service id was wrong")
 				.isEqualTo(this.registration.getInstanceId());
+		assertThat(service.getId()).as("service id include hostname")
+			.startsWith("localhost");
 		assertThat(service.getService()).as("service name was wrong")
 				.isEqualTo("myTestService1-FF-something");
 		assertThat(StringUtils.isEmpty(service.getAddress()))
