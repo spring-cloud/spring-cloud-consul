@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@ package org.springframework.cloud.consul;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.boot.actuate.health.AbstractHealthIndicator;
-import org.springframework.boot.actuate.health.Health;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
+
+import org.springframework.boot.actuate.health.AbstractHealthIndicator;
+import org.springframework.boot.actuate.health.Health;
 
 /**
  * @author Spencer Gibb
@@ -39,10 +39,11 @@ public class ConsulHealthIndicator extends AbstractHealthIndicator {
 
 	@Override
 	protected void doHealthCheck(Health.Builder builder) throws Exception {
-		final Response<String> leaderStatus = consul.getStatusLeader();
-		final Response<Map<String, List<String>>> services = consul
+		final Response<String> leaderStatus = this.consul.getStatusLeader();
+		final Response<Map<String, List<String>>> services = this.consul
 				.getCatalogServices(QueryParams.DEFAULT);
 		builder.up().withDetail("leader", leaderStatus.getValue()).withDetail("services",
 				services.getValue());
 	}
+
 }

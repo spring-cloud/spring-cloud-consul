@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,24 @@
 
 package org.springframework.cloud.consul.binder;
 
-import org.springframework.integration.handler.AbstractMessageHandler;
-import org.springframework.integration.handler.AbstractReplyProducingMessageHandler;
-import org.springframework.messaging.Message;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.event.model.Event;
 import com.ecwid.consul.v1.event.model.EventParams;
 
+import org.springframework.integration.handler.AbstractMessageHandler;
+import org.springframework.messaging.Message;
+
 /**
- * Adapter that converts and sends Messages as Consul events
+ * Adapter that converts and sends Messages as Consul events.
+ *
  * @author Spencer Gibb
  */
 public class ConsulSendingHandler extends AbstractMessageHandler {
 
 	private final ConsulClient consul;
+
 	private final String eventName;
 
 	public ConsulSendingHandler(ConsulClient consul, String eventName) {
@@ -42,16 +43,17 @@ public class ConsulSendingHandler extends AbstractMessageHandler {
 
 	@Override
 	protected void handleMessageInternal(Message<?> message) throws Exception {
-		if (logger.isTraceEnabled()) {
-			logger.trace("Publishing message" + message);
+		if (this.logger.isTraceEnabled()) {
+			this.logger.trace("Publishing message" + message);
 		}
 
 		Object payload = message.getPayload();
 		// TODO: support headers
 		// TODO: support consul event filters: NodeFilter, ServiceFilter, TagFilter
-		Response<Event> event = consul.eventFire(this.eventName, (String) payload,
+		Response<Event> event = this.consul.eventFire(this.eventName, (String) payload,
 				new EventParams(), QueryParams.DEFAULT);
 		// TODO: return event?
 		// return null;
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,14 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.annotation.PostConstruct;
 
-import org.springframework.cloud.consul.binder.config.ConsulBinderProperties;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.event.model.Event;
 import com.ecwid.consul.v1.event.model.EventParams;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.springframework.cloud.consul.binder.config.ConsulBinderProperties;
 
 /**
  * @author Spencer Gibb
@@ -43,14 +43,15 @@ public class EventService {
 
 	private AtomicReference<Long> lastIndex = new AtomicReference<>();
 
-	public EventService(ConsulBinderProperties properties, ConsulClient consul, ObjectMapper objectMapper) {
+	public EventService(ConsulBinderProperties properties, ConsulClient consul,
+			ObjectMapper objectMapper) {
 		this.properties = properties;
 		this.consul = consul;
 		this.objectMapper = objectMapper;
 	}
 
 	public ConsulClient getConsulClient() {
-		return consul;
+		return this.consul;
 	}
 
 	@PostConstruct
@@ -58,25 +59,25 @@ public class EventService {
 		setLastIndex(getEventsResponse());
 	}
 
+	public Long getLastIndex() {
+		return this.lastIndex.get();
+	}
+
 	private void setLastIndex(Response<?> response) {
 		Long consulIndex = response.getConsulIndex();
 		if (consulIndex != null) {
-			lastIndex.set(response.getConsulIndex());
+			this.lastIndex.set(response.getConsulIndex());
 		}
 	}
 
-	public Long getLastIndex() {
-		return lastIndex.get();
-	}
-
 	public Event fire(String name, String payload) {
-		Response<Event> response = consul.eventFire(name, payload, new EventParams(),
+		Response<Event> response = this.consul.eventFire(name, payload, new EventParams(),
 				QueryParams.DEFAULT);
 		return response.getValue();
 	}
 
 	public Response<List<Event>> getEventsResponse() {
-		return consul.eventList(QueryParams.DEFAULT);
+		return this.consul.eventList(QueryParams.DEFAULT);
 	}
 
 	public List<Event> getEvents() {
@@ -88,7 +89,7 @@ public class EventService {
 	}
 
 	public List<Event> watch() {
-		return watch(lastIndex.get());
+		return watch(this.lastIndex.get());
 	}
 
 	public List<Event> watch(Long lastIndex) {
@@ -98,10 +99,11 @@ public class EventService {
 			index = lastIndex;
 		}
 		int eventTimeout = 5;
-		if (properties != null) {
-			eventTimeout = properties.getEventTimeout();
+		if (this.properties != null) {
+			eventTimeout = this.properties.getEventTimeout();
 		}
-		Response<List<Event>> watch = consul.eventList(new QueryParams(eventTimeout, index));
+		Response<List<Event>> watch = this.consul
+				.eventList(new QueryParams(eventTimeout, index));
 		return filterEvents(readEvents(watch), lastIndex);
 	}
 
@@ -111,7 +113,10 @@ public class EventService {
 	}
 
 	/**
-	 * from https://github.com/hashicorp/consul/blob/master/watch/funcs.go#L169-L194
+	 * from https://github.com/hashicorp/consul/blob/master/watch/funcs.go#L169-L194 .
+	 * @param toFilter events to filter
+	 * @param lastIndex last index to pick from the list of events
+	 * @return filtered list of events
 	 */
 	protected List<Event> filterEvents(List<Event> toFilter, Long lastIndex) {
 		List<Event> events = toFilter;

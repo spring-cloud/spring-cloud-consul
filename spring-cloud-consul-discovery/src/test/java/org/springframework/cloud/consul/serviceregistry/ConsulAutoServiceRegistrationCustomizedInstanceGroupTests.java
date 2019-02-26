@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,13 @@ package org.springframework.cloud.consul.serviceregistry;
 import java.util.List;
 import java.util.Map;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.Service;
+import com.netflix.client.config.DefaultClientConfigImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -33,26 +38,17 @@ import org.springframework.cloud.consul.discovery.ConsulServerList;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-import com.netflix.client.config.DefaultClientConfigImpl;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Jin Zhang
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedInstanceGroupTests.TestConfig.class,
-	properties = { "spring.application.name=myTestService-WithGroup",
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedInstanceGroupTests.TestConfig.class, properties = {
+		"spring.application.name=myTestService-WithGroup",
 		"spring.cloud.consul.discovery.instanceId=myTestService1-WithGroup",
-		"spring.cloud.consul.discovery.instanceGroup=test"},
-		webEnvironment = RANDOM_PORT)
+		"spring.cloud.consul.discovery.instanceGroup=test" }, webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedInstanceGroupTests {
 
 	@Autowired
@@ -63,27 +59,34 @@ public class ConsulAutoServiceRegistrationCustomizedInstanceGroupTests {
 
 	@Test
 	public void contextLoads() {
-		Response<Map<String, Service>> response = consul.getAgentServices();
+		Response<Map<String, Service>> response = this.consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
 		Service service = services.get("myTestService1-WithGroup");
-		assertNotNull("service was null", service);
-		assertNotEquals("service port is 0", 0, service.getPort().intValue());
-		assertEquals("service id was wrong", "myTestService1-WithGroup", service.getId());
-		assertTrue("service group was wrong", service.getTags().contains("group=test"));
+		assertThat(service).as("service was null").isNotNull();
+		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
+		assertThat(service.getId()).as("service id was wrong")
+				.isEqualTo("myTestService1-WithGroup");
+		assertThat(service.getTags().contains("group=test")).as("service group was wrong")
+				.isTrue();
 
-		ConsulServerList serverList = new ConsulServerList(consul, properties);
+		ConsulServerList serverList = new ConsulServerList(this.consul, this.properties);
 		DefaultClientConfigImpl config = new DefaultClientConfigImpl();
 		config.setClientName("myTestService-WithGroup");
 		serverList.initWithNiwsConfig(config);
 
 		List<ConsulServer> servers = serverList.getInitialListOfServers();
-		assertEquals("servers was wrong size", 1, servers.size());
-		assertEquals("service group was wrong", "test", servers.get(0).getMetaInfo().getServerGroup());
+		assertThat(servers.size()).as("servers was wrong size").isEqualTo(1);
+		assertThat(servers.get(0).getMetaInfo().getServerGroup())
+				.as("service group was wrong").isEqualTo("test");
 	}
-
 
 	@Configuration
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
-	public static class TestConfig { }
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
+			ConsulAutoConfiguration.class,
+			ConsulAutoServiceRegistrationAutoConfiguration.class })
+	public static class TestConfig {
+
+	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,22 +26,28 @@ import static org.springframework.cloud.consul.config.ConsulConfigProperties.For
  * @author Spencer Gibb
  */
 public class ConsulFilesPropertySource extends ConsulPropertySource {
-	public ConsulFilesPropertySource(String context, ConsulClient source, ConsulConfigProperties configProperties) {
+
+	public ConsulFilesPropertySource(String context, ConsulClient source,
+			ConsulConfigProperties configProperties) {
 		super(context, source, configProperties);
 	}
 
 	@Override
 	public void init() {
-		//noop
+		// noop
 	}
 
 	public void init(GetValue value) {
 		if (this.getContext().endsWith(".yml") || this.getContext().endsWith(".yaml")) {
 			parseValue(value, YAML);
-		} else if (this.getContext().endsWith(".properties")) {
+		}
+		else if (this.getContext().endsWith(".properties")) {
 			parseValue(value, PROPERTIES);
-		} else {
-			throw new IllegalStateException("Unknown files extension for context " + this.getContext());
+		}
+		else {
+			throw new IllegalStateException(
+					"Unknown files extension for context " + this.getContext());
 		}
 	}
+
 }

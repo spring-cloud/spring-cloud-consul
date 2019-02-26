@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import org.springframework.cloud.client.DefaultServiceInstance;
-import org.springframework.cloud.client.serviceregistry.Registration;
-
-import com.ecwid.consul.v1.agent.model.NewService;
-import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
-import org.springframework.cloud.consul.discovery.ConsulServerUtils;
-
 import java.net.URI;
 import java.util.Map;
+
+import com.ecwid.consul.v1.agent.model.NewService;
+
+import org.springframework.cloud.client.DefaultServiceInstance;
+import org.springframework.cloud.client.serviceregistry.Registration;
+import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.discovery.ConsulServerUtils;
 
 /**
  * @author Spencer Gibb
@@ -32,6 +32,7 @@ import java.util.Map;
 public class ConsulRegistration implements Registration {
 
 	private final NewService service;
+
 	private ConsulDiscoveryProperties properties;
 
 	public ConsulRegistration(NewService service, ConsulDiscoveryProperties properties) {
@@ -40,11 +41,11 @@ public class ConsulRegistration implements Registration {
 	}
 
 	public NewService getService() {
-		return service;
+		return this.service;
 	}
 
 	protected ConsulDiscoveryProperties getProperties() {
-		return properties;
+		return this.properties;
 	}
 
 	public String getInstanceId() {
@@ -79,4 +80,5 @@ public class ConsulRegistration implements Registration {
 	public Map<String, String> getMetadata() {
 		return ConsulServerUtils.getMetadata(getService().getTags());
 	}
+
 }

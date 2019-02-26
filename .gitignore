@@ -15,3 +15,4 @@ _site/
 *.swp
 /consul
 consul_*.zip
+consul_*.zip.*

@@ -4,8 +4,6 @@ org.springframework.cloud.consul.discovery.configclient.ConsulConfigServerAutoCo
 org.springframework.cloud.consul.serviceregistry.ConsulAutoServiceRegistrationAutoConfiguration,\
 org.springframework.cloud.consul.serviceregistry.ConsulServiceRegistryAutoConfiguration,\
 org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration
-
-
 org.springframework.cloud.bootstrap.BootstrapConfiguration=\
 org.springframework.cloud.consul.discovery.configclient.ConsulDiscoveryClientConfigServiceBootstrapConfiguration
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,15 +47,16 @@ import static com.netflix.client.config.CommonClientConfigKey.EnableZoneAffinity
  */
 @Configuration
 public class ConsulRibbonClientConfiguration {
+
+	protected static final String VALUE_NOT_SET = "__not__set__";
+
+	protected static final String DEFAULT_NAMESPACE = "ribbon";
+
 	@Autowired
 	private ConsulClient client;
 
 	@Value("${ribbon.client.name}")
 	private String serviceId = "client";
-
-	protected static final String VALUE_NOT_SET = "__not__set__";
-
-	protected static final String DEFAULT_NAMESPACE = "ribbon";
 
 	public ConsulRibbonClientConfiguration() {
 	}
@@ -66,8 +67,9 @@ public class ConsulRibbonClientConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ServerList<?> ribbonServerList(IClientConfig config, ConsulDiscoveryProperties properties) {
-		ConsulServerList serverList = new ConsulServerList(client, properties);
+	public ServerList<?> ribbonServerList(IClientConfig config,
+			ConsulDiscoveryProperties properties) {
+		ConsulServerList serverList = new ConsulServerList(this.client, properties);
 		serverList.initWithNiwsConfig(config);
 		return serverList;
 	}

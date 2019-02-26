@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,16 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtils.HostInfo;
 import org.springframework.core.style.ToStringCreator;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Defines configuration for service discovery and registration.
@@ -45,22 +45,22 @@ public class ConsulDiscoveryProperties {
 	@Value("${consul.token:${CONSUL_TOKEN:${spring.cloud.consul.token:${SPRING_CLOUD_CONSUL_TOKEN:}}}}")
 	private String aclToken;
 
-	/** Tags to use when registering service */
+	/** Tags to use when registering service. */
 	private List<String> tags = new ArrayList<>();
 
 	/** Is service discovery enabled? */
 	private boolean enabled = true;
 
-	/** Tags to use when registering management service */
+	/** Tags to use when registering management service. */
 	private List<String> managementTags = new ArrayList<>();
 
-	/** Alternate server path to invoke for health checking */
+	/** Alternate server path to invoke for health checking. */
 	private String healthCheckPath = "/actuator/health";
 
-	/** Custom health check url to override default */
+	/** Custom health check url to override default. */
 	private String healthCheckUrl;
 
-	/** Headers to be applied to the Health Check calls */
+	/** Headers to be applied to the Health Check calls. */
 	private Map<String, List<String>> healthCheckHeaders = new HashMap<>();
 
 	/** How often to perform the health check (e.g. 10s), defaults to 10s. */
@@ -75,24 +75,26 @@ public class ConsulDiscoveryProperties {
 	 */
 	private String healthCheckCriticalTimeout;
 
-	/** IP address to use when accessing service (must also set preferIpAddress to use) */
+	/**
+	 * IP address to use when accessing service (must also set preferIpAddress to use).
+	 */
 	private String ipAddress;
 
-	/** Hostname to use when accessing server */
+	/** Hostname to use when accessing server. */
 	private String hostname;
 
-	/** Port to register the service under (defaults to listening port) */
+	/** Port to register the service under (defaults to listening port). */
 	private Integer port;
 
-	/** Port to register the management service under (defaults to management port) */
+	/** Port to register the management service under (defaults to management port). */
 	private Integer managementPort;
 
 	private Lifecycle lifecycle = new Lifecycle();
 
-	/** Use ip address rather than hostname during registration */
+	/** Use ip address rather than hostname during registration. */
 	private boolean preferIpAddress = false;
 
-	/** Source of how we will determine the address to use */
+	/** Source of how we will determine the address to use. */
 	private boolean preferAgentAddress = false;
 
 	/** The delay between calls to watch consul catalog in millis, default is 1000. */
@@ -101,16 +103,16 @@ public class ConsulDiscoveryProperties {
 	/** The number of seconds to block while watching consul catalog, default is 2. */
 	private int catalogServicesWatchTimeout = 2;
 
-	/** Service name */
+	/** Service name. */
 	private String serviceName;
 
-	/** Unique service instance id */
+	/** Unique service instance id. */
 	private String instanceId;
 
-	/** Service instance zone */
+	/** Service instance zone. */
 	private String instanceZone;
 
-	/** Service instance group*/
+	/** Service instance group. */
 	private String instanceGroup;
 
 	/**
@@ -118,28 +120,27 @@ public class ConsulDiscoveryProperties {
 	 */
 	private boolean includeHostnameInInstanceId;
 
-
 	/**
-	 * Service instance zone comes from metadata.
-	 * This allows changing the metadata tag name.
+	 * Service instance zone comes from metadata. This allows changing the metadata tag
+	 * name.
 	 */
 	private String defaultZoneMetadataName = "zone";
 
-	/** Whether to register an http or https service */
+	/** Whether to register an http or https service. */
 	private String scheme = "http";
 
-	/** Suffix to use when registering management service */
+	/** Suffix to use when registering management service. */
 	private String managementSuffix = MANAGEMENT;
 
 	/**
-	 * Map of serviceId's -> tag to query for in server list.
-	 * This allows filtering services by a single tag.
+	 * Map of serviceId's -> tag to query for in server list. This allows filtering
+	 * services by a single tag.
 	 */
 	private Map<String, String> serverListQueryTags = new HashMap<>();
 
 	/**
-	 * Map of serviceId's -> datacenter to query for in server list.
-	 * This allows looking up services in another datacenters.
+	 * Map of serviceId's -> datacenter to query for in server list. This allows looking
+	 * up services in another datacenters.
 	 */
 	private Map<String, String> datacenters = new HashMap<>();
 
@@ -147,8 +148,8 @@ public class ConsulDiscoveryProperties {
 	private String defaultQueryTag;
 
 	/**
-	 * Add the 'passing` parameter to /v1/health/service/serviceName.
-	 * This pushes health check passing to the server.
+	 * Add the 'passing` parameter to /v1/health/service/serviceName. This pushes health
+	 * check passing to the server.
 	 */
 	private boolean queryPassing = false;
 
@@ -162,19 +163,20 @@ public class ConsulDiscoveryProperties {
 	private boolean registerHealthCheck = true;
 
 	/**
-	 * Throw exceptions during service registration if true, otherwise, log
-	 * warnings (defaults to true).
+	 * Throw exceptions during service registration if true, otherwise, log warnings
+	 * (defaults to true).
 	 */
 	private boolean failFast = true;
 
 	/**
-	 * Skips certificate verification during service checks if true, otherwise
-	 * runs certificate verification.
+	 * Skips certificate verification during service checks if true, otherwise runs
+	 * certificate verification.
 	 */
 	private Boolean healthCheckTlsSkipVerify;
 
 	/**
-	 * Order of the discovery client used by `CompositeDiscoveryClient` for sorting available clients.
+	 * Order of the discovery client used by `CompositeDiscoveryClient` for sorting
+	 * available clients.
 	 */
 	private int order = 0;
 
@@ -194,9 +196,9 @@ public class ConsulDiscoveryProperties {
 	 * @param serviceId The service who's filtering tag is being looked up
 	 * @return The tag the given service id should be filtered by, or null.
 	 */
-	public String getQueryTagForService(String serviceId){
-		String tag = serverListQueryTags.get(serviceId);
-		return tag != null ? tag : defaultQueryTag;
+	public String getQueryTagForService(String serviceId) {
+		String tag = this.serverListQueryTags.get(serviceId);
+		return tag != null ? tag : this.defaultQueryTag;
 	}
 
 	public String getHostname() {
@@ -208,13 +210,8 @@ public class ConsulDiscoveryProperties {
 		this.hostInfo.override = true;
 	}
 
-	public void setIpAddress(String ipAddress) {
-		this.ipAddress = ipAddress;
-		this.hostInfo.override = true;
-	}
-
 	private HostInfo getHostInfo() {
-		return hostInfo;
+		return this.hostInfo;
 	}
 
 	private void setHostInfo(HostInfo hostInfo) {
@@ -222,7 +219,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getAclToken() {
-		return aclToken;
+		return this.aclToken;
 	}
 
 	public void setAclToken(String aclToken) {
@@ -230,7 +227,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public List<String> getTags() {
-		return tags;
+		return this.tags;
 	}
 
 	public void setTags(List<String> tags) {
@@ -238,7 +235,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public boolean isEnabled() {
-		return enabled;
+		return this.enabled;
 	}
 
 	public void setEnabled(boolean enabled) {
@@ -246,7 +243,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public List<String> getManagementTags() {
-		return managementTags;
+		return this.managementTags;
 	}
 
 	public void setManagementTags(List<String> managementTags) {
@@ -254,7 +251,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getHealthCheckPath() {
-		return healthCheckPath;
+		return this.healthCheckPath;
 	}
 
 	public void setHealthCheckPath(String healthCheckPath) {
@@ -262,7 +259,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getHealthCheckUrl() {
-		return healthCheckUrl;
+		return this.healthCheckUrl;
 	}
 
 	public void setHealthCheckUrl(String healthCheckUrl) {
@@ -270,7 +267,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public Map<String, List<String>> getHealthCheckHeaders() {
-		return healthCheckHeaders;
+		return this.healthCheckHeaders;
 	}
 
 	public void setHealthCheckHeaders(Map<String, List<String>> healthCheckHeaders) {
@@ -278,7 +275,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getHealthCheckInterval() {
-		return healthCheckInterval;
+		return this.healthCheckInterval;
 	}
 
 	public void setHealthCheckInterval(String healthCheckInterval) {
@@ -286,7 +283,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getHealthCheckTimeout() {
-		return healthCheckTimeout;
+		return this.healthCheckTimeout;
 	}
 
 	public void setHealthCheckTimeout(String healthCheckTimeout) {
@@ -294,7 +291,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getHealthCheckCriticalTimeout() {
-		return healthCheckCriticalTimeout;
+		return this.healthCheckCriticalTimeout;
 	}
 
 	public void setHealthCheckCriticalTimeout(String healthCheckCriticalTimeout) {
@@ -302,11 +299,16 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getIpAddress() {
-		return ipAddress;
+		return this.ipAddress;
+	}
+
+	public void setIpAddress(String ipAddress) {
+		this.ipAddress = ipAddress;
+		this.hostInfo.override = true;
 	}
 
 	public Integer getPort() {
-		return port;
+		return this.port;
 	}
 
 	public void setPort(Integer port) {
@@ -314,7 +316,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public Integer getManagementPort() {
-		return managementPort;
+		return this.managementPort;
 	}
 
 	public void setManagementPort(Integer managementPort) {
@@ -322,7 +324,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public Lifecycle getLifecycle() {
-		return lifecycle;
+		return this.lifecycle;
 	}
 
 	public void setLifecycle(Lifecycle lifecycle) {
@@ -330,7 +332,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public boolean isPreferIpAddress() {
-		return preferIpAddress;
+		return this.preferIpAddress;
 	}
 
 	public void setPreferIpAddress(boolean preferIpAddress) {
@@ -338,7 +340,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public boolean isPreferAgentAddress() {
-		return preferAgentAddress;
+		return this.preferAgentAddress;
 	}
 
 	public void setPreferAgentAddress(boolean preferAgentAddress) {
@@ -346,7 +348,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public int getCatalogServicesWatchDelay() {
-		return catalogServicesWatchDelay;
+		return this.catalogServicesWatchDelay;
 	}
 
 	public void setCatalogServicesWatchDelay(int catalogServicesWatchDelay) {
@@ -354,7 +356,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public int getCatalogServicesWatchTimeout() {
-		return catalogServicesWatchTimeout;
+		return this.catalogServicesWatchTimeout;
 	}
 
 	public void setCatalogServicesWatchTimeout(int catalogServicesWatchTimeout) {
@@ -362,7 +364,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getServiceName() {
-		return serviceName;
+		return this.serviceName;
 	}
 
 	public void setServiceName(String serviceName) {
@@ -370,7 +372,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getInstanceId() {
-		return instanceId;
+		return this.instanceId;
 	}
 
 	public void setInstanceId(String instanceId) {
@@ -378,7 +380,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getInstanceZone() {
-		return instanceZone;
+		return this.instanceZone;
 	}
 
 	public void setInstanceZone(String instanceZone) {
@@ -386,7 +388,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getInstanceGroup() {
-		return instanceGroup;
+		return this.instanceGroup;
 	}
 
 	public void setInstanceGroup(String instanceGroup) {
@@ -401,8 +403,8 @@ public class ConsulDiscoveryProperties {
 		this.includeHostnameInInstanceId = includeHostnameInInstanceId;
 	}
 
-    public String getDefaultZoneMetadataName() {
-		return defaultZoneMetadataName;
+	public String getDefaultZoneMetadataName() {
+		return this.defaultZoneMetadataName;
 	}
 
 	public void setDefaultZoneMetadataName(String defaultZoneMetadataName) {
@@ -410,7 +412,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getScheme() {
-		return scheme;
+		return this.scheme;
 	}
 
 	public void setScheme(String scheme) {
@@ -418,7 +420,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getManagementSuffix() {
-		return managementSuffix;
+		return this.managementSuffix;
 	}
 
 	public void setManagementSuffix(String managementSuffix) {
@@ -426,7 +428,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public Map<String, String> getServerListQueryTags() {
-		return serverListQueryTags;
+		return this.serverListQueryTags;
 	}
 
 	public void setServerListQueryTags(Map<String, String> serverListQueryTags) {
@@ -434,7 +436,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public Map<String, String> getDatacenters() {
-		return datacenters;
+		return this.datacenters;
 	}
 
 	public void setDatacenters(Map<String, String> datacenters) {
@@ -442,7 +444,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public String getDefaultQueryTag() {
-		return defaultQueryTag;
+		return this.defaultQueryTag;
 	}
 
 	public void setDefaultQueryTag(String defaultQueryTag) {
@@ -450,7 +452,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public boolean isQueryPassing() {
-		return queryPassing;
+		return this.queryPassing;
 	}
 
 	public void setQueryPassing(boolean queryPassing) {
@@ -458,7 +460,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public boolean isRegister() {
-		return register;
+		return this.register;
 	}
 
 	public void setRegister(boolean register) {
@@ -466,7 +468,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public boolean isDeregister() {
-		return deregister;
+		return this.deregister;
 	}
 
 	public void setDeregister(boolean deregister) {
@@ -474,7 +476,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public boolean isRegisterHealthCheck() {
-		return registerHealthCheck;
+		return this.registerHealthCheck;
 	}
 
 	public void setRegisterHealthCheck(boolean registerHealthCheck) {
@@ -482,7 +484,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public boolean isFailFast() {
-		return failFast;
+		return this.failFast;
 	}
 
 	public void setFailFast(boolean failFast) {
@@ -490,7 +492,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public Boolean getHealthCheckTlsSkipVerify() {
-		return healthCheckTlsSkipVerify;
+		return this.healthCheckTlsSkipVerify;
 	}
 
 	public void setHealthCheckTlsSkipVerify(Boolean healthCheckTlsSkipVerify) {
@@ -498,7 +500,7 @@ public class ConsulDiscoveryProperties {
 	}
 
 	public int getOrder() {
-		return order;
+		return this.order;
 	}
 
 	public void setOrder(int order) {
@@ -507,52 +509,50 @@ public class ConsulDiscoveryProperties {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this)
-				.append("hostInfo", hostInfo)
-				.append("aclToken", aclToken)
-				.append("tags", tags)
-				.append("enabled", enabled)
-				.append("managementTags", managementTags)
-				.append("healthCheckPath", healthCheckPath)
-				.append("healthCheckUrl", healthCheckUrl)
-				.append("healthCheckHeaders", healthCheckHeaders)
-				.append("healthCheckInterval", healthCheckInterval)
-				.append("healthCheckTimeout", healthCheckTimeout)
-				.append("healthCheckCriticalTimeout", healthCheckCriticalTimeout)
-				.append("ipAddress", ipAddress)
-				.append("hostname", hostname)
-				.append("port", port)
-				.append("managementPort", managementPort)
-				.append("lifecycle", lifecycle)
-				.append("preferIpAddress", preferIpAddress)
-				.append("preferAgentAddress", preferAgentAddress)
-				.append("catalogServicesWatchDelay", catalogServicesWatchDelay)
-				.append("catalogServicesWatchTimeout", catalogServicesWatchTimeout)
-				.append("serviceName", serviceName)
-				.append("instanceId", instanceId)
-				.append("instanceZone", instanceZone)
-				.append("instanceGroup", instanceGroup)
-				.append("defaultZoneMetadataName", defaultZoneMetadataName)
-				.append("scheme", scheme)
-				.append("managementSuffix", managementSuffix)
-				.append("serverListQueryTags", serverListQueryTags)
-				.append("datacenters", datacenters)
-				.append("defaultQueryTag", defaultQueryTag)
-				.append("queryPassing", queryPassing)
-				.append("register", register)
-				.append("deregister", deregister)
-				.append("registerHealthCheck", registerHealthCheck)
-				.append("failFast", failFast)
-				.append("healthCheckTlsSkipVerify", healthCheckTlsSkipVerify)
-				.append("order", order)
-				.toString();
+		return new ToStringCreator(this).append("hostInfo", this.hostInfo)
+				.append("aclToken", this.aclToken).append("tags", this.tags)
+				.append("enabled", this.enabled)
+				.append("managementTags", this.managementTags)
+				.append("healthCheckPath", this.healthCheckPath)
+				.append("healthCheckUrl", this.healthCheckUrl)
+				.append("healthCheckHeaders", this.healthCheckHeaders)
+				.append("healthCheckInterval", this.healthCheckInterval)
+				.append("healthCheckTimeout", this.healthCheckTimeout)
+				.append("healthCheckCriticalTimeout", this.healthCheckCriticalTimeout)
+				.append("ipAddress", this.ipAddress).append("hostname", this.hostname)
+				.append("port", this.port).append("managementPort", this.managementPort)
+				.append("lifecycle", this.lifecycle)
+				.append("preferIpAddress", this.preferIpAddress)
+				.append("preferAgentAddress", this.preferAgentAddress)
+				.append("catalogServicesWatchDelay", this.catalogServicesWatchDelay)
+				.append("catalogServicesWatchTimeout", this.catalogServicesWatchTimeout)
+				.append("serviceName", this.serviceName)
+				.append("instanceId", this.instanceId)
+				.append("instanceZone", this.instanceZone)
+				.append("instanceGroup", this.instanceGroup)
+				.append("defaultZoneMetadataName", this.defaultZoneMetadataName)
+				.append("scheme", this.scheme)
+				.append("managementSuffix", this.managementSuffix)
+				.append("serverListQueryTags", this.serverListQueryTags)
+				.append("datacenters", this.datacenters)
+				.append("defaultQueryTag", this.defaultQueryTag)
+				.append("queryPassing", this.queryPassing)
+				.append("register", this.register).append("deregister", this.deregister)
+				.append("registerHealthCheck", this.registerHealthCheck)
+				.append("failFast", this.failFast)
+				.append("healthCheckTlsSkipVerify", this.healthCheckTlsSkipVerify)
+				.append("order", this.order).toString();
 	}
 
+	/**
+	 * Properties releated to the lifecycle.
+	 */
 	public static class Lifecycle {
+
 		private boolean enabled = true;
 
 		public boolean isEnabled() {
-			return enabled;
+			return this.enabled;
 		}
 
 		public void setEnabled(boolean enabled) {
@@ -561,9 +561,9 @@ public class ConsulDiscoveryProperties {
 
 		@Override
 		public String toString() {
-			return "Lifecycle{" +
-					"enabled=" + enabled +
-					'}';
+			return "Lifecycle{" + "enabled=" + this.enabled + '}';
 		}
+
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ import org.springframework.util.Assert;
 /**
  * @author Spencer Gibb
  */
-public class ConsulBinder extends AbstractBinder<MessageChannel, ConsumerProperties, ProducerProperties> {
+public class ConsulBinder
+		extends AbstractBinder<MessageChannel, ConsumerProperties, ProducerProperties> {
 
 	private static final String BEAN_NAME_TEMPLATE = "outbound.%s";
 
@@ -40,8 +41,10 @@ public class ConsulBinder extends AbstractBinder<MessageChannel, ConsumerPropert
 	}
 
 	@Override
-	protected Binding<MessageChannel> doBindConsumer(String name, String group, MessageChannel inputChannel, ConsumerProperties properties) {
-		ConsulInboundMessageProducer messageProducer = new ConsulInboundMessageProducer(this.eventService);
+	protected Binding<MessageChannel> doBindConsumer(String name, String group,
+			MessageChannel inputChannel, ConsumerProperties properties) {
+		ConsulInboundMessageProducer messageProducer = new ConsulInboundMessageProducer(
+				this.eventService);
 		messageProducer.setOutputChannel(inputChannel);
 		messageProducer.setBeanFactory(this.getBeanFactory());
 		messageProducer.afterPropertiesSet();
@@ -51,13 +54,16 @@ public class ConsulBinder extends AbstractBinder<MessageChannel, ConsumerPropert
 	}
 
 	@Override
-	protected Binding<MessageChannel> doBindProducer(String name, MessageChannel channel, ProducerProperties properties) {
+	protected Binding<MessageChannel> doBindProducer(String name, MessageChannel channel,
+			ProducerProperties properties) {
 		Assert.isInstanceOf(SubscribableChannel.class, channel);
 
-		logger.debug("Binding Consul client to eventName " + name);
-		ConsulSendingHandler sendingHandler = new ConsulSendingHandler(this.eventService.getConsulClient(), name);
+		this.logger.debug("Binding Consul client to eventName " + name);
+		ConsulSendingHandler sendingHandler = new ConsulSendingHandler(
+				this.eventService.getConsulClient(), name);
 
-		EventDrivenConsumer consumer = new EventDrivenConsumer((SubscribableChannel) channel, sendingHandler);
+		EventDrivenConsumer consumer = new EventDrivenConsumer(
+				(SubscribableChannel) channel, sendingHandler);
 		consumer.setBeanFactory(getBeanFactory());
 		consumer.setBeanName(String.format(BEAN_NAME_TEMPLATE, name));
 		consumer.afterPropertiesSet();
@@ -65,4 +71,5 @@ public class ConsulBinder extends AbstractBinder<MessageChannel, ConsumerPropert
 
 		return new DefaultBinding<>(name, null, channel, consumer);
 	}
+
 }

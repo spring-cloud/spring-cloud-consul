@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -30,16 +31,15 @@ import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Marcin Biegan
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedTests.MyTestConfig.class,
-		properties = { "spring.application.name=testCustomAutoServiceRegistration"},
-		webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedTests.MyTestConfig.class, properties = {
+		"spring.application.name=testCustomAutoServiceRegistration" }, webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedTests {
 
 	@Autowired
@@ -53,14 +53,19 @@ public class ConsulAutoServiceRegistrationCustomizedTests {
 
 	@Test
 	public void usesCustomConsulLifecycle() {
-		assertEquals("configuration is not customized", "customconfiguration", registration1.getConfiguration());
-		assertEquals("configuration is not customized", "customconfiguration", registration2.getConfiguration());
+		assertThat(this.registration1.getConfiguration())
+				.as("configuration is not customized").isEqualTo("customconfiguration");
+		assertThat(this.registration2.getConfiguration())
+				.as("configuration is not customized").isEqualTo("customconfiguration");
 	}
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
+			ConsulAutoConfiguration.class,
+			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class MyTestConfig {
+
 		@Bean
 		public CustomAutoRegistration consulAutoServiceRegistration(
 				ConsulServiceRegistry serviceRegistry,
@@ -70,6 +75,7 @@ public class ConsulAutoServiceRegistrationCustomizedTests {
 			return new CustomAutoRegistration(serviceRegistry,
 					autoServiceRegistrationProperties, properties, registration);
 		}
+
 	}
 
 	public static class CustomAutoRegistration extends ConsulAutoServiceRegistration {
@@ -87,5 +93,7 @@ public class ConsulAutoServiceRegistrationCustomizedTests {
 		protected Object getConfiguration() {
 			return "customconfiguration";
 		}
+
 	}
+
 }

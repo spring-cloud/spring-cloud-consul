@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,30 @@ package org.springframework.cloud.consul.model;
 
 /**
  * Gossip pool (serf) statuses. Created by nicu on 10.03.2015.
+ * @author Nicu Marasoiu
  */
 public enum SerfStatusEnum {
-	StatusAlive(1), StatusLeaving(2), StatusLeft(3), StatusFailed(4);
+
+	/**
+	 * Alive status.
+	 */
+	StatusAlive(1),
+
+	/**
+	 * Leaving status.
+	 */
+	StatusLeaving(2),
+
+	/**
+	 * Left status.
+	 */
+	StatusLeft(3),
+
+	/**
+	 * Failed status.
+	 */
+	StatusFailed(4);
+
 	private final int code;
 
 	SerfStatusEnum(int code) {
@@ -28,7 +49,7 @@ public enum SerfStatusEnum {
 	}
 
 	public int getCode() {
-		return code;
+		return this.code;
 	}
 
 }

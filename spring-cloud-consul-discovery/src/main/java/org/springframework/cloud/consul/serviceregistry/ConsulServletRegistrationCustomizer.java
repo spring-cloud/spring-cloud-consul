@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import javax.servlet.ServletContext;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.util.StringUtils;
@@ -27,20 +28,21 @@ import org.springframework.util.StringUtils;
  * @author Piotr Wielgolaski
  */
 public class ConsulServletRegistrationCustomizer implements ConsulRegistrationCustomizer {
+
 	private ObjectProvider<ServletContext> servletContext;
 
-	public ConsulServletRegistrationCustomizer(ObjectProvider<ServletContext> servletContext) {
+	public ConsulServletRegistrationCustomizer(
+			ObjectProvider<ServletContext> servletContext) {
 		this.servletContext = servletContext;
 	}
 
 	@Override
 	public void customize(ConsulRegistration registration) {
-		if (servletContext == null) {
+		if (this.servletContext == null) {
 			return;
 		}
-		ServletContext sc = servletContext.getIfAvailable();
-		if(sc != null
-				&& StringUtils.hasText(sc.getContextPath())
+		ServletContext sc = this.servletContext.getIfAvailable();
+		if (sc != null && StringUtils.hasText(sc.getContextPath())
 				&& StringUtils.hasText(sc.getContextPath().replaceAll("/", ""))) {
 			List<String> tags = registration.getService().getTags();
 			if (tags == null) {
@@ -50,4 +52,5 @@ public class ConsulServletRegistrationCustomizer implements ConsulRegistrationCu
 			registration.getService().setTags(tags);
 		}
 	}
+
 }

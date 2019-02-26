@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,12 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.Service;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -31,15 +35,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
@@ -62,21 +58,24 @@ public class ConsulAutoServiceRegistrationManagementDisabledServiceTests {
 
 	@Test
 	public void contextLoads() {
-		Response<Map<String, Service>> response = consul.getAgentServices();
+		Response<Map<String, Service>> response = this.consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
 
 		Service mgmtService = services.get("myTestService-NM-0-management");
-		assertNull("Management service was not null", mgmtService);
+		assertThat(mgmtService).as("Management service was not null").isNull();
 
 		Service service = services.get("myTestService1-NM");
-		assertNotNull("Service was not null", service);
-		assertNotEquals("service port was 0", 0, service.getPort().intValue());
-		assertEquals("service id was wrong", "myTestService1-NM", service.getId());
-		assertEquals("service name was wrong", "myTestService-NM", service.getService());
-		assertFalse("service address must not be empty",
-				StringUtils.isEmpty(service.getAddress()));
-		assertEquals("service address must equals hostname from discovery properties",
-				discoveryProperties.getHostname(), service.getAddress());
+		assertThat(service).as("Service was not null").isNotNull();
+		assertThat(service.getPort().intValue()).as("service port was 0").isNotEqualTo(0);
+		assertThat(service.getId()).as("service id was wrong")
+				.isEqualTo("myTestService1-NM");
+		assertThat(service.getService()).as("service name was wrong")
+				.isEqualTo("myTestService-NM");
+		assertThat(StringUtils.isEmpty(service.getAddress()))
+				.as("service address must not be empty").isFalse();
+		assertThat(service.getAddress())
+				.as("service address must equals hostname from discovery properties")
+				.isEqualTo(this.discoveryProperties.getHostname());
 
 	}
 
@@ -86,5 +85,7 @@ public class ConsulAutoServiceRegistrationManagementDisabledServiceTests {
 			ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestConfig {
+
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,35 +16,33 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.Matchers.*;
-
 import org.joda.time.Period;
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Spencer Gibb
  */
 public class HeartbeatPropertiesTests {
 
-    @Test
-    public void computeHeartbeatIntervalWorks() {
-        HeartbeatProperties properties = new HeartbeatProperties();
-        Period period = properties.computeHearbeatInterval();
+	@Test
+	public void computeHeartbeatIntervalWorks() {
+		HeartbeatProperties properties = new HeartbeatProperties();
+		Period period = properties.computeHearbeatInterval();
 
-        assertThat(period, is(notNullValue()));
-        assertThat(period.getSeconds(), is(20));
-    }
+		assertThat(period).isNotNull();
+		assertThat(period.getSeconds()).isEqualTo(20);
+	}
 
-    @Test
-    public void computeShortHeartbeat() {
-        HeartbeatProperties properties = new HeartbeatProperties();
-        properties.setTtlValue(2);
-        Period period = properties.computeHearbeatInterval();
+	@Test
+	public void computeShortHeartbeat() {
+		HeartbeatProperties properties = new HeartbeatProperties();
+		properties.setTtlValue(2);
+		Period period = properties.computeHearbeatInterval();
 
-        assertThat(period, is(notNullValue()));
-        assertThat(period.getSeconds(), is(1));
-    }
-
+		assertThat(period).isNotNull();
+		assertThat(period.getSeconds()).isEqualTo(1);
+	}
 
 }

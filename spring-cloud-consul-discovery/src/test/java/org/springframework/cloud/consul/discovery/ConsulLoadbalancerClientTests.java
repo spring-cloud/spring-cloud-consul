@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
@@ -42,8 +41,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = { "spring.application.name=testConsulLoadBalancer",
 		"spring.cloud.consul.discovery.prefer-ip-address=true",
-		"spring.cloud.consul.discovery.tags=foo=bar", },
-		webEnvironment = RANDOM_PORT)
+		"spring.cloud.consul.discovery.tags=foo=bar" }, webEnvironment = RANDOM_PORT)
 public class ConsulLoadbalancerClientTests {
 
 	@Autowired
@@ -51,25 +49,26 @@ public class ConsulLoadbalancerClientTests {
 
 	@Test
 	public void chooseWorks() {
-		ServiceInstance instance = client.choose("testConsulLoadBalancer");
+		ServiceInstance instance = this.client.choose("testConsulLoadBalancer");
 		assertThat(instance).isNotNull();
 
 		assertThat(instance.isSecure()).isFalse();
 		assertIpAddress(instance);
-		assertThat(instance.getMetadata())
-				.containsEntry("foo", "bar");
+		assertThat(instance.getMetadata()).containsEntry("foo", "bar");
 	}
 
 	private void assertIpAddress(ServiceInstance instance) {
-		assertTrue("host isn't an ip address",
-				Character.isDigit(instance.getHost().charAt(0)));
+		assertThat(Character.isDigit(instance.getHost().charAt(0)))
+				.as("host isn't an ip address").isTrue();
 	}
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
 	@EnableDiscoveryClient
 	@RibbonClient(name = "testConsulLoadBalancer", configuration = MyRibbonConfig.class)
-	public static class MyTestConfig { }
+	public static class MyTestConfig {
+
+	}
 
 	public static class MyRibbonConfig {
 
@@ -81,5 +80,7 @@ public class ConsulLoadbalancerClientTests {
 		public ServerListFilter<Server> ribbonServerListFilter() {
 			return servers -> servers;
 		}
+
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,11 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
-
 import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,15 +29,16 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+
 /**
  * @author Glen Lockhart
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = { "spring.application.name=testConsulDiscoveryHttps",
-        "spring.cloud.consul.discovery.prefer-ip-address=true",
-		"spring.cloud.consul.discovery.scheme=https"},
-		classes = ConsulDiscoveryClientHttpsTests.MyTestConfig.class,
-		webEnvironment = RANDOM_PORT)
+		"spring.cloud.consul.discovery.prefer-ip-address=true",
+		"spring.cloud.consul.discovery.scheme=https" }, classes = ConsulDiscoveryClientHttpsTests.MyTestConfig.class, webEnvironment = RANDOM_PORT)
 public class ConsulDiscoveryClientHttpsTests {
 
 	@Autowired
@@ -49,12 +46,13 @@ public class ConsulDiscoveryClientHttpsTests {
 
 	@Test
 	public void getInstancesForServiceWorks() {
-		List<ServiceInstance> instances = discoveryClient.getInstances("testConsulDiscoveryHttps");
-		assertNotNull("instances was null", instances);
-		assertFalse("instances was empty", instances.isEmpty());
+		List<ServiceInstance> instances = this.discoveryClient
+				.getInstances("testConsulDiscoveryHttps");
+		assertThat(instances).as("instances was null").isNotNull();
+		assertThat(instances.isEmpty()).as("instances was empty").isFalse();
 
 		ServiceInstance instance = instances.get(0);
-		assertTrue("instance was not secure (https)", instance.isSecure());
+		assertThat(instance.isSecure()).as("instance was not secure (https)").isTrue();
 	}
 
 	@Configuration
@@ -63,4 +61,5 @@ public class ConsulDiscoveryClientHttpsTests {
 	public static class MyTestConfig {
 
 	}
+
 }

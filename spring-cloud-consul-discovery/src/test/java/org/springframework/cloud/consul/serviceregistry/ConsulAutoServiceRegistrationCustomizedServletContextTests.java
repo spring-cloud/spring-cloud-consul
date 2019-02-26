@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,18 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.Service;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -38,11 +38,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Piotr Wielgolaski
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedServletContextTests.TestConfig.class,
-	properties = { "spring.application.name=myTestService-WithServletContext",
-			"spring.cloud.consul.discovery.instanceId=myTestService1-WithServletContext",
-		"server.servlet.context-path=/customContext"},
-		webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedServletContextTests.TestConfig.class, properties = {
+		"spring.application.name=myTestService-WithServletContext",
+		"spring.cloud.consul.discovery.instanceId=myTestService1-WithServletContext",
+		"server.servlet.context-path=/customContext" }, webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedServletContextTests {
 
 	@Autowired
@@ -50,17 +49,22 @@ public class ConsulAutoServiceRegistrationCustomizedServletContextTests {
 
 	@Test
 	public void contextLoads() {
-		Response<Map<String, Service>> response = consul.getAgentServices();
+		Response<Map<String, Service>> response = this.consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
 		Service service = services.get("myTestService1-WithServletContext");
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
-		assertThat(service.getId()).as("service id was wrong").isEqualTo("myTestService1-WithServletContext");
-		assertThat(service.getTags()).as("contextPath tag missing").contains("contextPath=/customContext");
+		assertThat(service.getId()).as("service id was wrong")
+				.isEqualTo("myTestService1-WithServletContext");
+		assertThat(service.getTags()).as("contextPath tag missing")
+				.contains("contextPath=/customContext");
 	}
 
 	@EnableDiscoveryClient
 	@Configuration
 	@EnableAutoConfiguration
-	public static class TestConfig { }
+	public static class TestConfig {
+
+	}
+
 }

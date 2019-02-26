@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,30 +50,38 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 	private static final Log log = LogFactory.getLog(ConfigWatch.class);
 
 	private final ConsulConfigProperties properties;
+
 	private final ConsulClient consul;
-	private LinkedHashMap<String, Long> consulIndexes;
+
 	private final TaskScheduler taskScheduler;
+
 	private final AtomicBoolean running = new AtomicBoolean(false);
+
+	private LinkedHashMap<String, Long> consulIndexes;
+
 	private ApplicationEventPublisher publisher;
+
 	private boolean firstTime = true;
+
 	private ScheduledFuture<?> watchFuture;
 
-	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul, LinkedHashMap<String, Long> initialIndexes) {
+	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul,
+			LinkedHashMap<String, Long> initialIndexes) {
 		this(properties, consul, initialIndexes, getTaskScheduler());
-    }
+	}
+
+	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul,
+			LinkedHashMap<String, Long> initialIndexes, TaskScheduler taskScheduler) {
+		this.properties = properties;
+		this.consul = consul;
+		this.consulIndexes = new LinkedHashMap<>(initialIndexes);
+		this.taskScheduler = taskScheduler;
+	}
 
 	private static ThreadPoolTaskScheduler getTaskScheduler() {
 		ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
 		taskScheduler.initialize();
 		return taskScheduler;
-	}
-
-	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul, LinkedHashMap<String, Long> initialIndexes,
-					   TaskScheduler taskScheduler) {
-		this.properties = properties;
-		this.consul = consul;
-		this.consulIndexes = new LinkedHashMap<>(initialIndexes);
-		this.taskScheduler = taskScheduler;
 	}
 
 	@Override
@@ -84,8 +92,8 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 	@Override
 	public void start() {
 		if (this.running.compareAndSet(false, true)) {
-			this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(this::watchConfigKeyValues,
-					this.properties.getWatch().getDelay());
+			this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(
+					this::watchConfigKeyValues, this.properties.getWatch().getDelay());
 		}
 	}
 
@@ -117,13 +125,14 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 		return this.running.get();
 	}
 
-	@Timed(value ="consul.watch-config-keys")
+	@Timed("consul.watch-config-keys")
 	public void watchConfigKeyValues() {
 		if (this.running.get()) {
 			for (String context : this.consulIndexes.keySet()) {
 
-				// turn the context into a Consul folder path (unless our config format are FILES)
-				if (properties.getFormat() != FILES && !context.endsWith("/")) {
+				// turn the context into a Consul folder path (unless our config format
+				// are FILES)
+				if (this.properties.getFormat() != FILES && !context.endsWith("/")) {
 					context = context + "/";
 				}
 
@@ -133,63 +142,85 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 						currentIndex = -1L;
 					}
 
-					log.trace("watching consul for context '"+context+"' with index "+ currentIndex);
+					log.trace("watching consul for context '" + context + "' with index "
+							+ currentIndex);
 
 					// use the consul ACL token if found
-					String aclToken = properties.getAclToken();
+					String aclToken = this.properties.getAclToken();
 					if (StringUtils.isEmpty(aclToken)) {
-					    aclToken = null;
+						aclToken = null;
 					}
 
-					Response<List<GetValue>> response = this.consul.getKVValues(context, aclToken,
+					Response<List<GetValue>> response = this.consul.getKVValues(context,
+							aclToken,
 							new QueryParams(this.properties.getWatch().getWaitTime(),
 									currentIndex));
 
-					// if response.value == null, response was a 404, otherwise it was a 200
+					// if response.value == null, response was a 404, otherwise it was a
+					// 200
 					// reducing churn if there wasn't anything
 					if (response.getValue() != null && !response.getValue().isEmpty()) {
 						Long newIndex = response.getConsulIndex();
 
 						if (newIndex != null && !newIndex.equals(currentIndex)) {
-							// don't publish the same index again, don't publish the first time (-1) so index can be primed
-							if (!this.consulIndexes.containsValue(newIndex) && !currentIndex.equals(-1L)) {
-								log.trace("Context "+context + " has new index " + newIndex);
-								RefreshEventData data = new RefreshEventData(context, currentIndex, newIndex);
-								this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
-							} else if (log.isTraceEnabled()) {
-								log.trace("Event for index already published for context "+context);
+							// don't publish the same index again, don't publish the first
+							// time (-1) so index can be primed
+							if (!this.consulIndexes.containsValue(newIndex)
+									&& !currentIndex.equals(-1L)) {
+								log.trace("Context " + context + " has new index "
+										+ newIndex);
+								RefreshEventData data = new RefreshEventData(context,
+										currentIndex, newIndex);
+								this.publisher.publishEvent(
+										new RefreshEvent(this, data, data.toString()));
+							}
+							else if (log.isTraceEnabled()) {
+								log.trace("Event for index already published for context "
+										+ context);
 							}
 							this.consulIndexes.put(context, newIndex);
-						} else if (log.isTraceEnabled()) {
-							log.trace("Same index for context "+context);
 						}
-					} else if (log.isTraceEnabled()) {
-						log.trace("No value for context "+context);
+						else if (log.isTraceEnabled()) {
+							log.trace("Same index for context " + context);
+						}
+					}
+					else if (log.isTraceEnabled()) {
+						log.trace("No value for context " + context);
 					}
 
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					// only fail fast on the initial query, otherwise just log the error
-					if (firstTime && this.properties.isFailFast()) {
-						log.error("Fail fast is set and there was an error reading configuration from consul.");
+					if (this.firstTime && this.properties.isFailFast()) {
+						log.error(
+								"Fail fast is set and there was an error reading configuration from consul.");
 						ReflectionUtils.rethrowRuntimeException(e);
-					} else if (log.isTraceEnabled()) {
-						log.trace("Error querying consul Key/Values for context '" + context + "'", e);
-					} else if (log.isWarnEnabled()) {
-						// simplified one line log message in the event of an agent failure
-						log.warn("Error querying consul Key/Values for context '" + context + "'. Message: " + e.getMessage());
+					}
+					else if (log.isTraceEnabled()) {
+						log.trace("Error querying consul Key/Values for context '"
+								+ context + "'", e);
+					}
+					else if (log.isWarnEnabled()) {
+						// simplified one line log message in the event of an agent
+						// failure
+						log.warn("Error querying consul Key/Values for context '"
+								+ context + "'. Message: " + e.getMessage());
 					}
 				}
 			}
 		}
-		firstTime = false;
+		this.firstTime = false;
 	}
 
 	static class RefreshEventData {
+
 		private final String context;
+
 		private final Long prevIndex;
+
 		private final Long newIndex;
 
-		public RefreshEventData(String context, Long prevIndex, Long newIndex) {
+		RefreshEventData(String context, Long prevIndex, Long newIndex) {
 			this.context = context;
 			this.prevIndex = prevIndex;
 			this.newIndex = newIndex;
@@ -209,26 +240,30 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 		@Override
 		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
+			if (this == o) {
+				return true;
+			}
+			if (o == null || getClass() != o.getClass()) {
+				return false;
+			}
 			RefreshEventData that = (RefreshEventData) o;
-			return Objects.equals(context, that.context) &&
-					Objects.equals(prevIndex, that.prevIndex) &&
-					Objects.equals(newIndex, that.newIndex);
+			return Objects.equals(this.context, that.context)
+					&& Objects.equals(this.prevIndex, that.prevIndex)
+					&& Objects.equals(this.newIndex, that.newIndex);
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(context, prevIndex, newIndex);
+			return Objects.hash(this.context, this.prevIndex, this.newIndex);
 		}
 
 		@Override
 		public String toString() {
-			return new ToStringCreator(this)
-					.append("context", context)
-					.append("prevIndex", prevIndex)
-					.append("newIndex", newIndex)
+			return new ToStringCreator(this).append("context", this.context)
+					.append("prevIndex", this.prevIndex).append("newIndex", this.newIndex)
 					.toString();
 		}
+
 	}
+
 }

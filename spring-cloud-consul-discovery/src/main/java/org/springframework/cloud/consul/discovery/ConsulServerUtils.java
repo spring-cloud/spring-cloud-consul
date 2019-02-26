@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,13 @@ import org.springframework.util.StringUtils;
  * @author Spencer Gibb
  * @author Semenkov Alexey
  */
-public class ConsulServerUtils {
+public final class ConsulServerUtils {
 
 	private static final Log log = LogFactory.getLog(ConsulServerUtils.class);
+
+	private ConsulServerUtils() {
+		throw new IllegalStateException("Can't instantiate a utility class");
+	}
 
 	public static String findHost(HealthService healthService) {
 		HealthService.Service service = healthService.getService();
@@ -44,7 +48,8 @@ public class ConsulServerUtils {
 
 		if (StringUtils.hasText(service.getAddress())) {
 			return fixIPv6Address(service.getAddress());
-		} else if (StringUtils.hasText(node.getAddress())) {
+		}
+		else if (StringUtils.hasText(node.getAddress())) {
 			return fixIPv6Address(node.getAddress());
 		}
 		return node.getNode();
@@ -57,12 +62,12 @@ public class ConsulServerUtils {
 				return "[" + inetAdr.getHostName() + "]";
 			}
 			return address;
-		} catch (UnknownHostException e) {
+		}
+		catch (UnknownHostException e) {
 			log.debug("Not InetAddress: " + address + " , resolved as is.");
 			return address;
 		}
 	}
-
 
 	public static Map<String, String> getMetadata(HealthService healthService) {
 		return getMetadata(healthService.getService().getTags());
@@ -74,18 +79,18 @@ public class ConsulServerUtils {
 			for (String tag : tags) {
 				String[] parts = StringUtils.delimitedListToStringArray(tag, "=");
 				switch (parts.length) {
-					case 0:
-						break;
-					case 1:
-						metadata.put(parts[0], parts[0]);
-						break;
-					case 2:
-						metadata.put(parts[0], parts[1]);
-						break;
-					default:
-						String[] end = Arrays.copyOfRange(parts, 1, parts.length);
-						metadata.put(parts[0], StringUtils.arrayToDelimitedString(end, "="));
-						break;
+				case 0:
+					break;
+				case 1:
+					metadata.put(parts[0], parts[0]);
+					break;
+				case 2:
+					metadata.put(parts[0], parts[1]);
+					break;
+				default:
+					String[] end = Arrays.copyOfRange(parts, 1, parts.length);
+					metadata.put(parts[0], StringUtils.arrayToDelimitedString(end, "="));
+					break;
 				}
 
 			}
@@ -93,4 +98,5 @@ public class ConsulServerUtils {
 
 		return metadata;
 	}
+
 }

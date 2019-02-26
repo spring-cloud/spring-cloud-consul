@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,11 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
 /**
  * Created by nicu on 11.03.2015.
+ *
  * @author Stéphane LEROY
  */
 public class TtlScheduler {
+
 	private static final Log log = LogFactory.getLog(ConsulDiscoveryClient.class);
 
 	private final Map<String, ScheduledFuture> serviceHeartbeats = new ConcurrentHashMap<>();
@@ -57,41 +59,45 @@ public class TtlScheduler {
 
 	/**
 	 * Add a service to the checks loop.
+	 * @param instanceId instance id
 	 */
 	public void add(String instanceId) {
-		ScheduledFuture task = scheduler.scheduleAtFixedRate(new ConsulHeartbeatTask(
-				instanceId), configuration.computeHearbeatInterval()
-				.toStandardDuration().getMillis());
-		ScheduledFuture previousTask = serviceHeartbeats.put(instanceId, task);
+		ScheduledFuture task = this.scheduler.scheduleAtFixedRate(
+				new ConsulHeartbeatTask(instanceId), this.configuration
+						.computeHearbeatInterval().toStandardDuration().getMillis());
+		ScheduledFuture previousTask = this.serviceHeartbeats.put(instanceId, task);
 		if (previousTask != null) {
 			previousTask.cancel(true);
 		}
 	}
 
 	public void remove(String instanceId) {
-		ScheduledFuture task = serviceHeartbeats.get(instanceId);
+		ScheduledFuture task = this.serviceHeartbeats.get(instanceId);
 		if (task != null) {
 			task.cancel(true);
 		}
-		serviceHeartbeats.remove(instanceId);
+		this.serviceHeartbeats.remove(instanceId);
 	}
 
 	private class ConsulHeartbeatTask implements Runnable {
+
 		private String checkId;
 
 		ConsulHeartbeatTask(String serviceId) {
 			this.checkId = serviceId;
-			if (!checkId.startsWith("service:")) {
-				checkId = "service:" + checkId;
+			if (!this.checkId.startsWith("service:")) {
+				this.checkId = "service:" + this.checkId;
 			}
 		}
 
 		@Override
 		public void run() {
-			client.agentCheckPass(checkId);
+			TtlScheduler.this.client.agentCheckPass(this.checkId);
 			if (log.isDebugEnabled()) {
-				log.debug("Sending consul heartbeat for: " + checkId);
+				log.debug("Sending consul heartbeat for: " + this.checkId);
 			}
 		}
+
 	}
+
 }

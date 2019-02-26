@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * ServerList implementation that filters ConsulServers based on if all their Health Checks are PASSING.
+ * ServerList implementation that filters ConsulServers based on if all their Health
+ * Checks are PASSING.
+ *
  * @author Spencer Gibb
  */
 public class HealthServiceServerListFilter implements ServerListFilter<Server> {
+
 	private static final Log log = LogFactory.getLog(HealthServiceServerListFilter.class);
 
 	@Override
@@ -43,9 +46,11 @@ public class HealthServiceServerListFilter implements ServerListFilter<Server> {
 					filtered.add(server);
 				}
 
-			} else {
-			    if (log.isDebugEnabled()) {
-					log.debug("Unable to determine aliveness of server type " + server.getClass() + ", " + server);
+			}
+			else {
+				if (log.isDebugEnabled()) {
+					log.debug("Unable to determine aliveness of server type "
+							+ server.getClass() + ", " + server);
 				}
 				filtered.add(server);
 			}
@@ -53,4 +58,5 @@ public class HealthServiceServerListFilter implements ServerListFilter<Server> {
 
 		return filtered;
 	}
+
 }

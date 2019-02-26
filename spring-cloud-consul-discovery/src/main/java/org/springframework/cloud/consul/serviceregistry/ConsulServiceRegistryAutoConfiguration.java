@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
+import com.ecwid.consul.v1.ConsulClient;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -28,8 +30,6 @@ import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.ecwid.consul.v1.ConsulClient;
 
 /**
  * @author Spencer Gibb
@@ -45,15 +45,18 @@ public class ConsulServiceRegistryAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulServiceRegistry consulServiceRegistry(ConsulClient consulClient, ConsulDiscoveryProperties properties,
-													   HeartbeatProperties heartbeatProperties) {
-		return new ConsulServiceRegistry(consulClient, properties, ttlScheduler, heartbeatProperties);
+	public ConsulServiceRegistry consulServiceRegistry(ConsulClient consulClient,
+			ConsulDiscoveryProperties properties,
+			HeartbeatProperties heartbeatProperties) {
+		return new ConsulServiceRegistry(consulClient, properties, this.ttlScheduler,
+				heartbeatProperties);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
-	public TtlScheduler ttlScheduler(ConsulClient consulClient, HeartbeatProperties heartbeatProperties) {
+	public TtlScheduler ttlScheduler(ConsulClient consulClient,
+			HeartbeatProperties heartbeatProperties) {
 		return new TtlScheduler(heartbeatProperties, consulClient);
 	}
 

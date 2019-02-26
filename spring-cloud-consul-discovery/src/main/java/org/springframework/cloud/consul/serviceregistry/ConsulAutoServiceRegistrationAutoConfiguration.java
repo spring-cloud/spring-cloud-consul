@@ -44,7 +44,8 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnMissingBean(type = "org.springframework.cloud.consul.discovery.ConsulLifecycle")
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty(value = "spring.cloud.service-registry.auto-registration.enabled", matchIfMissing = true)
-@AutoConfigureAfter({AutoServiceRegistrationConfiguration.class, ConsulServiceRegistryAutoConfiguration.class})
+@AutoConfigureAfter({ AutoServiceRegistrationConfiguration.class,
+		ConsulServiceRegistryAutoConfiguration.class })
 public class ConsulAutoServiceRegistrationAutoConfiguration {
 
 	@Autowired
@@ -62,27 +63,34 @@ public class ConsulAutoServiceRegistrationAutoConfiguration {
 	}
 
 	@Bean
-	public ConsulAutoServiceRegistrationListener consulAutoServiceRegistrationListener(ConsulAutoServiceRegistration registration) {
+	public ConsulAutoServiceRegistrationListener consulAutoServiceRegistrationListener(
+			ConsulAutoServiceRegistration registration) {
 		return new ConsulAutoServiceRegistrationListener(registration);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulAutoRegistration consulRegistration(AutoServiceRegistrationProperties autoServiceRegistrationProperties,
+	public ConsulAutoRegistration consulRegistration(
+			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
 			ConsulDiscoveryProperties properties, ApplicationContext applicationContext,
-			ObjectProvider<List<ConsulRegistrationCustomizer>> registrationCustomizers, HeartbeatProperties heartbeatProperties) {
-		return ConsulAutoRegistration.registration(autoServiceRegistrationProperties, properties,
-			applicationContext, registrationCustomizers.getIfAvailable(), heartbeatProperties);
+			ObjectProvider<List<ConsulRegistrationCustomizer>> registrationCustomizers,
+			ObjectProvider<List<ConsulManagementRegistrationCustomizer>> managementRegistrationCustomizers,
+			HeartbeatProperties heartbeatProperties) {
+		return ConsulAutoRegistration.registration(autoServiceRegistrationProperties,
+				properties, applicationContext, registrationCustomizers.getIfAvailable(),
+				managementRegistrationCustomizers.getIfAvailable(), heartbeatProperties);
 	}
 
 	@Configuration
 	@ConditionalOnClass(ServletContext.class)
 	protected static class ConsulServletConfiguration {
+
 		@Bean
-		public ConsulRegistrationCustomizer servletConsulCustomizer(ObjectProvider<ServletContext> servletContext) {
+		public ConsulRegistrationCustomizer servletConsulCustomizer(
+				ObjectProvider<ServletContext> servletContext) {
 			return new ConsulServletRegistrationCustomizer(servletContext);
 		}
-	}
 
+	}
 
 }

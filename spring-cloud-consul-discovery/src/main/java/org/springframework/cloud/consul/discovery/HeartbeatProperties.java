@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.validation.annotation.Validated;
 
+/**
+ * Properties related to hearbeat verification.
+ *
+ * @author Spencer Gibb
+ */
 @ConfigurationProperties(prefix = "spring.cloud.consul.discovery.heartbeat")
 @Validated
 public class HeartbeatProperties {
 
-	private static final Log log = org.apache.commons.logging.LogFactory.getLog(HeartbeatProperties.class);
+	private static final Log log = org.apache.commons.logging.LogFactory
+			.getLog(HeartbeatProperties.class);
+
 	// TODO: change enabled to default to true when I stop seeing messages like
 	// [WARN] agent: Check 'service:testConsulApp:xtest:8080' missed TTL, is now critical
 	boolean enabled = false;
@@ -47,63 +54,62 @@ public class HeartbeatProperties {
 	@DecimalMax("0.9")
 	private double intervalRatio = 2.0 / 3.0;
 
-	//TODO: did heartbeatInterval need to be a field?
+	// TODO: did heartbeatInterval need to be a field?
 
-    protected Period computeHearbeatInterval() {
-        // heartbeat rate at ratio * ttl, but no later than ttl -1s and, (under lesser
-        // priority), no sooner than 1s from now
-        double interval = ttlValue * intervalRatio;
-        double max = Math.max(interval, 1);
-        int ttlMinus1 = ttlValue - 1;
-        double min = Math.min(ttlMinus1, max);
+	protected Period computeHearbeatInterval() {
+		// heartbeat rate at ratio * ttl, but no later than ttl -1s and, (under lesser
+		// priority), no sooner than 1s from now
+		double interval = this.ttlValue * this.intervalRatio;
+		double max = Math.max(interval, 1);
+		int ttlMinus1 = this.ttlValue - 1;
+		double min = Math.min(ttlMinus1, max);
 		Period heartbeatInterval = new Period(Math.round(1000 * min));
 		log.debug("Computed heartbeatInterval: " + heartbeatInterval);
 		return heartbeatInterval;
-    }
+	}
 
-    public String getTtl() {
-		return ttlValue + ttlUnit;
+	public String getTtl() {
+		return this.ttlValue + this.ttlUnit;
 	}
 
 	public boolean isEnabled() {
 		return this.enabled;
 	}
 
-	public @Min(1) int getTtlValue() {
-		return this.ttlValue;
-	}
-
-	public @NotNull String getTtlUnit() {
-		return this.ttlUnit;
-	}
-
-	public @DecimalMin("0.1") @DecimalMax("0.9") double getIntervalRatio() {
-		return this.intervalRatio;
-	}
-
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	public @Min(1) int getTtlValue() {
+		return this.ttlValue;
 	}
 
 	public void setTtlValue(@Min(1) int ttlValue) {
 		this.ttlValue = ttlValue;
 	}
 
+	public @NotNull String getTtlUnit() {
+		return this.ttlUnit;
+	}
+
 	public void setTtlUnit(@NotNull String ttlUnit) {
 		this.ttlUnit = ttlUnit;
 	}
 
-	public void setIntervalRatio(@DecimalMin("0.1") @DecimalMax("0.9") double intervalRatio) {
+	public @DecimalMin("0.1") @DecimalMax("0.9") double getIntervalRatio() {
+		return this.intervalRatio;
+	}
+
+	public void setIntervalRatio(
+			@DecimalMin("0.1") @DecimalMax("0.9") double intervalRatio) {
 		this.intervalRatio = intervalRatio;
 	}
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this)
-				.append("enabled", enabled)
-				.append("ttlValue", ttlValue)
-				.append("ttlUnit", ttlUnit)
-				.append("intervalRatio", intervalRatio)
-				.toString();
+		return new ToStringCreator(this).append("enabled", this.enabled)
+				.append("ttlValue", this.ttlValue).append("ttlUnit", this.ttlUnit)
+				.append("intervalRatio", this.intervalRatio).toString();
 	}
+
 }

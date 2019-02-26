@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2018 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.AbstractApplicationContext;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 
@@ -47,7 +47,7 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 
 	@Before
 	public void init() {
-		//FIXME: why do I need to do this? (fails in maven build without it.
+		// FIXME: why do I need to do this? (fails in maven build without it.
 		TomcatURLStreamHandlerFactory.disable();
 	}
 
@@ -67,29 +67,30 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 				"logging.level.org.springframework.cloud.config.client=DEBUG",
 				"spring.cloud.consul.discovery.test.enabled:true",
 				"spring.application.name=discoveryclientconfigservicetest",
-				"spring.jmx.enabled=false",
-				"spring.cloud.consul.discovery.port:7001",
+				"spring.jmx.enabled=false", "spring.cloud.consul.discovery.port:7001",
 				"spring.cloud.consul.discovery.hostname:foo",
 				"spring.cloud.config.discovery.service-id:configserver");
 
-		assertEquals( 1, this.context
-						.getBeanNamesForType(ConsulConfigServerAutoConfiguration.class).length);
-		ConsulDiscoveryClient client = this.context.getParent().getBean(
-				ConsulDiscoveryClient.class);
+		assertThat(this.context
+				.getBeanNamesForType(ConsulConfigServerAutoConfiguration.class).length)
+						.isEqualTo(1);
+		ConsulDiscoveryClient client = this.context.getParent()
+				.getBean(ConsulDiscoveryClient.class);
 		verify(client, atLeast(2)).getInstances("configserver");
 		ConfigClientProperties locator = this.context
 				.getBean(ConfigClientProperties.class);
-		assertEquals("http://foo:7001/", locator.getUri()[0]);
+		assertThat(locator.getUri()[0]).isEqualTo("http://foo:7001/");
 	}
 
 	private void setup(String... env) {
-		this.context = new SpringApplicationBuilder(TestConfig.class)
-				.properties(env)
+		this.context = new SpringApplicationBuilder(TestConfig.class).properties(env)
 				.run();
 	}
 
 	@Configuration
 	@EnableAutoConfiguration
-	protected static class TestConfig { }
+	protected static class TestConfig {
+
+	}
 
 }

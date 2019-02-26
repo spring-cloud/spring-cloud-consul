@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,28 +44,28 @@ public class RetryProperties {
 		return this.initialInterval;
 	}
 
-	public double getMultiplier() {
-		return this.multiplier;
-	}
-
-	public long getMaxInterval() {
-		return this.maxInterval;
-	}
-
-	public int getMaxAttempts() {
-		return this.maxAttempts;
-	}
-
 	public void setInitialInterval(long initialInterval) {
 		this.initialInterval = initialInterval;
+	}
+
+	public double getMultiplier() {
+		return this.multiplier;
 	}
 
 	public void setMultiplier(double multiplier) {
 		this.multiplier = multiplier;
 	}
 
+	public long getMaxInterval() {
+		return this.maxInterval;
+	}
+
 	public void setMaxInterval(long maxInterval) {
 		this.maxInterval = maxInterval;
+	}
+
+	public int getMaxAttempts() {
+		return this.maxAttempts;
 	}
 
 	public void setMaxAttempts(int maxAttempts) {
@@ -74,11 +74,10 @@ public class RetryProperties {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this)
-				.append("initialInterval", initialInterval)
-				.append("multiplier", multiplier)
-				.append("maxInterval", maxInterval)
-				.append("maxAttempts", maxAttempts)
-				.toString();
+		return new ToStringCreator(this).append("initialInterval", this.initialInterval)
+				.append("multiplier", this.multiplier)
+				.append("maxInterval", this.maxInterval)
+				.append("maxAttempts", this.maxAttempts).toString();
 	}
+
 }

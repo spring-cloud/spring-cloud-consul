@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,17 +30,19 @@ import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findH
 public class ConsulServer extends Server {
 
 	private final MetaInfo metaInfo;
+
 	private final HealthService service;
+
 	private final Map<String, String> metadata;
 
 	public ConsulServer(final HealthService healthService) {
 		super(findHost(healthService), healthService.getService().getPort());
 		this.service = healthService;
 		this.metadata = ConsulServerUtils.getMetadata(this.service);
-		metaInfo = new MetaInfo() {
+		this.metaInfo = new MetaInfo() {
 			@Override
 			public String getAppName() {
-				return service.getService().getService();
+				return ConsulServer.this.service.getService().getService();
 			}
 
 			@Override
@@ -55,7 +57,7 @@ public class ConsulServer extends Server {
 
 			@Override
 			public String getInstanceId() {
-				return service.getService().getId();
+				return ConsulServer.this.service.getService().getId();
 			}
 		};
 
@@ -64,7 +66,7 @@ public class ConsulServer extends Server {
 
 	@Override
 	public MetaInfo getMetaInfo() {
-		return metaInfo;
+		return this.metaInfo;
 	}
 
 	public HealthService getHealthService() {
@@ -72,7 +74,7 @@ public class ConsulServer extends Server {
 	}
 
 	public Map<String, String> getMetadata() {
-		return metadata;
+		return this.metadata;
 	}
 
 	public boolean isPassingChecks() {
@@ -83,4 +85,5 @@ public class ConsulServer extends Server {
 		}
 		return true;
 	}
+
 }

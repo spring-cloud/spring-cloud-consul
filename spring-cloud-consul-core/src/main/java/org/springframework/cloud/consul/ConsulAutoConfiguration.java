@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.cloud.consul;
 import com.ecwid.consul.transport.TLSConfig;
 import com.ecwid.consul.v1.ConsulClient;
 import org.aspectj.lang.annotation.Aspect;
+
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnEnabledEndpoint;
 import org.springframework.boot.actuate.autoconfigure.health.ConditionalOnEnabledHealthIndicator;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
@@ -33,8 +34,6 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.interceptor.RetryInterceptorBuilder;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
-
-import com.ecwid.consul.v1.ConsulClient;
 import org.springframework.util.StringUtils;
 
 /**
@@ -61,13 +60,9 @@ public class ConsulAutoConfiguration {
 
 		if (consulProperties.getTls() != null) {
 			ConsulProperties.TLSConfig tls = consulProperties.getTls();
-			TLSConfig tlsConfig = new TLSConfig(
-					tls.getKeyStoreInstanceType(),
-					tls.getCertificatePath(),
-					tls.getCertificatePassword(),
-					tls.getKeyStorePath(),
-					tls.getKeyStorePassword()
-			);
+			TLSConfig tlsConfig = new TLSConfig(tls.getKeyStoreInstanceType(),
+					tls.getCertificatePath(), tls.getCertificatePassword(),
+					tls.getKeyStorePath(), tls.getKeyStorePassword());
 			return new ConsulClient(agentHost, agentPort, tlsConfig);
 		}
 		return new ConsulClient(agentHost, agentPort);
@@ -90,6 +85,7 @@ public class ConsulAutoConfiguration {
 		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient) {
 			return new ConsulHealthIndicator(consulClient);
 		}
+
 	}
 
 	@ConditionalOnClass({ Retryable.class, Aspect.class, AopAutoConfiguration.class })
@@ -103,11 +99,12 @@ public class ConsulAutoConfiguration {
 		@ConditionalOnMissingBean(name = "consulRetryInterceptor")
 		public RetryOperationsInterceptor consulRetryInterceptor(
 				RetryProperties properties) {
-			return RetryInterceptorBuilder
-					.stateless()
+			return RetryInterceptorBuilder.stateless()
 					.backOffOptions(properties.getInitialInterval(),
 							properties.getMultiplier(), properties.getMaxInterval())
 					.maxAttempts(properties.getMaxAttempts()).build();
 		}
+
 	}
+
 }

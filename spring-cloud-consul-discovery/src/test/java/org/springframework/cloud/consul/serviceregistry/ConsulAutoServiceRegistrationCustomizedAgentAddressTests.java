@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2016 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,12 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.agent.model.Service;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -30,45 +34,45 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.StringUtils;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedAgentAddressTests.TestConfig.class,
-	properties = { "spring.application.name=myTestService-AA",
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedAgentAddressTests.TestConfig.class, properties = {
+		"spring.application.name=myTestService-AA",
 		"spring.cloud.consul.discovery.instanceId=myTestService1-AA",
 		"spring.cloud.consul.discovery.serviceName=myprefix-${spring.application.name}",
-		"spring.cloud.consul.discovery.preferAgentAddress=true"},
-		webEnvironment = RANDOM_PORT)
+		"spring.cloud.consul.discovery.preferAgentAddress=true" }, webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedAgentAddressTests {
 
 	@Autowired
 	private ConsulClient consul;
-	
+
 	@Test
 	public void contextLoads() {
-		Response<Map<String, Service>> response = consul.getAgentServices();
+		Response<Map<String, Service>> response = this.consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
 		Service service = services.get("myTestService1-AA");
-		assertNotNull("service was null", service);
-		assertNotEquals("service port is 0", 0, service.getPort().intValue());
-		assertEquals("service id was wrong", "myTestService1-AA", service.getId());
-		assertEquals("service name was wrong", "myprefix-myTestService-AA", service.getService());
-		assertTrue("service address must be empty", StringUtils.isEmpty(service.getAddress()));
+		assertThat(service).as("service was null").isNotNull();
+		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
+		assertThat(service.getId()).as("service id was wrong")
+				.isEqualTo("myTestService1-AA");
+		assertThat(service.getService()).as("service name was wrong")
+				.isEqualTo("myprefix-myTestService-AA");
+		assertThat(StringUtils.isEmpty(service.getAddress()))
+				.as("service address must be empty").isTrue();
 	}
 
 	@Configuration
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class, ConsulAutoServiceRegistrationAutoConfiguration.class })
-	public static class TestConfig { }
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
+			ConsulAutoConfiguration.class,
+			ConsulAutoServiceRegistrationAutoConfiguration.class })
+	public static class TestConfig {
+
+	}
+
 }

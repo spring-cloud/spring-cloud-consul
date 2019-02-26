@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,26 +22,46 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import com.ecwid.consul.v1.ConsulClient;
+
 import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
 
+/**
+ * When both property and consul classes are on the classpath.
+ * @author Spencer Gibb
+ */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ ElementType.TYPE, ElementType.METHOD })
 @Conditional(ConditionalOnConsulEnabled.OnConsulEnabledCondition.class)
 public @interface ConditionalOnConsulEnabled {
 
+	/**
+	 * Verifies multiple conditions to see if Consul should be enabled.
+	 */
 	class OnConsulEnabledCondition extends AllNestedConditions {
 
-		public OnConsulEnabledCondition() {
+		OnConsulEnabledCondition() {
 			super(ConfigurationPhase.REGISTER_BEAN);
 		}
 
+		/**
+		 * Consul property is enabled.
+		 */
 		@ConditionalOnProperty(value = "spring.cloud.consul.enabled", matchIfMissing = true)
-		static class FoundProperty {}
+		static class FoundProperty {
 
+		}
+
+		/**
+		 * Consul client class found.
+		 */
 		@ConditionalOnClass(ConsulClient.class)
-		static class FoundClass {}
+		static class FoundClass {
+
+		}
+
 	}
+
 }

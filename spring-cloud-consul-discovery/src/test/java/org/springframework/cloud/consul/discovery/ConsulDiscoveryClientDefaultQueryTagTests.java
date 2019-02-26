@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015 the original author or authors.
+ * Copyright 2013-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,38 +19,33 @@ package org.springframework.cloud.consul.discovery;
 import java.util.Arrays;
 import java.util.List;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.agent.model.NewService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.agent.model.NewService;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.hasSize;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK;
 
 /**
  * @author Piotr Wielgolaski
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = MOCK,
-				classes = ConsulDiscoveryClientDefaultQueryTagTests.TestConfig.class,
-				properties = {
-						"spring.application.name=consulServiceDefaultTag",
-						"spring.cloud.consul.discovery.catalogServicesWatch.enabled=false",
-						"spring.cloud.consul.discovery.defaultQueryTag=intg"})
+@SpringBootTest(webEnvironment = MOCK, classes = ConsulDiscoveryClientDefaultQueryTagTests.TestConfig.class, properties = {
+		"spring.application.name=consulServiceDefaultTag",
+		"spring.cloud.consul.discovery.catalogServicesWatch.enabled=false",
+		"spring.cloud.consul.discovery.defaultQueryTag=intg" })
 @DirtiesContext
 public class ConsulDiscoveryClientDefaultQueryTagTests {
 
@@ -63,25 +58,27 @@ public class ConsulDiscoveryClientDefaultQueryTagTests {
 	private ConsulClient consulClient;
 
 	private NewService intgService = serviceForEnvironment("intg", 9081);
+
 	private NewService uatService = serviceForEnvironment("uat", 9080);
 
 	@Before
 	public void setUp() throws Exception {
-		consulClient.agentServiceRegister(intgService);
-		consulClient.agentServiceRegister(uatService);
+		this.consulClient.agentServiceRegister(this.intgService);
+		this.consulClient.agentServiceRegister(this.uatService);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		consulClient.agentServiceDeregister(intgService.getId());
-		consulClient.agentServiceDeregister(uatService.getId());
+		this.consulClient.agentServiceDeregister(this.intgService.getId());
+		this.consulClient.agentServiceDeregister(this.uatService.getId());
 	}
 
 	@Test
 	public void shouldReturnOnlyIntgInstance() {
-		List<ServiceInstance> instances = discoveryClient.getInstances(NAME);
-		assertThat("instances was wrong size", instances, hasSize(1));
-		assertThat("instance is not intg", instances.get(0).getMetadata(), hasEntry("intg", "intg"));
+		List<ServiceInstance> instances = this.discoveryClient.getInstances(NAME);
+		assertThat(instances).as("instances was wrong size").hasSize(1);
+		assertThat(instances.get(0).getMetadata()).as("instance is not intg")
+				.containsEntry("intg", "intg");
 	}
 
 	private NewService serviceForEnvironment(String env, int port) {
@@ -100,4 +97,5 @@ public class ConsulDiscoveryClientDefaultQueryTagTests {
 	protected static class TestConfig {
 
 	}
+
 }
