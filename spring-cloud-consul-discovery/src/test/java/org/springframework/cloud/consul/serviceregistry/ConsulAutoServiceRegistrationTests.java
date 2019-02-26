@@ -35,10 +35,7 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistration.normalizeForDns;
 
@@ -47,7 +44,11 @@ import static org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistr
  * @author Venil Noronha
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = { "spring.application.name=myTestService1-FF::something" },
+@SpringBootTest(properties = {
+        "spring.application.name=myTestService1-FF::something",
+        "spring.cloud.consul.discovery.include-hostname-in-instance-id=true",
+        "spring.cloud.client.hostname=localhost"
+},
 		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationTests {
 
@@ -69,6 +70,7 @@ public class ConsulAutoServiceRegistrationTests {
 		assertNotEquals("service port is 0", 0, service.getPort().intValue());
 		assertFalse("service id contained invalid character: " + service.getId(), service.getId().contains(":"));
 		assertEquals("service id was wrong", registration.getInstanceId(), service.getId());
+		assertTrue("service id don't include hostname", service.getId().startsWith("localhost"));
 		assertEquals("service name was wrong", "myTestService1-FF-something", service.getService());
 		assertFalse("service address must not be empty", StringUtils.isEmpty(service.getAddress()));
 		assertEquals("service address must equals hostname from discovery properties", discoveryProperties.getHostname(), service.getAddress());

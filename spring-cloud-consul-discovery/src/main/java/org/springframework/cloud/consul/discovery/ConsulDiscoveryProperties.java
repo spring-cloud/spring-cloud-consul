@@ -115,8 +115,8 @@ public class ConsulDiscoveryProperties {
 
 	/**
 	 * Whether hostname is included into the default instance id when registering service.
-	 * */
-	private boolean instanceIdIncludeHostname;
+	 */
+	private boolean includeHostnameInInstanceId;
 
 
 	/**
@@ -393,13 +393,13 @@ public class ConsulDiscoveryProperties {
 		this.instanceGroup = instanceGroup;
 	}
 
-    public boolean isInstanceIdIncludeHostname() {
-        return instanceIdIncludeHostname;
-    }
+	public boolean isIncludeHostnameInInstanceId() {
+		return includeHostnameInInstanceId;
+	}
 
-    public void setInstanceIdIncludeHostname(boolean instanceIdIncludeHostname) {
-        this.instanceIdIncludeHostname = instanceIdIncludeHostname;
-    }
+	public void setIncludeHostnameInInstanceId(boolean includeHostnameInInstanceId) {
+		this.includeHostnameInInstanceId = includeHostnameInInstanceId;
+	}
 
     public String getDefaultZoneMetadataName() {
 		return defaultZoneMetadataName;

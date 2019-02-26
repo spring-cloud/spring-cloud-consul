@@ -136,7 +136,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 
 	public static String getInstanceId(ConsulDiscoveryProperties properties, ApplicationContext context) {
 		if (!StringUtils.hasText(properties.getInstanceId())) {
-			return normalizeForDns(IdUtils.getDefaultInstanceId(context.getEnvironment(), properties.isInstanceIdIncludeHostname()));
+			return normalizeForDns(IdUtils.getDefaultInstanceId(context.getEnvironment(),
+					properties.isIncludeHostnameInInstanceId()));
 		}
 		return normalizeForDns(properties.getInstanceId());
 	}
