@@ -225,7 +225,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		NewService.Check check = new NewService.Check();
 		if (StringUtils.hasText(properties.getHealthCheckCriticalTimeout())) {
 			check.setDeregisterCriticalServiceAfter(
-				properties.getHealthCheckCriticalTimeout());
+					properties.getHealthCheckCriticalTimeout());
 		}
 		if (ttlConfig.isEnabled()) {
 			check.setTtl(ttlConfig.getTtl());
