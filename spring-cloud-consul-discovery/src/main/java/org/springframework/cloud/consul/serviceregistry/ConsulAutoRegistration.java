@@ -223,6 +223,10 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	public static NewService.Check createCheck(Integer port,
 			HeartbeatProperties ttlConfig, ConsulDiscoveryProperties properties) {
 		NewService.Check check = new NewService.Check();
+		if (StringUtils.hasText(properties.getHealthCheckCriticalTimeout())) {
+			check.setDeregisterCriticalServiceAfter(
+				properties.getHealthCheckCriticalTimeout());
+		}
 		if (ttlConfig.isEnabled()) {
 			check.setTtl(ttlConfig.getTtl());
 			return check;
@@ -241,10 +245,6 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		check.setHeader(properties.getHealthCheckHeaders());
 		check.setInterval(properties.getHealthCheckInterval());
 		check.setTimeout(properties.getHealthCheckTimeout());
-		if (StringUtils.hasText(properties.getHealthCheckCriticalTimeout())) {
-			check.setDeregisterCriticalServiceAfter(
-					properties.getHealthCheckCriticalTimeout());
-		}
 		check.setTlsSkipVerify(properties.getHealthCheckTlsSkipVerify());
 		return check;
 	}
