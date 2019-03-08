@@ -16,3 +16,4 @@ _site/
 /consul
 consul_*.zip
 consul_*.zip.*
+.vscode/
