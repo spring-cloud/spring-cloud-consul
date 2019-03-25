@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?asciidoc-toc?>
 <?asciidoc-numbered?>
-<book xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
+<book xmlns="https://docbook.org/ns/docbook" xmlns:xl="https://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
 <info>
 <title>Spring Cloud Consul</title>
 <date>2019-03-08</date>
@@ -25,14 +25,14 @@ Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon), Circuit Brea
 <title>Consul Agent</title>
 <simpara>A Consul Agent client must be available to all Spring Cloud Consul applications.  By default, the Agent client is expected to be at <literal>localhost:8500</literal>.  See the <link xl:href="https://consul.io/docs/agent/basics.html">Agent documentation</link> for specifics on how to start an Agent client and how to connect to a cluster of Consul Agent Servers.  For development, after you have installed consul, you may start a Consul Agent using the following command:</simpara>
 <screen>./src/main/bash/local_run_consul.sh</screen>
-<simpara>This will start an agent in server mode on port 8500, with the ui available at <link xl:href="http://localhost:8500">http://localhost:8500</link></simpara>
+<simpara>This will start an agent in server mode on port 8500, with the ui available at <link xl:href="https://localhost:8500">https://localhost:8500</link></simpara>
 </chapter>
 <chapter xml:id="spring-cloud-consul-discovery">
 <title>Service Discovery with Consul</title>
 <simpara>Service Discovery is one of the key tenets of a microservice based architecture. Trying to hand configure each client or some form of convention can be very difficult to do and can be very brittle.  Consul provides Service Discovery services via an <link xl:href="https://www.consul.io/docs/agent/http.html">HTTP API</link> and <link xl:href="https://www.consul.io/docs/agent/dns.html">DNS</link>.  Spring Cloud Consul leverages the HTTP API for service registration and discovery.  This does not prevent non-Spring Cloud applications from leveraging the DNS interface.  Consul Agents servers are run in a <link xl:href="https://www.consul.io/docs/internals/architecture.html">cluster</link> that communicates via a <link xl:href="https://www.consul.io/docs/internals/gossip.html">gossip protocol</link> and uses the <link xl:href="https://www.consul.io/docs/internals/consensus.html">Raft consensus protocol</link>.</simpara>
 <section xml:id="_how_to_activate">
 <title>How to activate</title>
-<simpara>To activate Consul Service Discovery use the starter with group <literal>org.springframework.cloud</literal> and artifact id <literal>spring-cloud-starter-consul-discovery</literal>. See the <link xl:href="http://projects.spring.io/spring-cloud/">Spring Cloud Project page</link> for details on setting up your build system with the current Spring Cloud Release Train.</simpara>
+<simpara>To activate Consul Service Discovery use the starter with group <literal>org.springframework.cloud</literal> and artifact id <literal>spring-cloud-starter-consul-discovery</literal>. See the <link xl:href="https://projects.spring.io/spring-cloud/">Spring Cloud Project page</link> for details on setting up your build system with the current Spring Cloud Release Train.</simpara>
 </section>
 <section xml:id="_registering_with_consul">
 <title>Registering with Consul</title>
@@ -222,7 +222,7 @@ spring.cloud.consul.discovery.management-tags</screen>
 <section xml:id="_using_ribbon">
 <title>Using Ribbon</title>
 <simpara>Spring Cloud has support for <link xl:href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign">Feign</link> (a REST client builder) and also <link xl:href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-ribbon">Spring <literal>RestTemplate</literal></link>
-for looking up services using the logical service names/ids instead of physical URLs. Both Feign and the discovery-aware RestTemplate utilize <link xl:href="http://cloud.spring.io/spring-cloud-netflix/single/spring-cloud-netflix.html#spring-cloud-ribbon">Ribbon</link> for client-side load balancing.</simpara>
+for looking up services using the logical service names/ids instead of physical URLs. Both Feign and the discovery-aware RestTemplate utilize <link xl:href="https://cloud.spring.io/spring-cloud-netflix/single/spring-cloud-netflix.html#spring-cloud-ribbon">Ribbon</link> for client-side load balancing.</simpara>
 <simpara>If you want to access service STORES using the RestTemplate simply declare:</simpara>
 <screen>@LoadBalanced
 @Bean
@@ -274,7 +274,7 @@ config/application/</screen>
 <simpara>Configuration is currently read on startup of the application.  Sending a HTTP POST to <literal>/refresh</literal> will cause the configuration to be reloaded. <xref linkend="spring-cloud-consul-config-watch"/> will also automatically detect changes and reload the application context.</simpara>
 <section xml:id="_how_to_activate_2">
 <title>How to activate</title>
-<simpara>To get started with Consul Configuration use the starter with group <literal>org.springframework.cloud</literal> and artifact id <literal>spring-cloud-starter-consul-config</literal>. See the <link xl:href="http://projects.spring.io/spring-cloud/">Spring Cloud Project page</link> for details on setting up your build system with the current Spring Cloud Release Train.</simpara>
+<simpara>To get started with Consul Configuration use the starter with group <literal>org.springframework.cloud</literal> and artifact id <literal>spring-cloud-starter-consul-config</literal>. See the <link xl:href="https://projects.spring.io/spring-cloud/">Spring Cloud Project page</link> for details on setting up your build system with the current Spring Cloud Release Train.</simpara>
 <simpara>This will enable auto-configuration that will setup Spring Cloud Consul Config.</simpara>
 </section>
 <section xml:id="_customizing">
@@ -387,13 +387,13 @@ Retry has a <literal>RetryInterceptorBuilder</literal> that makes it easy to cre
 <title>Spring Cloud Bus with Consul</title>
 <section xml:id="_how_to_activate_3">
 <title>How to activate</title>
-<simpara>To get started with the Consul Bus use the starter with group <literal>org.springframework.cloud</literal> and artifact id <literal>spring-cloud-starter-consul-bus</literal>. See the <link xl:href="http://projects.spring.io/spring-cloud/">Spring Cloud Project page</link> for details on setting up your build system with the current Spring Cloud Release Train.</simpara>
+<simpara>To get started with the Consul Bus use the starter with group <literal>org.springframework.cloud</literal> and artifact id <literal>spring-cloud-starter-consul-bus</literal>. See the <link xl:href="https://projects.spring.io/spring-cloud/">Spring Cloud Project page</link> for details on setting up your build system with the current Spring Cloud Release Train.</simpara>
 <simpara>See the <link xl:href="https://cloud.spring.io/spring-cloud-bus/">Spring Cloud Bus</link> documentation for the available actuator endpoints and howto send custom messages.</simpara>
 </section>
 </chapter>
 <chapter xml:id="spring-cloud-consul-hystrix">
 <title>Circuit Breaker with Hystrix</title>
-<simpara>Applications can use the Hystrix Circuit Breaker provided by the Spring Cloud Netflix project by including this starter in the projects pom.xml: <literal>spring-cloud-starter-hystrix</literal>.  Hystrix doesn&#8217;t depend on the Netflix Discovery Client. The <literal>@EnableHystrix</literal> annotation should be placed on a configuration class (usually the main class). Then methods can be annotated with <literal>@HystrixCommand</literal> to be protected by a circuit breaker. See <link xl:href="http://projects.spring.io/spring-cloud/spring-cloud.html#_circuit_breaker_hystrix_clients">the documentation</link> for more details.</simpara>
+<simpara>Applications can use the Hystrix Circuit Breaker provided by the Spring Cloud Netflix project by including this starter in the projects pom.xml: <literal>spring-cloud-starter-hystrix</literal>.  Hystrix doesn&#8217;t depend on the Netflix Discovery Client. The <literal>@EnableHystrix</literal> annotation should be placed on a configuration class (usually the main class). Then methods can be annotated with <literal>@HystrixCommand</literal> to be protected by a circuit breaker. See <link xl:href="https://projects.spring.io/spring-cloud/spring-cloud.html#_circuit_breaker_hystrix_clients">the documentation</link> for more details.</simpara>
 </chapter>
 <chapter xml:id="spring-cloud-consul-turbine">
 <title>Hystrix metrics aggregation with Turbine and Consul</title>
