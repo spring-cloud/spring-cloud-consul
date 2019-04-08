@@ -240,7 +240,7 @@ If you want to access service STORES using the RestTemplate simply declare:
 @LoadBalanced
 @Bean
 public RestTemplate loadbalancedRestTemplate() {
-     new RestTemplate();
+     return new RestTemplate();
 }
 ----
 
