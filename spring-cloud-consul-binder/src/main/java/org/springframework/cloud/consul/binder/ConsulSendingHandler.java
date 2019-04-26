@@ -42,7 +42,7 @@ public class ConsulSendingHandler extends AbstractMessageHandler {
 	}
 
 	@Override
-	protected void handleMessageInternal(Message<?> message) throws Exception {
+	protected void handleMessageInternal(Message<?> message) {
 		if (this.logger.isTraceEnabled()) {
 			this.logger.trace("Publishing message" + message);
 		}
