@@ -42,12 +42,14 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Dmitry Zhikharev (jihor)
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationManagementDisabledServiceTests.TestConfig.class, properties = {
-		"spring.application.name=myTestService-NM",
-		"spring.cloud.consul.discovery.instanceId=myTestService1-NM",
-		"spring.cloud.service-registry.auto-registration.register-management=false",
-		"spring.cloud.consul.discovery.managementPort=4453",
-		"management.port=0" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(
+		classes = ConsulAutoServiceRegistrationManagementDisabledServiceTests.TestConfig.class,
+		properties = { "spring.application.name=myTestService-NM",
+				"spring.cloud.consul.discovery.instanceId=myTestService1-NM",
+				"spring.cloud.service-registry.auto-registration.register-management=false",
+				"spring.cloud.consul.discovery.managementPort=4453",
+				"management.port=0" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationManagementDisabledServiceTests {
 
 	@Autowired

@@ -44,8 +44,8 @@ import static org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistr
  * @author Venil Noronha
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = {
-		"spring.application.name=myTestService1-FF::something" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(properties = { "spring.application.name=myTestService1-FF::something" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationTests {
 
 	@Autowired

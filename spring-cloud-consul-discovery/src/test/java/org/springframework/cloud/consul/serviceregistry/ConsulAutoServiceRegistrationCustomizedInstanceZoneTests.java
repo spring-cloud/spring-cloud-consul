@@ -40,11 +40,13 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Sixian Liu
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedInstanceZoneTests.TestConfig.class, properties = {
-		"spring.application.name=myTestService-WithZone",
-		"spring.cloud.consul.discovery.instanceId=myTestService1-WithZone",
-		"spring.cloud.consul.discovery.instanceZone=zone1",
-		"spring.cloud.consul.discovery.defaultZoneMetadataName=myZone" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(
+		classes = ConsulAutoServiceRegistrationCustomizedInstanceZoneTests.TestConfig.class,
+		properties = { "spring.application.name=myTestService-WithZone",
+				"spring.cloud.consul.discovery.instanceId=myTestService1-WithZone",
+				"spring.cloud.consul.discovery.instanceZone=zone1",
+				"spring.cloud.consul.discovery.defaultZoneMetadataName=myZone" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedInstanceZoneTests {
 
 	@Autowired

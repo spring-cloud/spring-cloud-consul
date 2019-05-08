@@ -43,11 +43,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Stéphane Leroy
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TtlSchedulerRemoveTests.TtlSchedulerRemoveTestConfig.class, properties = {
-		"spring.application.name=ttlSchedulerRemove",
-		"spring.cloud.consul.discovery.instance-id=ttlSchedulerRemove-id",
-		"spring.cloud.consul.discovery.heartbeat.enabled=true",
-		"spring.cloud.consul.discovery.heartbeat.ttlValue=2" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = TtlSchedulerRemoveTests.TtlSchedulerRemoveTestConfig.class,
+		properties = { "spring.application.name=ttlSchedulerRemove",
+				"spring.cloud.consul.discovery.instance-id=ttlSchedulerRemove-id",
+				"spring.cloud.consul.discovery.heartbeat.enabled=true",
+				"spring.cloud.consul.discovery.heartbeat.ttlValue=2" },
+		webEnvironment = RANDOM_PORT)
 public class TtlSchedulerRemoveTests {
 
 	@Autowired

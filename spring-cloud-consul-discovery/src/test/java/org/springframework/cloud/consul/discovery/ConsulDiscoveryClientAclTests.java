@@ -37,10 +37,11 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulDiscoveryClientAclTests.MyTestConfig.class, properties = {
-		"spring.application.name=testConsulDiscoveryAcl",
-		"spring.cloud.consul.discovery.preferIpAddress=true",
-		"consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = ConsulDiscoveryClientAclTests.MyTestConfig.class,
+		properties = { "spring.application.name=testConsulDiscoveryAcl",
+				"spring.cloud.consul.discovery.preferIpAddress=true",
+				"consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulDiscoveryClientAclTests {
 
 	@Autowired

@@ -40,9 +40,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Joe Athman
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = { "spring.application.name=testConsulDiscovery",
-		"spring.cloud.consul.discovery.prefer-ip-address=true",
-		"spring.cloud.consul.discovery.tags=foo=bar" }, classes = ConsulDiscoveryClientTests.MyTestConfig.class, webEnvironment = RANDOM_PORT)
+@SpringBootTest(
+		properties = { "spring.application.name=testConsulDiscovery",
+				"spring.cloud.consul.discovery.prefer-ip-address=true",
+				"spring.cloud.consul.discovery.tags=foo=bar" },
+		classes = ConsulDiscoveryClientTests.MyTestConfig.class,
+		webEnvironment = RANDOM_PORT)
 public class ConsulDiscoveryClientTests {
 
 	@Autowired

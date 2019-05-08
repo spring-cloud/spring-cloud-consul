@@ -46,7 +46,8 @@ public class ConsulConfigAutoConfiguration {
 	protected static class ConsulRefreshConfiguration {
 
 		@Bean
-		@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled", matchIfMissing = true)
+		@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled",
+				matchIfMissing = true)
 		public ConfigWatch configWatch(ConsulConfigProperties properties,
 				ConsulPropertySourceLocator locator, ConsulClient consul,
 				@Qualifier(CONFIG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
@@ -55,7 +56,8 @@ public class ConsulConfigAutoConfiguration {
 		}
 
 		@Bean(name = CONFIG_WATCH_TASK_SCHEDULER_NAME)
-		@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled", matchIfMissing = true)
+		@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled",
+				matchIfMissing = true)
 		public TaskScheduler configWatchTaskScheduler() {
 			return new ThreadPoolTaskScheduler();
 		}

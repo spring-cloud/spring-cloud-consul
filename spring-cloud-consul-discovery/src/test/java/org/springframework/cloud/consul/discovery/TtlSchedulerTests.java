@@ -42,12 +42,13 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Stéphane Leroy
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TtlSchedulerTests.TtlSchedulerTestConfig.class, properties = {
-		"spring.application.name=ttlScheduler",
-		"spring.cloud.consul.discovery.instance-id=ttlScheduler-id",
-		"spring.cloud.consul.discovery.heartbeat.enabled=true",
-		"spring.cloud.consul.discovery.heartbeat.ttlValue=2",
-		"management.server.port=0" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = TtlSchedulerTests.TtlSchedulerTestConfig.class,
+		properties = { "spring.application.name=ttlScheduler",
+				"spring.cloud.consul.discovery.instance-id=ttlScheduler-id",
+				"spring.cloud.consul.discovery.heartbeat.enabled=true",
+				"spring.cloud.consul.discovery.heartbeat.ttlValue=2",
+				"management.server.port=0" },
+		webEnvironment = RANDOM_PORT)
 public class TtlSchedulerTests {
 
 	@Autowired

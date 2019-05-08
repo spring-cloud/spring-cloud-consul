@@ -34,12 +34,13 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @deprecated remove in Edgware
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TestPropsConfig.class, properties = {
-		"spring.application.name=myTestServiceDefaultChecks",
-		"spring.cloud.consul.discovery.instanceId=myTestServiceDefaultChecks",
-		"spring.cloud.consul.discovery.healthCheckCriticalTimeout=30m",
-		"spring.cloud.consul.discovery.healthCheckInterval=19s",
-		"spring.cloud.consul.discovery.healthCheckTimeout=12s" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = TestPropsConfig.class,
+		properties = { "spring.application.name=myTestServiceDefaultChecks",
+				"spring.cloud.consul.discovery.instanceId=myTestServiceDefaultChecks",
+				"spring.cloud.consul.discovery.healthCheckCriticalTimeout=30m",
+				"spring.cloud.consul.discovery.healthCheckInterval=19s",
+				"spring.cloud.consul.discovery.healthCheckTimeout=12s" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationDefaultCheckTests {
 
 	@Autowired

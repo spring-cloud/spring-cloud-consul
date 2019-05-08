@@ -38,8 +38,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Marcin Biegan
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedTests.MyTestConfig.class, properties = {
-		"spring.application.name=testCustomAutoServiceRegistration" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedTests.MyTestConfig.class,
+		properties = { "spring.application.name=testCustomAutoServiceRegistration" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedTests {
 
 	@Autowired

@@ -30,11 +30,13 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulPropertySourceLocatorFailFastTests.Config.class, properties = {
-		"spring.application.name=testConsulPropertySourceLocatorFailFast",
-		"spring.cloud.consul.host=53210a7c-4809-42cb-8b30-057d2db85fcc",
-		"spring.cloud.consul.port=65530", "spring.cloud.consul.retry.maxAttempts=0",
-		"spring.cloud.consul.config.failFast=false" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = ConsulPropertySourceLocatorFailFastTests.Config.class,
+		properties = { "spring.application.name=testConsulPropertySourceLocatorFailFast",
+				"spring.cloud.consul.host=53210a7c-4809-42cb-8b30-057d2db85fcc",
+				"spring.cloud.consul.port=65530",
+				"spring.cloud.consul.retry.maxAttempts=0",
+				"spring.cloud.consul.config.failFast=false" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulPropertySourceLocatorFailFastTests {
 
 	@Test

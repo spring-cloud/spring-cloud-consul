@@ -41,9 +41,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Alexey Savchuk
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulServiceRegistryCheckTtlTests.TestConfig.class, properties = {
-		"spring.application.name=myConsulServiceRegistryCheckTtlTestService-S",
-		"spring.cloud.consul.discovery.heartbeat.enabled=true" }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = ConsulServiceRegistryCheckTtlTests.TestConfig.class,
+		properties = {
+				"spring.application.name=myConsulServiceRegistryCheckTtlTestService-S",
+				"spring.cloud.consul.discovery.heartbeat.enabled=true" },
+		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ConsulServiceRegistryCheckTtlTests {
 
 	@LocalServerPort

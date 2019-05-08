@@ -37,9 +37,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Patrick Hi
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoRegistrationHealthCheckTlsSkipVerifyTests.TestConfig.class, properties = {
-		"spring.application.name=myTestService-DiscoveryHealthCheckTlsSkipVerify",
-		"spring.cloud.consul.discovery.health-check-tls-skip-verify=true" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(
+		classes = ConsulAutoRegistrationHealthCheckTlsSkipVerifyTests.TestConfig.class,
+		properties = {
+				"spring.application.name=myTestService-DiscoveryHealthCheckTlsSkipVerify",
+				"spring.cloud.consul.discovery.health-check-tls-skip-verify=true" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulAutoRegistrationHealthCheckTlsSkipVerifyTests {
 
 	@Autowired

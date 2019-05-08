@@ -41,10 +41,11 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Jon Freedman
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationDisabledTests.TestConfig.class, properties = {
-		"spring.application.name=myTestNotDeRegisteredService",
-		"spring.cloud.consul.discovery.instanceId=myTestNotDeRegisteredService-D",
-		"spring.cloud.consul.discovery.deregister=false" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = ConsulAutoServiceRegistrationDisabledTests.TestConfig.class,
+		properties = { "spring.application.name=myTestNotDeRegisteredService",
+				"spring.cloud.consul.discovery.instanceId=myTestNotDeRegisteredService-D",
+				"spring.cloud.consul.discovery.deregister=false" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceDeRegistrationDisabledTests {
 
 	@Autowired

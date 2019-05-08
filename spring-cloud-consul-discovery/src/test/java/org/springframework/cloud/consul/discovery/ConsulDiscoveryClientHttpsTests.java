@@ -36,9 +36,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Glen Lockhart
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = { "spring.application.name=testConsulDiscoveryHttps",
-		"spring.cloud.consul.discovery.prefer-ip-address=true",
-		"spring.cloud.consul.discovery.scheme=https" }, classes = ConsulDiscoveryClientHttpsTests.MyTestConfig.class, webEnvironment = RANDOM_PORT)
+@SpringBootTest(
+		properties = { "spring.application.name=testConsulDiscoveryHttps",
+				"spring.cloud.consul.discovery.prefer-ip-address=true",
+				"spring.cloud.consul.discovery.scheme=https" },
+		classes = ConsulDiscoveryClientHttpsTests.MyTestConfig.class,
+		webEnvironment = RANDOM_PORT)
 public class ConsulDiscoveryClientHttpsTests {
 
 	@Autowired

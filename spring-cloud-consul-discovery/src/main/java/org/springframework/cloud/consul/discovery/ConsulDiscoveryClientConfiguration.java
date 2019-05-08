@@ -40,7 +40,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  */
 @Configuration
 @ConditionalOnConsulEnabled
-@ConditionalOnProperty(value = "spring.cloud.consul.discovery.enabled", matchIfMissing = true)
+@ConditionalOnProperty(value = "spring.cloud.consul.discovery.enabled",
+		matchIfMissing = true)
 @ConditionalOnDiscoveryEnabled
 @EnableConfigurationProperties
 @AutoConfigureBefore({ SimpleDiscoveryClientAutoConfiguration.class,
@@ -86,7 +87,9 @@ public class ConsulDiscoveryClientConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	@ConditionalOnProperty(name = "spring.cloud.consul.discovery.catalog-services-watch.enabled", matchIfMissing = true)
+	@ConditionalOnProperty(
+			name = "spring.cloud.consul.discovery.catalog-services-watch.enabled",
+			matchIfMissing = true)
 	public ConsulCatalogWatch consulCatalogWatch(
 			ConsulDiscoveryProperties discoveryProperties,
 			@Qualifier(CATALOG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
@@ -95,7 +98,9 @@ public class ConsulDiscoveryClientConfiguration {
 	}
 
 	@Bean(name = CATALOG_WATCH_TASK_SCHEDULER_NAME)
-	@ConditionalOnProperty(name = "spring.cloud.consul.discovery.catalog-services-watch.enabled", matchIfMissing = true)
+	@ConditionalOnProperty(
+			name = "spring.cloud.consul.discovery.catalog-services-watch.enabled",
+			matchIfMissing = true)
 	public TaskScheduler catalogWatchTaskScheduler() {
 		return new ThreadPoolTaskScheduler();
 	}

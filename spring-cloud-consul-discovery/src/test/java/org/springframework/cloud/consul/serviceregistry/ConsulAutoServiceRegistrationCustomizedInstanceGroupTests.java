@@ -45,10 +45,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Jin Zhang
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedInstanceGroupTests.TestConfig.class, properties = {
-		"spring.application.name=myTestService-WithGroup",
-		"spring.cloud.consul.discovery.instanceId=myTestService1-WithGroup",
-		"spring.cloud.consul.discovery.instanceGroup=test" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(
+		classes = ConsulAutoServiceRegistrationCustomizedInstanceGroupTests.TestConfig.class,
+		properties = { "spring.application.name=myTestService-WithGroup",
+				"spring.cloud.consul.discovery.instanceId=myTestService1-WithGroup",
+				"spring.cloud.consul.discovery.instanceGroup=test" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedInstanceGroupTests {
 
 	@Autowired

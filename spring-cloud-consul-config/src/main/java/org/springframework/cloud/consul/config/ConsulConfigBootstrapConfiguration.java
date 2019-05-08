@@ -39,7 +39,8 @@ public class ConsulConfigBootstrapConfiguration {
 	@Configuration
 	@EnableConfigurationProperties
 	@Import(ConsulAutoConfiguration.class)
-	@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled", matchIfMissing = true)
+	@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled",
+			matchIfMissing = true)
 	protected static class ConsulPropertySourceConfiguration {
 
 		@Autowired

@@ -45,14 +45,16 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Venil Noronha
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedPropsTests.TestPropsConfig.class, properties = {
-		"spring.application.name=myTestService-B",
-		"spring.cloud.consul.discovery.instanceId=myTestService1-B",
-		"spring.cloud.consul.discovery.port=4452",
-		"spring.cloud.consul.discovery.hostname=myhost",
-		"spring.cloud.consul.discovery.ipAddress=10.0.0.1",
-		"spring.cloud.consul.discovery.registerHealthCheck=false",
-		"spring.cloud.consul.discovery.failFast=false" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(
+		classes = ConsulAutoServiceRegistrationCustomizedPropsTests.TestPropsConfig.class,
+		properties = { "spring.application.name=myTestService-B",
+				"spring.cloud.consul.discovery.instanceId=myTestService1-B",
+				"spring.cloud.consul.discovery.port=4452",
+				"spring.cloud.consul.discovery.hostname=myhost",
+				"spring.cloud.consul.discovery.ipAddress=10.0.0.1",
+				"spring.cloud.consul.discovery.registerHealthCheck=false",
+				"spring.cloud.consul.discovery.failFast=false" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 
 	@Autowired

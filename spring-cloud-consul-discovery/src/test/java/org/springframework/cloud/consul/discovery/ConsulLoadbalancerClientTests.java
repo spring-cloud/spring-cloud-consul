@@ -39,9 +39,11 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = { "spring.application.name=testConsulLoadBalancer",
-		"spring.cloud.consul.discovery.prefer-ip-address=true",
-		"spring.cloud.consul.discovery.tags=foo=bar" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(
+		properties = { "spring.application.name=testConsulLoadBalancer",
+				"spring.cloud.consul.discovery.prefer-ip-address=true",
+				"spring.cloud.consul.discovery.tags=foo=bar" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulLoadbalancerClientTests {
 
 	@Autowired

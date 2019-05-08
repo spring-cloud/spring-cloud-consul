@@ -35,10 +35,13 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Niko Tung
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoRegistrationCheckTtlDeregisterCriticalServiceTests.TestConfig.class, properties = {
-		"spring.application.name=myConsulServiceRegistryHealthCheckTtlDeregisterCriticalServiceAfter-N",
-		"spring.cloud.consul.discovery.health-check-critical-timeout=1m",
-		"spring.cloud.consul.discovery.heartbeat.enabled=true" }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+		classes = ConsulAutoRegistrationCheckTtlDeregisterCriticalServiceTests.TestConfig.class,
+		properties = {
+				"spring.application.name=myConsulServiceRegistryHealthCheckTtlDeregisterCriticalServiceAfter-N",
+				"spring.cloud.consul.discovery.health-check-critical-timeout=1m",
+				"spring.cloud.consul.discovery.heartbeat.enabled=true" },
+		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ConsulAutoRegistrationCheckTtlDeregisterCriticalServiceTests {
 
 	@Autowired

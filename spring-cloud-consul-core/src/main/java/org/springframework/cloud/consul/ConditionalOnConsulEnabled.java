@@ -49,7 +49,8 @@ public @interface ConditionalOnConsulEnabled {
 		/**
 		 * Consul property is enabled.
 		 */
-		@ConditionalOnProperty(value = "spring.cloud.consul.enabled", matchIfMissing = true)
+		@ConditionalOnProperty(value = "spring.cloud.consul.enabled",
+				matchIfMissing = true)
 		static class FoundProperty {
 
 		}

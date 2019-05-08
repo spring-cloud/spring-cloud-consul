@@ -43,10 +43,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Lomesh Patel (lomeshpatel)
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationManagementServiceTests.TestConfig.class, properties = {
-		"spring.application.name=myTestService-EE",
-		"spring.cloud.consul.discovery.registerHealthCheck=false",
-		"management.server.port=4452" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(
+		classes = ConsulAutoServiceRegistrationManagementServiceTests.TestConfig.class,
+		properties = { "spring.application.name=myTestService-EE",
+				"spring.cloud.consul.discovery.registerHealthCheck=false",
+				"management.server.port=4452" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationManagementServiceTests {
 
 	@Autowired

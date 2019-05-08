@@ -40,8 +40,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedDiscoveryPortTests.TestConfig.class, properties = {
-		"spring.application.name=myTestService-DiscoveryPort" }, webEnvironment = DEFINED_PORT)
+@SpringBootTest(
+		classes = ConsulAutoServiceRegistrationCustomizedDiscoveryPortTests.TestConfig.class,
+		properties = { "spring.application.name=myTestService-DiscoveryPort" },
+		webEnvironment = DEFINED_PORT)
 public class ConsulAutoServiceRegistrationCustomizedDiscoveryPortTests {
 
 	@Autowired

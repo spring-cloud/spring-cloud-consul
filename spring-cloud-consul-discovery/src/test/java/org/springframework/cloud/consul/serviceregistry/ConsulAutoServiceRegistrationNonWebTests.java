@@ -38,9 +38,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationNonWebTests.TestConfig.class, properties = {
-		"spring.application.name=consulNonWebTest",
-		"server.port=32111" }, webEnvironment = NONE)
+@SpringBootTest(classes = ConsulAutoServiceRegistrationNonWebTests.TestConfig.class,
+		properties = { "spring.application.name=consulNonWebTest", "server.port=32111" },
+		webEnvironment = NONE)
 public class ConsulAutoServiceRegistrationNonWebTests {
 
 	@Autowired

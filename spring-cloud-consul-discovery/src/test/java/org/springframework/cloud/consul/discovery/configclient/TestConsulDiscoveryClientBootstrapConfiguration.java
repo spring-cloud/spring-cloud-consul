@@ -29,7 +29,8 @@ import org.springframework.context.annotation.Configuration;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-@ConditionalOnProperty(value = "spring.cloud.consul.discovery.test.enabled", matchIfMissing = false)
+@ConditionalOnProperty(value = "spring.cloud.consul.discovery.test.enabled",
+		matchIfMissing = false)
 @Configuration
 public class TestConsulDiscoveryClientBootstrapConfiguration {
 

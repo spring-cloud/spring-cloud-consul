@@ -41,7 +41,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = "spring.cloud.consul.discovery.query-passing=true", webEnvironment = RANDOM_PORT)
+@SpringBootTest(properties = "spring.cloud.consul.discovery.query-passing=true",
+		webEnvironment = RANDOM_PORT)
 public class ConsulServiceRegistryTests {
 
 	@Autowired(required = false)

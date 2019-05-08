@@ -40,9 +40,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoServiceRegistrationDisabledTests.TestConfig.class, properties = {
-		"spring.application.name=myTestNotRegisteredService2",
-		"spring.cloud.service-registry.auto-registration.enabled=false" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = ConsulAutoServiceRegistrationDisabledTests.TestConfig.class,
+		properties = { "spring.application.name=myTestNotRegisteredService2",
+				"spring.cloud.service-registry.auto-registration.enabled=false" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationDisabledTests {
 
 	@Autowired

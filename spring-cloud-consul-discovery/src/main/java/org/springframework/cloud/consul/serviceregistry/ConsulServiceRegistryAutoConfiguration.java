@@ -36,7 +36,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ConditionalOnConsulEnabled
-@ConditionalOnProperty(value = "spring.cloud.service-registry.enabled", matchIfMissing = true)
+@ConditionalOnProperty(value = "spring.cloud.service-registry.enabled",
+		matchIfMissing = true)
 @AutoConfigureBefore(ServiceRegistryAutoConfiguration.class)
 public class ConsulServiceRegistryAutoConfiguration {
 

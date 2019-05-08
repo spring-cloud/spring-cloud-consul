@@ -37,9 +37,11 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Lomesh Patel
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulAutoRegistrationHealthCheckHeadersTests.TestConfig.class, properties = {
-		"spring.application.name=myTestService-DiscoveryHealthCheckTlsSkipVerify",
-		"spring.cloud.consul.discovery.health-check-headers.X-Config-Token=ACCESSTOKEN" }, webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = ConsulAutoRegistrationHealthCheckHeadersTests.TestConfig.class,
+		properties = {
+				"spring.application.name=myTestService-DiscoveryHealthCheckTlsSkipVerify",
+				"spring.cloud.consul.discovery.health-check-headers.X-Config-Token=ACCESSTOKEN" },
+		webEnvironment = RANDOM_PORT)
 public class ConsulAutoRegistrationHealthCheckHeadersTests {
 
 	@Autowired
