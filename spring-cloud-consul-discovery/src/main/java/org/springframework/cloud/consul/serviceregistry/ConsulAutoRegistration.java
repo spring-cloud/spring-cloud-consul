@@ -147,7 +147,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		if (properties.isRegisterHealthCheck()) {
 			management.setCheck(createCheck(getManagementPort(properties, context),
 					heartbeatProperties, properties));
-		}else if (heartbeatProperties.isEnabled() && service.getCheck() == null)) {
+		}else if (heartbeatProperties.isEnabled() && management.getCheck() == null)) {
 			management.setCheck(createCheck(0, heartbeatProperties, properties));
 		}
 		ConsulAutoRegistration registration = new ConsulAutoRegistration(management,
