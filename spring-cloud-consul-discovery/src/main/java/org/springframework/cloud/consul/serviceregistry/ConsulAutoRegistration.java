@@ -127,6 +127,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 			}
 			Assert.notNull(checkPort, "checkPort may not be null");
 			service.setCheck(createCheck(checkPort, heartbeatProperties, properties));
+		}else if (heartbeatProperties.isEnabled() && service.getCheck() == null)) {
+			service.setCheck(createCheck(0, heartbeatProperties, properties));
 		}
 	}
 
@@ -145,6 +147,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		if (properties.isRegisterHealthCheck()) {
 			management.setCheck(createCheck(getManagementPort(properties, context),
 					heartbeatProperties, properties));
+		}else if (heartbeatProperties.isEnabled() && service.getCheck() == null)) {
+			management.setCheck(createCheck(0, heartbeatProperties, properties));
 		}
 		ConsulAutoRegistration registration = new ConsulAutoRegistration(management,
 				autoServiceRegistrationProperties, properties, context,
