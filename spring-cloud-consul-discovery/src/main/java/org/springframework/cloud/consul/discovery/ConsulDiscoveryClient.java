@@ -17,8 +17,10 @@
 package org.springframework.cloud.consul.discovery;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -112,18 +114,50 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		return instances;
 	}
 
+	private List<String> getAllDCServices(List<String> datacenters, String aclToken) {
+		Map<String, String> localDcMap = this.properties.getDatacenters();
+		Set<String> servicesList = new HashSet<>();
+		for (String datacenter : datacenters) {
+			Set<String> services;
+			QueryParams queryParams = new QueryParams(datacenter);
+			if (StringUtils.hasText(aclToken)) {
+				services = this.client.getCatalogServices(queryParams, aclToken)
+						.getValue().keySet();
+				servicesList.addAll(new ArrayList<>(services));
+			}
+			else {
+				services = this.client.getCatalogServices(queryParams, aclToken)
+						.getValue().keySet();
+				servicesList.addAll(new ArrayList<>(services));
+			}
+			for (String service : services) {
+				if (!localDcMap.containsKey(service)) {
+					localDcMap.put(service, datacenter);
+				}
+			}
+		}
+		this.properties.setDatacenters(localDcMap);
+		return new ArrayList<>(servicesList);
+	}
+
 	@Override
 	public List<String> getServices() {
 		String aclToken = this.properties.getAclToken();
 
-		if (StringUtils.hasText(aclToken)) {
-			return new ArrayList<>(
-					this.client.getCatalogServices(QueryParams.DEFAULT, aclToken)
-							.getValue().keySet());
+		List<String> datacenters = this.client.getCatalogDatacenters().getValue();
+		if (datacenters.size() > 1) {
+			return getAllDCServices(datacenters, aclToken);
 		}
 		else {
-			return new ArrayList<>(this.client.getCatalogServices(QueryParams.DEFAULT)
-					.getValue().keySet());
+			if (StringUtils.hasText(aclToken)) {
+				return new ArrayList<>(
+						this.client.getCatalogServices(QueryParams.DEFAULT, aclToken)
+								.getValue().keySet());
+			}
+			else {
+				return new ArrayList<>(this.client.getCatalogServices(QueryParams.DEFAULT)
+						.getValue().keySet());
+			}
 		}
 	}
 
