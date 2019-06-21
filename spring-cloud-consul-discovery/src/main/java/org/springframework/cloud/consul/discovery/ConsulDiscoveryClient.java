@@ -115,7 +115,6 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	private List<String> getAllDCServices(List<String> datacenters, String aclToken) {
-		Map<String, String> localDcMap = this.properties.getDatacenters();
 		Set<String> servicesList = new HashSet<>();
 		for (String datacenter : datacenters) {
 			Set<String> services;
@@ -130,13 +129,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 						.getValue().keySet();
 				servicesList.addAll(new ArrayList<>(services));
 			}
-			for (String service : services) {
-				if (!localDcMap.containsKey(service)) {
-					localDcMap.put(service, datacenter);
-				}
-			}
 		}
-		this.properties.setDatacenters(localDcMap);
 		return new ArrayList<>(servicesList);
 	}
 
