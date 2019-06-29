@@ -53,6 +53,7 @@ public class TtlScheduler {
 			ConsulDiscoveryProperties properties) {
 		this.configuration = configuration;
 		this.client = client;
+		this.properties = properties;
 	}
 
 	public ConsulDiscoveryProperties getConsulDiscoveryProperties() {

@@ -22,17 +22,15 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
- * @author Stéphane Leroy
+ * @author varnson
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TtlSchedulerAclTokenTests.TtlSchedulerTestConfig.class,
@@ -49,17 +47,16 @@ public class TtlSchedulerAclTokenTests {
 	@Test
 	public void ttlSchedulerTokenCheck() throws InterruptedException {
 
-		assertThat(ttlScheduler.getConsulDiscoveryProperties()).isNotNull()
-				.as("properties is null");
+		assertThat(ttlScheduler.getConsulDiscoveryProperties()).as("properties is null")
+				.isNotNull();
 		assertThat(ttlScheduler.getConsulDiscoveryProperties().getAclToken())
-				.isEqualTo("testtoken4ttl").as("ttl acl token error");
+				.as("ttl acl token error").isEqualTo("testtoken4ttl");
 
 	}
 
 	@Configuration
 	@EnableAutoConfiguration
-	@Import({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
-			ConsulDiscoveryClientConfiguration.class })
+	@EnableDiscoveryClient
 	public static class TtlSchedulerTestConfig {
 
 	}
