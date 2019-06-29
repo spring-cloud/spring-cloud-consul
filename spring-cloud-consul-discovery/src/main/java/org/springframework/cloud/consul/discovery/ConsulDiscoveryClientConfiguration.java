@@ -60,8 +60,9 @@ public class ConsulDiscoveryClientConfiguration {
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
 	// TODO: move to service-registry for Edgware
-	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties) {
-		return new TtlScheduler(heartbeatProperties, this.consulClient);
+	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties,
+			ConsulDiscoveryProperties properties) {
+		return new TtlScheduler(heartbeatProperties, this.consulClient, properties);
 	}
 
 	@Bean

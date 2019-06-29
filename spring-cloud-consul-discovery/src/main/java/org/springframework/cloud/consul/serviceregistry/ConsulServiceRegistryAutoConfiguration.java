@@ -57,8 +57,9 @@ public class ConsulServiceRegistryAutoConfiguration {
 	@ConditionalOnMissingBean
 	@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
 	public TtlScheduler ttlScheduler(ConsulClient consulClient,
-			HeartbeatProperties heartbeatProperties) {
-		return new TtlScheduler(heartbeatProperties, consulClient);
+			HeartbeatProperties heartbeatProperties,
+			ConsulDiscoveryProperties properties) {
+		return new TtlScheduler(heartbeatProperties, consulClient, properties);
 	}
 
 	@Bean
