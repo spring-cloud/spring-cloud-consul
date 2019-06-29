@@ -116,6 +116,11 @@ public class ConsulDiscoveryProperties {
 	private String instanceGroup;
 
 	/**
+	 * Whether hostname is included into the default instance id when registering service.
+	 */
+	private boolean includeHostnameInInstanceId = false;
+
+	/**
 	 * Service instance zone comes from metadata. This allows changing the metadata tag
 	 * name.
 	 */
@@ -388,6 +393,14 @@ public class ConsulDiscoveryProperties {
 
 	public void setInstanceGroup(String instanceGroup) {
 		this.instanceGroup = instanceGroup;
+	}
+
+	public boolean isIncludeHostnameInInstanceId() {
+		return includeHostnameInInstanceId;
+	}
+
+	public void setIncludeHostnameInInstanceId(boolean includeHostnameInInstanceId) {
+		this.includeHostnameInInstanceId = includeHostnameInInstanceId;
 	}
 
 	public String getDefaultZoneMetadataName() {
