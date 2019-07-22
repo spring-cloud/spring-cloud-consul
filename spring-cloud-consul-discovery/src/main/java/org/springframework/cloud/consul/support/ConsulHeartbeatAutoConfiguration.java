@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.consul;
+package org.springframework.cloud.consul.support;
 
 import com.ecwid.consul.v1.ConsulClient;
 
@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
+import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;

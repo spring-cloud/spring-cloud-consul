@@ -5,7 +5,7 @@ org.springframework.cloud.consul.serviceregistry.ConsulAutoServiceRegistrationAu
 org.springframework.cloud.consul.serviceregistry.ConsulServiceRegistryAutoConfiguration,\
 org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration,\
 org.springframework.cloud.consul.discovery.ConsulCatalogWatchAutoConfiguration, \
-org.springframework.cloud.consul.ConsulHeartbeatAutoConfiguration
+org.springframework.cloud.consul.support.ConsulHeartbeatAutoConfiguration
 org.springframework.cloud.bootstrap.BootstrapConfiguration=\
 org.springframework.cloud.consul.discovery.configclient.ConsulDiscoveryClientConfigServiceBootstrapConfiguration
 
