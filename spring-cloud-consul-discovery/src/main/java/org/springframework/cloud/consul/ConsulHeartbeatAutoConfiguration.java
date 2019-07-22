@@ -14,41 +14,34 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.consul.serviceregistry;
+package org.springframework.cloud.consul;
 
 import com.ecwid.consul.v1.ConsulClient;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.client.serviceregistry.ServiceRegistryAutoConfiguration;
-import org.springframework.cloud.commons.util.InetUtils;
-import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
-import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
+import org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
+import org.springframework.cloud.consul.serviceregistry.ConsulServiceRegistryAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author Spencer Gibb
+ * Auto configuration for the heartbeat.
+ *
  * @author Tim Ysewyn
  */
 @Configuration
 @ConditionalOnConsulEnabled
-@ConditionalOnProperty(value = "spring.cloud.service-registry.enabled", matchIfMissing = true)
-@AutoConfigureBefore(ServiceRegistryAutoConfiguration.class)
-public class ConsulServiceRegistryAutoConfiguration {
-
-	@Bean
-	@ConditionalOnMissingBean
-	public ConsulServiceRegistry consulServiceRegistry(ConsulClient consulClient,
-			ConsulDiscoveryProperties properties, HeartbeatProperties heartbeatProperties,
-			@Autowired(required = false) TtlScheduler ttlScheduler) {
-		return new ConsulServiceRegistry(consulClient, properties, ttlScheduler,
-				heartbeatProperties);
-	}
+@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
+@ConditionalOnDiscoveryEnabled
+@AutoConfigureBefore({ ConsulServiceRegistryAutoConfiguration.class })
+@AutoConfigureAfter({ ConsulDiscoveryClientConfiguration.class })
+public class ConsulHeartbeatAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -58,9 +51,9 @@ public class ConsulServiceRegistryAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	// TODO: Split appropriate values to service-registry for Edgware
-	public ConsulDiscoveryProperties consulDiscoveryProperties(InetUtils inetUtils) {
-		return new ConsulDiscoveryProperties(inetUtils);
+	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties,
+			ConsulClient consulClient) {
+		return new TtlScheduler(heartbeatProperties, consulClient);
 	}
 
 }
