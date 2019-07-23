@@ -33,6 +33,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Spencer Gibb
+ * @author Tim Ysewyn
  */
 @Configuration
 @ConditionalOnConsulEnabled
@@ -40,24 +41,13 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureBefore(ServiceRegistryAutoConfiguration.class)
 public class ConsulServiceRegistryAutoConfiguration {
 
-	@Autowired(required = false)
-	private TtlScheduler ttlScheduler;
-
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulServiceRegistry consulServiceRegistry(ConsulClient consulClient,
-			ConsulDiscoveryProperties properties,
-			HeartbeatProperties heartbeatProperties) {
-		return new ConsulServiceRegistry(consulClient, properties, this.ttlScheduler,
+			ConsulDiscoveryProperties properties, HeartbeatProperties heartbeatProperties,
+			@Autowired(required = false) TtlScheduler ttlScheduler) {
+		return new ConsulServiceRegistry(consulClient, properties, ttlScheduler,
 				heartbeatProperties);
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
-	@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
-	public TtlScheduler ttlScheduler(ConsulClient consulClient,
-			HeartbeatProperties heartbeatProperties) {
-		return new TtlScheduler(heartbeatProperties, consulClient);
 	}
 
 	@Bean
@@ -68,6 +58,7 @@ public class ConsulServiceRegistryAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
+	// TODO: Split appropriate values to service-registry for Edgware
 	public ConsulDiscoveryProperties consulDiscoveryProperties(InetUtils inetUtils) {
 		return new ConsulDiscoveryProperties(inetUtils);
 	}

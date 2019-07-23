@@ -30,6 +30,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.support.ConsulHeartbeatAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -80,7 +81,8 @@ public class TtlSchedulerTests {
 	@Configuration
 	@EnableAutoConfiguration
 	@Import({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
-			ConsulDiscoveryClientConfiguration.class })
+			ConsulDiscoveryClientConfiguration.class,
+			ConsulHeartbeatAutoConfiguration.class })
 	public static class TtlSchedulerTestConfig {
 
 	}
