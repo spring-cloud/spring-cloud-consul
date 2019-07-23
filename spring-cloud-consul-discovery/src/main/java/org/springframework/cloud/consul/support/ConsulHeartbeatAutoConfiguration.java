@@ -14,54 +14,47 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.consul.discovery;
+package org.springframework.cloud.consul.support;
 
 import com.ecwid.consul.v1.ConsulClient;
 
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.client.CommonsClientAutoConfiguration;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
-import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
-import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
+import org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration;
+import org.springframework.cloud.consul.discovery.HeartbeatProperties;
+import org.springframework.cloud.consul.discovery.TtlScheduler;
+import org.springframework.cloud.consul.serviceregistry.ConsulServiceRegistryAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author Spencer Gibb
- * @author Olga Maciaszek-Sharma
+ * Auto configuration for the heartbeat.
+ *
  * @author Tim Ysewyn
  */
 @Configuration
 @ConditionalOnConsulEnabled
-@ConditionalOnProperty(value = "spring.cloud.consul.discovery.enabled", matchIfMissing = true)
+@ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
 @ConditionalOnDiscoveryEnabled
-@EnableConfigurationProperties
-@AutoConfigureBefore({ SimpleDiscoveryClientAutoConfiguration.class,
-		CommonsClientAutoConfiguration.class })
-public class ConsulDiscoveryClientConfiguration {
-
-	/**
-	 * Name of the catalog watch task scheduler bean.
-	 * @Deprecated Moved to {@link ConsulCatalogWatchAutoConfiguration}.
-	 */
-	@Deprecated
-	public static final String CATALOG_WATCH_TASK_SCHEDULER_NAME = ConsulCatalogWatchAutoConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME;
+@AutoConfigureBefore({ ConsulServiceRegistryAutoConfiguration.class })
+@AutoConfigureAfter({ ConsulDiscoveryClientConfiguration.class })
+public class ConsulHeartbeatAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulDiscoveryProperties consulDiscoveryProperties(InetUtils inetUtils) {
-		return new ConsulDiscoveryProperties(inetUtils);
+	public HeartbeatProperties heartbeatProperties() {
+		return new HeartbeatProperties();
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulDiscoveryClient consulDiscoveryClient(ConsulClient consulClient,
-			ConsulDiscoveryProperties discoveryProperties) {
-		return new ConsulDiscoveryClient(consulClient, discoveryProperties);
+	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties,
+			ConsulClient consulClient) {
+		return new TtlScheduler(heartbeatProperties, consulClient);
 	}
 
 }
