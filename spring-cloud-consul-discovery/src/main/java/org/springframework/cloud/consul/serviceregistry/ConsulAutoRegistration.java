@@ -87,6 +87,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		}
 		service.setName(normalizeForDns(appName));
 		service.setTags(createTags(properties));
+		service.setEnableTagOverride(properties.isEnableTagOverride());
+		service.setMeta(properties.getMetadata());
 
 		if (properties.getPort() != null) {
 			service.setPort(properties.getPort());

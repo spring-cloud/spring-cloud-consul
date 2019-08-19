@@ -53,7 +53,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 				"spring.cloud.consul.discovery.hostname=myhost",
 				"spring.cloud.consul.discovery.ipAddress=10.0.0.1",
 				"spring.cloud.consul.discovery.registerHealthCheck=false",
-				"spring.cloud.consul.discovery.failFast=false" },
+				"spring.cloud.consul.discovery.failFast=false",
+				"spring.cloud.consul.discovery.enableTagOverride=true",
+				"spring.cloud.consul.discovery.metadata.key1=value1",
+				"spring.cloud.consul.discovery.metadata.key2=value2" },
 		webEnvironment = RANDOM_PORT)
 public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 
@@ -81,6 +84,12 @@ public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 				.isEqualTo(this.properties.getIpAddress());
 		assertThat("myhost").as("service address was wrong")
 				.isEqualTo(service.getAddress());
+		assertThat(service.getEnableTagOverride())
+				.as("property enableTagOverride was wrong").isTrue();
+		assertThat(service.getMeta()).as("property metadata contains the wrong keys")
+				.containsOnlyKeys("key1", "key2");
+		assertThat(service.getMeta()).as("property metadata contains the wrong values")
+				.containsEntry("key1", "value1").containsEntry("key2", "value2");
 
 		Response<List<Check>> checkResponse = this.consul
 				.getHealthChecksForService("myTestService-B", QueryParams.DEFAULT);
