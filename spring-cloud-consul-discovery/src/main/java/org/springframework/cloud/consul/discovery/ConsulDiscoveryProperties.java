@@ -257,6 +257,22 @@ public class ConsulDiscoveryProperties {
 		this.tags = tags;
 	}
 
+	public boolean isEnableTagOverride() {
+		return enableTagOverride;
+	}
+
+	public void setEnableTagOverride(boolean enableTagOverride) {
+		this.enableTagOverride = enableTagOverride;
+	}
+
+	public Map<String, String> getMetadata() {
+		return metadata;
+	}
+
+	public void setMetadata(Map<String, String> metadata) {
+		this.metadata = metadata;
+	}
+
 	public boolean isEnabled() {
 		return this.enabled;
 	}
@@ -584,7 +600,8 @@ public class ConsulDiscoveryProperties {
 	public String toString() {
 		return new ToStringCreator(this).append("hostInfo", this.hostInfo)
 				.append("aclToken", this.aclToken).append("tags", this.tags)
-				.append("enabled", this.enabled)
+				.append("enableTagOverride", this.enableTagOverride)
+				.append("metadata", this.metadata).append("enabled", this.enabled)
 				.append("managementTags", this.managementTags)
 				.append("healthCheckPath", this.healthCheckPath)
 				.append("healthCheckUrl", this.healthCheckUrl)
