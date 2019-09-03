@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.config;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -157,7 +158,8 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		}
 		else if (format == YAML) {
 			final YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
-			yaml.setResources(new ByteArrayResource(value.getBytes()));
+			yaml.setResources(
+					new ByteArrayResource(value.getBytes(Charset.forName("UTF-8"))));
 
 			return yaml.getObject();
 		}
