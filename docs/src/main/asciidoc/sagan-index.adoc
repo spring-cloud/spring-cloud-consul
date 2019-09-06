@@ -6,6 +6,7 @@ Spring Cloud Consul features:
 
 * Service Discovery: instances can be registered with the Consul agent and clients can discover the instances using Spring-managed beans
  * Supports Ribbon, the client side load-balancer via Spring Cloud Netflix
+ * Supports Spring Cloud LoadBalancer - a client side load-balancer provided by the Spring Cloud project
  * Supports Zuul, a dynamic router and filter via Spring Cloud Netflix
 * Distributed Configuration: using the Consul Key/Value store
 * Control Bus: Distributed control events using Consul Events
