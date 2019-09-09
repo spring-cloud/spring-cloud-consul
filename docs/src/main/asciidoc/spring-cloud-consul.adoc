@@ -229,7 +229,7 @@ spring:
 
 === Looking up services
 
-==== Using Ribbon
+==== Using Load-balancer
 
 Spring Cloud has support for https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign[Feign] (a REST client builder) and also https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-ribbon[Spring `RestTemplate`]
 for looking up services using the logical service names/ids instead of physical URLs. Both Feign and the discovery-aware RestTemplate utilize https://cloud.spring.io/spring-cloud-netflix/single/spring-cloud-netflix.html#spring-cloud-ribbon[Ribbon] for client-side load balancing.
@@ -258,6 +258,13 @@ public String getFirstProduct() {
 If you have Consul clusters in multiple datacenters and you want to access a service in another datacenter a service name/id alone is not enough. In that case
 you use property `spring.cloud.consul.discovery.datacenters.STORES=dc-west` where `STORES` is the service name/id and `dc-west` is the datacenter
 where the STORES service lives.
+
+TIP: Spring Cloud now also offers support for
+https://cloud.spring.io/spring-cloud-commons/reference/html/#_spring_resttemplate_as_a_load_balancer_client[Spring Cloud LoadBalancer].
+
+As Spring Cloud Ribbon is now under maintenance, we suggest you set `spring.cloud.loadbalancer.ribbon.enabled`
+to `false`, so that `BlockingLoadBalancerClient` is used instead of `RibbonLoadBalancerClient`.
+
 
 ==== Using the DiscoveryClient
 
