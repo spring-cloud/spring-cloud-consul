@@ -446,7 +446,7 @@ spring.cloud.consul.discovery.management-tags</pre>
 <div class="sect2">
 <h3 id="_looking_up_services"><a class="link" href="#_looking_up_services">Looking up services</a></h3>
 <div class="sect3">
-<h4 id="_using_ribbon"><a class="link" href="#_using_ribbon">Using Ribbon</a></h4>
+<h4 id="_using_load_balancer"><a class="link" href="#_using_load_balancer">Using Load-balancer</a></h4>
 <div class="paragraph">
 <p>Spring Cloud has support for <a href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign">Feign</a> (a REST client builder) and also <a href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-ribbon">Spring <code>RestTemplate</code></a>
 for looking up services using the logical service names/ids instead of physical URLs. Both Feign and the discovery-aware RestTemplate utilize <a href="https://cloud.spring.io/spring-cloud-netflix/single/spring-cloud-netflix.html#spring-cloud-ribbon">Ribbon</a> for client-side load balancing.</p>
@@ -480,6 +480,23 @@ public String getFirstProduct() {
 <p>If you have Consul clusters in multiple datacenters and you want to access a service in another datacenter a service name/id alone is not enough. In that case
 you use property <code>spring.cloud.consul.discovery.datacenters.STORES=dc-west</code> where <code>STORES</code> is the service name/id and <code>dc-west</code> is the datacenter
 where the STORES service lives.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Spring Cloud now also offers support for
+<a href="https://cloud.spring.io/spring-cloud-commons/reference/html/#_spring_resttemplate_as_a_load_balancer_client">Spring Cloud LoadBalancer</a>.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>As Spring Cloud Ribbon is now under maintenance, we suggest you set <code>spring.cloud.loadbalancer.ribbon.enabled</code>
+to <code>false</code>, so that <code>BlockingLoadBalancerClient</code> is used instead of <code>RibbonLoadBalancerClient</code>.</p>
 </div>
 </div>
 <div class="sect3">
