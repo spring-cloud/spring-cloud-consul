@@ -262,8 +262,8 @@ where the STORES service lives.
 TIP: Spring Cloud now also offers support for
 https://cloud.spring.io/spring-cloud-commons/reference/html/#_spring_resttemplate_as_a_load_balancer_client[Spring Cloud LoadBalancer].
 
-As Spring Cloud Ribbon is now under maintenance, we suggest you set `spring.cloud.loadbalancer.default`
-to `true`, so that `BlockingLoadBalancerClient` is used instead of `RibbonLoadBalancerClient`.
+As Spring Cloud Ribbon is now under maintenance, we suggest you set `spring.cloud.loadbalancer.ribbon.enabled`
+to `false`, so that `BlockingLoadBalancerClient` is used instead of `RibbonLoadBalancerClient`.
 
 
 ==== Using the DiscoveryClient
