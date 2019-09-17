@@ -96,35 +96,50 @@ $(addBlockSwitches);
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#spring-cloud-consul-install">Install Consul</a></li>
-<li><a href="#spring-cloud-consul-agent">Consul Agent</a></li>
-<li><a href="#spring-cloud-consul-discovery">Service Discovery with Consul</a>
+<li><a href="#spring-cloud-consul-install">1. Install Consul</a></li>
+<li><a href="#spring-cloud-consul-agent">2. Consul Agent</a></li>
+<li><a href="#spring-cloud-consul-discovery">3. Service Discovery with Consul</a>
 <ul class="sectlevel2">
-<li><a href="#_how_to_activate">How to activate</a></li>
-<li><a href="#_registering_with_consul">Registering with Consul</a></li>
-<li><a href="#_http_health_check">HTTP Health Check</a></li>
-<li><a href="#_looking_up_services">Looking up services</a></li>
-<li><a href="#_consul_catalog_watch">Consul Catalog Watch</a></li>
+<li><a href="#how-to-activate">3.1. How to activate</a></li>
+<li><a href="#registering-with-consul">3.2. Registering with Consul</a>
+<ul class="sectlevel3">
+<li><a href="#registering-management-as-a-separate-service">3.2.1. Registering Management as a Separate Service</a></li>
 </ul>
 </li>
-<li><a href="#spring-cloud-consul-config">Distributed Configuration with Consul</a>
-<ul class="sectlevel2">
-<li><a href="#_how_to_activate_2">How to activate</a></li>
-<li><a href="#_customizing">Customizing</a></li>
-<li><a href="#spring-cloud-consul-config-watch">Config Watch</a></li>
-<li><a href="#spring-cloud-consul-config-format">YAML or Properties with Config</a></li>
-<li><a href="#spring-cloud-consul-config-git2consul">git2consul with Config</a></li>
-<li><a href="#spring-cloud-consul-failfast">Fail Fast</a></li>
+<li><a href="#http-health-check">3.3. HTTP Health Check</a>
+<ul class="sectlevel3">
+<li><a href="#metadata-and-consul-tags">3.3.1. Metadata and Consul tags</a></li>
+<li><a href="#making-the-consul-instance-id-unique">3.3.2. Making the Consul Instance ID Unique</a></li>
+<li><a href="#applying-headers-to-health-check-requests">3.3.3. Applying Headers to Health Check Requests</a></li>
 </ul>
 </li>
-<li><a href="#spring-cloud-consul-retry">Consul Retry</a></li>
-<li><a href="#spring-cloud-consul-bus">Spring Cloud Bus with Consul</a>
-<ul class="sectlevel2">
-<li><a href="#_how_to_activate_3">How to activate</a></li>
+<li><a href="#looking-up-services">3.4. Looking up services</a>
+<ul class="sectlevel3">
+<li><a href="#using-load-balancer">3.4.1. Using Load-balancer</a></li>
+<li><a href="#using-the-discoveryclient">3.4.2. Using the DiscoveryClient</a></li>
 </ul>
 </li>
-<li><a href="#spring-cloud-consul-hystrix">Circuit Breaker with Hystrix</a></li>
-<li><a href="#spring-cloud-consul-turbine">Hystrix metrics aggregation with Turbine and Consul</a></li>
+<li><a href="#consul-catalog-watch">3.5. Consul Catalog Watch</a></li>
+</ul>
+</li>
+<li><a href="#spring-cloud-consul-config">4. Distributed Configuration with Consul</a>
+<ul class="sectlevel2">
+<li><a href="#how-to-activate-2">4.1. How to activate</a></li>
+<li><a href="#customizing">4.2. Customizing</a></li>
+<li><a href="#spring-cloud-consul-config-watch">4.3. Config Watch</a></li>
+<li><a href="#spring-cloud-consul-config-format">4.4. YAML or Properties with Config</a></li>
+<li><a href="#spring-cloud-consul-config-git2consul">4.5. git2consul with Config</a></li>
+<li><a href="#spring-cloud-consul-failfast">4.6. Fail Fast</a></li>
+</ul>
+</li>
+<li><a href="#spring-cloud-consul-retry">5. Consul Retry</a></li>
+<li><a href="#spring-cloud-consul-bus">6. Spring Cloud Bus with Consul</a>
+<ul class="sectlevel2">
+<li><a href="#how-to-activate-3">6.1. How to activate</a></li>
+</ul>
+</li>
+<li><a href="#spring-cloud-consul-hystrix">7. Circuit Breaker with Hystrix</a></li>
+<li><a href="#spring-cloud-consul-turbine">8. Hystrix metrics aggregation with Turbine and Consul</a></li>
 </ul>
 </div>
 </div>
@@ -146,7 +161,7 @@ Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon), Circuit Brea
 </div>
 </div>
 <div class="sect1">
-<h2 id="spring-cloud-consul-install"><a class="link" href="#spring-cloud-consul-install">Install Consul</a></h2>
+<h2 id="spring-cloud-consul-install"><a class="anchor" href="#spring-cloud-consul-install"></a><a class="link" href="#spring-cloud-consul-install">1. Install Consul</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Please see the <a href="https://www.consul.io/intro/getting-started/install.html">installation documentation</a> for instructions on how to install Consul.</p>
@@ -154,7 +169,7 @@ Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon), Circuit Brea
 </div>
 </div>
 <div class="sect1">
-<h2 id="spring-cloud-consul-agent"><a class="link" href="#spring-cloud-consul-agent">Consul Agent</a></h2>
+<h2 id="spring-cloud-consul-agent"><a class="anchor" href="#spring-cloud-consul-agent"></a><a class="link" href="#spring-cloud-consul-agent">2. Consul Agent</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>A Consul Agent client must be available to all Spring Cloud Consul applications.  By default, the Agent client is expected to be at <code>localhost:8500</code>.  See the <a href="https://consul.io/docs/agent/basics.html">Agent documentation</a> for specifics on how to start an Agent client and how to connect to a cluster of Consul Agent Servers.  For development, after you have installed consul, you may start a Consul Agent using the following command:</p>
@@ -165,24 +180,24 @@ Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon), Circuit Brea
 </div>
 </div>
 <div class="paragraph">
-<p>This will start an agent in server mode on port 8500, with the ui available at <a href="http://localhost:8500" class="bare">http://localhost:8500</a></p>
+<p>This will start an agent in server mode on port 8500, with the ui available at <a href="http://localhost:8500" class="bare">localhost:8500</a></p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="spring-cloud-consul-discovery"><a class="link" href="#spring-cloud-consul-discovery">Service Discovery with Consul</a></h2>
+<h2 id="spring-cloud-consul-discovery"><a class="anchor" href="#spring-cloud-consul-discovery"></a><a class="link" href="#spring-cloud-consul-discovery">3. Service Discovery with Consul</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Service Discovery is one of the key tenets of a microservice based architecture. Trying to hand configure each client or some form of convention can be very difficult to do and can be very brittle.  Consul provides Service Discovery services via an <a href="https://www.consul.io/docs/agent/http.html">HTTP API</a> and <a href="https://www.consul.io/docs/agent/dns.html">DNS</a>.  Spring Cloud Consul leverages the HTTP API for service registration and discovery.  This does not prevent non-Spring Cloud applications from leveraging the DNS interface.  Consul Agents servers are run in a <a href="https://www.consul.io/docs/internals/architecture.html">cluster</a> that communicates via a <a href="https://www.consul.io/docs/internals/gossip.html">gossip protocol</a> and uses the <a href="https://www.consul.io/docs/internals/consensus.html">Raft consensus protocol</a>.</p>
 </div>
 <div class="sect2">
-<h3 id="_how_to_activate"><a class="link" href="#_how_to_activate">How to activate</a></h3>
+<h3 id="how-to-activate"><a class="anchor" href="#how-to-activate"></a><a class="link" href="#how-to-activate">3.1. How to activate</a></h3>
 <div class="paragraph">
 <p>To activate Consul Service Discovery use the starter with group <code>org.springframework.cloud</code> and artifact id <code>spring-cloud-starter-consul-discovery</code>. See the <a href="https://projects.spring.io/spring-cloud/">Spring Cloud Project page</a> for details on setting up your build system with the current Spring Cloud Release Train.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_registering_with_consul"><a class="link" href="#_registering_with_consul">Registering with Consul</a></h3>
+<h3 id="registering-with-consul"><a class="anchor" href="#registering-with-consul"></a><a class="link" href="#registering-with-consul">3.2. Registering with Consul</a></h3>
 <div class="paragraph">
 <p>When a client registers with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An HTTP <a href="https://www.consul.io/docs/agent/checks.html">Check</a> is created by default that Consul hits the <code>/health</code> endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.</p>
 </div>
@@ -242,7 +257,7 @@ If you use <a href="#spring-cloud-consul-config">Spring Cloud Consul Config</a>,
 <p>To disable the service registration you can set <code>spring.cloud.consul.discovery.register</code> to <code>false</code>.</p>
 </div>
 <div class="sect3">
-<h4 id="_registering_management_as_a_separate_service"><a class="link" href="#_registering_management_as_a_separate_service">Registering Management as a Separate Service</a></h4>
+<h4 id="registering-management-as-a-separate-service"><a class="anchor" href="#registering-management-as-a-separate-service"></a><a class="link" href="#registering-management-as-a-separate-service">3.2.1. Registering Management as a Separate Service</a></h4>
 <div class="paragraph">
 <p>When management server port is set to something different than the application port, by setting <code>management.server.port</code> property, management service will be registered as a separate service than the application service. For example:</p>
 </div>
@@ -353,7 +368,7 @@ spring.cloud.consul.discovery.management-tags</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_http_health_check"><a class="link" href="#_http_health_check">HTTP Health Check</a></h3>
+<h3 id="http-health-check"><a class="anchor" href="#http-health-check"></a><a class="link" href="#http-health-check">3.3. HTTP Health Check</a></h3>
 <div class="paragraph">
 <p>The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. <code>server.servletPath=/foo</code>) or management endpoint path (e.g. <code>management.server.servlet.context-path=/admin</code>). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectively.  Example:</p>
 </div>
@@ -372,7 +387,7 @@ spring.cloud.consul.discovery.management-tags</pre>
 <p>You can disable the health check by setting <code>management.health.consul.enabled=false</code>.</p>
 </div>
 <div class="sect3">
-<h4 id="_metadata_and_consul_tags"><a class="link" href="#_metadata_and_consul_tags">Metadata and Consul tags</a></h4>
+<h4 id="metadata-and-consul-tags"><a class="anchor" href="#metadata-and-consul-tags"></a><a class="link" href="#metadata-and-consul-tags">3.3.1. Metadata and Consul tags</a></h4>
 <div class="paragraph">
 <p>Consul does not yet support metadata on services. Spring Cloud&#8217;s <code>ServiceInstance</code> has a <code>Map&lt;String, String&gt; metadata</code> field. Spring Cloud Consul uses Consul tags to approximate metadata until Consul officially supports metadata. Tags with the form <code>key=value</code> will be split and used as a <code>Map</code> key and value respectively. Tags without the equal <code>=</code> sign, will be used as both the key and value.</p>
 </div>
@@ -391,7 +406,7 @@ spring.cloud.consul.discovery.management-tags</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_making_the_consul_instance_id_unique"><a class="link" href="#_making_the_consul_instance_id_unique">Making the Consul Instance ID Unique</a></h4>
+<h4 id="making-the-consul-instance-id-unique"><a class="anchor" href="#making-the-consul-instance-id-unique"></a><a class="link" href="#making-the-consul-instance-id-unique">3.3.2. Making the Consul Instance ID Unique</a></h4>
 <div class="paragraph">
 <p>By default a consul instance is registered with an ID that is equal to its Spring Application Context ID. By default, the Spring Application Context ID is <code>${spring.application.name}:comma,separated,profiles:${server.port}</code>. For most cases, this will allow multiple instances of one service to run on one machine.  If further uniqueness is required, Using Spring Cloud you can override this by providing a unique identifier in <code>spring.cloud.consul.discovery.instanceId</code>. For example:</p>
 </div>
@@ -410,7 +425,7 @@ spring.cloud.consul.discovery.management-tags</pre>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_applying_headers_to_health_check_requests"><a class="link" href="#_applying_headers_to_health_check_requests">Applying Headers to Health Check Requests</a></h4>
+<h4 id="applying-headers-to-health-check-requests"><a class="anchor" href="#applying-headers-to-health-check-requests"></a><a class="link" href="#applying-headers-to-health-check-requests">3.3.3. Applying Headers to Health Check Requests</a></h4>
 <div class="paragraph">
 <p>Headers can be applied to health check requests. For example, if you&#8217;re trying to register a <a href="https://cloud.spring.io/spring-cloud-config/">Spring Cloud Config</a> server that uses <a href="https://github.com/spring-cloud/spring-cloud-config/blob/master/docs/src/main/asciidoc/spring-cloud-config.adoc#vault-backend">Vault Backend</a>:</p>
 </div>
@@ -444,9 +459,9 @@ spring.cloud.consul.discovery.management-tags</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_looking_up_services"><a class="link" href="#_looking_up_services">Looking up services</a></h3>
+<h3 id="looking-up-services"><a class="anchor" href="#looking-up-services"></a><a class="link" href="#looking-up-services">3.4. Looking up services</a></h3>
 <div class="sect3">
-<h4 id="_using_load_balancer"><a class="link" href="#_using_load_balancer">Using Load-balancer</a></h4>
+<h4 id="using-load-balancer"><a class="anchor" href="#using-load-balancer"></a><a class="link" href="#using-load-balancer">3.4.1. Using Load-balancer</a></h4>
 <div class="paragraph">
 <p>Spring Cloud has support for <a href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign">Feign</a> (a REST client builder) and also <a href="https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-ribbon">Spring <code>RestTemplate</code></a>
 for looking up services using the logical service names/ids instead of physical URLs. Both Feign and the discovery-aware RestTemplate utilize <a href="https://cloud.spring.io/spring-cloud-netflix/single/spring-cloud-netflix.html#spring-cloud-ribbon">Ribbon</a> for client-side load balancing.</p>
@@ -500,7 +515,7 @@ to <code>false</code>, so that <code>BlockingLoadBalancerClient</code> is used i
 </div>
 </div>
 <div class="sect3">
-<h4 id="_using_the_discoveryclient"><a class="link" href="#_using_the_discoveryclient">Using the DiscoveryClient</a></h4>
+<h4 id="using-the-discoveryclient"><a class="anchor" href="#using-the-discoveryclient"></a><a class="link" href="#using-the-discoveryclient">3.4.2. Using the DiscoveryClient</a></h4>
 <div class="paragraph">
 <p>You can also use the <code>org.springframework.cloud.client.discovery.DiscoveryClient</code> which provides a simple API for discovery clients that is not specific to Netflix, e.g.</p>
 </div>
@@ -521,7 +536,7 @@ public String serviceUrl() {
 </div>
 </div>
 <div class="sect2">
-<h3 id="_consul_catalog_watch"><a class="link" href="#_consul_catalog_watch">Consul Catalog Watch</a></h3>
+<h3 id="consul-catalog-watch"><a class="anchor" href="#consul-catalog-watch"></a><a class="link" href="#consul-catalog-watch">3.5. Consul Catalog Watch</a></h3>
 <div class="paragraph">
 <p>The Consul Catalog Watch takes advantage of the ability of consul to <a href="https://www.consul.io/docs/agent/watches.html#services">watch services</a>. The Catalog Watch makes a blocking Consul HTTP API call to determine if any services have changed. If there is new service data a Heartbeat Event is published.</p>
 </div>
@@ -538,7 +553,7 @@ public String serviceUrl() {
 </div>
 </div>
 <div class="sect1">
-<h2 id="spring-cloud-consul-config"><a class="link" href="#spring-cloud-consul-config">Distributed Configuration with Consul</a></h2>
+<h2 id="spring-cloud-consul-config"><a class="anchor" href="#spring-cloud-consul-config"></a><a class="link" href="#spring-cloud-consul-config">4. Distributed Configuration with Consul</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Consul provides a <a href="https://consul.io/docs/agent/http/kv.html">Key/Value Store</a> for storing configuration and other metadata.  Spring Cloud Consul Config is an alternative to the <a href="https://github.com/spring-cloud/spring-cloud-config">Config Server and Client</a>.  Configuration is loaded into the Spring Environment during the special "bootstrap" phase.  Configuration is stored in the <code>/config</code> folder by default.  Multiple <code>PropertySource</code> instances are created based on the application&#8217;s name and the active profiles that mimicks the Spring Cloud Config order of resolving properties.  For example, an application with the name "testApp" and with the "dev" profile will have the following property sources created:</p>
@@ -558,7 +573,7 @@ config/application/</pre>
 <p>Configuration is currently read on startup of the application.  Sending a HTTP POST to <code>/refresh</code> will cause the configuration to be reloaded. <a href="#spring-cloud-consul-config-watch">Config Watch</a> will also automatically detect changes and reload the application context.</p>
 </div>
 <div class="sect2">
-<h3 id="_how_to_activate_2"><a class="link" href="#_how_to_activate_2">How to activate</a></h3>
+<h3 id="how-to-activate-2"><a class="anchor" href="#how-to-activate-2"></a><a class="link" href="#how-to-activate-2">4.1. How to activate</a></h3>
 <div class="paragraph">
 <p>To get started with Consul Configuration use the starter with group <code>org.springframework.cloud</code> and artifact id <code>spring-cloud-starter-consul-config</code>. See the <a href="https://projects.spring.io/spring-cloud/">Spring Cloud Project page</a> for details on setting up your build system with the current Spring Cloud Release Train.</p>
 </div>
@@ -567,7 +582,7 @@ config/application/</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_customizing"><a class="link" href="#_customizing">Customizing</a></h3>
+<h3 id="customizing"><a class="anchor" href="#customizing"></a><a class="link" href="#customizing">4.2. Customizing</a></h3>
 <div class="paragraph">
 <p>Consul Config may be customized using the following properties:</p>
 </div>
@@ -602,7 +617,7 @@ config/application/</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="spring-cloud-consul-config-watch"><a class="link" href="#spring-cloud-consul-config-watch">Config Watch</a></h3>
+<h3 id="spring-cloud-consul-config-watch"><a class="anchor" href="#spring-cloud-consul-config-watch"></a><a class="link" href="#spring-cloud-consul-config-watch">4.3. Config Watch</a></h3>
 <div class="paragraph">
 <p>The Consul Config Watch takes advantage of the ability of consul to <a href="https://www.consul.io/docs/agent/watches.html#keyprefix">watch a key prefix</a>. The Config Watch makes a blocking Consul HTTP API call to determine if any relevant configuration data has changed for the current application. If there is new configuration data a Refresh Event is published. This is equivalent to calling the <code>/refresh</code> actuator endpoint.</p>
 </div>
@@ -617,7 +632,7 @@ config/application/</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="spring-cloud-consul-config-format"><a class="link" href="#spring-cloud-consul-config-format">YAML or Properties with Config</a></h3>
+<h3 id="spring-cloud-consul-config-format"><a class="anchor" href="#spring-cloud-consul-config-format"></a><a class="link" href="#spring-cloud-consul-config-format">4.4. YAML or Properties with Config</a></h3>
 <div class="paragraph">
 <p>It may be more convenient to store a blob of properties in YAML or Properties format as opposed to individual key/value pairs.  Set the <code>spring.cloud.consul.config.format</code> property to <code>YAML</code> or <code>PROPERTIES</code>. For example to use YAML:</p>
 </div>
@@ -650,7 +665,7 @@ config/application/data</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="spring-cloud-consul-config-git2consul"><a class="link" href="#spring-cloud-consul-config-git2consul">git2consul with Config</a></h3>
+<h3 id="spring-cloud-consul-config-git2consul"><a class="anchor" href="#spring-cloud-consul-config-git2consul"></a><a class="link" href="#spring-cloud-consul-config-git2consul">4.5. git2consul with Config</a></h3>
 <div class="paragraph">
 <p>git2consul is a Consul community project that loads files from a git repository to individual keys into Consul. By default the names of the keys are names of the files. YAML and Properties files are supported with file extensions of <code>.yml</code> and <code>.properties</code> respectively.  Set the <code>spring.cloud.consul.config.format</code> property to <code>FILES</code>. For example:</p>
 </div>
@@ -693,7 +708,7 @@ config/application.yml</pre>
 </div>
 </div>
 <div class="sect2">
-<h3 id="spring-cloud-consul-failfast"><a class="link" href="#spring-cloud-consul-failfast">Fail Fast</a></h3>
+<h3 id="spring-cloud-consul-failfast"><a class="anchor" href="#spring-cloud-consul-failfast"></a><a class="link" href="#spring-cloud-consul-failfast">4.6. Fail Fast</a></h3>
 <div class="paragraph">
 <p>It may be convenient in certain circumstances (like local development or certain test scenarios) to not fail if consul isn&#8217;t available for configuration. Setting <code>spring.cloud.consul.config.failFast=false</code> in <code>bootstrap.yml</code> will cause the configuration module to log a warning rather than throw an exception. This will allow the application to continue startup normally.</p>
 </div>
@@ -701,7 +716,7 @@ config/application.yml</pre>
 </div>
 </div>
 <div class="sect1">
-<h2 id="spring-cloud-consul-retry"><a class="link" href="#spring-cloud-consul-retry">Consul Retry</a></h2>
+<h2 id="spring-cloud-consul-retry"><a class="anchor" href="#spring-cloud-consul-retry"></a><a class="link" href="#spring-cloud-consul-retry">5. Consul Retry</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>If you expect that the consul agent may occasionally be unavailable when
@@ -729,10 +744,10 @@ Retry has a <code>RetryInterceptorBuilder</code> that makes it easy to create on
 </div>
 </div>
 <div class="sect1">
-<h2 id="spring-cloud-consul-bus"><a class="link" href="#spring-cloud-consul-bus">Spring Cloud Bus with Consul</a></h2>
+<h2 id="spring-cloud-consul-bus"><a class="anchor" href="#spring-cloud-consul-bus"></a><a class="link" href="#spring-cloud-consul-bus">6. Spring Cloud Bus with Consul</a></h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_how_to_activate_3"><a class="link" href="#_how_to_activate_3">How to activate</a></h3>
+<h3 id="how-to-activate-3"><a class="anchor" href="#how-to-activate-3"></a><a class="link" href="#how-to-activate-3">6.1. How to activate</a></h3>
 <div class="paragraph">
 <p>To get started with the Consul Bus use the starter with group <code>org.springframework.cloud</code> and artifact id <code>spring-cloud-starter-consul-bus</code>. See the <a href="https://projects.spring.io/spring-cloud/">Spring Cloud Project page</a> for details on setting up your build system with the current Spring Cloud Release Train.</p>
 </div>
@@ -743,7 +758,7 @@ Retry has a <code>RetryInterceptorBuilder</code> that makes it easy to create on
 </div>
 </div>
 <div class="sect1">
-<h2 id="spring-cloud-consul-hystrix"><a class="link" href="#spring-cloud-consul-hystrix">Circuit Breaker with Hystrix</a></h2>
+<h2 id="spring-cloud-consul-hystrix"><a class="anchor" href="#spring-cloud-consul-hystrix"></a><a class="link" href="#spring-cloud-consul-hystrix">7. Circuit Breaker with Hystrix</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Applications can use the Hystrix Circuit Breaker provided by the Spring Cloud Netflix project by including this starter in the projects pom.xml: <code>spring-cloud-starter-hystrix</code>.  Hystrix doesn&#8217;t depend on the Netflix Discovery Client. The <code>@EnableHystrix</code> annotation should be placed on a configuration class (usually the main class). Then methods can be annotated with <code>@HystrixCommand</code> to be protected by a circuit breaker. See <a href="https://projects.spring.io/spring-cloud/spring-cloud.html#_circuit_breaker_hystrix_clients">the documentation</a> for more details.</p>
@@ -751,7 +766,7 @@ Retry has a <code>RetryInterceptorBuilder</code> that makes it easy to create on
 </div>
 </div>
 <div class="sect1">
-<h2 id="spring-cloud-consul-turbine"><a class="link" href="#spring-cloud-consul-turbine">Hystrix metrics aggregation with Turbine and Consul</a></h2>
+<h2 id="spring-cloud-consul-turbine"><a class="anchor" href="#spring-cloud-consul-turbine"></a><a class="link" href="#spring-cloud-consul-turbine">8. Hystrix metrics aggregation with Turbine and Consul</a></h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>Turbine (provided by the Spring Cloud Netflix project), aggregates multiple instances Hystrix metrics streams, so the dashboard can display an aggregate view. Turbine uses the <code>DiscoveryClient</code> interface to lookup relevant instances. To use Turbine with Spring Cloud Consul, configure the Turbine application in a manner similar to the following examples:</p>
