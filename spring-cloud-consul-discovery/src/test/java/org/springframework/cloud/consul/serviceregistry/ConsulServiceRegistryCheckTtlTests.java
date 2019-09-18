@@ -32,6 +32,7 @@ import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationC
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
+import org.springframework.cloud.consul.support.ConsulHeartbeatAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -97,7 +98,8 @@ public class ConsulServiceRegistryCheckTtlTests {
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,
-			ConsulAutoServiceRegistrationAutoConfiguration.class })
+			ConsulAutoServiceRegistrationAutoConfiguration.class,
+			ConsulHeartbeatAutoConfiguration.class })
 	protected static class TestConfig {
 
 	}

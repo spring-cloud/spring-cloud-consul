@@ -18,51 +18,47 @@ package org.springframework.cloud.consul.discovery;
 
 import com.ecwid.consul.v1.ConsulClient;
 
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.client.CommonsClientAutoConfiguration;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
-import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
-import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 /**
- * @author Spencer Gibb
- * @author Olga Maciaszek-Sharma
+ * Auto configuration for the catalog watcher.
+ *
  * @author Tim Ysewyn
  */
 @Configuration
 @ConditionalOnConsulEnabled
-@ConditionalOnProperty(value = "spring.cloud.consul.discovery.enabled",
+@ConditionalOnProperty(
+		value = "spring.cloud.consul.discovery.catalog-services-watch.enabled",
 		matchIfMissing = true)
 @ConditionalOnDiscoveryEnabled
-@EnableConfigurationProperties
-@AutoConfigureBefore({ SimpleDiscoveryClientAutoConfiguration.class,
-		CommonsClientAutoConfiguration.class })
-public class ConsulDiscoveryClientConfiguration {
+@AutoConfigureAfter({ ConsulDiscoveryClientConfiguration.class })
+public class ConsulCatalogWatchAutoConfiguration {
 
 	/**
 	 * Name of the catalog watch task scheduler bean.
-	 * @Deprecated Moved to {@link ConsulCatalogWatchAutoConfiguration}.
 	 */
-	@Deprecated
-	public static final String CATALOG_WATCH_TASK_SCHEDULER_NAME = ConsulCatalogWatchAutoConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME;
+	public static final String CATALOG_WATCH_TASK_SCHEDULER_NAME = "catalogWatchTaskScheduler";
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulDiscoveryProperties consulDiscoveryProperties(InetUtils inetUtils) {
-		return new ConsulDiscoveryProperties(inetUtils);
+	public ConsulCatalogWatch consulCatalogWatch(
+			ConsulDiscoveryProperties discoveryProperties, ConsulClient consulClient,
+			@Qualifier(CATALOG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
+		return new ConsulCatalogWatch(discoveryProperties, consulClient, taskScheduler);
 	}
 
-	@Bean
-	@ConditionalOnMissingBean
-	public ConsulDiscoveryClient consulDiscoveryClient(ConsulClient consulClient,
-			ConsulDiscoveryProperties discoveryProperties) {
-		return new ConsulDiscoveryClient(consulClient, discoveryProperties);
+	@Bean(name = CATALOG_WATCH_TASK_SCHEDULER_NAME)
+	public TaskScheduler catalogWatchTaskScheduler() {
+		return new ThreadPoolTaskScheduler();
 	}
 
 }

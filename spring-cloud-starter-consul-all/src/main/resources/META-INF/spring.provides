@@ -1,1 +1,0 @@
-provides: spring-cloud-consul-bus, spring-cloud-consul-config, spring-cloud-consul-discovery, spring-cloud-consul-ui
