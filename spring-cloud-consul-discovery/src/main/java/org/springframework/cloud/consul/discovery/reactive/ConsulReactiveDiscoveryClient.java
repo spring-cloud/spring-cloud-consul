@@ -16,16 +16,15 @@
 
 package org.springframework.cloud.consul.discovery.reactive;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.health.model.HealthService;
-import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -67,43 +66,41 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 
 	@Override
 	public Flux<ServiceInstance> getInstances(String serviceId) {
-		return Flux.defer(getHealthServices(serviceId))
-				.map(mapToServiceInstance(serviceId)).onErrorResume(exception -> {
-					logger.error("Error getting instances from Consul.", exception);
-					return Flux.empty();
-				}).subscribeOn(Schedulers.elastic());
-	}
-
-	private Supplier<? extends Publisher<HealthService>> getHealthServices(
-			String serviceId) {
-		return () -> {
-			Response<List<HealthService>> services = StringUtils
-					.hasText(properties.getAclToken())
-							? this.client.getHealthServices(serviceId,
-									this.properties.getDefaultQueryTag(),
-									this.properties.isQueryPassing(), QueryParams.DEFAULT,
-									properties.getAclToken())
-							: this.client.getHealthServices(serviceId,
-									this.properties.getDefaultQueryTag(),
-									this.properties.isQueryPassing(),
-									QueryParams.DEFAULT);
-			return services == null ? Flux.empty()
-					: Flux.fromIterable(services.getValue());
-		};
-	}
-
-	private Function<HealthService, ServiceInstance> mapToServiceInstance(
-			String serviceId) {
-		return service -> {
-			String host = findHost(service);
-			Map<String, String> metadata = getMetadata(service);
-			boolean secure = false;
-			if (metadata.containsKey("secure")) {
-				secure = Boolean.parseBoolean(metadata.get("secure"));
+		return Flux.defer(() -> {
+			List<ServiceInstance> instances = new ArrayList<>();
+			for (HealthService healthService : getHealthServices(serviceId)) {
+				instances.add(mapToServiceInstance(healthService, serviceId));
 			}
-			return new DefaultServiceInstance(service.getService().getId(), serviceId,
-					host, service.getService().getPort(), secure, metadata);
-		};
+			return Flux.fromIterable(instances);
+		}).onErrorResume(exception -> {
+			logger.error("Error getting instances from Consul.", exception);
+			return Flux.empty();
+		}).subscribeOn(Schedulers.boundedElastic());
+	}
+
+	private List<HealthService> getHealthServices(String serviceId) {
+		Response<List<HealthService>> services = StringUtils
+				.hasText(properties.getAclToken())
+						? this.client.getHealthServices(serviceId,
+								this.properties.getDefaultQueryTag(),
+								this.properties.isQueryPassing(), QueryParams.DEFAULT,
+								properties.getAclToken())
+						: this.client.getHealthServices(serviceId,
+								this.properties.getDefaultQueryTag(),
+								this.properties.isQueryPassing(), QueryParams.DEFAULT);
+		return services == null ? Collections.emptyList() : services.getValue();
+	}
+
+	private ServiceInstance mapToServiceInstance(HealthService service,
+			String serviceId) {
+		String host = findHost(service);
+		Map<String, String> metadata = getMetadata(service);
+		boolean secure = false;
+		if (metadata.containsKey("secure")) {
+			secure = Boolean.parseBoolean(metadata.get("secure"));
+		}
+		return new DefaultServiceInstance(service.getService().getId(), serviceId, host,
+				service.getService().getPort(), secure, metadata);
 	}
 
 	@Override
