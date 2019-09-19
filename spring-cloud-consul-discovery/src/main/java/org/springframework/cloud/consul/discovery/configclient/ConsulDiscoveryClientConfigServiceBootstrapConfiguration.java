@@ -18,16 +18,11 @@ package org.springframework.cloud.consul.discovery.configclient;
 
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.cloud.client.discovery.health.DiscoveryClientHealthIndicatorProperties;
-import org.springframework.cloud.commons.util.UtilAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.config.client.ConfigServicePropertySourceLocator;
-import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.cloud.consul.discovery.ConditionalOnConsulDiscoveryEnabled;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration;
 import org.springframework.cloud.consul.discovery.reactive.ConsulReactiveDiscoveryClientConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -37,18 +32,11 @@ import org.springframework.context.annotation.Configuration;
  * @author Tim Ysewyn
  */
 @ConditionalOnClass(ConfigServicePropertySourceLocator.class)
-@ConditionalOnConsulEnabled
-@ConditionalOnConsulDiscoveryEnabled
+@ConditionalOnProperty("spring.cloud.config.discovery.enabled")
 @Configuration
-@ImportAutoConfiguration({ UtilAutoConfiguration.class, ConsulAutoConfiguration.class,
+@ImportAutoConfiguration({ ConsulAutoConfiguration.class,
 		ConsulDiscoveryClientConfiguration.class,
 		ConsulReactiveDiscoveryClientConfiguration.class })
 public class ConsulDiscoveryClientConfigServiceBootstrapConfiguration {
-
-	@Bean
-	@ConditionalOnMissingBean
-	public DiscoveryClientHealthIndicatorProperties discoveryClientHealthIndicatorProperties() {
-		return new DiscoveryClientHealthIndicatorProperties();
-	}
 
 }
