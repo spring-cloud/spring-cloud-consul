@@ -48,7 +48,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnReactiveDiscoveryEnabled
 @ConditionalOnConsulEnabled
 @ConditionalOnConsulDiscoveryEnabled
-@EnableConfigurationProperties
+@EnableConfigurationProperties(DiscoveryClientHealthIndicatorProperties.class)
 @AutoConfigureBefore(ReactiveCommonsClientAutoConfiguration.class)
 @AutoConfigureAfter({ UtilAutoConfiguration.class,
 		ReactiveCompositeDiscoveryClientAutoConfiguration.class,
