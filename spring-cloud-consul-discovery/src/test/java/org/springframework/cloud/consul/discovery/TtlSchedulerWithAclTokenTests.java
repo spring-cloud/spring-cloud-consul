@@ -33,10 +33,14 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
  * @author varnson fan
 =======
  * @author Stéphane Leroy
 >>>>>>> f53abd16... add acl-token for ttl
+=======
+ * @author Stéphane Leroy
+>>>>>>> f53abd16c80ffd2efa648ff3512845fa4a54251c
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TtlSchedulerWithAclTokenTests.TtlSchedulerTestConfig.class,
