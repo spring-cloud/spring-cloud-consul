@@ -18,23 +18,37 @@ package org.springframework.cloud.consul.discovery.configclient;
 
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cloud.client.discovery.health.DiscoveryClientHealthIndicatorProperties;
+import org.springframework.cloud.commons.util.UtilAutoConfiguration;
 import org.springframework.cloud.config.client.ConfigServicePropertySourceLocator;
+import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.discovery.ConditionalOnConsulDiscoveryEnabled;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration;
+import org.springframework.cloud.consul.discovery.reactive.ConsulReactiveDiscoveryClientConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
  * Helper for config client that wants to lookup the config server via discovery.
  *
  * @author Spencer Gibb
+ * @author Tim Ysewyn
  */
 @ConditionalOnClass(ConfigServicePropertySourceLocator.class)
-@ConditionalOnProperty(value = "spring.cloud.config.discovery.enabled",
-		matchIfMissing = false)
+@ConditionalOnConsulEnabled
+@ConditionalOnConsulDiscoveryEnabled
 @Configuration
-@ImportAutoConfiguration({ ConsulAutoConfiguration.class,
-		ConsulDiscoveryClientConfiguration.class })
+@ImportAutoConfiguration({ UtilAutoConfiguration.class, ConsulAutoConfiguration.class,
+		ConsulDiscoveryClientConfiguration.class,
+		ConsulReactiveDiscoveryClientConfiguration.class })
 public class ConsulDiscoveryClientConfigServiceBootstrapConfiguration {
+
+	@Bean
+	@ConditionalOnMissingBean
+	public DiscoveryClientHealthIndicatorProperties discoveryClientHealthIndicatorProperties() {
+		return new DiscoveryClientHealthIndicatorProperties();
+	}
 
 }

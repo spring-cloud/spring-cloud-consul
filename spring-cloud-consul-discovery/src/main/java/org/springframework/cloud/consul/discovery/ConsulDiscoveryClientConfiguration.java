@@ -18,15 +18,18 @@ package org.springframework.cloud.consul.discovery;
 
 import com.ecwid.consul.v1.ConsulClient;
 
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.client.CommonsClientAutoConfiguration;
+import org.springframework.cloud.client.ConditionalOnBlockingDiscoveryEnabled;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.client.discovery.simple.SimpleDiscoveryClientAutoConfiguration;
 import org.springframework.cloud.commons.util.InetUtils;
+import org.springframework.cloud.commons.util.UtilAutoConfiguration;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
+import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,13 +39,14 @@ import org.springframework.context.annotation.Configuration;
  * @author Tim Ysewyn
  */
 @Configuration
-@ConditionalOnConsulEnabled
-@ConditionalOnProperty(value = "spring.cloud.consul.discovery.enabled",
-		matchIfMissing = true)
 @ConditionalOnDiscoveryEnabled
+@ConditionalOnBlockingDiscoveryEnabled
+@ConditionalOnConsulEnabled
+@ConditionalOnConsulDiscoveryEnabled
 @EnableConfigurationProperties
 @AutoConfigureBefore({ SimpleDiscoveryClientAutoConfiguration.class,
 		CommonsClientAutoConfiguration.class })
+@AutoConfigureAfter({ UtilAutoConfiguration.class, ConsulAutoConfiguration.class })
 public class ConsulDiscoveryClientConfiguration {
 
 	/**
