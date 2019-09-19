@@ -32,7 +32,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
+<<<<<<< HEAD
  * @author varnson fan
+=======
+ * @author Stéphane Leroy
+>>>>>>> f53abd16... add acl-token for ttl
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TtlSchedulerWithAclTokenTests.TtlSchedulerTestConfig.class,
