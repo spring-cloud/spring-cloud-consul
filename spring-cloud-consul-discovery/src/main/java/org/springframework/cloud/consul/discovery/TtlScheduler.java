@@ -33,6 +33,7 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
  * Created by nicu on 11.03.2015.
  *
  * @author Stéphane LEROY
+ * @author Varnson FAN
  */
 public class TtlScheduler {
 
@@ -47,9 +48,17 @@ public class TtlScheduler {
 
 	private ConsulClient client;
 
-	public TtlScheduler(HeartbeatProperties configuration, ConsulClient client) {
+	private ConsulDiscoveryProperties properties;
+
+	public TtlScheduler(HeartbeatProperties configuration, ConsulClient client,
+			ConsulDiscoveryProperties properties) {
 		this.configuration = configuration;
 		this.client = client;
+		this.properties = properties;
+	}
+
+	public ConsulDiscoveryProperties getConsulDiscoveryProperties() {
+		return properties;
 	}
 
 	@Deprecated
@@ -92,7 +101,8 @@ public class TtlScheduler {
 
 		@Override
 		public void run() {
-			TtlScheduler.this.client.agentCheckPass(this.checkId);
+			TtlScheduler.this.client.agentCheckPass(this.checkId, null,
+					properties.getAclToken());
 			if (log.isDebugEnabled()) {
 				log.debug("Sending consul heartbeat for: " + this.checkId);
 			}
