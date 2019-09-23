@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ecwid.consul.v1.ConsistencyMode;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.commons.util.InetUtils;
@@ -119,6 +121,11 @@ public class ConsulDiscoveryProperties {
 	 * Whether hostname is included into the default instance id when registering service.
 	 */
 	private boolean includeHostnameInInstanceId = false;
+
+	/**
+	 * Consistency mode for health service request.
+	 */
+	private ConsistencyMode consistencyMode = ConsistencyMode.DEFAULT;
 
 	/**
 	 * Service instance zone comes from metadata. This allows changing the metadata tag
@@ -403,6 +410,14 @@ public class ConsulDiscoveryProperties {
 		this.includeHostnameInInstanceId = includeHostnameInInstanceId;
 	}
 
+	public ConsistencyMode getConsistencyMode() {
+		return consistencyMode;
+	}
+
+	public void setConsistencyMode(ConsistencyMode consistencyMode) {
+		this.consistencyMode = consistencyMode;
+	}
+
 	public String getDefaultZoneMetadataName() {
 		return this.defaultZoneMetadataName;
 	}
@@ -526,6 +541,8 @@ public class ConsulDiscoveryProperties {
 				.append("preferAgentAddress", this.preferAgentAddress)
 				.append("catalogServicesWatchDelay", this.catalogServicesWatchDelay)
 				.append("catalogServicesWatchTimeout", this.catalogServicesWatchTimeout)
+				.append("includeHostnameInInstanceId", this.includeHostnameInInstanceId)
+				.append("consistencyMode", this.consistencyMode)
 				.append("serviceName", this.serviceName)
 				.append("instanceId", this.instanceId)
 				.append("instanceZone", this.instanceZone)

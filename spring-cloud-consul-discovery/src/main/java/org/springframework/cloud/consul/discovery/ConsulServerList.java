@@ -30,6 +30,7 @@ import com.netflix.loadbalancer.AbstractServerList;
 /**
  * @author Spencer Gibb
  * @author Richard Kettelerij
+ * @author Varnson Fan
  */
 public class ConsulServerList extends AbstractServerList<ConsulServer> {
 
@@ -115,9 +116,9 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	protected QueryParams createQueryParamsForClientRequest() {
 		String datacenter = getDatacenter();
 		if (datacenter != null) {
-			return new QueryParams(datacenter);
+			return new QueryParams(datacenter, this.properties.getConsistencyMode());
 		}
-		return QueryParams.DEFAULT;
+		return new QueryParams(this.properties.getConsistencyMode());
 	}
 
 	protected String getTag() {
