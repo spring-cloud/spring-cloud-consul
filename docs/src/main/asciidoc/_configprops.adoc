@@ -16,6 +16,7 @@
 |spring.cloud.consul.discovery.acl-token |  | 
 |spring.cloud.consul.discovery.catalog-services-watch-delay | 1000 | The delay between calls to watch consul catalog in millis, default is 1000.
 |spring.cloud.consul.discovery.catalog-services-watch-timeout | 2 | The number of seconds to block while watching consul catalog, default is 2.
+|spring.cloud.consul.discovery.consistency-mode |  | Consistency mode for health service request.
 |spring.cloud.consul.discovery.datacenters |  | Map of serviceId's -> datacenter to query for in server list. This allows looking up services in another datacenters.
 |spring.cloud.consul.discovery.default-query-tag |  | Tag to query for in service list if one is not listed in serverListQueryTags.
 |spring.cloud.consul.discovery.default-zone-metadata-name | zone | Service instance zone comes from metadata. This allows changing the metadata tag name.
