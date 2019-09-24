@@ -61,7 +61,8 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<ServiceInstance> getInstances(final String serviceId) {
-		return getInstances(serviceId, new QueryParams(this.properties.getConsistencyMode()));
+		return getInstances(serviceId,
+				new QueryParams(this.properties.getConsistencyMode()));
 	}
 
 	public List<ServiceInstance> getInstances(final String serviceId,
