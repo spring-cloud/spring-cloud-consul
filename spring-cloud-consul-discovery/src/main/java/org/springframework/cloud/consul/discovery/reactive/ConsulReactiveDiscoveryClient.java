@@ -81,13 +81,13 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 	private List<HealthService> getHealthServices(String serviceId) {
 		Response<List<HealthService>> services = StringUtils
 				.hasText(properties.getAclToken())
-						? this.client.getHealthServices(serviceId,
-								this.properties.getDefaultQueryTag(),
-								this.properties.isQueryPassing(), QueryParams.DEFAULT,
+						? client.getHealthServices(serviceId,
+								properties.getDefaultQueryTag(),
+								properties.isQueryPassing(), QueryParams.DEFAULT,
 								properties.getAclToken())
-						: this.client.getHealthServices(serviceId,
-								this.properties.getDefaultQueryTag(),
-								this.properties.isQueryPassing(), QueryParams.DEFAULT);
+						: client.getHealthServices(serviceId,
+								properties.getDefaultQueryTag(),
+								properties.isQueryPassing(), QueryParams.DEFAULT);
 		return services == null ? Collections.emptyList() : services.getValue();
 	}
 
@@ -116,7 +116,7 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 		}).onErrorResume(exception -> {
 			logger.error("Error getting services from Consul.", exception);
 			return Flux.empty();
-		}).subscribeOn(Schedulers.elastic());
+		}).subscribeOn(Schedulers.boundedElastic());
 	}
 
 	@Override
