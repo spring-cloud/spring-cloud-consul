@@ -18,7 +18,6 @@ package org.springframework.cloud.consul.discovery.reactive;
 
 import com.ecwid.consul.v1.ConsulClient;
 
-import org.springframework.boot.actuate.health.ReactiveHealthIndicator;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -69,7 +68,8 @@ public class ConsulReactiveDiscoveryClientConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnClass(ReactiveHealthIndicator.class)
+	@ConditionalOnClass(
+			name = "org.springframework.boot.actuate.health.ReactiveHealthIndicator")
 	@ConditionalOnDiscoveryHealthIndicatorEnabled
 	public ReactiveDiscoveryClientHealthIndicator consulReactiveDiscoveryClientHealthIndicator(
 			ConsulReactiveDiscoveryClient client,
