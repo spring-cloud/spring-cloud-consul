@@ -17,11 +17,15 @@
 package org.springframework.cloud.consul.discovery;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.ecwid.consul.v1.ConsistencyMode;
+import com.ecwid.consul.v1.health.model.Check;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -159,6 +163,12 @@ public class ConsulDiscoveryProperties {
 	 * check passing to the server.
 	 */
 	private boolean queryPassing = false;
+
+	/**
+	 * List of status considered as healthy. Contains "passing" by default.
+	 */
+	private Set<Check.CheckStatus> statusConsideredAsHealthy = new HashSet(
+			Collections.singleton(Check.CheckStatus.PASSING));
 
 	/** Register as a service in consul. */
 	private boolean register = true;
@@ -470,8 +480,17 @@ public class ConsulDiscoveryProperties {
 		return this.queryPassing;
 	}
 
+	public Set<Check.CheckStatus> getStatusConsideredAsHealthy() {
+		return statusConsideredAsHealthy;
+	}
+
 	public void setQueryPassing(boolean queryPassing) {
 		this.queryPassing = queryPassing;
+	}
+
+	public void setStatusConsideredAsHealthy(
+			Set<Check.CheckStatus> statusConsideredAsHealthy) {
+		this.statusConsideredAsHealthy = statusConsideredAsHealthy;
 	}
 
 	public boolean isRegister() {

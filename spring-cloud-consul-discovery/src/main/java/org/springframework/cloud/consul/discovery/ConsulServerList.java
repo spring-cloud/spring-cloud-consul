@@ -19,10 +19,12 @@ package org.springframework.cloud.consul.discovery;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.health.model.Check;
 import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.AbstractServerList;
@@ -83,20 +85,24 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		if (response.getValue() == null || response.getValue().isEmpty()) {
 			return Collections.emptyList();
 		}
-		return transformResponse(response.getValue());
+		return transformResponse(response.getValue(),
+				this.properties.getStatusConsideredAsHealthy());
 	}
 
 	/**
 	 * Transforms the response from Consul in to a list of usable {@link ConsulServer}s.
 	 * @param healthServices the initial list of servers from Consul. Guaranteed to be
 	 * non-empty list
+	 * @param statusConsideredAsHealthy list of status that are considered as
+	 * healthy/passing
 	 * @return ConsulServer instances
-	 * @see ConsulServer#ConsulServer(HealthService)
+	 * @see ConsulServer#ConsulServer(HealthService, java.util.Set)
 	 */
-	protected List<ConsulServer> transformResponse(List<HealthService> healthServices) {
+	protected List<ConsulServer> transformResponse(List<HealthService> healthServices,
+			Set<Check.CheckStatus> statusConsideredAsHealthy) {
 		List<ConsulServer> servers = new ArrayList<>();
 		for (HealthService service : healthServices) {
-			ConsulServer server = new ConsulServer(service);
+			ConsulServer server = new ConsulServer(service, statusConsideredAsHealthy);
 			if (server.getMetadata()
 					.containsKey(this.properties.getDefaultZoneMetadataName())) {
 				server.setZone(server.getMetadata()

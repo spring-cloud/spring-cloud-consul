@@ -17,10 +17,9 @@
 package org.springframework.cloud.consul.discovery;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import com.ecwid.consul.v1.health.model.Check;
-import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.loadbalancer.Server;
 import org.junit.Test;
 
@@ -28,6 +27,7 @@ import static com.ecwid.consul.v1.health.model.Check.CheckStatus.CRITICAL;
 import static com.ecwid.consul.v1.health.model.Check.CheckStatus.PASSING;
 import static com.ecwid.consul.v1.health.model.Check.CheckStatus.WARNING;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.cloud.consul.discovery.ConsulServerTest.newServer;
 
 /**
  * @author Spencer Gibb
@@ -39,33 +39,13 @@ public class HealthServiceServerListFilterTests {
 		HealthServiceServerListFilter filter = new HealthServiceServerListFilter();
 
 		ArrayList<Server> servers = new ArrayList<>();
-		servers.add(newServer(PASSING));
-		servers.add(newServer(PASSING));
-		servers.add(newServer(CRITICAL));
-		servers.add(newServer(WARNING));
+		servers.add(newServer(PASSING, Collections.singleton(PASSING)));
+		servers.add(newServer(PASSING, Collections.singleton(PASSING)));
+		servers.add(newServer(CRITICAL, Collections.singleton(PASSING)));
+		servers.add(newServer(WARNING, Collections.singleton(PASSING)));
 
 		List<Server> filtered = filter.getFilteredListOfServers(servers);
 		assertThat(filtered).as("wrong # of filtered servers").hasSize(2);
-	}
-
-	private ConsulServer newServer(Check.CheckStatus checkStatus) {
-		HealthService healthService = new HealthService();
-		HealthService.Node node = new HealthService.Node();
-		node.setAddress("nodeaddr" + checkStatus.name());
-		node.setNode("nodenode" + checkStatus.name());
-		healthService.setNode(node);
-		HealthService.Service service = new HealthService.Service();
-		service.setAddress("serviceaddr" + checkStatus.name());
-		service.setId("serviceid" + checkStatus.name());
-		service.setPort(8080);
-		service.setService("serviceservice" + checkStatus.name());
-		healthService.setService(service);
-		ArrayList<Check> checks = new ArrayList<>();
-		Check check = new Check();
-		check.setStatus(checkStatus);
-		checks.add(check);
-		healthService.setChecks(checks);
-		return new ConsulServer(healthService);
 	}
 
 }
