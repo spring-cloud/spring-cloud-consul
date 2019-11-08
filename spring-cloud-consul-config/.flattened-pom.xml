@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.springframework.cloud</groupId>
     <artifactId>spring-cloud-consul</artifactId>
-    <version>2.2.0.RC2</version>
+    <version>2.2.0.BUILD-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
   <groupId>org.springframework.cloud</groupId>
   <artifactId>spring-cloud-consul-config</artifactId>
-  <version>2.2.0.RC2</version>
+  <version>2.2.0.BUILD-SNAPSHOT</version>
   <name>Spring Cloud Consul Config</name>
   <description>Spring Cloud Consul Config</description>
   <url>https://spring.io/spring-cloud/spring-cloud-consul/spring-cloud-consul-config</url>
@@ -134,14 +134,14 @@
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-consul-core</artifactId>
-      <version>2.2.0.RC2</version>
+      <version>2.2.0.BUILD-SNAPSHOT</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-context</artifactId>
-      <version>2.2.0.RC2</version>
+      <version>2.2.0.BUILD-SNAPSHOT</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
