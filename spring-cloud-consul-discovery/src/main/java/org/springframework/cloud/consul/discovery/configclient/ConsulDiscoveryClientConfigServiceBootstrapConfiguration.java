@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @ConditionalOnClass(ConfigServicePropertySourceLocator.class)
 @ConditionalOnProperty("spring.cloud.config.discovery.enabled")
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ImportAutoConfiguration({ ConsulAutoConfiguration.class,
 		ConsulDiscoveryClientConfiguration.class,
 		ConsulReactiveDiscoveryClientConfiguration.class })

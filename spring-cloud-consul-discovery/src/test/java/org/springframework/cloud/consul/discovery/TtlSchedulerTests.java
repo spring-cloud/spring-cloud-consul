@@ -79,7 +79,7 @@ public class TtlSchedulerTests {
 		return null;
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@Import({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulDiscoveryClientConfiguration.class,

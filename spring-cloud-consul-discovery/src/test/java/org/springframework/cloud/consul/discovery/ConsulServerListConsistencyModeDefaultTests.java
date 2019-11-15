@@ -57,7 +57,7 @@ public class ConsulServerListConsistencyModeDefaultTests {
 						.isTrue();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@EnableDiscoveryClient
 	public static class TestConfig {

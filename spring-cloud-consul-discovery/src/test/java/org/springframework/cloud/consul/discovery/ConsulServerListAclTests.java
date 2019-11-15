@@ -62,7 +62,7 @@ public class ConsulServerListAclTests {
 		assertThat(servers.isEmpty()).as("servers was empty").isFalse();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@EnableDiscoveryClient
 	public static class TestConfig {

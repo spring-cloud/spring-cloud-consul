@@ -38,7 +38,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Olga Maciaszek-Sharma
  * @author Tim Ysewyn
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnDiscoveryEnabled
 @ConditionalOnBlockingDiscoveryEnabled
 @ConditionalOnConsulEnabled

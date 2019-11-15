@@ -61,7 +61,7 @@ public class ConsulBinderConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@EnableBinding(Events.class)
 	public static class Application {

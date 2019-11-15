@@ -65,7 +65,7 @@ public class ConsulAutoServiceRegistrationCustomizedInstanceZoneTests {
 				.as("service zone was wrong").isTrue();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,

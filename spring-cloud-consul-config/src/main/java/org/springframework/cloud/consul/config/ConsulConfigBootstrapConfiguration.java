@@ -32,11 +32,11 @@ import org.springframework.context.annotation.Import;
  * @author Spencer Gibb
  * @author Edvin Eriksson
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnConsulEnabled
 public class ConsulConfigBootstrapConfiguration {
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableConfigurationProperties
 	@Import(ConsulAutoConfiguration.class)
 	@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled",

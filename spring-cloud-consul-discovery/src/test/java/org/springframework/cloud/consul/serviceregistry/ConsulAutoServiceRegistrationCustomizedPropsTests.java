@@ -94,7 +94,7 @@ public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 				.isFalse();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,

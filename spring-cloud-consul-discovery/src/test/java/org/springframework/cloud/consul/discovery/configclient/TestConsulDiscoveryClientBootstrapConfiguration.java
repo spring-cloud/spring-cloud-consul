@@ -31,7 +31,7 @@ import static org.mockito.Mockito.mock;
 
 @ConditionalOnProperty(value = "spring.cloud.consul.discovery.test.enabled",
 		matchIfMissing = false)
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class TestConsulDiscoveryClientBootstrapConfiguration {
 
 	@Bean

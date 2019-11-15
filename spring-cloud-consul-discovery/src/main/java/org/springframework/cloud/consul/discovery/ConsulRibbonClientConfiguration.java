@@ -45,7 +45,7 @@ import static com.netflix.client.config.CommonClientConfigKey.EnableZoneAffinity
  * @author Spencer Gibb
  * @author Dave Syer
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class ConsulRibbonClientConfiguration {
 
 	protected static final String VALUE_NOT_SET = "__not__set__";

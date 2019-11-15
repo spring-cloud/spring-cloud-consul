@@ -34,7 +34,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  *
  * @author Tim Ysewyn
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty(
 		value = "spring.cloud.consul.discovery.catalog-services-watch.enabled",

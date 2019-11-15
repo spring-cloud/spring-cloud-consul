@@ -56,7 +56,7 @@ public class ConsulAutoRegistrationCheckTtlDeregisterCriticalServiceTests {
 				.isTrue();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,

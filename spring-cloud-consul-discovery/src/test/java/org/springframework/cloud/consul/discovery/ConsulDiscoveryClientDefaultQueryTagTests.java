@@ -92,7 +92,7 @@ public class ConsulDiscoveryClientDefaultQueryTagTests {
 		return service;
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@Import({ ConsulDiscoveryClientConfiguration.class })
 	protected static class TestConfig {

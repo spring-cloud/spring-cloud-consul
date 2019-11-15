@@ -140,7 +140,7 @@ public class ConsulPropertySourceLocatorFilesTests {
 		}
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	static class Config {
 
