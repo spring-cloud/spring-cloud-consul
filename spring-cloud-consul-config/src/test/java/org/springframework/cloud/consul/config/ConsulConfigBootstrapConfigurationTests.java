@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.config;
 
+import java.util.Collections;
+
 import org.junit.Test;
 
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
@@ -39,7 +41,7 @@ public class ConsulConfigBootstrapConfigurationTests {
 		this.contextRunner.withUserConfiguration(TestConfig.class).withInitializer(new ConsulTestcontainers())
 				.withUserConfiguration(ConsulConfigBootstrapConfiguration.class).run(context -> {
 					ConsulConfigProperties config = context.getBean(ConsulConfigProperties.class);
-					assertThat(config.getPrefix()).as("Prefix did not match").isEqualTo("platform-config");
+					assertThat(config.getPrefixes().get(0)).as("Prefix did not match").isEqualTo("platform-config");
 					assertThat(config.getDefaultContext()).as("Default context did not match").isEqualTo("defaults");
 				});
 	}
@@ -53,7 +55,7 @@ public class ConsulConfigBootstrapConfigurationTests {
 		this.contextRunner.withUserConfiguration(ConsulConfigBootstrapConfiguration.class)
 				.withInitializer(new ConsulTestcontainers()).run(context -> {
 					ConsulConfigProperties config = context.getBean(ConsulConfigProperties.class);
-					assertThat(config.getPrefix()).as("Prefix did not match").isEqualTo("config");
+					assertThat(config.getPrefixes().get(0)).as("Prefix did not match").isEqualTo("config");
 					assertThat(config.getDefaultContext()).as("Default context did not match").isEqualTo("application");
 				});
 	}
@@ -66,7 +68,7 @@ public class ConsulConfigBootstrapConfigurationTests {
 		@Bean
 		public ConsulConfigProperties consulConfigProperties() {
 			ConsulConfigProperties config = new ConsulConfigProperties();
-			config.setPrefix("platform-config");
+			config.setPrefixes(Collections.singletonList("platform-config"));
 			config.setDefaultContext("defaults");
 			return config;
 		}

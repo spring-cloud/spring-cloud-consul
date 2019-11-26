@@ -91,7 +91,7 @@ public class ConsulPropertySourceLocatorTests {
 				"--spring.application.name=" + APP_NAME, "--spring.config.use-legacy-processing=true",
 				"--spring.cloud.consul.host=" + ConsulTestcontainers.getHost(),
 				"--spring.cloud.consul.port=" + ConsulTestcontainers.getPort(),
-				"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.watch.delay=10");
+				"--spring.cloud.consul.config.prefixes=" + ROOT, "--spring.cloud.consul.config.watch.delay=10");
 
 		client = context.getBean(ConsulClient.class);
 		environment = context.getEnvironment();
