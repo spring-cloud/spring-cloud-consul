@@ -86,35 +86,36 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
 			List<String> profiles = Arrays.asList(env.getActiveProfiles());
 
-			String prefix = this.properties.getPrefix();
+			for (String prefix : this.properties.getPrefixes()) {
 
-			List<String> suffixes = new ArrayList<>();
-			if (this.properties.getFormat() != FILES) {
-				suffixes.add("/");
-			}
-			else {
-				suffixes.add(".yml");
-				suffixes.add(".yaml");
-				suffixes.add(".properties");
-			}
+				List<String> suffixes = new ArrayList<>();
+				if (this.properties.getFormat() != FILES) {
+					suffixes.add("/");
+				}
+				else {
+					suffixes.add(".yml");
+					suffixes.add(".yaml");
+					suffixes.add(".properties");
+				}
 
-			String defaultContext = getContext(prefix,
-					this.properties.getDefaultContext());
+				String defaultContext = getContext(prefix,
+						this.properties.getDefaultContext());
 
-			for (String suffix : suffixes) {
-				this.contexts.add(defaultContext + suffix);
-			}
-			for (String suffix : suffixes) {
-				addProfiles(this.contexts, defaultContext, profiles, suffix);
-			}
+				for (String suffix : suffixes) {
+					this.contexts.add(defaultContext + suffix);
+				}
+				for (String suffix : suffixes) {
+					addProfiles(this.contexts, defaultContext, profiles, suffix);
+				}
 
-			String baseContext = getContext(prefix, appName);
+				String baseContext = getContext(prefix, appName);
 
-			for (String suffix : suffixes) {
-				this.contexts.add(baseContext + suffix);
-			}
-			for (String suffix : suffixes) {
-				addProfiles(this.contexts, baseContext, profiles, suffix);
+				for (String suffix : suffixes) {
+					this.contexts.add(baseContext + suffix);
+				}
+				for (String suffix : suffixes) {
+					addProfiles(this.contexts, baseContext, profiles, suffix);
+				}
 			}
 
 			Collections.reverse(this.contexts);

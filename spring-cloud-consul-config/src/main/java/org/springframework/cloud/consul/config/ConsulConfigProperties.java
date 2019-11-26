@@ -16,6 +16,9 @@
 
 package org.springframework.cloud.consul.config;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -34,7 +37,7 @@ public class ConsulConfigProperties {
 
 	private boolean enabled = true;
 
-	private String prefix = "config";
+	private List<String> prefixes = Collections.singletonList("config");
 
 	@NotEmpty
 	private String defaultContext = "application";
@@ -85,12 +88,17 @@ public class ConsulConfigProperties {
 		this.enabled = enabled;
 	}
 
-	public String getPrefix() {
-		return this.prefix;
+	public List<String> getPrefixes() {
+		return this.prefixes;
 	}
 
+	public void setPrefixes(List<String> prefixes) {
+		this.prefixes = prefixes;
+	}
+
+	@Deprecated
 	public void setPrefix(String prefix) {
-		this.prefix = prefix;
+		this.prefixes = Collections.singletonList(prefix);
 	}
 
 	public @NotEmpty String getDefaultContext() {
@@ -160,7 +168,7 @@ public class ConsulConfigProperties {
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("enabled", this.enabled)
-				.append("prefix", this.prefix)
+				.append("prefixes", this.prefixes)
 				.append("defaultContext", this.defaultContext)
 				.append("profileSeparator", this.profileSeparator)
 				.append("format", this.format).append("dataKey", this.dataKey)

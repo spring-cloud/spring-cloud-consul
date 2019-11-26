@@ -40,7 +40,7 @@ public class ConsulConfigBootstrapConfigurationTests {
 				.run(context -> {
 					ConsulConfigProperties config = context
 							.getBean(ConsulConfigProperties.class);
-					assertThat(config.getPrefix()).as("Prefix did not match")
+					assertThat(config.getPrefixes().get(0)).as("Prefix did not match")
 							.isEqualTo("platform-config");
 					assertThat(config.getDefaultContext())
 							.as("Default context did not match").isEqualTo("defaults");
@@ -57,7 +57,7 @@ public class ConsulConfigBootstrapConfigurationTests {
 				.run(context -> {
 					ConsulConfigProperties config = context
 							.getBean(ConsulConfigProperties.class);
-					assertThat(config.getPrefix()).as("Prefix did not match")
+					assertThat(config.getPrefixes().get(0)).as("Prefix did not match")
 							.isEqualTo("config");
 					assertThat(config.getDefaultContext())
 							.as("Default context did not match").isEqualTo("application");
