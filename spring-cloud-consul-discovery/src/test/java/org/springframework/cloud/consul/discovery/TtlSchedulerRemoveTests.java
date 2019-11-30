@@ -67,7 +67,7 @@ public class TtlSchedulerRemoveTests {
 
 		// Remove service from TtlScheduler and wait for TTL to expired.
 		this.ttlScheduler.remove("ttlSchedulerRemove-id");
-		Thread.sleep(2100);
+		Thread.sleep(2500);
 		serviceCheck = getCheckForService("ttlSchedulerRemove");
 		assertThat(serviceCheck.getStatus()).as("Service check is in wrong state")
 				.isEqualTo(CRITICAL);
