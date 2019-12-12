@@ -106,7 +106,7 @@ public class ConsulDiscoveryPropertiesTests {
 	public void testConsiderWarningStatusAsHealthy() {
 		this.properties.getStatusConsideredAsHealthy().add(Check.CheckStatus.WARNING);
 		assertThat(this.properties.getStatusConsideredAsHealthy())
-				.containsExactly(Check.CheckStatus.WARNING, Check.CheckStatus.PASSING);
+				.containsExactlyInAnyOrder(Check.CheckStatus.WARNING, Check.CheckStatus.PASSING);
 	}
 
 }
