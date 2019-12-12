@@ -87,7 +87,7 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 				.run();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	protected static class TestConfig {
 

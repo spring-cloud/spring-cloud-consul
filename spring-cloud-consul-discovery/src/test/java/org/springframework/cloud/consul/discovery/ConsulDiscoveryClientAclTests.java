@@ -70,7 +70,7 @@ public class ConsulDiscoveryClientAclTests {
 				.isFalse();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@EnableDiscoveryClient
 	public static class MyTestConfig {

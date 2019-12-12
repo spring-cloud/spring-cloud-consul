@@ -31,7 +31,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 /**
  * @author Spencer Gibb
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty(name = "spring.cloud.consul.config.enabled", matchIfMissing = true)
 public class ConsulConfigAutoConfiguration {
@@ -41,7 +41,7 @@ public class ConsulConfigAutoConfiguration {
 	 */
 	public static final String CONFIG_WATCH_TASK_SCHEDULER_NAME = "configWatchTaskScheduler";
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(RefreshEndpoint.class)
 	protected static class ConsulRefreshConfiguration {
 

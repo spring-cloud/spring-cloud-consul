@@ -101,7 +101,7 @@ public class ConsulPropertySourceLocatorAppNameCustomizedTests {
 		assertThat(testProp2).as("testProp2 was wrong").isEqualTo(VALUE2);
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	static class Config {
 

@@ -149,7 +149,7 @@ public class ConsulPropertySourceLocatorTests {
 				.isEqualTo("testPropValInsert");
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	static class Config {
 

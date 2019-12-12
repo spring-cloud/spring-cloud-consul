@@ -84,7 +84,7 @@ public class ConsulAutoServiceDeRegistrationDisabledTests {
 		}
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,

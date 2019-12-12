@@ -57,7 +57,7 @@ public class ConsulServerListConsistencyModeStaleTests {
 				.equals(ConsistencyMode.STALE)).as("ConsistencyMode is stale").isTrue();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@EnableDiscoveryClient
 	public static class TestConfig {

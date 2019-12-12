@@ -90,7 +90,7 @@ public class ConsulAutoServiceRegistrationManagementServiceTests {
 				.isEqualTo(this.discoveryProperties.getHostname());
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,

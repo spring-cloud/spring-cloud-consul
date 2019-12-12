@@ -63,7 +63,7 @@ public class ConsulAutoServiceRegistrationCustomizedServletContextTests {
 	}
 
 	@EnableDiscoveryClient
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	public static class TestConfig {
 

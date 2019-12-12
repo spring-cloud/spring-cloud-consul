@@ -94,7 +94,7 @@ public class ConsulServiceRegistryCheckTtlTests {
 				.as("Service with HTTP check registered in TTL scheduler").isFalse();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,

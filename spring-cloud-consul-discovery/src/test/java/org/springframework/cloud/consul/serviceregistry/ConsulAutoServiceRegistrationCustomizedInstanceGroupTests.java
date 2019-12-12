@@ -82,7 +82,7 @@ public class ConsulAutoServiceRegistrationCustomizedInstanceGroupTests {
 				.as("service group was wrong").isEqualTo("test");
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,
