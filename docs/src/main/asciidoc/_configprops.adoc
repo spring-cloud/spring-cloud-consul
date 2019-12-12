@@ -54,6 +54,7 @@
 |spring.cloud.consul.discovery.scheme | http | Whether to register an http or https service.
 |spring.cloud.consul.discovery.server-list-query-tags |  | Map of serviceId's -> tag to query for in server list. This allows filtering services by a single tag.
 |spring.cloud.consul.discovery.service-name |  | Service name.
+|spring.cloud.consul.discovery.status-considered-as-healthy | passing | The accepted health check states of instances used for routing in load balancer.
 |spring.cloud.consul.discovery.tags |  | Tags to use when registering service.
 |spring.cloud.consul.enabled | true | Is spring cloud consul enabled.
 |spring.cloud.consul.host | localhost | Consul agent hostname. Defaults to 'localhost'.

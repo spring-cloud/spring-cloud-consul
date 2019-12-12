@@ -85,24 +85,21 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		if (response.getValue() == null || response.getValue().isEmpty()) {
 			return Collections.emptyList();
 		}
-		return transformResponse(response.getValue(),
-				this.properties.getStatusConsideredAsHealthy());
+		return transformResponse(response.getValue());
 	}
 
 	/**
 	 * Transforms the response from Consul in to a list of usable {@link ConsulServer}s.
 	 * @param healthServices the initial list of servers from Consul. Guaranteed to be
 	 * non-empty list
-	 * @param statusConsideredAsHealthy list of status that are considered as
-	 * healthy/passing
 	 * @return ConsulServer instances
 	 * @see ConsulServer#ConsulServer(HealthService, java.util.Set)
 	 */
-	protected List<ConsulServer> transformResponse(List<HealthService> healthServices,
-			Set<Check.CheckStatus> statusConsideredAsHealthy) {
+	protected List<ConsulServer> transformResponse(List<HealthService> healthServices) {
 		List<ConsulServer> servers = new ArrayList<>();
 		for (HealthService service : healthServices) {
-			ConsulServer server = new ConsulServer(service, statusConsideredAsHealthy);
+			ConsulServer server = new ConsulServer(service,
+				this.properties.getStatusConsideredAsHealthy());
 			if (server.getMetadata()
 					.containsKey(this.properties.getDefaultZoneMetadataName())) {
 				server.setZone(server.getMetadata()

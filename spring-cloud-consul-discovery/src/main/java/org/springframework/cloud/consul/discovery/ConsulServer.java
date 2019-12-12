@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,6 +38,10 @@ public class ConsulServer extends Server {
 	private final Set<Check.CheckStatus> statusConsideredAsHealthy;
 
 	private final Map<String, String> metadata;
+
+	public ConsulServer(final HealthService healthService) {
+		this(healthService, Collections.singleton(Check.CheckStatus.PASSING));
+	}
 
 	public ConsulServer(final HealthService healthService,
 			Set<Check.CheckStatus> statusConsideredAsHealthy) {
