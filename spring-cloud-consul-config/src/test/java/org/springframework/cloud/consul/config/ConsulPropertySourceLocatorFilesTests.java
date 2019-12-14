@@ -16,8 +16,6 @@
 
 package org.springframework.cloud.consul.config;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.UUID;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -31,10 +29,8 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertySource;
 import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -109,35 +105,17 @@ public class ConsulPropertySourceLocatorFilesTests {
 		assertThat(myBaz).as("my.baz was wrong").isEqualTo("bar-app-dev");
 
 		MutablePropertySources propertySources = this.environment.getPropertySources();
-		PropertySource<?> bootstrapProperties = propertySources
-				.get("bootstrapProperties");
-		assertThat(bootstrapProperties).as("bootstrapProperties was null").isNotNull();
-		assertThat(bootstrapProperties).as("bootstrapProperties was wrong type")
-				.isInstanceOf(CompositePropertySource.class);
 
-		Collection<PropertySource<?>> consulSources = ((CompositePropertySource) bootstrapProperties)
-				.getPropertySources();
-		assertThat(consulSources).as("consulSources was wrong size").hasSize(1);
-
-		PropertySource<?> consulSource = consulSources.iterator().next();
-		assertThat(consulSource).as("consulSource was wrong type")
-				.isInstanceOf(CompositePropertySource.class);
-		Collection<PropertySource<?>> fileSources = ((CompositePropertySource) consulSource)
-				.getPropertySources();
-		assertThat(fileSources).as("fileSources was wrong size").hasSize(4);
-
-		assertFileSourceNames(fileSources, APP_NAME_DEV_PROPS, APP_NAME_PROPS,
-				APPLICATION_DEV_YML, APPLICATION_YML);
+		assertFilePropertySourceExists(propertySources, APP_NAME_DEV_PROPS);
+		assertFilePropertySourceExists(propertySources, APP_NAME_PROPS);
+		assertFilePropertySourceExists(propertySources, APPLICATION_DEV_YML);
+		assertFilePropertySourceExists(propertySources, APPLICATION_YML);
 	}
 
-	private void assertFileSourceNames(Collection<PropertySource<?>> fileSources,
-			String... names) {
-		Iterator<PropertySource<?>> iterator = fileSources.iterator();
-		for (String name : names) {
-			PropertySource<?> fileSource = iterator.next();
-			assertThat(fileSource.getName()).as("fileSources was wrong name")
-					.endsWith(name);
-		}
+	private void assertFilePropertySourceExists(MutablePropertySources propertySources, String name) {
+		boolean found = propertySources.stream()
+			.anyMatch(propertySource -> propertySource.getName().endsWith(name));
+		assertThat(found).as("missing consul filesource: " + name).isTrue();
 	}
 
 	@Configuration(proxyBeanMethods = false)
