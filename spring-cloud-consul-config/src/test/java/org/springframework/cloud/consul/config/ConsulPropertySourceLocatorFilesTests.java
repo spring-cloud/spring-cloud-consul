@@ -112,9 +112,10 @@ public class ConsulPropertySourceLocatorFilesTests {
 		assertFilePropertySourceExists(propertySources, APPLICATION_YML);
 	}
 
-	private void assertFilePropertySourceExists(MutablePropertySources propertySources, String name) {
+	private void assertFilePropertySourceExists(MutablePropertySources propertySources,
+			String name) {
 		boolean found = propertySources.stream()
-			.anyMatch(propertySource -> propertySource.getName().endsWith(name));
+				.anyMatch(propertySource -> propertySource.getName().endsWith(name));
 		assertThat(found).as("missing consul filesource: " + name).isTrue();
 	}
 
