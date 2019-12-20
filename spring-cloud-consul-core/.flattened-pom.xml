@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.springframework.cloud</groupId>
     <artifactId>spring-cloud-consul</artifactId>
-    <version>2.2.1.BUILD-SNAPSHOT</version>
+    <version>2.2.1.RELEASE</version>
     <relativePath>..</relativePath>
   </parent>
   <groupId>org.springframework.cloud</groupId>
   <artifactId>spring-cloud-consul-core</artifactId>
-  <version>2.2.1.BUILD-SNAPSHOT</version>
+  <version>2.2.1.RELEASE</version>
   <name>Spring Cloud Consul Core</name>
   <description>Spring Cloud Consul Core</description>
   <url>https://spring.io/spring-cloud/spring-cloud-consul/spring-cloud-consul-core</url>
@@ -121,7 +121,7 @@
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-commons</artifactId>
-      <version>2.2.1.BUILD-SNAPSHOT</version>
+      <version>2.2.1.RELEASE</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
