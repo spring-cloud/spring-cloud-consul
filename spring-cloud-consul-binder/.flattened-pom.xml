@@ -5,12 +5,12 @@
   <parent>
     <groupId>org.springframework.cloud</groupId>
     <artifactId>spring-cloud-consul</artifactId>
-    <version>2.2.1.BUILD-SNAPSHOT</version>
+    <version>2.2.2.BUILD-SNAPSHOT</version>
     <relativePath>..</relativePath>
   </parent>
   <groupId>org.springframework.cloud</groupId>
   <artifactId>spring-cloud-consul-binder</artifactId>
-  <version>2.2.1.BUILD-SNAPSHOT</version>
+  <version>2.2.2.BUILD-SNAPSHOT</version>
   <name>Spring Cloud Consul Binder</name>
   <description>Spring Cloud Consul Binder</description>
   <url>https://spring.io/spring-cloud/spring-cloud-consul/spring-cloud-consul-binder</url>
@@ -107,14 +107,14 @@
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-consul-core</artifactId>
-      <version>2.2.1.BUILD-SNAPSHOT</version>
+      <version>2.2.2.BUILD-SNAPSHOT</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-stream</artifactId>
-      <version>3.0.0.RELEASE</version>
+      <version>3.0.1.RELEASE</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
