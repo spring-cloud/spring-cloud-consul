@@ -212,7 +212,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 		this.firstTime = false;
 	}
 
-	static class RefreshEventData {
+	public static class RefreshEventData {
 
 		private final String context;
 
