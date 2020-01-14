@@ -17,3 +17,5 @@ _site/
 consul_*.zip
 consul_*.zip.*
 .vscode/
+.flattened-pom.xml
+
