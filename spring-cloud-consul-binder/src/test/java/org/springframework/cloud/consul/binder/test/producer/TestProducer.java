@@ -46,7 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @Import(ConsulBinderConfiguration.class)
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableAutoConfiguration
 public class TestProducer implements ApplicationRunner {
 

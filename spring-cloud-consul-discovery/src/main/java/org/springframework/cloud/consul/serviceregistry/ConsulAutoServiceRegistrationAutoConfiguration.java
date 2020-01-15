@@ -39,7 +39,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Spencer Gibb
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnBean(AutoServiceRegistrationProperties.class)
 @ConditionalOnMissingBean(
 		type = "org.springframework.cloud.consul.discovery.ConsulLifecycle")
@@ -83,7 +83,7 @@ public class ConsulAutoServiceRegistrationAutoConfiguration {
 				managementRegistrationCustomizers.getIfAvailable(), heartbeatProperties);
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(ServletContext.class)
 	protected static class ConsulServletConfiguration {
 

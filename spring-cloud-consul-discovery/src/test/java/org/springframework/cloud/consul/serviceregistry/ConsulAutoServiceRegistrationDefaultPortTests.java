@@ -58,7 +58,7 @@ public class ConsulAutoServiceRegistrationDefaultPortTests {
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,

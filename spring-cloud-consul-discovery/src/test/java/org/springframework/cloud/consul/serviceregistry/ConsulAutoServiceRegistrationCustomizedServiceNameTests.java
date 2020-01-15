@@ -64,7 +64,7 @@ public class ConsulAutoServiceRegistrationCustomizedServiceNameTests {
 				.isEqualTo("myprefix-myTestService-CC");
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,

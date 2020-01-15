@@ -16,16 +16,14 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.List;
-
+import com.ecwid.consul.v1.ConsistencyMode;
+import com.ecwid.consul.v1.ConsulClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -34,46 +32,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
- * @author Spencer Gibb
+ * @author Varnson Fan
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = ConsulDiscoveryClientAclTests.MyTestConfig.class,
-		properties = { "spring.application.name=testConsulDiscoveryAcl",
+@SpringBootTest(classes = ConsulServerListConsistencyModeStaleTests.TestConfig.class,
+		properties = { "spring.application.name=testConsulServerListConsistencyMode",
 				"spring.cloud.consul.discovery.preferIpAddress=true",
-				"consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304" },
+				"spring.cloud.consul.discovery.consistencyMode=STALE" },
 		webEnvironment = RANDOM_PORT)
-public class ConsulDiscoveryClientAclTests {
+public class ConsulServerListConsistencyModeStaleTests {
 
 	@Autowired
-	private ConsulDiscoveryClient discoveryClient;
+	private ConsulClient consulClient;
+
+	@Autowired
+	private ConsulDiscoveryProperties properties;
 
 	@Test
-	public void getInstancesForThisServiceWorks() {
-		List<ServiceInstance> instances = this.discoveryClient
-				.getInstances("testConsulDiscoveryAcl");
-		assertThat(instances).as("instances was null").isNotNull();
-		assertThat(instances.isEmpty()).as("instances was empty").isFalse();
-	}
+	public void serverListWorksWithConsistencyMode() {
+		ConsulServerList consulServerList = new ConsulServerList(this.consulClient,
+				this.properties);
 
-	@Test
-	public void getInstancesForSecondServiceWorks() throws Exception {
-
-		new SpringApplicationBuilder(MyTestConfig.class).run(
-				"--spring.application.name=testSecondServiceAcl", "--server.port=0",
-				"--spring.cloud.consul.discovery.preferIpAddress=true",
-				"--consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304");
-
-		List<ServiceInstance> instances = this.discoveryClient
-				.getInstances("testSecondServiceAcl");
-		assertThat(instances).as("second service instances was null").isNotNull();
-		assertThat(instances.isEmpty()).as("second service instances was empty")
-				.isFalse();
+		assertThat(consulServerList.getProperties().getConsistencyMode()
+				.equals(ConsistencyMode.STALE)).as("ConsistencyMode is stale").isTrue();
 	}
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@EnableDiscoveryClient
-	public static class MyTestConfig {
+	public static class TestConfig {
 
 	}
 

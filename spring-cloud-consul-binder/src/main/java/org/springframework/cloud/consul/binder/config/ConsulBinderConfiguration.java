@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Import;
  *
  * @author Spencer Gibb
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnMissingBean(Binder.class)
 @Import({ PropertyPlaceholderAutoConfiguration.class })
 @ConditionalOnConsulEnabled

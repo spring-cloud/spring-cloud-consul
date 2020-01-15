@@ -87,7 +87,7 @@ public class ConsulDiscoveryClientTests {
 				.as("host isn't an ip address").isTrue();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@EnableDiscoveryClient
 	public static class MyTestConfig {

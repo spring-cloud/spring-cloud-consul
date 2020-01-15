@@ -36,7 +36,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author Tim Ysewyn
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty("spring.cloud.consul.discovery.heartbeat.enabled")
 @ConditionalOnDiscoveryEnabled

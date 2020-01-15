@@ -93,7 +93,7 @@ public class ConsulDiscoveryClientCustomizedTests {
 		assertThat(foo2).as("metadata key foo2 was wrong").isEqualTo("bar2=baz2");
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@EnableDiscoveryClient
 	public static class MyTestConfig {

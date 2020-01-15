@@ -39,7 +39,7 @@ import org.springframework.util.StringUtils;
 /**
  * @author Spencer Gibb
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties
 @ConditionalOnConsulEnabled
 public class ConsulAutoConfiguration {
@@ -68,7 +68,7 @@ public class ConsulAutoConfiguration {
 		return new ConsulClient(agentHost, agentPort);
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(Endpoint.class)
 	protected static class ConsulHealthConfig {
 
@@ -89,7 +89,7 @@ public class ConsulAutoConfiguration {
 	}
 
 	@ConditionalOnClass({ Retryable.class, Aspect.class, AopAutoConfiguration.class })
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableRetry(proxyTargetClass = true)
 	@Import(AopAutoConfiguration.class)
 	@EnableConfigurationProperties(RetryProperties.class)

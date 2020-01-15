@@ -71,7 +71,7 @@ public class ConsulAutoServiceRegistrationManagementCustomizerTests {
 				.isTrue();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	public static class ManagementConfig {
 
 		@Bean
@@ -100,7 +100,7 @@ public class ConsulAutoServiceRegistrationManagementCustomizerTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,

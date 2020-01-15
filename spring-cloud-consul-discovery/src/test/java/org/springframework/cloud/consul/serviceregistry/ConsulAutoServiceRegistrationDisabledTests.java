@@ -63,7 +63,7 @@ public class ConsulAutoServiceRegistrationDisabledTests {
 		assertThat(service).as("service was registered").isNull();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,

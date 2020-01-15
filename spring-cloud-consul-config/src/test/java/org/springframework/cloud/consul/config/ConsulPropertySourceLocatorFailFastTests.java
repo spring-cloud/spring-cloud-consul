@@ -43,7 +43,7 @@ public class ConsulPropertySourceLocatorFailFastTests {
 	public void testFailFastFalse() {
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	static class Config {
 

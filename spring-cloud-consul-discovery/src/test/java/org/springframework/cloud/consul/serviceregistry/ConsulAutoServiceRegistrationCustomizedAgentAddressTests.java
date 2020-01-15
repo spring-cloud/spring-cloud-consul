@@ -68,7 +68,7 @@ public class ConsulAutoServiceRegistrationCustomizedAgentAddressTests {
 				.as("service address must be empty").isTrue();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,

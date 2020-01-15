@@ -35,7 +35,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Spencer Gibb
  * @author Tim Ysewyn
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty(value = "spring.cloud.service-registry.enabled",
 		matchIfMissing = true)

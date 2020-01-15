@@ -82,7 +82,7 @@ public class ConsulAutoServiceRegistrationCustomizedDiscoveryPortTests {
 		// unable to call consul api to get health check details
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
 			ConsulAutoConfiguration.class,
