@@ -16,7 +16,9 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import com.ecwid.consul.v1.health.model.Check;
 import com.ecwid.consul.v1.health.model.HealthService;
@@ -33,11 +35,19 @@ public class ConsulServer extends Server {
 
 	private final HealthService service;
 
+	private final Set<Check.CheckStatus> statusConsideredAsHealthy;
+
 	private final Map<String, String> metadata;
 
 	public ConsulServer(final HealthService healthService) {
+		this(healthService, Collections.singleton(Check.CheckStatus.PASSING));
+	}
+
+	public ConsulServer(final HealthService healthService,
+			Set<Check.CheckStatus> statusConsideredAsHealthy) {
 		super(findHost(healthService), healthService.getService().getPort());
 		this.service = healthService;
+		this.statusConsideredAsHealthy = statusConsideredAsHealthy;
 		this.metadata = ConsulServerUtils.getMetadata(this.service);
 		this.metaInfo = new MetaInfo() {
 			@Override
@@ -79,7 +89,7 @@ public class ConsulServer extends Server {
 
 	public boolean isPassingChecks() {
 		for (Check check : this.service.getChecks()) {
-			if (check.getStatus() != Check.CheckStatus.PASSING) {
+			if (!statusConsideredAsHealthy.contains(check.getStatus())) {
 				return false;
 			}
 		}

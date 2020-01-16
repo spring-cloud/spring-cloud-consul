@@ -91,12 +91,13 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	 * @param healthServices the initial list of servers from Consul. Guaranteed to be
 	 * non-empty list
 	 * @return ConsulServer instances
-	 * @see ConsulServer#ConsulServer(HealthService)
+	 * @see ConsulServer#ConsulServer(HealthService, java.util.Set)
 	 */
 	protected List<ConsulServer> transformResponse(List<HealthService> healthServices) {
 		List<ConsulServer> servers = new ArrayList<>();
 		for (HealthService service : healthServices) {
-			ConsulServer server = new ConsulServer(service);
+			ConsulServer server = new ConsulServer(service,
+				this.properties.getStatusConsideredAsHealthy());
 			if (server.getMetadata()
 					.containsKey(this.properties.getDefaultZoneMetadataName())) {
 				server.setZone(server.getMetadata()

@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.discovery;
 import java.util.Collections;
 import java.util.Map;
 
+import com.ecwid.consul.v1.health.model.Check;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -93,6 +94,19 @@ public class ConsulDiscoveryPropertiesTests {
 		this.properties.getManagementTags().add("newTag");
 		assertThat(this.properties.getManagementTags())
 				.containsOnly(ConsulDiscoveryProperties.MANAGEMENT, "newTag");
+	}
+
+	@Test
+	public void testConsiderStatusAsHealthyContainsPassingByDefault() {
+		assertThat(this.properties.getStatusConsideredAsHealthy())
+				.containsExactly(Check.CheckStatus.PASSING);
+	}
+
+	@Test
+	public void testConsiderWarningStatusAsHealthy() {
+		this.properties.getStatusConsideredAsHealthy().add(Check.CheckStatus.WARNING);
+		assertThat(this.properties.getStatusConsideredAsHealthy())
+				.containsExactlyInAnyOrder(Check.CheckStatus.WARNING, Check.CheckStatus.PASSING);
 	}
 
 }

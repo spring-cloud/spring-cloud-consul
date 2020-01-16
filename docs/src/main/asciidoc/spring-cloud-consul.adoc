@@ -279,6 +279,20 @@ public String serviceUrl() {
 }
 ----
 
+==== Instances used by Load-balancer
+
+The load balancer will only use instances of a service with health checks in "passing" state by default. However Consul also offers the "warning" state, which you might still want to accept for routing. You can configure the accepted states via property `spring.cloud.consul.discovery.status-considered-as-healthy`, e.g.
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        status-considered-as-healthy:
+          - PASSING
+          - WARNING
+----
+
 === Consul Catalog Watch
 
 The Consul Catalog Watch takes advantage of the ability of consul to https://www.consul.io/docs/agent/watches.html#services[watch services]. The Catalog Watch makes a blocking Consul HTTP API call to determine if any services have changed. If there is new service data a Heartbeat Event is published.
