@@ -94,8 +94,8 @@ public class HeartbeatProperties {
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("enabled", this.enabled)
-				.append("ttl", this.ttl)
-				.append("intervalRatio", this.intervalRatio).toString();
+				.append("ttl", this.ttl).append("intervalRatio", this.intervalRatio)
+				.toString();
 	}
 
 }

@@ -38,8 +38,8 @@ public class TestConsulDiscoveryClientBootstrapConfiguration {
 	public ConsulDiscoveryClient consulDiscoveryClient(
 			ConsulDiscoveryProperties properties) {
 		ConsulDiscoveryClient client = mock(ConsulDiscoveryClient.class);
-		ServiceInstance instance = new DefaultServiceInstance("configserver",
-				properties.getHostname(), properties.getPort(), false);
+		ServiceInstance instance = new DefaultServiceInstance("configserver1",
+				"configserver", properties.getHostname(), properties.getPort(), false);
 		given(client.getInstances("configserver")).willReturn(Arrays.asList(instance));
 		return client;
 	}

@@ -63,8 +63,8 @@ public class TtlScheduler {
 	 */
 	public void add(String instanceId) {
 		ScheduledFuture task = this.scheduler.scheduleAtFixedRate(
-				new ConsulHeartbeatTask(instanceId), this.configuration
-						.computeHearbeatInterval().toMillis());
+				new ConsulHeartbeatTask(instanceId),
+				this.configuration.computeHearbeatInterval().toMillis());
 		ScheduledFuture previousTask = this.serviceHeartbeats.put(instanceId, task);
 		if (previousTask != null) {
 			previousTask.cancel(true);

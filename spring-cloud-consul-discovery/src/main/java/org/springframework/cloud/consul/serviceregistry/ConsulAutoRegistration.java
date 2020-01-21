@@ -228,7 +228,9 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 					properties.getHealthCheckCriticalTimeout());
 		}
 		if (ttlConfig.isEnabled()) {
-			check.setTtl(ttlConfig.getTtl());
+			// FIXME 3.0.0
+			// https://github.com/spring-cloud/spring-cloud-consul/issues/614
+			check.setTtl(ttlConfig.getTtl().getSeconds() + "s");
 			return check;
 		}
 
