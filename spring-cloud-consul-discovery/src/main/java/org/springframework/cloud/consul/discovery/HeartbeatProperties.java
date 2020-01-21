@@ -16,15 +16,16 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 
 import org.apache.commons.logging.Log;
-import org.joda.time.Period;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.convert.DurationUnit;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.validation.annotation.Validated;
 
@@ -44,11 +45,8 @@ public class HeartbeatProperties {
 	// [WARN] agent: Check 'service:testConsulApp:xtest:8080' missed TTL, is now critical
 	boolean enabled = false;
 
-	@Min(1)
-	private int ttlValue = 30;
-
-	@NotNull
-	private String ttlUnit = "s";
+	@DurationUnit(ChronoUnit.SECONDS)
+	private Duration ttl = Duration.ofSeconds(30);
 
 	@DecimalMin("0.1")
 	@DecimalMax("0.9")
@@ -56,20 +54,16 @@ public class HeartbeatProperties {
 
 	// TODO: did heartbeatInterval need to be a field?
 
-	protected Period computeHearbeatInterval() {
+	protected Duration computeHearbeatInterval() {
 		// heartbeat rate at ratio * ttl, but no later than ttl -1s and, (under lesser
 		// priority), no sooner than 1s from now
-		double interval = this.ttlValue * this.intervalRatio;
+		double interval = this.ttl.getSeconds() * this.intervalRatio;
 		double max = Math.max(interval, 1);
-		int ttlMinus1 = this.ttlValue - 1;
+		long ttlMinus1 = this.ttl.getSeconds() - 1;
 		double min = Math.min(ttlMinus1, max);
-		Period heartbeatInterval = new Period(Math.round(1000 * min));
+		Duration heartbeatInterval = Duration.ofMillis(Math.round(1000 * min));
 		log.debug("Computed heartbeatInterval: " + heartbeatInterval);
 		return heartbeatInterval;
-	}
-
-	public String getTtl() {
-		return this.ttlValue + this.ttlUnit;
 	}
 
 	public boolean isEnabled() {
@@ -80,20 +74,12 @@ public class HeartbeatProperties {
 		this.enabled = enabled;
 	}
 
-	public @Min(1) int getTtlValue() {
-		return this.ttlValue;
+	public Duration getTtl() {
+		return this.ttl;
 	}
 
-	public void setTtlValue(@Min(1) int ttlValue) {
-		this.ttlValue = ttlValue;
-	}
-
-	public @NotNull String getTtlUnit() {
-		return this.ttlUnit;
-	}
-
-	public void setTtlUnit(@NotNull String ttlUnit) {
-		this.ttlUnit = ttlUnit;
+	public void setTtl(Duration ttl) {
+		this.ttl = ttl;
 	}
 
 	public @DecimalMin("0.1") @DecimalMax("0.9") double getIntervalRatio() {
@@ -108,7 +94,7 @@ public class HeartbeatProperties {
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("enabled", this.enabled)
-				.append("ttlValue", this.ttlValue).append("ttlUnit", this.ttlUnit)
+				.append("ttl", this.ttl)
 				.append("intervalRatio", this.intervalRatio).toString();
 	}
 

@@ -16,7 +16,9 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import org.joda.time.Period;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,20 +31,20 @@ public class HeartbeatPropertiesTests {
 	@Test
 	public void computeHeartbeatIntervalWorks() {
 		HeartbeatProperties properties = new HeartbeatProperties();
-		Period period = properties.computeHearbeatInterval();
+		Duration period = properties.computeHearbeatInterval();
 
 		assertThat(period).isNotNull();
-		assertThat(period.getSeconds()).isEqualTo(20);
+		assertThat(period.get(ChronoUnit.SECONDS)).isEqualTo(20);
 	}
 
 	@Test
 	public void computeShortHeartbeat() {
 		HeartbeatProperties properties = new HeartbeatProperties();
-		properties.setTtlValue(2);
-		Period period = properties.computeHearbeatInterval();
+		properties.setTtl(Duration.ofSeconds(2));
+		Duration period = properties.computeHearbeatInterval();
 
 		assertThat(period).isNotNull();
-		assertThat(period.getSeconds()).isEqualTo(1);
+		assertThat(period.get(ChronoUnit.SECONDS)).isEqualTo(1);
 	}
 
 }
