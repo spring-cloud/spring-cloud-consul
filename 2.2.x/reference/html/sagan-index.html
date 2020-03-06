@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 1.5.8">
+<title>Features</title>
+<link rel="stylesheet" href="css/spring.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<style>
+.hidden {
+	display: none;
+}
+
+.switch {
+	border-width: 1px 1px 0 1px;
+	border-style: solid;
+	border-color: #7a2518;
+	display: inline-block;
+}
+
+.switch--item {
+	padding: 10px;
+	background-color: #ffffff;
+	color: #7a2518;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.switch--item:not(:first-child) {
+	border-width: 0 0 0 1px;
+	border-style: solid;
+	border-color: #7a2518;
+}
+
+.switch--item.selected {
+	background-color: #7a2519;
+	color: #ffffff;
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+<script type="text/javascript">
+function addBlockSwitches() {
+	$('.primary').each(function() {
+		primary = $(this);
+		createSwitchItem(primary, createBlockSwitch(primary)).item.addClass("selected");
+		primary.children('.title').remove();
+	});
+	$('.secondary').each(function(idx, node) {
+		secondary = $(node);
+		primary = findPrimary(secondary);
+		switchItem = createSwitchItem(secondary, primary.children('.switch'));
+		switchItem.content.addClass('hidden');
+		findPrimary(secondary).append(switchItem.content);
+		secondary.remove();
+	});
+}
+
+function createBlockSwitch(primary) {
+	blockSwitch = $('<div class="switch"></div>');
+	primary.prepend(blockSwitch);
+	return blockSwitch;
+}
+
+function findPrimary(secondary) {
+	candidate = secondary.prev();
+	while (!candidate.is('.primary')) {
+		candidate = candidate.prev();
+	}
+	return candidate;
+}
+
+function createSwitchItem(block, blockSwitch) {
+	blockName = block.children('.title').text();
+	content = block.children('.content').first().append(block.next('.colist'));
+	item = $('<div class="switch--item">' + blockName + '</div>');
+	item.on('click', '', content, function(e) {
+		$(this).addClass('selected');
+		$(this).siblings().removeClass('selected');
+		e.data.siblings('.content').addClass('hidden');
+		e.data.removeClass('hidden');
+	});
+	blockSwitch.append(item);
+	return {'item': item, 'content': content};
+}
+
+$(addBlockSwitches);
+</script>
+
+</head>
+<body class="book toc2 toc-left">
+<div id="header">
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_features">Features</a></li>
+<li><a href="#_quick_start">Quick Start</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring Cloud Consul provides <a href="http://consul.io">Consul</a> integrations for Spring Boot apps through autoconfiguration and binding to the Spring Environment and other Spring programming model idioms. With a few simple annotations you can quickly enable and configure the common patterns inside your application and build large distributed systems with Hashicorp&#8217;s Consul. The patterns provided include Service Discovery, Distributed Configuration and Control Bus.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_features"><a class="link" href="#_features">Features</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Spring Cloud Consul features:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Service Discovery: instances can be registered with the Consul agent and clients can discover the instances using Spring-managed beans</p>
+</li>
+<li>
+<p>Supports Ribbon, the client side load-balancer via Spring Cloud Netflix</p>
+</li>
+<li>
+<p>Supports Spring Cloud LoadBalancer - a client side load-balancer provided by the Spring Cloud project</p>
+</li>
+<li>
+<p>Supports Zuul, a dynamic router and filter via Spring Cloud Netflix</p>
+</li>
+<li>
+<p>Distributed Configuration: using the Consul Key/Value store</p>
+</li>
+<li>
+<p>Control Bus: Distributed control events using Consul Events</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_quick_start"><a class="link" href="#_quick_start">Quick Start</a></h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>As long as Spring Cloud Consul and the Consul API are on the
+classpath any Spring Boot application with <code>@EnableDiscoveryClient</code> will try to contact a Consul
+agent on <code>localhost:8500</code> (the default values of
+<code>spring.cloud.consul.host</code> and <code>spring.cloud.consul.port</code> respectively):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code class="language-java hljs" data-lang="java">@Configuration
+@EnableAutoConfiguration
+@EnableDiscoveryClient
+@RestController
+public class Application {
+
+  @RequestMapping("/")
+  public String home() {
+    return "Hello World";
+  }
+
+  public static void main(String[] args) {
+    SpringApplication.run(Application.class, args);
+  }
+
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A local Consul agent must be running.  See the <a href="https://consul.io/docs/agent/basics.html">Consul agent documentation</a> on how to run an agent.</p>
+</div>
+</div>
+</div>
+</div>
+<script type="text/javascript" src="js/tocbot/tocbot.min.js"></script>
+<script type="text/javascript" src="js/toc.js"></script>
+<link rel="stylesheet" href="js/highlight/styles/atom-one-dark-reasonable.min.css">
+<script src="js/highlight/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>
