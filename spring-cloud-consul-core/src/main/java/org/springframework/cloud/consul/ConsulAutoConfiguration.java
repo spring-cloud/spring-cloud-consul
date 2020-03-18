@@ -20,7 +20,7 @@ import com.ecwid.consul.transport.TLSConfig;
 import com.ecwid.consul.v1.ConsulClient;
 import org.aspectj.lang.annotation.Aspect;
 
-import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnEnabledEndpoint;
+import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.autoconfigure.health.ConditionalOnEnabledHealthIndicator;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
@@ -74,7 +74,7 @@ public class ConsulAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		@ConditionalOnEnabledEndpoint
+		@ConditionalOnAvailableEndpoint
 		public ConsulEndpoint consulEndpoint(ConsulClient consulClient) {
 			return new ConsulEndpoint(consulClient);
 		}

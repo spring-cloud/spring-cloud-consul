@@ -27,7 +27,7 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -45,7 +45,7 @@ public class ConsulAutoServiceRegistrationRetryTests {
 	public ExpectedException exception = ExpectedException.none();
 
 	@Rule
-	public OutputCapture output = new OutputCapture();
+	public OutputCaptureRule output = new OutputCaptureRule();
 
 	@Test
 	public void testRetry() {

@@ -14,12 +14,13 @@
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
 		<artifactId>spring-cloud-build</artifactId>
-		<version>2.2.3.RELEASE</version>
+		<version>2.2.4.BUILD-SNAPSHOT</version>
 		<relativePath/>
 		<!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
+		<joda-time.version>2.10.5</joda-time.version>
 		<spring-cloud-bus.version>2.2.2.BUILD-SNAPSHOT</spring-cloud-bus.version>
 		<spring-cloud-commons.version>2.2.3.BUILD-SNAPSHOT</spring-cloud-commons.version>
 		<spring-cloud-config.version>2.2.3.BUILD-SNAPSHOT</spring-cloud-config.version>
@@ -171,6 +172,11 @@
 				</exclusions>
 			</dependency>
 			<!-- end archaius deps -->
+			<dependency>
+				<groupId>joda-time</groupId>
+				<artifactId>joda-time</artifactId>
+				<version>${joda-time.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

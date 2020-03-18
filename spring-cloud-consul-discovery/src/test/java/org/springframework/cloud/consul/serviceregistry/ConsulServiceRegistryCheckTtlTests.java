@@ -88,11 +88,14 @@ public class ConsulServiceRegistryCheckTtlTests {
 					.getDeclaredField("serviceHeartbeats");
 			serviceHeartbeatsField.setAccessible(true);
 			Map serviceHeartbeats = (Map) serviceHeartbeatsField.get(this.ttlScheduler);
-			assertThat(serviceHeartbeats.keySet().contains(this.registration.getInstanceId()))
-					.as("Service with heartbeat check not registered in TTL scheduler")
-					.isTrue();
-			assertThat(serviceHeartbeats.keySet().contains(httpRegistration.getInstanceId()))
-					.as("Service with HTTP check registered in TTL scheduler").isFalse();
+			assertThat(serviceHeartbeats.keySet()
+					.contains(this.registration.getInstanceId())).as(
+							"Service with heartbeat check not registered in TTL scheduler")
+							.isTrue();
+			assertThat(
+					serviceHeartbeats.keySet().contains(httpRegistration.getInstanceId()))
+							.as("Service with HTTP check registered in TTL scheduler")
+							.isFalse();
 		}
 		finally {
 			this.consulServiceRegistry.deregister(httpRegistration);
