@@ -20,6 +20,7 @@ import com.ecwid.consul.v1.ConsulClient;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.serviceregistry.ServiceRegistryAutoConfiguration;
@@ -29,6 +30,7 @@ import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -37,8 +39,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnConsulEnabled
-@ConditionalOnProperty(value = "spring.cloud.service-registry.enabled",
-		matchIfMissing = true)
+@Conditional(ConsulServiceRegistryAutoConfiguration.OnConsulRegistrationEnabledCondition.class)
 @AutoConfigureBefore(ServiceRegistryAutoConfiguration.class)
 public class ConsulServiceRegistryAutoConfiguration {
 
@@ -62,6 +63,27 @@ public class ConsulServiceRegistryAutoConfiguration {
 	// TODO: Split appropriate values to service-registry for Edgware
 	public ConsulDiscoveryProperties consulDiscoveryProperties(InetUtils inetUtils) {
 		return new ConsulDiscoveryProperties(inetUtils);
+	}
+
+	protected static class OnConsulRegistrationEnabledCondition
+			extends AllNestedConditions {
+
+		OnConsulRegistrationEnabledCondition() {
+			super(ConfigurationPhase.REGISTER_BEAN);
+		}
+
+		@ConditionalOnProperty(value = "spring.cloud.service-registry.enabled",
+				matchIfMissing = true)
+		static class ServiceRegistryEnabledClass {
+
+		}
+
+		@ConditionalOnProperty(value = "spring.cloud.consul.service-registry.enabled",
+				matchIfMissing = true)
+		static class ConsulServiceRegistryEnabledClass {
+
+		}
+
 	}
 
 }
