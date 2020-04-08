@@ -25,6 +25,9 @@ import org.springframework.core.style.ToStringCreator;
 @ConfigurationProperties("spring.cloud.consul.retry")
 public class RetryProperties {
 
+	/** If consul retry is enabled. */
+	private boolean enabled = true;
+
 	/** Initial retry interval in milliseconds. */
 	private long initialInterval = 1000;
 
@@ -38,6 +41,14 @@ public class RetryProperties {
 	private int maxAttempts = 6;
 
 	public RetryProperties() {
+	}
+
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	public long getInitialInterval() {
@@ -74,7 +85,8 @@ public class RetryProperties {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this).append("initialInterval", this.initialInterval)
+		return new ToStringCreator(this).append("enabled", this.enabled)
+				.append("initialInterval", this.initialInterval)
 				.append("multiplier", this.multiplier)
 				.append("maxInterval", this.maxInterval)
 				.append("maxAttempts", this.maxAttempts).toString();

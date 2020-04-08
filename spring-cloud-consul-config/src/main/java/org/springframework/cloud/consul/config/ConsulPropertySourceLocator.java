@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.config;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -70,6 +71,12 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 
 	public LinkedHashMap<String, Long> getContextIndexes() {
 		return this.contextIndex;
+	}
+
+	@Override
+	@Retryable(interceptor = "consulRetryInterceptor")
+	public Collection<PropertySource<?>> locateCollection(Environment environment) {
+		return PropertySourceLocator.locateCollection(this, environment);
 	}
 
 	@Override
