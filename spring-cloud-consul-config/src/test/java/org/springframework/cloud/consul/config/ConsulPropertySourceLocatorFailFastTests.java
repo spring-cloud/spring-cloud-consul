@@ -34,6 +34,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 		properties = { "spring.application.name=testConsulPropertySourceLocatorFailFast",
 				"spring.cloud.consul.host=53210a7c-4809-42cb-8b30-057d2db85fcc",
 				"spring.cloud.consul.port=65530",
+				"spring.cloud.consul.retry.enabled=false",
 				"spring.cloud.consul.retry.maxAttempts=0",
 				"spring.cloud.consul.config.failFast=false" },
 		webEnvironment = RANDOM_PORT)
