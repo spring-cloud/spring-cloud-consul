@@ -94,7 +94,8 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 	private ServiceInstance mapToServiceInstance(HealthService service,
 			String serviceId) {
 		String host = findHost(service);
-		Map<String, String> metadata = getMetadata(service);
+		Map<String, String> metadata = getMetadata(service,
+				properties.isTagsAsMetadata());
 		boolean secure = false;
 		if (metadata.containsKey("secure")) {
 			secure = Boolean.parseBoolean(metadata.get("secure"));

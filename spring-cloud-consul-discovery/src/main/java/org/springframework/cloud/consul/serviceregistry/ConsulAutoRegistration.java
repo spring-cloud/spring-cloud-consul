@@ -17,8 +17,10 @@
 package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import com.ecwid.consul.v1.agent.model.NewService;
 
@@ -31,6 +33,7 @@ import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -87,6 +90,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		}
 		service.setName(normalizeForDns(appName));
 		service.setTags(createTags(properties));
+		service.setEnableTagOverride(properties.getEnableTagOverride());
+		service.setMeta(getMetadata(properties));
 
 		if (properties.getPort() != null) {
 			service.setPort(properties.getPort());
@@ -142,6 +147,8 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 				.setName(getManagementServiceName(properties, context.getEnvironment()));
 		management.setPort(getManagementPort(properties, context));
 		management.setTags(properties.getManagementTags());
+		management.setEnableTagOverride(properties.getManagementEnableTagOverride());
+		management.setMeta(properties.getManagementMetadata());
 		if (properties.isRegisterHealthCheck()) {
 			management.setCheck(createCheck(getManagementPort(properties, context),
 					heartbeatProperties, properties));
@@ -201,23 +208,50 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		return normalized.toString();
 	}
 
+	@Deprecated
 	public static List<String> createTags(ConsulDiscoveryProperties properties) {
 		List<String> tags = new LinkedList<>(properties.getTags());
+		if (properties.isTagsAsMetadata()) {
+			if (!StringUtils.isEmpty(properties.getInstanceZone())) {
+				tags.add(properties.getDefaultZoneMetadataName() + "="
+						+ properties.getInstanceZone());
+			}
+			if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
+				tags.add("group=" + properties.getInstanceGroup());
+			}
 
-		if (!StringUtils.isEmpty(properties.getInstanceZone())) {
-			tags.add(properties.getDefaultZoneMetadataName() + "="
-					+ properties.getInstanceZone());
+			// store the secure flag in the tags so that clients will be able to figure
+			// out whether to use http or https automatically
+			tags.add("secure="
+					+ Boolean.toString(properties.getScheme().equalsIgnoreCase("https")));
 		}
-		if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
-			tags.add("group=" + properties.getInstanceGroup());
-		}
-
-		// store the secure flag in the tags so that clients will be able to figure out
-		// whether to use http or https automatically
-		tags.add("secure="
-				+ Boolean.toString(properties.getScheme().equalsIgnoreCase("https")));
 
 		return tags;
+	}
+
+	private static Map<String, String> getMetadata(ConsulDiscoveryProperties properties) {
+		LinkedHashMap<String, String> metadata = new LinkedHashMap<>();
+		if (!CollectionUtils.isEmpty(properties.getMetadata())) {
+			metadata.putAll(properties.getMetadata());
+		}
+
+		if (!properties.isTagsAsMetadata()) {
+			// add metadata from other properties. See createTags above.
+			if (!StringUtils.isEmpty(properties.getInstanceZone())) {
+				metadata.put(properties.getDefaultZoneMetadataName(),
+						properties.getInstanceZone());
+			}
+			if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
+				metadata.put("group", properties.getInstanceGroup());
+			}
+
+			// store the secure flag in the tags so that clients will be able to figure
+			// out whether to use http or https automatically
+			metadata.put("secure",
+					Boolean.toString(properties.getScheme().equalsIgnoreCase("https")));
+		}
+
+		return metadata;
 	}
 
 	public static NewService.Check createCheck(Integer port,
