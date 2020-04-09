@@ -23,6 +23,7 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
+import com.ecwid.consul.v1.health.HealthChecksForServiceRequest;
 import com.ecwid.consul.v1.health.model.Check;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -82,8 +83,9 @@ public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 		assertThat("myhost").as("service address was wrong")
 				.isEqualTo(service.getAddress());
 
-		Response<List<Check>> checkResponse = this.consul
-				.getHealthChecksForService("myTestService-B", QueryParams.DEFAULT);
+		Response<List<Check>> checkResponse = this.consul.getHealthChecksForService(
+				"myTestService-B", HealthChecksForServiceRequest.newBuilder()
+						.setQueryParams(QueryParams.DEFAULT).build());
 		List<Check> checks = checkResponse.getValue();
 		assertThat(checks).as("checks was wrong size").hasSize(0);
 	}

@@ -24,6 +24,8 @@ import java.util.Map;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
+import com.ecwid.consul.v1.health.HealthServicesRequest;
 import com.ecwid.consul.v1.health.model.HealthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +36,6 @@ import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.ReactiveDiscoveryClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
-import org.springframework.util.StringUtils;
 
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.getMetadata;
@@ -79,15 +80,14 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 	}
 
 	private List<HealthService> getHealthServices(String serviceId) {
-		Response<List<HealthService>> services = StringUtils
-				.hasText(properties.getAclToken())
-						? client.getHealthServices(serviceId,
-								properties.getDefaultQueryTag(),
-								properties.isQueryPassing(), QueryParams.DEFAULT,
-								properties.getAclToken())
-						: client.getHealthServices(serviceId,
-								properties.getDefaultQueryTag(),
-								properties.isQueryPassing(), QueryParams.DEFAULT);
+		HealthServicesRequest request = HealthServicesRequest.newBuilder()
+				.setTag(this.properties.getDefaultQueryTag())
+				.setPassing(this.properties.isQueryPassing())
+				.setQueryParams(QueryParams.DEFAULT)
+				.setToken(this.properties.getAclToken()).build();
+
+		Response<List<HealthService>> services = client.getHealthServices(serviceId,
+				request);
 		return services == null ? Collections.emptyList() : services.getValue();
 	}
 
@@ -106,11 +106,11 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 	@Override
 	public Flux<String> getServices() {
 		return Flux.defer(() -> {
-			Response<Map<String, List<String>>> services = StringUtils
-					.hasText(properties.getAclToken())
-							? client.getCatalogServices(QueryParams.DEFAULT,
-									properties.getAclToken())
-							: client.getCatalogServices(QueryParams.DEFAULT);
+			CatalogServicesRequest request = CatalogServicesRequest.newBuilder()
+					.setToken(properties.getAclToken())
+					.setQueryParams(QueryParams.DEFAULT).build();
+			Response<Map<String, List<String>>> services = client
+					.getCatalogServices(request);
 			return services == null ? Flux.empty()
 					: Flux.fromIterable(services.getValue().keySet());
 		}).onErrorResume(exception -> {

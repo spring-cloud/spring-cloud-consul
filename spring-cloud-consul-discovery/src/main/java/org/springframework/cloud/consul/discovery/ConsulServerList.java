@@ -23,6 +23,7 @@ import java.util.List;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.health.HealthServicesRequest;
 import com.ecwid.consul.v1.health.model.HealthService;
 import com.netflix.client.config.IClientConfig;
 import com.netflix.loadbalancer.AbstractServerList;
@@ -76,10 +77,12 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 		if (this.client == null) {
 			return Collections.emptyList();
 		}
-		String tag = getTag(); // null is ok
-		Response<List<HealthService>> response = this.client.getHealthServices(
-				this.serviceId, tag, this.properties.isQueryPassing(),
-				createQueryParamsForClientRequest(), this.properties.getAclToken());
+		HealthServicesRequest request = HealthServicesRequest.newBuilder()
+				.setTag(getTag()).setPassing(this.properties.isQueryPassing())
+				.setQueryParams(createQueryParamsForClientRequest())
+				.setToken(this.properties.getAclToken()).build();
+		Response<List<HealthService>> response = this.client
+				.getHealthServices(this.serviceId, request);
 		if (response.getValue() == null || response.getValue().isEmpty()) {
 			return Collections.emptyList();
 		}

@@ -24,6 +24,9 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
+import com.ecwid.consul.v1.catalog.CatalogNodesRequest;
+import com.ecwid.consul.v1.catalog.CatalogServiceRequest;
+import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
 import com.ecwid.consul.v1.catalog.model.CatalogService;
 import com.ecwid.consul.v1.catalog.model.Node;
 
@@ -51,16 +54,19 @@ public class ConsulEndpoint {
 		data.setAgentServices(agentServices.getValue());
 
 		Response<Map<String, List<String>>> catalogServices = this.consul
-				.getCatalogServices(QueryParams.DEFAULT);
+				.getCatalogServices(CatalogServicesRequest.newBuilder()
+						.setQueryParams(QueryParams.DEFAULT).build());
 
 		for (String serviceId : catalogServices.getValue().keySet()) {
 			Response<List<CatalogService>> response = this.consul
-					.getCatalogService(serviceId, QueryParams.DEFAULT);
+					.getCatalogService(serviceId, CatalogServiceRequest.newBuilder()
+							.setQueryParams(QueryParams.DEFAULT).build());
 			data.getCatalogServices().put(serviceId, response.getValue());
 		}
 
 		Response<List<Node>> catalogNodes = this.consul
-				.getCatalogNodes(QueryParams.DEFAULT);
+				.getCatalogNodes(CatalogNodesRequest.newBuilder()
+						.setQueryParams(QueryParams.DEFAULT).build());
 		data.setCatalogNodes(catalogNodes.getValue());
 
 		return data;

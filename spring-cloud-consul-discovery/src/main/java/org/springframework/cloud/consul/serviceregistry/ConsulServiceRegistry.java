@@ -23,6 +23,7 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.NewService;
+import com.ecwid.consul.v1.health.HealthChecksForServiceRequest;
 import com.ecwid.consul.v1.health.model.Check;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -119,7 +120,8 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 	public Object getStatus(ConsulRegistration registration) {
 		String serviceId = registration.getServiceId();
 		Response<List<Check>> response = this.client.getHealthChecksForService(serviceId,
-				QueryParams.DEFAULT);
+				HealthChecksForServiceRequest.newBuilder()
+						.setQueryParams(QueryParams.DEFAULT).build());
 		List<Check> checks = response.getValue();
 
 		for (Check check : checks) {
