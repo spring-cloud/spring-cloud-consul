@@ -21,7 +21,6 @@
 |spring.cloud.consul.discovery.default-query-tag |  | Tag to query for in service list if one is not listed in serverListQueryTags.
 |spring.cloud.consul.discovery.default-zone-metadata-name | zone | Service instance zone comes from metadata. This allows changing the metadata tag name.
 |spring.cloud.consul.discovery.deregister | true | Disable automatic de-registration of service in consul.
-|spring.cloud.consul.discovery.enable-tag-override |  | Enable tag override for the registered service.
 |spring.cloud.consul.discovery.enabled | true | Is service discovery enabled?
 |spring.cloud.consul.discovery.fail-fast | true | Throw exceptions during service registration if true, otherwise, log warnings (defaults to true).
 |spring.cloud.consul.discovery.health-check-critical-timeout |  | Timeout to deregister services critical for longer than timeout (e.g. 30m). Requires consul version 7.x or higher.
@@ -41,12 +40,9 @@
 |spring.cloud.consul.discovery.instance-zone |  | Service instance zone.
 |spring.cloud.consul.discovery.ip-address |  | IP address to use when accessing service (must also set preferIpAddress to use).
 |spring.cloud.consul.discovery.lifecycle.enabled | true | 
-|spring.cloud.consul.discovery.management-enable-tag-override |  | Enable tag override for the registered management service.
-|spring.cloud.consul.discovery.management-metadata |  | Metadata to use when registering management service.
 |spring.cloud.consul.discovery.management-port |  | Port to register the management service under (defaults to management port).
 |spring.cloud.consul.discovery.management-suffix | management | Suffix to use when registering management service.
 |spring.cloud.consul.discovery.management-tags |  | Tags to use when registering management service.
-|spring.cloud.consul.discovery.metadata |  | Metadata to use when registering service.
 |spring.cloud.consul.discovery.order | 0 | Order of the discovery client used by `CompositeDiscoveryClient` for sorting available clients.
 |spring.cloud.consul.discovery.port |  | Port to register the service under (defaults to listening port).
 |spring.cloud.consul.discovery.prefer-agent-address | false | Source of how we will determine the address to use.
