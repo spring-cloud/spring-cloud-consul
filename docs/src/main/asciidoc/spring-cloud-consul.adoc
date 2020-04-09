@@ -180,6 +180,32 @@ spring:
 
 The above configuration will result in a map with `foo->bar` and `baz->baz`.
 
+===== Generated Metadata
+
+The Consul Auto Registration will generate a few entries automatically.
+
+.Auto Generated Metadata
+|===
+| Key | Value
+
+| 'group'
+| Property `spring.cloud.consul.discovery.instance-group`. This values is only generated if `instance-group` is not empty.'
+
+| 'secure'
+| True if property `spring.cloud.consul.discovery.scheme` equals 'https', otherwise false.
+
+| Property `spring.cloud.consul.discovery.default-zone-metadata-name`, defaults to 'zone'
+| Property `spring.cloud.consul.discovery.instance-zone`. This values is only generated if `instance-zone` is not empty.'
+
+|===
+
+
+===== Official Consul Metadata
+
+Consul added official support for a `meta` field that is a `Map<String, String>`. Spring Cloud Consul has added `spring.cloud.consul.discovery.metadata` and `spring.cloud.consul.discovery.management-metadata` properties to support it.
+
+NOTE: By default, the `ServiceInstance.getMetadata()` method from Spring Cloud Commons will continue to populated by parsing the `spring.cloud.consul.discovery.tags` property for backwards compatibility. To change this behaviour set `spring.cloud.consul.discovery.tags-as-metadata=false` and the metadata will be populated from `spring.cloud.consul.discovery.metadata`. In a future version, parsing the `tags` property will be removed.
+
 ==== Making the Consul Instance ID Unique
 
 By default a consul instance is registered with an ID that is equal to its Spring Application Context ID. By default, the Spring Application Context ID is `${spring.application.name}:comma,separated,profiles:${server.port}`. For most cases, this will allow multiple instances of one service to run on one machine.  If further uniqueness is required, Using Spring Cloud you can override this by providing a unique identifier in `spring.cloud.consul.discovery.instanceId`. For example:

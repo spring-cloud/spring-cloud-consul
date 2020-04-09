@@ -554,14 +554,6 @@ public class ConsulDiscoveryProperties {
 		this.order = order;
 	}
 
-	public Map<String, String> getMetadata() {
-		return this.metadata;
-	}
-
-	public void setMetadata(Map<String, String> metadata) {
-		this.metadata = metadata;
-	}
-
 	@Deprecated
 	public boolean isTagsAsMetadata() {
 		return this.tagsAsMetadata;
@@ -600,8 +592,9 @@ public class ConsulDiscoveryProperties {
 	public String toString() {
 		return new ToStringCreator(this).append("hostInfo", this.hostInfo)
 				.append("aclToken", this.aclToken).append("tags", this.tags)
+				.append("enabled", this.enabled)
 				.append("enableTagOverride", this.enableTagOverride)
-				.append("metadata", this.metadata).append("enabled", this.enabled)
+				.append("metadata", this.metadata)
 				.append("managementTags", this.managementTags)
 				.append("healthCheckPath", this.healthCheckPath)
 				.append("healthCheckUrl", this.healthCheckUrl)
@@ -633,8 +626,7 @@ public class ConsulDiscoveryProperties {
 				.append("registerHealthCheck", this.registerHealthCheck)
 				.append("failFast", this.failFast)
 				.append("healthCheckTlsSkipVerify", this.healthCheckTlsSkipVerify)
-				.append("order", this.order).append("metadata", this.metadata)
-				.append("tagsAsMetadata", this.tagsAsMetadata)
+				.append("order", this.order).append("tagsAsMetadata", this.tagsAsMetadata)
 				.append("enableTagOverride", this.enableTagOverride)
 				.append("managementEnableTagOverride", this.managementEnableTagOverride)
 				.append("managementMetadata", this.managementMetadata).toString();
