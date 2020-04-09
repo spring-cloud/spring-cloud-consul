@@ -36,9 +36,14 @@ public class ConsulServer extends Server {
 	private final Map<String, String> metadata;
 
 	public ConsulServer(final HealthService healthService) {
+		this(healthService, true);
+	}
+
+	@Deprecated
+	public ConsulServer(final HealthService healthService, boolean tagsAsMetadata) {
 		super(findHost(healthService), healthService.getService().getPort());
 		this.service = healthService;
-		this.metadata = ConsulServerUtils.getMetadata(this.service);
+		this.metadata = ConsulServerUtils.getMetadata(this.service, tagsAsMetadata);
 		this.metaInfo = new MetaInfo() {
 			@Override
 			public String getAppName() {

@@ -88,7 +88,8 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		for (HealthService service : services.getValue()) {
 			String host = findHost(service);
 
-			Map<String, String> metadata = getMetadata(service);
+			Map<String, String> metadata = getMetadata(service,
+					this.properties.isTagsAsMetadata());
 			boolean secure = false;
 			if (metadata.containsKey("secure")) {
 				secure = Boolean.parseBoolean(metadata.get("secure"));

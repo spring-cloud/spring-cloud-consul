@@ -69,10 +69,21 @@ public final class ConsulServerUtils {
 		}
 	}
 
+	@Deprecated
 	public static Map<String, String> getMetadata(HealthService healthService) {
-		return getMetadata(healthService.getService().getTags());
+		return getMetadata(healthService, true);
 	}
 
+	@Deprecated
+	public static Map<String, String> getMetadata(HealthService healthService,
+			boolean tagsAsMetadata) {
+		if (tagsAsMetadata) {
+			return getMetadata(healthService.getService().getTags());
+		}
+		return healthService.getService().getMeta();
+	}
+
+	@Deprecated
 	public static Map<String, String> getMetadata(List<String> tags) {
 		LinkedHashMap<String, String> metadata = new LinkedHashMap<>();
 		if (tags != null) {

@@ -78,7 +78,10 @@ public class ConsulRegistration implements Registration {
 
 	@Override
 	public Map<String, String> getMetadata() {
-		return ConsulServerUtils.getMetadata(getService().getTags());
+		if (properties.isTagsAsMetadata()) {
+			return ConsulServerUtils.getMetadata(getService().getTags());
+		}
+		return getService().getMeta();
 	}
 
 }

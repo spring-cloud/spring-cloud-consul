@@ -41,6 +41,7 @@ import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -172,7 +173,7 @@ class ConsulReactiveDiscoveryClientTests {
 		when(healthService.getService()).thenReturn(service);
 		when(service.getAddress()).thenReturn("localhost");
 		when(service.getPort()).thenReturn(443);
-		when(service.getTags()).thenReturn(singletonList("secure=true"));
+		lenient().when(service.getTags()).thenReturn(singletonList("secure=true"));
 
 		return new Response<>(singletonList(healthService), 0L, true,
 				System.currentTimeMillis());

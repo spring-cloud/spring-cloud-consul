@@ -50,11 +50,27 @@ public class ConsulDiscoveryProperties {
 	/** Tags to use when registering service. */
 	private List<String> tags = new ArrayList<>();
 
+	/** Metadata to use when registering service. */
+	private Map<String, String> metadata;
+
+	/** Enable tag override for the registered service. */
+	private Boolean enableTagOverride;
+
+	/** Use tags as metadata, defaults to true. */
+	@Deprecated
+	private boolean tagsAsMetadata = true;
+
 	/** Is service discovery enabled? */
 	private boolean enabled = true;
 
 	/** Tags to use when registering management service. */
 	private List<String> managementTags = new ArrayList<>();
+
+	/** Enable tag override for the registered management service. */
+	private Boolean managementEnableTagOverride;
+
+	/** Metadata to use when registering management service. */
+	private Map<String, String> managementMetadata;
 
 	/** Alternate server path to invoke for health checking. */
 	private String healthCheckPath = "/actuator/health";
@@ -522,6 +538,48 @@ public class ConsulDiscoveryProperties {
 		this.order = order;
 	}
 
+	public Map<String, String> getMetadata() {
+		return this.metadata;
+	}
+
+	public void setMetadata(Map<String, String> metadata) {
+		this.metadata = metadata;
+	}
+
+	@Deprecated
+	public boolean isTagsAsMetadata() {
+		return this.tagsAsMetadata;
+	}
+
+	@Deprecated
+	public void setTagsAsMetadata(boolean tagsAsMetadata) {
+		this.tagsAsMetadata = tagsAsMetadata;
+	}
+
+	public Map<String, String> getManagementMetadata() {
+		return this.managementMetadata;
+	}
+
+	public void setManagementMetadata(Map<String, String> managementMetadata) {
+		this.managementMetadata = managementMetadata;
+	}
+
+	public Boolean getEnableTagOverride() {
+		return this.enableTagOverride;
+	}
+
+	public void setEnableTagOverride(Boolean enableTagOverride) {
+		this.enableTagOverride = enableTagOverride;
+	}
+
+	public Boolean getManagementEnableTagOverride() {
+		return this.managementEnableTagOverride;
+	}
+
+	public void setManagementEnableTagOverride(Boolean managementEnableTagOverride) {
+		this.managementEnableTagOverride = managementEnableTagOverride;
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("hostInfo", this.hostInfo)
@@ -558,7 +616,11 @@ public class ConsulDiscoveryProperties {
 				.append("registerHealthCheck", this.registerHealthCheck)
 				.append("failFast", this.failFast)
 				.append("healthCheckTlsSkipVerify", this.healthCheckTlsSkipVerify)
-				.append("order", this.order).toString();
+				.append("order", this.order).append("metadata", this.metadata)
+				.append("tagsAsMetadata", this.tagsAsMetadata)
+				.append("enableTagOverride", this.enableTagOverride)
+				.append("managementEnableTagOverride", this.managementEnableTagOverride)
+				.append("managementMetadata", this.managementMetadata).toString();
 	}
 
 	/**
