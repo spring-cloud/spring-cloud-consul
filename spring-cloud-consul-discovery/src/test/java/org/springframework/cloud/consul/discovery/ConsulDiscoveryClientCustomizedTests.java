@@ -44,7 +44,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 				"spring.cloud.consul.discovery.instanceId=testConsulDiscovery2Id",
 				"spring.cloud.consul.discovery.hostname=testConsulDiscovery2Host",
 				"spring.cloud.consul.discovery.registerHealthCheck=false",
-				"spring.cloud.consul.discovery.tags=plaintag,foo=bar,foo2=bar2=baz2" },
+				"spring.cloud.consul.discovery.tags=plaintag",
+				"spring.cloud.consul.discovery.metadata[foo]=bar",
+				"spring.cloud.consul.discovery.metadata[foo2]=bar2" },
 		webEnvironment = RANDOM_PORT)
 public class ConsulDiscoveryClientCustomizedTests {
 
@@ -86,11 +88,8 @@ public class ConsulDiscoveryClientCustomizedTests {
 		String foo = metadata.get("foo");
 		assertThat(foo).as("metadata key foo was wrong").isEqualTo("bar");
 
-		String plaintag = metadata.get("plaintag");
-		assertThat(plaintag).as("metadata key plaintag was wrong").isEqualTo("plaintag");
-
 		String foo2 = metadata.get("foo2");
-		assertThat(foo2).as("metadata key foo2 was wrong").isEqualTo("bar2=baz2");
+		assertThat(foo2).as("metadata key foo2 was wrong").isEqualTo("bar2");
 	}
 
 	@Configuration(proxyBeanMethods = false)

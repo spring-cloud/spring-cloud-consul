@@ -16,9 +16,9 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -89,7 +89,7 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 			service.setAddress(properties.getHostname());
 		}
 		service.setName(normalizeForDns(appName));
-		service.setTags(createTags(properties));
+		service.setTags(new ArrayList<>(properties.getTags()));
 		service.setEnableTagOverride(properties.getEnableTagOverride());
 		service.setMeta(getMetadata(properties));
 
@@ -208,48 +208,25 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		return normalized.toString();
 	}
 
-	@Deprecated
-	public static List<String> createTags(ConsulDiscoveryProperties properties) {
-		List<String> tags = new LinkedList<>(properties.getTags());
-		if (properties.isTagsAsMetadata()) {
-			if (!StringUtils.isEmpty(properties.getInstanceZone())) {
-				tags.add(properties.getDefaultZoneMetadataName() + "="
-						+ properties.getInstanceZone());
-			}
-			if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
-				tags.add("group=" + properties.getInstanceGroup());
-			}
-
-			// store the secure flag in the tags so that clients will be able to figure
-			// out whether to use http or https automatically
-			tags.add("secure="
-					+ Boolean.toString(properties.getScheme().equalsIgnoreCase("https")));
-		}
-
-		return tags;
-	}
-
 	private static Map<String, String> getMetadata(ConsulDiscoveryProperties properties) {
 		LinkedHashMap<String, String> metadata = new LinkedHashMap<>();
 		if (!CollectionUtils.isEmpty(properties.getMetadata())) {
 			metadata.putAll(properties.getMetadata());
 		}
 
-		if (!properties.isTagsAsMetadata()) {
-			// add metadata from other properties. See createTags above.
-			if (!StringUtils.isEmpty(properties.getInstanceZone())) {
-				metadata.put(properties.getDefaultZoneMetadataName(),
-						properties.getInstanceZone());
-			}
-			if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
-				metadata.put("group", properties.getInstanceGroup());
-			}
-
-			// store the secure flag in the tags so that clients will be able to figure
-			// out whether to use http or https automatically
-			metadata.put("secure",
-					Boolean.toString(properties.getScheme().equalsIgnoreCase("https")));
+		// add metadata from other properties. See createTags above.
+		if (!StringUtils.isEmpty(properties.getInstanceZone())) {
+			metadata.put(properties.getDefaultZoneMetadataName(),
+					properties.getInstanceZone());
 		}
+		if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
+			metadata.put("group", properties.getInstanceGroup());
+		}
+
+		// store the secure flag in the tags so that clients will be able to figure
+		// out whether to use http or https automatically
+		metadata.put("secure",
+				Boolean.toString(properties.getScheme().equalsIgnoreCase("https")));
 
 		return metadata;
 	}

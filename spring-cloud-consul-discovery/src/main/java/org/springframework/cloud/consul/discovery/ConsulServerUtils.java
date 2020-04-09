@@ -19,10 +19,6 @@ package org.springframework.cloud.consul.discovery;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import com.ecwid.consul.v1.health.model.HealthService;
 import org.apache.commons.logging.Log;
@@ -67,47 +63,6 @@ public final class ConsulServerUtils {
 			log.debug("Not InetAddress: " + address + " , resolved as is.");
 			return address;
 		}
-	}
-
-	@Deprecated
-	public static Map<String, String> getMetadata(HealthService healthService) {
-		return getMetadata(healthService, true);
-	}
-
-	@Deprecated
-	public static Map<String, String> getMetadata(HealthService healthService,
-			boolean tagsAsMetadata) {
-		if (tagsAsMetadata) {
-			return getMetadata(healthService.getService().getTags());
-		}
-		return healthService.getService().getMeta();
-	}
-
-	@Deprecated
-	public static Map<String, String> getMetadata(List<String> tags) {
-		LinkedHashMap<String, String> metadata = new LinkedHashMap<>();
-		if (tags != null) {
-			for (String tag : tags) {
-				String[] parts = StringUtils.delimitedListToStringArray(tag, "=");
-				switch (parts.length) {
-				case 0:
-					break;
-				case 1:
-					metadata.put(parts[0], parts[0]);
-					break;
-				case 2:
-					metadata.put(parts[0], parts[1]);
-					break;
-				default:
-					String[] end = Arrays.copyOfRange(parts, 1, parts.length);
-					metadata.put(parts[0], StringUtils.arrayToDelimitedString(end, "="));
-					break;
-				}
-
-			}
-		}
-
-		return metadata;
 	}
 
 }

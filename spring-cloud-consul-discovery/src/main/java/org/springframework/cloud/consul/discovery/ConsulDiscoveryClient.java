@@ -17,6 +17,7 @@
 package org.springframework.cloud.consul.discovery;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,6 @@ import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
-import static org.springframework.cloud.consul.discovery.ConsulServerUtils.getMetadata;
 
 /**
  * @author Spencer Gibb
@@ -88,8 +88,10 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		for (HealthService service : services.getValue()) {
 			String host = findHost(service);
 
-			Map<String, String> metadata = getMetadata(service,
-					this.properties.isTagsAsMetadata());
+			Map<String, String> metadata = service.getService().getMeta();
+			if (metadata == null) {
+				metadata = new LinkedHashMap<>();
+			}
 			boolean secure = false;
 			if (metadata.containsKey("secure")) {
 				secure = Boolean.parseBoolean(metadata.get("secure"));
@@ -113,8 +115,6 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<String> getServices() {
-		String aclToken = this.properties.getAclToken();
-
 		CatalogServicesRequest request = CatalogServicesRequest.newBuilder()
 				.setQueryParams(QueryParams.DEFAULT)
 				.setToken(this.properties.getAclToken()).build();

@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.discovery.reactive;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,6 @@ import org.springframework.cloud.client.discovery.ReactiveDiscoveryClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
-import static org.springframework.cloud.consul.discovery.ConsulServerUtils.getMetadata;
 
 /**
  * Consul version of {@link ReactiveDiscoveryClient}.
@@ -94,8 +94,10 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 	private ServiceInstance mapToServiceInstance(HealthService service,
 			String serviceId) {
 		String host = findHost(service);
-		Map<String, String> metadata = getMetadata(service,
-				properties.isTagsAsMetadata());
+		Map<String, String> metadata = service.getService().getMeta();
+		if (metadata == null) {
+			metadata = new LinkedHashMap<>();
+		}
 		boolean secure = false;
 		if (metadata.containsKey("secure")) {
 			secure = Boolean.parseBoolean(metadata.get("secure"));

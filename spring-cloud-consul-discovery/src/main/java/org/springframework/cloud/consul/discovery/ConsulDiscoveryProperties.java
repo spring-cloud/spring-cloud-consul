@@ -56,10 +56,6 @@ public class ConsulDiscoveryProperties {
 	/** Enable tag override for the registered service. */
 	private Boolean enableTagOverride;
 
-	/** Use tags as metadata, defaults to true. */
-	@Deprecated
-	private boolean tagsAsMetadata = true;
-
 	/** Is service discovery enabled? */
 	private boolean enabled = true;
 
@@ -554,16 +550,6 @@ public class ConsulDiscoveryProperties {
 		this.order = order;
 	}
 
-	@Deprecated
-	public boolean isTagsAsMetadata() {
-		return this.tagsAsMetadata;
-	}
-
-	@Deprecated
-	public void setTagsAsMetadata(boolean tagsAsMetadata) {
-		this.tagsAsMetadata = tagsAsMetadata;
-	}
-
 	public Map<String, String> getManagementMetadata() {
 		return this.managementMetadata;
 	}
@@ -590,46 +576,44 @@ public class ConsulDiscoveryProperties {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this).append("hostInfo", this.hostInfo)
-				.append("aclToken", this.aclToken).append("tags", this.tags)
-				.append("enabled", this.enabled)
-				.append("enableTagOverride", this.enableTagOverride)
-				.append("metadata", this.metadata)
-				.append("managementTags", this.managementTags)
-				.append("healthCheckPath", this.healthCheckPath)
-				.append("healthCheckUrl", this.healthCheckUrl)
-				.append("healthCheckHeaders", this.healthCheckHeaders)
-				.append("healthCheckInterval", this.healthCheckInterval)
-				.append("healthCheckTimeout", this.healthCheckTimeout)
-				.append("healthCheckCriticalTimeout", this.healthCheckCriticalTimeout)
-				.append("ipAddress", this.ipAddress).append("hostname", this.hostname)
-				.append("port", this.port).append("managementPort", this.managementPort)
-				.append("lifecycle", this.lifecycle)
-				.append("preferIpAddress", this.preferIpAddress)
-				.append("preferAgentAddress", this.preferAgentAddress)
+		return new ToStringCreator(this).append("aclToken", this.aclToken)
 				.append("catalogServicesWatchDelay", this.catalogServicesWatchDelay)
 				.append("catalogServicesWatchTimeout", this.catalogServicesWatchTimeout)
-				.append("includeHostnameInInstanceId", this.includeHostnameInInstanceId)
 				.append("consistencyMode", this.consistencyMode)
-				.append("serviceName", this.serviceName)
-				.append("instanceId", this.instanceId)
-				.append("instanceZone", this.instanceZone)
-				.append("instanceGroup", this.instanceGroup)
-				.append("defaultZoneMetadataName", this.defaultZoneMetadataName)
-				.append("scheme", this.scheme)
-				.append("managementSuffix", this.managementSuffix)
-				.append("serverListQueryTags", this.serverListQueryTags)
 				.append("datacenters", this.datacenters)
 				.append("defaultQueryTag", this.defaultQueryTag)
-				.append("queryPassing", this.queryPassing)
-				.append("register", this.register).append("deregister", this.deregister)
-				.append("registerHealthCheck", this.registerHealthCheck)
-				.append("failFast", this.failFast)
-				.append("healthCheckTlsSkipVerify", this.healthCheckTlsSkipVerify)
-				.append("order", this.order).append("tagsAsMetadata", this.tagsAsMetadata)
+				.append("defaultZoneMetadataName", this.defaultZoneMetadataName)
+				.append("deregister", this.deregister).append("enabled", this.enabled)
 				.append("enableTagOverride", this.enableTagOverride)
+				.append("failFast", this.failFast).append("hostInfo", this.hostInfo)
+				.append("healthCheckCriticalTimeout", this.healthCheckCriticalTimeout)
+				.append("healthCheckHeaders", this.healthCheckHeaders)
+				.append("healthCheckInterval", this.healthCheckInterval)
+				.append("healthCheckPath", this.healthCheckPath)
+				.append("healthCheckTimeout", this.healthCheckTimeout)
+				.append("healthCheckTlsSkipVerify", this.healthCheckTlsSkipVerify)
+				.append("healthCheckUrl", this.healthCheckUrl)
+				.append("hostname", this.hostname)
+				.append("includeHostnameInInstanceId", this.includeHostnameInInstanceId)
+				.append("instanceId", this.instanceId)
+				.append("instanceGroup", this.instanceGroup)
+				.append("instanceZone", this.instanceZone)
+				.append("ipAddress", this.ipAddress).append("lifecycle", this.lifecycle)
+				.append("metadata", this.metadata)
 				.append("managementEnableTagOverride", this.managementEnableTagOverride)
-				.append("managementMetadata", this.managementMetadata).toString();
+				.append("managementMetadata", this.managementMetadata)
+				.append("managementPort", this.managementPort)
+				.append("managementSuffix", this.managementSuffix)
+				.append("managementTags", this.managementTags).append("order", this.order)
+				.append("port", this.port)
+				.append("preferAgentAddress", this.preferAgentAddress)
+				.append("preferIpAddress", this.preferIpAddress)
+				.append("queryPassing", this.queryPassing)
+				.append("register", this.register)
+				.append("registerHealthCheck", this.registerHealthCheck)
+				.append("scheme", this.scheme).append("serviceName", this.serviceName)
+				.append("serverListQueryTags", this.serverListQueryTags)
+				.append("tags", this.tags).toString();
 	}
 
 	/**

@@ -64,7 +64,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 				"spring.cloud.consul.discovery.metadata.key1=value1",
 				"spring.cloud.consul.discovery.metadata.key2=value2" },
 		webEnvironment = RANDOM_PORT)
-@Deprecated
 public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 
 	@Autowired
@@ -94,11 +93,13 @@ public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 		assertThat(service.getEnableTagOverride())
 				.as("property enableTagOverride was wrong").isTrue();
 		assertThat(service.getTags()).as("property tags contains the wrong values")
-				.containsExactly("mytag", "mydefaultzonemetadataname=myzone",
-						"group=mygroup", "secure=false");
+				.containsExactly("mytag");
 		HashMap<String, String> entries = new HashMap<>();
 		entries.put("key1", "value1");
 		entries.put("key2", "value2");
+		entries.put("mydefaultzonemetadataname", "myzone");
+		entries.put("group", "mygroup");
+		entries.put("secure", "false");
 		assertThat(service.getMeta()).as("property metadata contains the wrong entries")
 				.containsExactlyInAnyOrderEntriesOf(entries);
 

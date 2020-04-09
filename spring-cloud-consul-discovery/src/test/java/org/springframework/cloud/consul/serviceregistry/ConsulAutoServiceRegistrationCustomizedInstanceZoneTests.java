@@ -61,8 +61,8 @@ public class ConsulAutoServiceRegistrationCustomizedInstanceZoneTests {
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
 		assertThat(service.getId()).as("service id was wrong")
 				.isEqualTo("myTestService1-WithZone");
-		assertThat(service.getTags().contains("myZone=zone1"))
-				.as("service zone was wrong").isTrue();
+		assertThat(service.getMeta()).as("service zone was wrong").containsEntry("myZone",
+				"zone1");
 	}
 
 	@Configuration(proxyBeanMethods = false)

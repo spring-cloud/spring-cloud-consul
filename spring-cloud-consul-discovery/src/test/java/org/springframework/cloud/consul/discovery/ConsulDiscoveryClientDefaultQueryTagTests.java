@@ -78,8 +78,10 @@ public class ConsulDiscoveryClientDefaultQueryTagTests {
 	public void shouldReturnOnlyIntgInstance() {
 		List<ServiceInstance> instances = this.discoveryClient.getInstances(NAME);
 		assertThat(instances).as("instances was wrong size").hasSize(1);
-		assertThat(instances.get(0).getMetadata()).as("instance is not intg")
-				.containsEntry("intg", "intg");
+		ServiceInstance serviceInstance = instances.get(0);
+		assertThat(serviceInstance.getPort()).isEqualTo(intgService.getPort());
+		assertThat(serviceInstance.getServiceId()).isEqualTo(intgService.getName());
+		assertThat(serviceInstance.getInstanceId()).isEqualTo(intgService.getId());
 	}
 
 	private NewService serviceForEnvironment(String env, int port) {

@@ -91,7 +91,7 @@ public class ConfigWatchTests {
 		this.configProperties.setFormat(FILES);
 		setupWatch(eventPublisher, new GetValue(), "/config/app.yml");
 
-		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
+		verify(eventPublisher, atLeastOnce()).publishEvent(any(RefreshEvent.class));
 	}
 
 	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue,

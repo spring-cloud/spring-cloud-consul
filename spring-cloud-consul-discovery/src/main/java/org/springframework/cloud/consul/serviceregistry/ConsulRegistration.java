@@ -24,7 +24,6 @@ import com.ecwid.consul.v1.agent.model.NewService;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
-import org.springframework.cloud.consul.discovery.ConsulServerUtils;
 
 /**
  * @author Spencer Gibb
@@ -78,9 +77,6 @@ public class ConsulRegistration implements Registration {
 
 	@Override
 	public Map<String, String> getMetadata() {
-		if (properties.isTagsAsMetadata()) {
-			return ConsulServerUtils.getMetadata(getService().getTags());
-		}
 		return getService().getMeta();
 	}
 
