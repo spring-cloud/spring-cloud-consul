@@ -21,6 +21,7 @@ import java.util.List;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.health.HealthChecksForServiceRequest;
 import com.ecwid.consul.v1.health.model.Check;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -77,7 +78,8 @@ public class TtlSchedulerRemoveTests {
 
 	private Check getCheckForService(String serviceId) {
 		Response<List<Check>> checkResponse = this.consul
-				.getHealthChecksForService(serviceId, QueryParams.DEFAULT);
+				.getHealthChecksForService(serviceId, HealthChecksForServiceRequest
+						.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
 		if (checkResponse.getValue().size() > 0) {
 			return checkResponse.getValue().get(0);
 		}

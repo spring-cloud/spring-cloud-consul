@@ -24,6 +24,7 @@ import javax.annotation.PostConstruct;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.event.EventListRequest;
 import com.ecwid.consul.v1.event.model.Event;
 import com.ecwid.consul.v1.event.model.EventParams;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -77,7 +78,8 @@ public class EventService {
 	}
 
 	public Response<List<Event>> getEventsResponse() {
-		return this.consul.eventList(QueryParams.DEFAULT);
+		return this.consul.eventList(EventListRequest.newBuilder()
+				.setQueryParams(QueryParams.DEFAULT).build());
 	}
 
 	public List<Event> getEvents() {
@@ -102,8 +104,8 @@ public class EventService {
 		if (this.properties != null) {
 			eventTimeout = this.properties.getEventTimeout();
 		}
-		Response<List<Event>> watch = this.consul
-				.eventList(new QueryParams(eventTimeout, index));
+		Response<List<Event>> watch = this.consul.eventList(EventListRequest.newBuilder()
+				.setQueryParams(new QueryParams(eventTimeout, index)).build());
 		return filterEvents(readEvents(watch), lastIndex);
 	}
 

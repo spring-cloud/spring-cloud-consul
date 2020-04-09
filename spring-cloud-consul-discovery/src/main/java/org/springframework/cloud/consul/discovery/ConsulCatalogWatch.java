@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
 import io.micrometer.core.annotation.Timed;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -126,10 +127,12 @@ public class ConsulCatalogWatch
 				index = this.catalogServicesIndex.get().longValue();
 			}
 
-			Response<Map<String, List<String>>> response = this.consul.getCatalogServices(
-					new QueryParams(this.properties.getCatalogServicesWatchTimeout(),
-							index),
-					this.properties.getAclToken());
+			CatalogServicesRequest request = CatalogServicesRequest.newBuilder()
+					.setQueryParams(new QueryParams(
+							this.properties.getCatalogServicesWatchTimeout(), index))
+					.setToken(this.properties.getAclToken()).build();
+			Response<Map<String, List<String>>> response = this.consul
+					.getCatalogServices(request);
 			Long consulIndex = response.getConsulIndex();
 			if (consulIndex != null) {
 				this.catalogServicesIndex.set(BigInteger.valueOf(consulIndex));
