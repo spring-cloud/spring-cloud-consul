@@ -48,9 +48,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(
-		classes = ConsulAutoServiceRegistrationCustomizedPropsTests.TestPropsConfig.class,
-		properties = { "spring.application.name=myTestService-B",
-				"spring.cloud.consul.discovery.instanceId=myTestService1-B",
+		classes = ConsulAutoServiceRegistrationCustomizedPropsRealMetadataTests.TestPropsConfig.class,
+		properties = { "spring.application.name=myTestServiceRealMetadata-B",
+				"spring.cloud.consul.discovery.instanceId=myTestServiceRealMetadata1-B",
 				"spring.cloud.consul.discovery.port=4452",
 				"spring.cloud.consul.discovery.hostname=myhost",
 				"spring.cloud.consul.discovery.ipAddress=10.0.0.1",
@@ -61,11 +61,11 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 				"spring.cloud.consul.discovery.instance-group=mygroup",
 				"spring.cloud.consul.discovery.tags[0]=mytag",
 				"spring.cloud.consul.discovery.enableTagOverride=true",
+				"spring.cloud.consul.discovery.tags-as-metadata=false",
 				"spring.cloud.consul.discovery.metadata.key1=value1",
 				"spring.cloud.consul.discovery.metadata.key2=value2" },
 		webEnvironment = RANDOM_PORT)
-@Deprecated
-public class ConsulAutoServiceRegistrationCustomizedPropsTests {
+public class ConsulAutoServiceRegistrationCustomizedPropsRealMetadataTests {
 
 	@Autowired
 	private ConsulClient consul;
@@ -77,13 +77,13 @@ public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 	public void propertiesAreCorrect() {
 		Response<Map<String, Service>> response = this.consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
-		Service service = services.get("myTestService1-B");
+		Service service = services.get("myTestServiceRealMetadata1-B");
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort()).as("service port is discovery port")
 				.isEqualTo(4452);
-		assertThat("myTestService1-B").as("service id was wrong")
+		assertThat("myTestServiceRealMetadata1-B").as("service id was wrong")
 				.isEqualTo(service.getId());
-		assertThat("myTestService-B").as("service name was wrong")
+		assertThat("myTestServiceRealMetadata-B").as("service name was wrong")
 				.isEqualTo(service.getService());
 		assertThat("myhost").as("property hostname was wrong")
 				.isEqualTo(this.properties.getHostname());
@@ -94,16 +94,18 @@ public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 		assertThat(service.getEnableTagOverride())
 				.as("property enableTagOverride was wrong").isTrue();
 		assertThat(service.getTags()).as("property tags contains the wrong values")
-				.containsExactly("mytag", "mydefaultzonemetadataname=myzone",
-						"group=mygroup", "secure=false");
+				.containsExactly("mytag");
 		HashMap<String, String> entries = new HashMap<>();
 		entries.put("key1", "value1");
 		entries.put("key2", "value2");
+		entries.put("mydefaultzonemetadataname", "myzone");
+		entries.put("group", "mygroup");
+		entries.put("secure", "false");
 		assertThat(service.getMeta()).as("property metadata contains the wrong entries")
 				.containsExactlyInAnyOrderEntriesOf(entries);
 
 		Response<List<Check>> checkResponse = this.consul.getHealthChecksForService(
-				"myTestService-B", HealthChecksForServiceRequest.newBuilder()
+				"myTestServiceRealMetadata-B", HealthChecksForServiceRequest.newBuilder()
 						.setQueryParams(QueryParams.DEFAULT).build());
 		List<Check> checks = checkResponse.getValue();
 		assertThat(checks).as("checks was wrong size").hasSize(0);

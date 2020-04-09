@@ -99,7 +99,8 @@ public class ConsulServerList extends AbstractServerList<ConsulServer> {
 	protected List<ConsulServer> transformResponse(List<HealthService> healthServices) {
 		List<ConsulServer> servers = new ArrayList<>();
 		for (HealthService service : healthServices) {
-			ConsulServer server = new ConsulServer(service);
+			ConsulServer server = new ConsulServer(service,
+					properties.isTagsAsMetadata());
 			if (server.getMetadata()
 					.containsKey(this.properties.getDefaultZoneMetadataName())) {
 				server.setZone(server.getMetadata()
