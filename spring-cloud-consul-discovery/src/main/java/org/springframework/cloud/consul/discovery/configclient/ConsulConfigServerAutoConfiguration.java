@@ -39,6 +39,8 @@ import org.springframework.util.StringUtils;
 		ConfigServerProperties.class })
 public class ConsulConfigServerAutoConfiguration {
 
+	public static final String CONFIG_PATH_KEY = "configPath";
+
 	@Autowired(required = false)
 	private ConsulDiscoveryProperties properties;
 
@@ -52,7 +54,12 @@ public class ConsulConfigServerAutoConfiguration {
 		}
 		String prefix = this.server.getPrefix();
 		if (StringUtils.hasText(prefix)) {
-			this.properties.getTags().add("configPath=" + prefix);
+			if (this.properties.isTagsAsMetadata()) {
+				this.properties.getTags().add(CONFIG_PATH_KEY + "=" + prefix);
+			}
+			else {
+				this.properties.getMetadata().put(CONFIG_PATH_KEY, prefix);
+			}
 		}
 	}
 

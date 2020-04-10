@@ -63,6 +63,18 @@ public class ConsulConfigServerAutoConfigurationTests {
 		assertThat(properties.getTags()).containsExactly("configPath=/config");
 	}
 
+	@Test
+	public void onWhenRequestedMetadata() throws Exception {
+		setup("spring.cloud.config.server.prefix=/config",
+				"spring.cloud.consul.discovery.tags-as-metadata=false");
+		assertThat(
+				this.context.getBeanNamesForType(ConsulDiscoveryProperties.class).length)
+						.isEqualTo(1);
+		ConsulDiscoveryProperties properties = this.context
+				.getBean(ConsulDiscoveryProperties.class);
+		assertThat(properties.getMetadata()).containsEntry("configPath", "/config");
+	}
+
 	private void setup(String... env) {
 		this.context = new SpringApplicationBuilder(
 				PropertyPlaceholderAutoConfiguration.class,
