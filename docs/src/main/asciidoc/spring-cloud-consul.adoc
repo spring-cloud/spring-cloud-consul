@@ -165,9 +165,9 @@ spring:
 
 You can disable the health check by setting `management.health.consul.enabled=false`.
 
-==== Metadata and Consul tags
+==== Metadata
 
-Consul does not yet support metadata on services. Spring Cloud's `ServiceInstance` has a `Map<String, String> metadata` field. Spring Cloud Consul uses Consul tags to approximate metadata until Consul officially supports metadata. Tags with the form `key=value` will be split and used as a `Map` key and value respectively. Tags without the equal `=` sign, will be used as both the key and value.
+Consul supports metadata on services. Spring Cloud's `ServiceInstance` has a `Map<String, String> metadata` field which is populated from a services `meta` field. To populate the `meta` field set values on `spring.cloud.consul.discovery.metadata` or `spring.cloud.consul.discovery.management-metadata` properties.
 
 .application.yml
 ----
@@ -175,10 +175,12 @@ spring:
   cloud:
     consul:
       discovery:
-        tags: foo=bar, baz
+        metadata:
+          myfield: myvalue
+          anotherfield: anothervalue
 ----
 
-The above configuration will result in a map with `foo->bar` and `baz->baz`.
+The above configuration will result in a service who's meta field contains `myfield->myvalue` and `anotherfield->anothervalue`.
 
 ===== Generated Metadata
 
@@ -199,12 +201,7 @@ The Consul Auto Registration will generate a few entries automatically.
 
 |===
 
-
-===== Official Consul Metadata
-
-Consul added official support for a `meta` field that is a `Map<String, String>`. Spring Cloud Consul has added `spring.cloud.consul.discovery.metadata` and `spring.cloud.consul.discovery.management-metadata` properties to support it.
-
-NOTE: By default, the `ServiceInstance.getMetadata()` method from Spring Cloud Commons will continue to populated by parsing the `spring.cloud.consul.discovery.tags` property for backwards compatibility. To change this behaviour set `spring.cloud.consul.discovery.tags-as-metadata=false` and the metadata will be populated from `spring.cloud.consul.discovery.metadata`. In a future version, parsing the `tags` property will be removed.
+WARNING: Older versions of Spring Cloud Consul populated the `ServiceInstance.getMetadata()` method from Spring Cloud Commons by parsing the `spring.cloud.consul.discovery.tags` property. This is no longer supported, please migrate to using  the `spring.cloud.consul.discovery.metadata` map.
 
 ==== Making the Consul Instance ID Unique
 
