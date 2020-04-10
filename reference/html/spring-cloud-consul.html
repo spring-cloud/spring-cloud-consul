@@ -127,10 +127,9 @@ $(globalSwitch);
 </li>
 <li><a href="#http-health-check">3.3. HTTP Health Check</a>
 <ul class="sectlevel3">
-<li><a href="#metadata-and-consul-tags">3.3.1. Metadata and Consul tags</a>
+<li><a href="#metadata">3.3.1. Metadata</a>
 <ul class="sectlevel4">
 <li><a href="#generated-metadata">Generated Metadata</a></li>
-<li><a href="#official-consul-metadata">Official Consul Metadata</a></li>
 </ul>
 </li>
 <li><a href="#making-the-consul-instance-id-unique">3.3.2. Making the Consul Instance ID Unique</a></li>
@@ -412,9 +411,9 @@ spring.cloud.consul.discovery.management-tags</pre>
 <p>You can disable the health check by setting <code>management.health.consul.enabled=false</code>.</p>
 </div>
 <div class="sect3">
-<h4 id="metadata-and-consul-tags"><a class="anchor" href="#metadata-and-consul-tags"></a><a class="link" href="#metadata-and-consul-tags">3.3.1. Metadata and Consul tags</a></h4>
+<h4 id="metadata"><a class="anchor" href="#metadata"></a><a class="link" href="#metadata">3.3.1. Metadata</a></h4>
 <div class="paragraph">
-<p>Consul does not yet support metadata on services. Spring Cloud&#8217;s <code>ServiceInstance</code> has a <code>Map&lt;String, String&gt; metadata</code> field. Spring Cloud Consul uses Consul tags to approximate metadata until Consul officially supports metadata. Tags with the form <code>key=value</code> will be split and used as a <code>Map</code> key and value respectively. Tags without the equal <code>=</code> sign, will be used as both the key and value.</p>
+<p>Consul supports metadata on services. Spring Cloud&#8217;s <code>ServiceInstance</code> has a <code>Map&lt;String, String&gt; metadata</code> field which is populated from a services <code>meta</code> field. To populate the <code>meta</code> field set values on <code>spring.cloud.consul.discovery.metadata</code> or <code>spring.cloud.consul.discovery.management-metadata</code> properties.</p>
 </div>
 <div class="listingblock">
 <div class="title">application.yml</div>
@@ -423,11 +422,13 @@ spring.cloud.consul.discovery.management-tags</pre>
   cloud:
     consul:
       discovery:
-        tags: foo=bar, baz</pre>
+        metadata:
+          myfield: myvalue
+          anotherfield: anothervalue</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The above configuration will result in a map with <code>foo&#8594;bar</code> and <code>baz&#8594;baz</code>.</p>
+<p>The above configuration will result in a service who&#8217;s meta field contains <code>myfield&#8594;myvalue</code> and <code>anotherfield&#8594;anothervalue</code>.</p>
 </div>
 <div class="sect4">
 <h5 id="generated-metadata"><a class="anchor" href="#generated-metadata"></a><a class="link" href="#generated-metadata">Generated Metadata</a></h5>
@@ -461,20 +462,14 @@ spring.cloud.consul.discovery.management-tags</pre>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="sect4">
-<h5 id="official-consul-metadata"><a class="anchor" href="#official-consul-metadata"></a><a class="link" href="#official-consul-metadata">Official Consul Metadata</a></h5>
-<div class="paragraph">
-<p>Consul added official support for a <code>meta</code> field that is a <code>Map&lt;String, String&gt;</code>. Spring Cloud Consul has added <code>spring.cloud.consul.discovery.metadata</code> and <code>spring.cloud.consul.discovery.management-metadata</code> properties to support it.</p>
-</div>
-<div class="admonitionblock note">
+<div class="admonitionblock warning">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-note" title="Note"></i>
+<i class="fa icon-warning" title="Warning"></i>
 </td>
 <td class="content">
-By default, the <code>ServiceInstance.getMetadata()</code> method from Spring Cloud Commons will continue to populated by parsing the <code>spring.cloud.consul.discovery.tags</code> property for backwards compatibility. To change this behaviour set <code>spring.cloud.consul.discovery.tags-as-metadata=false</code> and the metadata will be populated from <code>spring.cloud.consul.discovery.metadata</code>. In a future version, parsing the <code>tags</code> property will be removed.
+Older versions of Spring Cloud Consul populated the <code>ServiceInstance.getMetadata()</code> method from Spring Cloud Commons by parsing the <code>spring.cloud.consul.discovery.tags</code> property. This is no longer supported, please migrate to using  the <code>spring.cloud.consul.discovery.metadata</code> map.
 </td>
 </tr>
 </table>
