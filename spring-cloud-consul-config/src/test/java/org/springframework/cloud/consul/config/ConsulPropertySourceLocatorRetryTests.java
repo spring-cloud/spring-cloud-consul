@@ -31,16 +31,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Spencer Gibb
  */
-/*
- * @RunWith(SpringRunner.class)
- *
- * @SpringBootTest(classes = ConsulPropertySourceLocatorRetryTests.Config.class,
- * properties = { "spring.application.name=testConsulPropertySourceLocatorRetry",
- * "spring.cloud.consul.host=53210a7c-4809-42cb-8b30-057d2db85fcc",
- * "logging.level.org.springframework.retry=TRACE", "spring.cloud.consul.port=65530",
- * "spring.cloud.consul.retry.maxAttempts=1", "spring.cloud.consul.config.failFast=true"
- * }, webEnvironment = RANDOM_PORT)
- */
 public class ConsulPropertySourceLocatorRetryTests {
 
 	@Rule
