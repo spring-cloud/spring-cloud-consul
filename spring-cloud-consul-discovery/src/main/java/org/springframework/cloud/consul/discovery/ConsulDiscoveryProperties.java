@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.discovery;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +52,7 @@ public class ConsulDiscoveryProperties {
 	private List<String> tags = new ArrayList<>();
 
 	/** Metadata to use when registering service. */
-	private Map<String, String> metadata;
+	private Map<String, String> metadata = new LinkedHashMap<>();
 
 	/** Enable tag override for the registered service. */
 	private Boolean enableTagOverride;
