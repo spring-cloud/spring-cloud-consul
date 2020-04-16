@@ -39,6 +39,9 @@ import org.springframework.util.StringUtils;
 		ConfigServerProperties.class })
 public class ConsulConfigServerAutoConfiguration {
 
+	/**
+	 * The metadata key for the path for config server.
+	 */
 	public static final String CONFIG_PATH_KEY = "configPath";
 
 	@Autowired(required = false)
