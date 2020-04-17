@@ -57,12 +57,7 @@ public class ConsulConfigServerAutoConfiguration {
 		}
 		String prefix = this.server.getPrefix();
 		if (StringUtils.hasText(prefix)) {
-			if (this.properties.isTagsAsMetadata()) {
-				this.properties.getTags().add(CONFIG_PATH_KEY + "=" + prefix);
-			}
-			else {
-				this.properties.getMetadata().put(CONFIG_PATH_KEY, prefix);
-			}
+			this.properties.getMetadata().put(CONFIG_PATH_KEY, prefix);
 		}
 	}
 
