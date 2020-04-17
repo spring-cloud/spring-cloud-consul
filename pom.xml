@@ -23,7 +23,6 @@
 		<spring-cloud-bus.version>3.0.0.BUILD-SNAPSHOT</spring-cloud-bus.version>
 		<spring-cloud-commons.version>3.0.0.BUILD-SNAPSHOT</spring-cloud-commons.version>
 		<spring-cloud-config.version>3.0.0.BUILD-SNAPSHOT</spring-cloud-config.version>
-		<spring-cloud-netflix.version>3.0.0.BUILD-SNAPSHOT</spring-cloud-netflix.version>
 		<spring-cloud-deployer.version>1.0.3.RELEASE</spring-cloud-deployer.version>
 		<spring-cloud-openfeign.version>3.0.0.BUILD-SNAPSHOT</spring-cloud-openfeign.version>
 		<spring-cloud-stream.version>Horsham.BUILD-SNAPSHOT</spring-cloud-stream.version>
@@ -143,13 +142,6 @@
 				<version>${spring-cloud-config.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-netflix-dependencies</artifactId>
-				<version>${spring-cloud-netflix.version}</version>
-				<scope>import</scope>
-				<type>pom</type>
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
