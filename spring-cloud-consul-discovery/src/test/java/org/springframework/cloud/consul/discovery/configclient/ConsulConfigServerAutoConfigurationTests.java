@@ -44,7 +44,7 @@ public class ConsulConfigServerAutoConfigurationTests {
 	}
 
 	@Test
-	public void offByDefault() throws Exception {
+	public void offByDefault() {
 		this.context = new AnnotationConfigApplicationContext(
 				ConsulConfigServerAutoConfiguration.class);
 		assertThat(
@@ -53,18 +53,7 @@ public class ConsulConfigServerAutoConfigurationTests {
 	}
 
 	@Test
-	public void onWhenRequested() throws Exception {
-		setup("spring.cloud.config.server.prefix=/config");
-		assertThat(
-				this.context.getBeanNamesForType(ConsulDiscoveryProperties.class).length)
-						.isEqualTo(1);
-		ConsulDiscoveryProperties properties = this.context
-				.getBean(ConsulDiscoveryProperties.class);
-		assertThat(properties.getTags()).containsExactly("configPath=/config");
-	}
-
-	@Test
-	public void onWhenRequestedMetadata() throws Exception {
+	public void onWhenRequested() {
 		setup("spring.cloud.config.server.prefix=/config",
 				"spring.cloud.consul.discovery.tags-as-metadata=false");
 		assertThat(
