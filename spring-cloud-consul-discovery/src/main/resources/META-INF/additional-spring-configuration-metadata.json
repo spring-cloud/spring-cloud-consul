@@ -24,4 +24,5 @@
       "description": "Enables Consul Service Registry Auto-registration.",
       "defaultValue": "true"
     }
+  ]
 }
