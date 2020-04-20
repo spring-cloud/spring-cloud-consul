@@ -1,0 +1,28 @@
+{
+  "properties": [
+    {
+      "name": "spring.cloud.service-registry.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enables Service Registry functionality.",
+      "defaultValue": "true"
+    },
+    {
+      "name": "spring.cloud.consul.service-registry.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enables Consul Service Registry functionality.",
+      "defaultValue": "true"
+    },
+    {
+      "name": "spring.cloud.service-registry.auto-registration.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enables Service Registry Auto-registration.",
+      "defaultValue": "true"
+    },
+    {
+      "name": "spring.cloud.consul.service-registry.auto-registration.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enables Consul Service Registry Auto-registration.",
+      "defaultValue": "true"
+    }
+  ]
+}

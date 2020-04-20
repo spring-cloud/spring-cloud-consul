@@ -20,6 +20,7 @@ import com.ecwid.consul.v1.ConsulClient;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
@@ -41,6 +42,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 		matchIfMissing = true)
 @ConditionalOnDiscoveryEnabled
 @AutoConfigureAfter({ ConsulDiscoveryClientConfiguration.class })
+@ConditionalOnBean(ConsulDiscoveryProperties.class)
 public class ConsulCatalogWatchAutoConfiguration {
 
 	/**
