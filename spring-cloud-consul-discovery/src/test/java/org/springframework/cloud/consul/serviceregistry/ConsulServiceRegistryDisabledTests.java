@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.runner.WebApplicationContextRunner;
+import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.context.annotation.Configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,29 +33,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Spencer Gibb
  */
-public class ConsulAutoServiceRegistrationDisabledTests {
+public class ConsulServiceRegistryDisabledTests {
 
 	@Test
 	public void disabledViaSpringCloudProperty() {
-		testAutoRegistrationDisabled("myTestNotRegisteredService2",
-				"spring.cloud.service-registry.auto-registration.enabled");
-	}
-
-	@Test
-	public void disabledViaConsulProperty() {
-		testAutoRegistrationDisabled("myTestNotRegisteredService3",
-				"spring.cloud.consul.service-registry.auto-registration.enabled");
-	}
-
-	@Test
-	public void disabledViaSpringCloudServiceRegistryProperty() {
-		testAutoRegistrationDisabled("myTestNotRegisteredService4",
+		testAutoRegistrationDisabled("serviceRegistryDisabledTest1",
 				"spring.cloud.service-registry.enabled");
 	}
 
 	@Test
-	public void disabledViaConsulServiceRegistryProperty() {
-		testAutoRegistrationDisabled("myTestNotRegisteredService5",
+	public void disabledViaConsulProperty() {
+		testAutoRegistrationDisabled("serviceRegistryDisabledTest2",
 				"spring.cloud.consul.service-registry.enabled");
 	}
 
@@ -63,14 +52,8 @@ public class ConsulAutoServiceRegistrationDisabledTests {
 				.withPropertyValues("spring.application.name=" + testName,
 						disableProperty + "=false", "server.port=0")
 				.run(context -> {
-
-					assertThat(context)
-							.doesNotHaveBean(ConsulAutoServiceRegistration.class);
-					assertThat(context)
-							.doesNotHaveBean(ConsulAutoServiceRegistrationListener.class);
-					assertThat(context).doesNotHaveBean(ConsulAutoRegistration.class);
-					assertThat(context)
-							.doesNotHaveBean(ConsulRegistrationCustomizer.class);
+					assertThat(context).doesNotHaveBean(ConsulServiceRegistry.class);
+					assertThat(context).doesNotHaveBean(HeartbeatProperties.class);
 
 					ConsulClient consul = context.getBean(ConsulClient.class);
 
@@ -78,7 +61,6 @@ public class ConsulAutoServiceRegistrationDisabledTests {
 					Map<String, Service> services = response.getValue();
 					Service service = services.get(testName);
 					assertThat(service).as("service was registered").isNull();
-
 				});
 	}
 
