@@ -67,6 +67,8 @@
 |spring.cloud.consul.retry.max-interval | 2000 | Maximum interval for backoff.
 |spring.cloud.consul.retry.multiplier | 1.1 | Multiplier for next interval.
 |spring.cloud.consul.scheme |  | Consul agent scheme (HTTP/HTTPS). If there is no scheme in address - client will use HTTP.
+|spring.cloud.consul.service-registry.auto-registration.enabled | true | Enables Consul Service Registry Auto-registration.
+|spring.cloud.consul.service-registry.enabled | true | Enables Consul Service Registry functionality.
 |spring.cloud.consul.tls.certificate-password |  | Password to open the certificate.
 |spring.cloud.consul.tls.certificate-path |  | File path to the certificate.
 |spring.cloud.consul.tls.key-store-instance-type |  | Type of key framework to use.
