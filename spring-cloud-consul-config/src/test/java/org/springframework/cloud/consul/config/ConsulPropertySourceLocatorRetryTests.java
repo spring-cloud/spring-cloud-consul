@@ -38,7 +38,7 @@ public class ConsulPropertySourceLocatorRetryTests {
 
 	@Test
 	public void testRetry() {
-		//Assert.assertThrows(TransportException.class, () -> {
+		// Assert.assertThrows(TransportException.class, () -> {
 		try {
 			new SpringApplicationBuilder(Config.class).properties(
 					"spring.application.name=testConsulPropertySourceLocatorRetry",
@@ -52,7 +52,7 @@ public class ConsulPropertySourceLocatorRetryTests {
 		catch (TransportException e) {
 			// success
 		}
-		//});
+		// });
 		assertThat(output).contains("RetryContext retrieved");
 	}
 
