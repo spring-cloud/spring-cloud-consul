@@ -25,13 +25,13 @@ public class ConsulConfigDataResource extends ConfigDataResource {
 
 	private final ConsulConfigProperties properties;
 
-	private final String context;
+	private final ConsulPropertyContext context;
 
 	private final boolean optional;
 
 	private final ConsulPropertySources consulPropertySources;
 
-	public ConsulConfigDataResource(String context, boolean optional, ConsulConfigProperties properties,
+	public ConsulConfigDataResource(ConsulPropertyContext context, boolean optional, ConsulConfigProperties properties,
 			ConsulPropertySources consulPropertySources) {
 		this.properties = properties;
 		this.context = context;
@@ -39,7 +39,7 @@ public class ConsulConfigDataResource extends ConfigDataResource {
 		this.consulPropertySources = consulPropertySources;
 	}
 
-	public String getContext() {
+	public ConsulPropertyContext getContext() {
 		return this.context;
 	}
 

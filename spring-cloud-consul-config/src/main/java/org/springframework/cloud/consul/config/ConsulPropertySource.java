@@ -48,15 +48,22 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 	private String context;
 
+	private ConsulConfigProperties.Format format;
+
 	private ConsulConfigProperties configProperties;
 
 	private Long initialIndex;
 
 	public ConsulPropertySource(String context, ConsulClient source, ConsulConfigProperties configProperties) {
+		this(context, source, configProperties, configProperties.getFormat());
+	}
+
+	public ConsulPropertySource(String context, ConsulClient source, ConsulConfigProperties configProperties,
+			ConsulConfigProperties.Format format) {
 		super(context, source);
 		this.context = context;
 		this.configProperties = configProperties;
-
+		this.format = format;
 	}
 
 	public void init() {
@@ -70,14 +77,13 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		this.initialIndex = response.getConsulIndex();
 
 		final List<GetValue> values = response.getValue();
-		ConsulConfigProperties.Format format = this.configProperties.getFormat();
-		switch (format) {
+		switch (this.format) {
 		case KEY_VALUE:
 			parsePropertiesInKeyValueFormat(values);
 			break;
 		case PROPERTIES:
 		case YAML:
-			parsePropertiesWithNonKeyValueFormat(values, format);
+			parsePropertiesWithNonKeyValueFormat(values, this.format);
 		}
 	}
 

@@ -46,6 +46,8 @@ public class ConsulConfigProperties {
 	@NotEmpty
 	private String defaultContext = "application";
 
+	private Format defaultContextFormat;
+
 	@NotEmpty
 	private String profileSeparator = ",";
 
@@ -108,6 +110,14 @@ public class ConsulConfigProperties {
 		this.defaultContext = defaultContext;
 	}
 
+	public @NotNull Format getDefaultContextFormat() {
+		return this.defaultContextFormat != null ? this.defaultContextFormat : this.format;
+	}
+
+	public void setDefaultContextFormat(Format defaultContextFormat) {
+		this.defaultContextFormat = defaultContextFormat;
+	}
+
 	public @NotEmpty String getProfileSeparator() {
 		return this.profileSeparator;
 	}
@@ -167,9 +177,10 @@ public class ConsulConfigProperties {
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("enabled", this.enabled).append("prefix", this.prefix)
-				.append("defaultContext", this.defaultContext).append("profileSeparator", this.profileSeparator)
-				.append("format", this.format).append("dataKey", this.dataKey).append("aclToken", this.aclToken)
-				.append("watch", this.watch).append("failFast", this.failFast).append("name", this.name).toString();
+				.append("defaultContext", this.defaultContext).append("defaultContextFormat", this.defaultContextFormat)
+				.append("profileSeparator", this.profileSeparator).append("format", this.format)
+				.append("dataKey", this.dataKey).append("aclToken", this.aclToken).append("watch", this.watch)
+				.append("failFast", this.failFast).append("name", this.name).toString();
 	}
 
 	/**

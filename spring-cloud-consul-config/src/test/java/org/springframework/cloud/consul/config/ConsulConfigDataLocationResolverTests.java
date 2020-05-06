@@ -82,7 +82,8 @@ public class ConsulConfigDataLocationResolverTests {
 	}
 
 	private List<String> toContexts(List<ConsulConfigDataResource> locations) {
-		return locations.stream().map(ConsulConfigDataResource::getContext).collect(Collectors.toList());
+		return locations.stream().map(ConsulConfigDataResource::getContext).map(ConsulPropertyContext::getContext)
+				.collect(Collectors.toList());
 	}
 
 	private List<ConsulConfigDataResource> testResolveProfileSpecific(String location) {

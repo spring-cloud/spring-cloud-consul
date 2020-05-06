@@ -28,7 +28,7 @@ import static org.springframework.cloud.consul.config.ConsulConfigProperties.For
 public class ConsulFilesPropertySource extends ConsulPropertySource {
 
 	public ConsulFilesPropertySource(String context, ConsulClient source, ConsulConfigProperties configProperties) {
-		super(context, source, configProperties);
+		super(context, source, configProperties, ConsulConfigProperties.Format.FILES);
 	}
 
 	@Override

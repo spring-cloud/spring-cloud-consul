@@ -47,26 +47,27 @@ public class ConsulPropertySources {
 		this.log = log;
 	}
 
-	public List<String> getAutomaticContexts(List<String> profiles) {
-		List<String> contexts = new ArrayList<>();
+	public List<ConsulPropertyContext> getAutomaticContexts(List<String> profiles) {
+		List<ConsulPropertyContext> contexts = new ArrayList<>();
 		String prefix = properties.getPrefix();
 		String defaultContext = getContext(prefix, properties.getDefaultContext());
-		List<String> suffixes = getSuffixes();
+		List<String> suffixes = getSuffixes(properties.getDefaultContextFormat());
 		for (String suffix : suffixes) {
-			contexts.add(defaultContext + suffix);
+			contexts.add(new ConsulPropertyContext(defaultContext + suffix, properties.getDefaultContextFormat()));
 		}
 		for (String suffix : suffixes) {
-			addProfiles(contexts, defaultContext, profiles, suffix);
+			addProfiles(contexts, defaultContext, profiles, suffix, properties.getDefaultContextFormat());
 		}
 
 		// getName() defaults to ${spring.application.name} or application
 		String baseContext = getContext(prefix, properties.getName());
+		suffixes = getSuffixes(properties.getFormat());
 
 		for (String suffix : suffixes) {
-			contexts.add(baseContext + suffix);
+			contexts.add(new ConsulPropertyContext(baseContext + suffix, properties.getFormat()));
 		}
 		for (String suffix : suffixes) {
-			addProfiles(contexts, baseContext, profiles, suffix);
+			addProfiles(contexts, baseContext, profiles, suffix, properties.getFormat());
 		}
 		// we build them backwards, first wins, so reverse
 		Collections.reverse(contexts);
@@ -82,25 +83,34 @@ public class ConsulPropertySources {
 		}
 	}
 
-	protected List<String> getSuffixes() {
-		if (properties.getFormat() == FILES) {
+	protected List<String> getSuffixes(ConsulConfigProperties.Format format) {
+		if (format == FILES) {
 			return FILES_SUFFIXES;
 		}
 		return DIR_SUFFIXES;
 	}
 
-	private void addProfiles(List<String> contexts, String baseContext, List<String> profiles, String suffix) {
+	private void addProfiles(List<ConsulPropertyContext> contexts, String baseContext, List<String> profiles,
+			String suffix, ConsulConfigProperties.Format format) {
 		for (String profile : profiles) {
-			contexts.add(baseContext + properties.getProfileSeparator() + profile + suffix);
+			contexts.add(
+					new ConsulPropertyContext(baseContext + getProfileSeparator(format) + profile + suffix, format));
 		}
 	}
 
+	private String getProfileSeparator(ConsulConfigProperties.Format format) {
+		if (format == FILES) {
+			return "-";
+		}
+		return this.properties.getProfileSeparator();
+	}
+
 	public ConsulPropertySource createPropertySource(String propertySourceContext, boolean optional,
-			ConsulClient consul, BiConsumer<String, Long> indexConsumer) {
+			ConsulClient consul, BiConsumer<String, Long> indexConsumer, ConsulConfigProperties.Format format) {
 		try {
 			ConsulPropertySource propertySource = null;
 
-			if (properties.getFormat() == FILES) {
+			if (format == FILES) {
 				Response<GetValue> response = consul.getKVValue(propertySourceContext, properties.getAclToken());
 				indexConsumer.accept(propertySourceContext, response.getConsulIndex());
 				if (response.getValue() != null) {
@@ -114,7 +124,7 @@ public class ConsulPropertySources {
 				}
 			}
 			else {
-				propertySource = create(propertySourceContext, consul, indexConsumer);
+				propertySource = create(propertySourceContext, consul, indexConsumer, format);
 			}
 			return propertySource;
 		}
@@ -133,8 +143,8 @@ public class ConsulPropertySources {
 	}
 
 	private ConsulPropertySource create(String context, ConsulClient consulClient,
-			BiConsumer<String, Long> indexConsumer) {
-		ConsulPropertySource propertySource = new ConsulPropertySource(context, consulClient, this.properties);
+			BiConsumer<String, Long> indexConsumer, ConsulConfigProperties.Format format) {
+		ConsulPropertySource propertySource = new ConsulPropertySource(context, consulClient, this.properties, format);
 		propertySource.init();
 		indexConsumer.accept(context, propertySource.getInitialIndex());
 		return propertySource;
