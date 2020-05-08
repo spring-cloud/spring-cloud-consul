@@ -1,7 +1,11 @@
 #!/bin/bash
 
 CONSUL_VER="1.7.2"
-CONSUL_ZIP="consul_${CONSUL_VER}_linux_amd64.zip"
+PLATFORM="amd64"
+if [ "$(uname -m)" == aarch64 ]; then
+  PLATFORM="arm64"
+fi
+CONSUL_ZIP="consul_${CONSUL_VER}_linux_${PLATFORM}.zip"
 IGNORE_CERTS="${IGNORE_CERTS:-no}"
 
 # cleanup
