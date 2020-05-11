@@ -58,9 +58,7 @@ public class ConsulTestcontainers
 	}
 
 	public static void start() {
-		if (!consul.isRunning()) {
-			consul.start();
-		}
+		consul.start();
 	}
 
 	public static Integer getPort() {
