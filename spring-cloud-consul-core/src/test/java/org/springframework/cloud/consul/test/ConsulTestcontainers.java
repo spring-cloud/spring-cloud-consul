@@ -24,6 +24,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
+import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.MapPropertySource;
@@ -48,7 +49,8 @@ public class ConsulTestcontainers
 		if (!sources.contains("consulTestcontainer")) {
 			Integer mappedPort = consul.getMappedPort(8500);
 			HashMap<String, Object> map = new HashMap<>();
-			map.put("spring.cloud.consul.port", String.valueOf(mappedPort));
+			map.put(ConsulProperties.PREFIX + ".port", String.valueOf(mappedPort));
+			map.put(ConsulProperties.PREFIX + ".host", consul.getContainerIpAddress());
 
 			sources.addFirst(new MapPropertySource("consulTestcontainer", map));
 		}
@@ -57,7 +59,8 @@ public class ConsulTestcontainers
 	public static void start() {
 		if (!consul.isRunning()) {
 			consul.start();
-			consul.followOutput(new Slf4jLogConsumer(logger).withSeparateOutputStreams());
+			consul.withLogConsumer(
+					new Slf4jLogConsumer(logger).withSeparateOutputStreams());
 		}
 	}
 
@@ -66,6 +69,13 @@ public class ConsulTestcontainers
 			throw new IllegalStateException("consul Testcontainer is not running");
 		}
 		return consul.getMappedPort(8500);
+	}
+
+	public static String getHost() {
+		if (!consul.isRunning()) {
+			throw new IllegalStateException("consul Testcontainer is not running");
+		}
+		return consul.getContainerIpAddress();
 	}
 
 }

@@ -66,8 +66,9 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 	public void onWhenRequested() throws Exception {
 		ConsulTestcontainers.start();
 		Integer port = ConsulTestcontainers.getPort();
+		String host = ConsulTestcontainers.getHost();
 		setup("server.port=0", "spring.cloud.config.discovery.enabled=true",
-				"spring.cloud.consul.port=" + port,
+				"spring.cloud.consul.port=" + port, "spring.cloud.consul.host=" + host,
 				"logging.level.org.springframework.cloud.config.client=DEBUG",
 				"spring.cloud.consul.discovery.catalog-services-watch.enabled=false",
 				"spring.cloud.consul.discovery.test.enabled:true",
