@@ -36,6 +36,7 @@ public class ConsulTestcontainers
 	static final Logger logger = LoggerFactory.getLogger(ConsulTestcontainers.class);
 
 	public static GenericContainer<?> consul = new GenericContainer<>("consul:1.7.2")
+			.withLogConsumer(new Slf4jLogConsumer(logger).withSeparateOutputStreams())
 			.waitingFor(Wait.forHttp("/v1/status/leader")).withExposedPorts(8500)
 			.withCommand("agent", "-dev", "-server", "-bootstrap", "-client", "0.0.0.0",
 					"-log-level", "trace");
@@ -59,8 +60,6 @@ public class ConsulTestcontainers
 	public static void start() {
 		if (!consul.isRunning()) {
 			consul.start();
-			consul.withLogConsumer(
-					new Slf4jLogConsumer(logger).withSeparateOutputStreams());
 		}
 	}
 
