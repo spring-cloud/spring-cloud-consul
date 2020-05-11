@@ -20,15 +20,8 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 import com.ecwid.consul.v1.agent.model.NewService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.testcontainers.containers.wait.strategy.Wait;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -40,7 +33,9 @@ import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.cloud.consul.support.ConsulHeartbeatAutoConfiguration;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,31 +49,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 				"spring.application.name=myConsulServiceRegistryCheckTtlTestService-S",
 				"spring.cloud.consul.discovery.heartbeat.enabled=true" },
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulServiceRegistryCheckTtlTests {
-
-	static final Logger logger = LoggerFactory.getLogger(ConsulServiceRegistryTests.class);
-
-	public static GenericContainer consul = new GenericContainer("consul:1.7.1")
-		.waitingFor(Wait.forHttp("/v1/status/leader"))
-		.withExposedPorts(8500)
-		.withCommand("agent", "-dev", "-server", "-bootstrap", "-client", "0.0.0.0", "-log-level", "trace");
 
 	@LocalServerPort
 	private int port;
-
-	@BeforeClass
-	public static void before() {
-		consul.start();
-		consul.followOutput(new Slf4jLogConsumer(logger).withSeparateOutputStreams());
-		Integer mappedPort = consul.getMappedPort(8500);
-		System.setProperty("spring.cloud.consul.port", String.valueOf(mappedPort));
-	}
-
-	@AfterClass
-	public static void after() {
-		System.clearProperty("spring.cloud.consul.port");
-		consul.stop();
-	}
 
 	@Autowired
 	private ConsulDiscoveryProperties discoveryProperties;
