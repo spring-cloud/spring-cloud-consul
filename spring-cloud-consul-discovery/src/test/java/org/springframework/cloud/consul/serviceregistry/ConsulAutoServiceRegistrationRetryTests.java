@@ -34,6 +34,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.DirtiesContext;
 
+import static org.hamcrest.Matchers.isA;
+
 /**
  * @author Spencer Gibb
  * @author Venil Noronha
@@ -49,7 +51,7 @@ public class ConsulAutoServiceRegistrationRetryTests {
 
 	@Test
 	public void testRetry() {
-		this.exception.expect(ConsulException.class);
+		this.exception.expectCause(isA(ConsulException.class));
 		try (ConfigurableApplicationContext context = new SpringApplicationBuilder(
 				TestConfig.class)
 						.properties("spring.application.name=testregistrationretry",
