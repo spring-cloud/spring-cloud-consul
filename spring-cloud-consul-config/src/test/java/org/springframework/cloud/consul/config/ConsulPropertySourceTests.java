@@ -23,7 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,8 +34,6 @@ public class ConsulPropertySourceTests {
 
 	private ConsulClient client;
 
-	private ConsulProperties properties;
-
 	private String prefix;
 
 	private String kvContext;
@@ -44,11 +42,10 @@ public class ConsulPropertySourceTests {
 
 	@Before
 	public void setup() {
-		this.properties = new ConsulProperties();
+		ConsulTestcontainers.start();
 		this.prefix = "consulPropertySourceTests"
 				+ new Random().nextInt(Integer.MAX_VALUE);
-		this.client = new ConsulClient(this.properties.getHost(),
-				this.properties.getPort());
+		this.client = ConsulTestcontainers.client();
 	}
 
 	@After

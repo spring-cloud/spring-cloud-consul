@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.config;
 import org.junit.Test;
 
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Bean;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,6 +37,7 @@ public class ConsulConfigBootstrapConfigurationTests {
 	@Test
 	public void testConfigPropsBeanBacksOff() {
 		this.contextRunner.withUserConfiguration(TestConfig.class)
+				.withInitializer(new ConsulTestcontainers())
 				.withUserConfiguration(ConsulConfigBootstrapConfiguration.class)
 				.run(context -> {
 					ConsulConfigProperties config = context
@@ -54,7 +56,7 @@ public class ConsulConfigBootstrapConfigurationTests {
 	@Test
 	public void testConfigPropsBeanKicksIn() {
 		this.contextRunner.withUserConfiguration(ConsulConfigBootstrapConfiguration.class)
-				.run(context -> {
+				.withInitializer(new ConsulTestcontainers()).run(context -> {
 					ConsulConfigProperties config = context
 							.getBean(ConsulConfigProperties.class);
 					assertThat(config.getPrefix()).as("Prefix did not match")
@@ -64,19 +66,19 @@ public class ConsulConfigBootstrapConfigurationTests {
 				});
 	}
 
-}
+	/**
+	 * Test config that simulates a "user provided bean".
+	 */
+	private static class TestConfig {
 
-/**
- * Test config that simulates a "user provided bean".
- */
-class TestConfig {
+		@Bean
+		public ConsulConfigProperties consulConfigProperties() {
+			ConsulConfigProperties config = new ConsulConfigProperties();
+			config.setPrefix("platform-config");
+			config.setDefaultContext("defaults");
+			return config;
+		}
 
-	@Bean
-	public ConsulConfigProperties consulConfigProperties() {
-		ConsulConfigProperties config = new ConsulConfigProperties();
-		config.setPrefix("platform-config");
-		config.setDefaultContext("defaults");
-		return config;
 	}
 
 }

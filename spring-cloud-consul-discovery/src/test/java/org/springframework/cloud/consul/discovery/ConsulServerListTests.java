@@ -41,8 +41,7 @@ public class ConsulServerListTests {
 	@Test
 	public void tagsWork() {
 		ConsulTestcontainers.start();
-		ConsulClient consul = new ConsulClient(ConsulTestcontainers.getHost(),
-				ConsulTestcontainers.getPort());
+		ConsulClient consul = ConsulTestcontainers.client();
 
 		NewService nonTagged = createService("NonTagged", 8080, null);
 

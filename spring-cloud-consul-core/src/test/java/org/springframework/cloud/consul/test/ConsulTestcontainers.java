@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.test;
 
 import java.util.HashMap;
 
+import com.ecwid.consul.v1.ConsulClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -73,6 +74,10 @@ public class ConsulTestcontainers
 			throw new IllegalStateException("consul Testcontainer is not running");
 		}
 		return consul.getContainerIpAddress();
+	}
+
+	public static ConsulClient client() {
+		return new ConsulClient(getHost(), getPort());
 	}
 
 }
