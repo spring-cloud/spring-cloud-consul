@@ -28,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -39,6 +41,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 		"spring.cloud.consul.tls.key-store-password=letmein",
 		"spring.cloud.consul.tls.certificate-path=src/test/resources/trustStore.jks",
 		"spring.cloud.consul.tls.certificate-password=change_me" })
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoConfigurationTests {
 
 	@Autowired

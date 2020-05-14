@@ -23,6 +23,7 @@ import org.junit.rules.ExpectedException;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +44,7 @@ public class ConsulBinderConfigurationTests {
 	public void consulBinderDisabledWorks() {
 		this.exception.expectMessage(containsString("no proper implementation found"));
 		new SpringApplicationBuilder(Application.class)
+				.initializers(new ConsulTestcontainers())
 				.properties("spring.cloud.consul.binder.enabled=false").run();
 	}
 
@@ -51,7 +53,8 @@ public class ConsulBinderConfigurationTests {
 	public void consulDisabledDisablesBinder() {
 		this.exception.expectMessage(containsString("no proper implementation found"));
 		new SpringApplicationBuilder(Application.class)
-				.properties("spring.cloud.consul.enabled=false").run();
+			.initializers(new ConsulTestcontainers())
+			.properties("spring.cloud.consul.enabled=false").run();
 	}
 
 	interface Events {
