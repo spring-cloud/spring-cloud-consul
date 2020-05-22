@@ -23,6 +23,7 @@ import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 
 import org.apache.commons.logging.Log;
+import org.joda.time.Period;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.convert.DurationUnit;
@@ -52,9 +53,10 @@ public class HeartbeatProperties {
 	@DecimalMax("0.9")
 	private double intervalRatio = 2.0 / 3.0;
 
-	// TODO: did heartbeatInterval need to be a field?
-
-	protected Duration computeHearbeatInterval() {
+	/**
+	 * @return the computed heartbeat interval
+	 */
+	protected Duration computeHeartbeatInterval() {
 		// heartbeat rate at ratio * ttl, but no later than ttl -1s and, (under lesser
 		// priority), no sooner than 1s from now
 		double interval = this.ttl.getSeconds() * this.intervalRatio;
