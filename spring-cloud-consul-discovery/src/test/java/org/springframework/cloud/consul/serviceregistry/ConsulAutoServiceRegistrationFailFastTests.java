@@ -31,6 +31,8 @@ import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.DirtiesContext;
 
+import static org.hamcrest.Matchers.isA;
+
 /**
  * @author Spencer Gibb
  * @author Venil Noronha
@@ -43,7 +45,7 @@ public class ConsulAutoServiceRegistrationFailFastTests {
 
 	@Test
 	public void testFailFastEnabled() {
-		this.exception.expect(ConsulException.class);
+		this.exception.expectCause(isA(ConsulException.class));
 		new SpringApplicationBuilder(TestConfig.class)
 				.properties("spring.application.name=testregistrationfails-fast",
 						"spring.jmx.default-domain=testautoregfailfast", "server.port=0",
