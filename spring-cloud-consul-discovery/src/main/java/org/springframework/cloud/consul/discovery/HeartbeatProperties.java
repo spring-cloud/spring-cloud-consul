@@ -54,8 +54,11 @@ public class HeartbeatProperties {
 	@DecimalMax("0.9")
 	private double intervalRatio = 2.0 / 3.0;
 
-	// TODO: did heartbeatInterval need to be a field?
-
+	/**
+	 * @deprecated the joda time {@link Period} will be replaced with java8 duration.
+	 * @return the computed heartbeat interval
+	 */
+	@Deprecated
 	protected Period computeHearbeatInterval() {
 		// heartbeat rate at ratio * ttl, but no later than ttl -1s and, (under lesser
 		// priority), no sooner than 1s from now
@@ -66,6 +69,11 @@ public class HeartbeatProperties {
 		Period heartbeatInterval = new Period(Math.round(1000 * min));
 		log.debug("Computed heartbeatInterval: " + heartbeatInterval);
 		return heartbeatInterval;
+	}
+
+	@Deprecated
+	protected Period computeHeartbeatInterval() {
+		return computeHearbeatInterval();
 	}
 
 	public String getTtl() {
