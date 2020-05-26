@@ -1,63 +1,63 @@
 |===
 |Name | Default | Description
 
-|spring.cloud.consul.config.acl-token |  | 
+|spring.cloud.consul.config.acl-token | null | null
 |spring.cloud.consul.config.data-key | data | If format is Format.PROPERTIES or Format.YAML then the following field is used as key to look up consul for configuration.
-|spring.cloud.consul.config.default-context | application | 
-|spring.cloud.consul.config.enabled | true | 
+|spring.cloud.consul.config.default-context | application | null
+|spring.cloud.consul.config.enabled | true | null
 |spring.cloud.consul.config.fail-fast | true | Throw exceptions during config lookup if true, otherwise, log warnings.
-|spring.cloud.consul.config.format |  | 
-|spring.cloud.consul.config.name |  | Alternative to spring.application.name to use in looking up values in consul KV.
-|spring.cloud.consul.config.prefix | config | 
-|spring.cloud.consul.config.profile-separator | , | 
+|spring.cloud.consul.config.format | null | null
+|spring.cloud.consul.config.name | null | Alternative to spring.application.name to use in looking up values in consul KV.
+|spring.cloud.consul.config.prefix | config | null
+|spring.cloud.consul.config.profile-separator | , | null
 |spring.cloud.consul.config.watch.delay | 1000 | The value of the fixed delay for the watch in millis. Defaults to 1000.
 |spring.cloud.consul.config.watch.enabled | true | If the watch is enabled. Defaults to true.
 |spring.cloud.consul.config.watch.wait-time | 55 | The number of seconds to wait (or block) for watch query, defaults to 55. Needs to be less than default ConsulClient (defaults to 60). To increase ConsulClient timeout create a ConsulClient bean with a custom ConsulRawClient with a custom HttpClient.
-|spring.cloud.consul.discovery.acl-token |  | 
+|spring.cloud.consul.discovery.acl-token | null | null
 |spring.cloud.consul.discovery.catalog-services-watch-delay | 1000 | The delay between calls to watch consul catalog in millis, default is 1000.
 |spring.cloud.consul.discovery.catalog-services-watch-timeout | 2 | The number of seconds to block while watching consul catalog, default is 2.
-|spring.cloud.consul.discovery.consistency-mode |  | Consistency mode for health service request.
-|spring.cloud.consul.discovery.datacenters |  | Map of serviceId's -> datacenter to query for in server list. This allows looking up services in another datacenters.
-|spring.cloud.consul.discovery.default-query-tag |  | Tag to query for in service list if one is not listed in serverListQueryTags.
+|spring.cloud.consul.discovery.consistency-mode | null | Consistency mode for health service request.
+|spring.cloud.consul.discovery.datacenters | null | Map of serviceId's -> datacenter to query for in server list. This allows looking up services in another datacenters.
+|spring.cloud.consul.discovery.default-query-tag | null | Tag to query for in service list if one is not listed in serverListQueryTags.
 |spring.cloud.consul.discovery.default-zone-metadata-name | zone | Service instance zone comes from metadata. This allows changing the metadata tag name.
 |spring.cloud.consul.discovery.deregister | true | Disable automatic de-registration of service in consul.
-|spring.cloud.consul.discovery.enable-tag-override |  | Enable tag override for the registered service.
+|spring.cloud.consul.discovery.enable-tag-override | null | Enable tag override for the registered service.
 |spring.cloud.consul.discovery.enabled | true | Is service discovery enabled?
 |spring.cloud.consul.discovery.fail-fast | true | Throw exceptions during service registration if true, otherwise, log warnings (defaults to true).
-|spring.cloud.consul.discovery.health-check-critical-timeout |  | Timeout to deregister services critical for longer than timeout (e.g. 30m). Requires consul version 7.x or higher.
-|spring.cloud.consul.discovery.health-check-headers |  | Headers to be applied to the Health Check calls.
+|spring.cloud.consul.discovery.health-check-critical-timeout | null | Timeout to deregister services critical for longer than timeout (e.g. 30m). Requires consul version 7.x or higher.
+|spring.cloud.consul.discovery.health-check-headers | null | Headers to be applied to the Health Check calls.
 |spring.cloud.consul.discovery.health-check-interval | 10s | How often to perform the health check (e.g. 10s), defaults to 10s.
 |spring.cloud.consul.discovery.health-check-path | /actuator/health | Alternate server path to invoke for health checking.
-|spring.cloud.consul.discovery.health-check-timeout |  | Timeout for health check (e.g. 10s).
-|spring.cloud.consul.discovery.health-check-tls-skip-verify |  | Skips certificate verification during service checks if true, otherwise runs certificate verification.
-|spring.cloud.consul.discovery.health-check-url |  | Custom health check url to override default.
-|spring.cloud.consul.discovery.heartbeat.enabled | false | 
-|spring.cloud.consul.discovery.heartbeat.interval-ratio |  | 
-|spring.cloud.consul.discovery.heartbeat.ttl | 30s | 
-|spring.cloud.consul.discovery.hostname |  | Hostname to use when accessing server.
+|spring.cloud.consul.discovery.health-check-timeout | null | Timeout for health check (e.g. 10s).
+|spring.cloud.consul.discovery.health-check-tls-skip-verify | null | Skips certificate verification during service checks if true, otherwise runs certificate verification.
+|spring.cloud.consul.discovery.health-check-url | null | Custom health check url to override default.
+|spring.cloud.consul.discovery.heartbeat.enabled | false | null
+|spring.cloud.consul.discovery.heartbeat.interval-ratio | null | null
+|spring.cloud.consul.discovery.heartbeat.ttl | 30s | null
+|spring.cloud.consul.discovery.hostname | null | Hostname to use when accessing server.
 |spring.cloud.consul.discovery.include-hostname-in-instance-id | false | Whether hostname is included into the default instance id when registering service.
-|spring.cloud.consul.discovery.instance-group |  | Service instance group.
-|spring.cloud.consul.discovery.instance-id |  | Unique service instance id.
-|spring.cloud.consul.discovery.instance-zone |  | Service instance zone.
-|spring.cloud.consul.discovery.ip-address |  | IP address to use when accessing service (must also set preferIpAddress to use).
-|spring.cloud.consul.discovery.lifecycle.enabled | true | 
-|spring.cloud.consul.discovery.management-enable-tag-override |  | Enable tag override for the registered management service.
-|spring.cloud.consul.discovery.management-metadata |  | Metadata to use when registering management service.
-|spring.cloud.consul.discovery.management-port |  | Port to register the management service under (defaults to management port).
+|spring.cloud.consul.discovery.instance-group | null | Service instance group.
+|spring.cloud.consul.discovery.instance-id | null | Unique service instance id.
+|spring.cloud.consul.discovery.instance-zone | null | Service instance zone.
+|spring.cloud.consul.discovery.ip-address | null | IP address to use when accessing service (must also set preferIpAddress to use).
+|spring.cloud.consul.discovery.lifecycle.enabled | true | null
+|spring.cloud.consul.discovery.management-enable-tag-override | null | Enable tag override for the registered management service.
+|spring.cloud.consul.discovery.management-metadata | null | Metadata to use when registering management service.
+|spring.cloud.consul.discovery.management-port | null | Port to register the management service under (defaults to management port).
 |spring.cloud.consul.discovery.management-suffix | management | Suffix to use when registering management service.
-|spring.cloud.consul.discovery.management-tags |  | Tags to use when registering management service.
-|spring.cloud.consul.discovery.metadata |  | Metadata to use when registering service.
+|spring.cloud.consul.discovery.management-tags | null | Tags to use when registering management service.
+|spring.cloud.consul.discovery.metadata | null | Metadata to use when registering service.
 |spring.cloud.consul.discovery.order | 0 | Order of the discovery client used by `CompositeDiscoveryClient` for sorting available clients.
-|spring.cloud.consul.discovery.port |  | Port to register the service under (defaults to listening port).
+|spring.cloud.consul.discovery.port | null | Port to register the service under (defaults to listening port).
 |spring.cloud.consul.discovery.prefer-agent-address | false | Source of how we will determine the address to use.
 |spring.cloud.consul.discovery.prefer-ip-address | false | Use ip address rather than hostname during registration.
 |spring.cloud.consul.discovery.query-passing | false | Add the 'passing` parameter to /v1/health/service/serviceName. This pushes health check passing to the server.
 |spring.cloud.consul.discovery.register | true | Register as a service in consul.
 |spring.cloud.consul.discovery.register-health-check | true | Register health check in consul. Useful during development of a service.
 |spring.cloud.consul.discovery.scheme | http | Whether to register an http or https service.
-|spring.cloud.consul.discovery.server-list-query-tags |  | Map of serviceId's -> tag to query for in server list. This allows filtering services by a single tag.
-|spring.cloud.consul.discovery.service-name |  | Service name.
-|spring.cloud.consul.discovery.tags |  | Tags to use when registering service.
+|spring.cloud.consul.discovery.server-list-query-tags | null | Map of serviceId's -> tag to query for in server list. This allows filtering services by a single tag.
+|spring.cloud.consul.discovery.service-name | null | Service name.
+|spring.cloud.consul.discovery.tags | null | Tags to use when registering service.
 |spring.cloud.consul.enabled | true | Is spring cloud consul enabled.
 |spring.cloud.consul.host | localhost | Consul agent hostname. Defaults to 'localhost'.
 |spring.cloud.consul.port | 8500 | Consul agent port. Defaults to '8500'.
@@ -66,13 +66,13 @@
 |spring.cloud.consul.retry.max-attempts | 6 | Maximum number of attempts.
 |spring.cloud.consul.retry.max-interval | 2000 | Maximum interval for backoff.
 |spring.cloud.consul.retry.multiplier | 1.1 | Multiplier for next interval.
-|spring.cloud.consul.scheme |  | Consul agent scheme (HTTP/HTTPS). If there is no scheme in address - client will use HTTP.
+|spring.cloud.consul.scheme | null | Consul agent scheme (HTTP/HTTPS). If there is no scheme in address - client will use HTTP.
 |spring.cloud.consul.service-registry.auto-registration.enabled | true | Enables Consul Service Registry Auto-registration.
 |spring.cloud.consul.service-registry.enabled | true | Enables Consul Service Registry functionality.
-|spring.cloud.consul.tls.certificate-password |  | Password to open the certificate.
-|spring.cloud.consul.tls.certificate-path |  | File path to the certificate.
-|spring.cloud.consul.tls.key-store-instance-type |  | Type of key framework to use.
-|spring.cloud.consul.tls.key-store-password |  | Password to an external keystore.
-|spring.cloud.consul.tls.key-store-path |  | Path to an external keystore.
+|spring.cloud.consul.tls.certificate-password | null | Password to open the certificate.
+|spring.cloud.consul.tls.certificate-path | null | File path to the certificate.
+|spring.cloud.consul.tls.key-store-instance-type | null | Type of key framework to use.
+|spring.cloud.consul.tls.key-store-password | null | Password to an external keystore.
+|spring.cloud.consul.tls.key-store-path | null | Path to an external keystore.
 
 |===
