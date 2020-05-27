@@ -29,7 +29,7 @@ public class RibbonConsulAutoConfigurationTests {
 
 	@Test
 	public void shouldNotHaveConsulRibbonClientWhenConsulRibbonDisabled() {
-		contextRunner.withPropertyValues("spring.cloud.consul.ribbon.enabled=true")
+		contextRunner.withPropertyValues("spring.cloud.consul.ribbon.enabled=false")
 			.run(context -> {
 				assertThat(context).doesNotHaveBean(ConsulRibbonClientConfiguration.class);
 			});
@@ -38,6 +38,14 @@ public class RibbonConsulAutoConfigurationTests {
 	@Test
 	public void shouldNotHaveConsulRibbonClientWhenConsulDiscoveryDisabled() {
 		contextRunner.withPropertyValues("spring.cloud.consul.discovery.enabled=false")
+			.run(context -> {
+				assertThat(context).doesNotHaveBean(ConsulRibbonClientConfiguration.class);
+			});
+	}
+
+	@Test
+	public void shouldHaveConsulRibbonClientWhenConsulDiscoveryAndConsulRibbonEnabled() {
+		contextRunner.withPropertyValues("spring.cloud.consul.discovery.enabled=true", "spring.cloud.consul.ribbon.enabled=true")
 			.run(context -> {
 				assertThat(context).doesNotHaveBean(ConsulRibbonClientConfiguration.class);
 			});
