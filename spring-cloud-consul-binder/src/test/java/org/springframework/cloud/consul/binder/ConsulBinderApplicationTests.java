@@ -21,7 +21,6 @@ import java.util.concurrent.TimeUnit;
 import com.ecwid.consul.v1.ConsulClient;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;

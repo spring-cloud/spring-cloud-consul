@@ -21,11 +21,9 @@ import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.event.model.Event;
 import com.ecwid.consul.v1.event.model.EventParams;
-
+import java.util.Arrays;
 import org.springframework.integration.handler.AbstractMessageHandler;
 import org.springframework.messaging.Message;
-
-import java.util.Arrays;
 
 /**
  * Adapter that converts and sends Messages as Consul events.
