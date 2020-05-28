@@ -25,6 +25,8 @@ import com.ecwid.consul.v1.event.model.EventParams;
 import org.springframework.integration.handler.AbstractMessageHandler;
 import org.springframework.messaging.Message;
 
+import java.util.Arrays;
+
 /**
  * Adapter that converts and sends Messages as Consul events.
  *
@@ -48,12 +50,16 @@ public class ConsulSendingHandler extends AbstractMessageHandler {
 		}
 
 		Object payload = message.getPayload();
+		if (payload instanceof byte[])
+		{
+			payload = Arrays.toString((byte[])payload);
+		}
+
 		// TODO: support headers
 		// TODO: support consul event filters: NodeFilter, ServiceFilter, TagFilter
 		Response<Event> event = this.consul.eventFire(this.eventName, (String) payload,
 				new EventParams(), QueryParams.DEFAULT);
 		// TODO: return event?
-		// return null;
 	}
 
 }

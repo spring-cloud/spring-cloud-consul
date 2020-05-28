@@ -78,14 +78,12 @@ public class ConsulBinderApplicationTests {
 	}
 
 	@Test
-	@Ignore // FIXME: 2.0.0 need stream fix
 	public void shouldInitializeConsulSource() {
 
 		assertThat(this.events).isNotNull();
 	}
 
 	@Test
-	@Ignore // FIXME: 2.0.0 need stream fix
 	public void shouldPublishTextConsulMessage() {
 
 		// given
