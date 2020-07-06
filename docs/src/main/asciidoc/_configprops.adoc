@@ -58,6 +58,7 @@
 |spring.cloud.consul.discovery.server-list-query-tags |  | Map of serviceId's -> tag to query for in server list. This allows filtering services by a single tag.
 |spring.cloud.consul.discovery.service-name |  | Service name.
 |spring.cloud.consul.discovery.tags |  | Tags to use when registering service.
+|spring.cloud.consul.discovery.tags-as-metadata | true | Use tags as metadata, defaults to true.
 |spring.cloud.consul.enabled | true | Is spring cloud consul enabled.
 |spring.cloud.consul.host | localhost | Consul agent hostname. Defaults to 'localhost'.
 |spring.cloud.consul.port | 8500 | Consul agent port. Defaults to '8500'.

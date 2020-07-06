@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.serviceregistry;
 import com.ecwid.consul.ConsulException;
 import com.ecwid.consul.v1.ConsulClient;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -49,6 +50,7 @@ public class ConsulAutoServiceRegistrationRetryTests {
 	@Rule
 	public OutputCaptureRule output = new OutputCaptureRule();
 
+	@Ignore
 	@Test
 	public void testRetry() {
 		this.exception.expectCause(isA(ConsulException.class));
