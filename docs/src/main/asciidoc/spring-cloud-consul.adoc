@@ -210,7 +210,7 @@ By default, it retrieves the Consul leader node status and all registered servic
 In deployments that have many registered services it may be costly to retrieve all services on every health check.
 To skip the service retrieval and only check the leader node status set `spring.cloud.consul.health-indicator.include-services-query=false`.
 
-To disable the indicator set `spring.cloud.consul.health-indicator.enabled=false`.
+To disable the indicator set `management.health.consul.enabled=false`.
 
 WARNING: When the application runs in https://cloud.spring.io/spring-cloud-commons/2.2.x/reference/html/#the-bootstrap-application-context[bootstrap context mode] (the default),
 this indicator is loaded into the bootstrap context and is not made available to the Actuator health endpoint.

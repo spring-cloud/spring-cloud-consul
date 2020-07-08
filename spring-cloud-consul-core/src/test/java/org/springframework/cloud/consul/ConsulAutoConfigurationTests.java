@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Chris Bono
  */
-public class ConsulAutoConfigurationTest {
+public class ConsulAutoConfigurationTests {
 
 	private final ApplicationContextRunner appContextRunner = new ApplicationContextRunner()
 			.withConfiguration(AutoConfigurations.of(ConsulAutoConfiguration.class));
@@ -118,14 +118,6 @@ public class ConsulAutoConfigurationTest {
 
 	@Test
 	public void consulHealthIndicatorDisabled() {
-		appContextRunner
-				.withPropertyValues("spring.cloud.consul.health-indicator.enabled=false")
-				.run(context -> assertThat(context).hasNotFailed()
-						.doesNotHaveBean(ConsulHealthIndicator.class));
-	}
-
-	@Test
-	public void consulHealthIndicatorDisabledViaStandardActuatorProperty() {
 		appContextRunner.withPropertyValues("management.health.consul.enabled=false")
 				.run(context -> assertThat(context).hasNotFailed()
 						.doesNotHaveBean(ConsulHealthIndicator.class));

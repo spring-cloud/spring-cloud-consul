@@ -59,8 +59,7 @@
 |spring.cloud.consul.discovery.service-name |  | Service name.
 |spring.cloud.consul.discovery.tags |  | Tags to use when registering service.
 |spring.cloud.consul.enabled | true | Is spring cloud consul enabled.
-|spring.cloud.consul.health-indicator.enabed | true | If ConsulHealthIndicator should be enabled
-|spring.cloud.consul.health-indicator.include-services-query | true | If ConsulHealthIndicator shouldinclude a query for registrered services.
+|spring.cloud.consul.health-indicator.include-services-query | true | If ConsulHealthIndicator should include a query for registered services.
 |spring.cloud.consul.host | localhost | Consul agent hostname. Defaults to 'localhost'.
 |spring.cloud.consul.port | 8500 | Consul agent port. Defaults to '8500'.
 |spring.cloud.consul.retry.enabled | true | If consul retry is enabled.

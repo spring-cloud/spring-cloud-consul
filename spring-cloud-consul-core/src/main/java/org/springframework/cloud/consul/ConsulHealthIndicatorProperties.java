@@ -27,17 +27,7 @@ import org.springframework.core.style.ToStringCreator;
 @ConfigurationProperties("spring.cloud.consul.health-indicator")
 public class ConsulHealthIndicatorProperties {
 
-	private boolean enabled = true;
-
 	private boolean includeServicesQuery = true;
-
-	public boolean isEnabled() {
-		return this.enabled;
-	}
-
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
 
 	/**
 	 * @return whether or not the health indicator should include a query for all
