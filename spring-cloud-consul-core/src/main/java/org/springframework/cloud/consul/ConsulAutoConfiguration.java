@@ -21,7 +21,6 @@ import com.ecwid.consul.v1.ConsulClient;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
-import org.springframework.boot.actuate.autoconfigure.health.ConditionalOnEnabledHealthIndicator;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -71,6 +70,7 @@ public class ConsulAutoConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(Endpoint.class)
+	@EnableConfigurationProperties(ConsulHealthIndicatorProperties.class)
 	protected static class ConsulHealthConfig {
 
 		@Bean
@@ -82,9 +82,13 @@ public class ConsulAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		@ConditionalOnEnabledHealthIndicator("consul")
-		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient) {
-			return new ConsulHealthIndicator(consulClient);
+		@ConditionalOnProperty(
+				value = { "spring.cloud.consul.health-indicator.enabled",
+						"management.health.consul.enabled" },
+				havingValue = "true", matchIfMissing = true)
+		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient,
+				ConsulHealthIndicatorProperties properties) {
+			return new ConsulHealthIndicator(consulClient, properties);
 		}
 
 	}
