@@ -77,3 +77,5 @@
 |spring.cloud.consul.tls.key-store-instance-type |  | Type of key framework to use.
 |spring.cloud.consul.tls.key-store-password |  | Password to an external keystore.
 |spring.cloud.consul.tls.key-store-path |  | Path to an external keystore.
+
+|===
