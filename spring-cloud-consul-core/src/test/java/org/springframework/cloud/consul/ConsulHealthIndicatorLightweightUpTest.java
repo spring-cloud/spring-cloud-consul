@@ -32,16 +32,19 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 /**
- * Integration test for {@link ConsulHealthIndicator} when its in the UP status.
+ * Integration test for {@link ConsulHealthIndicator} using its lightweight check when its
+ * in the UP status.
  *
  * @author Lomesh Patel (lomeshpatel)
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
-public class ConsulHealthIndicatorUpTest {
+@SpringBootTest(
+		properties = "spring.cloud.consul.health-indicator.include-services-query=false")
+public class ConsulHealthIndicatorLightweightUpTest {
 
 	@SpyBean
 	private ConsulClient consulClient;
@@ -54,7 +57,8 @@ public class ConsulHealthIndicatorUpTest {
 		assertThat(this.healthEndpoint.health().getStatus())
 				.as("health status was not UP").isEqualTo(Status.UP);
 		verify(consulClient).getStatusLeader();
-		verify(consulClient).getCatalogServices(any(CatalogServicesRequest.class));
+		verify(consulClient, never())
+				.getCatalogServices(any(CatalogServicesRequest.class));
 	}
 
 	@EnableAutoConfiguration
