@@ -71,6 +71,7 @@ public class ConsulAutoConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(Endpoint.class)
+	@EnableConfigurationProperties(ConsulHealthIndicatorProperties.class)
 	protected static class ConsulHealthConfig {
 
 		@Bean
@@ -83,8 +84,9 @@ public class ConsulAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean
 		@ConditionalOnEnabledHealthIndicator("consul")
-		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient) {
-			return new ConsulHealthIndicator(consulClient);
+		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient,
+				ConsulHealthIndicatorProperties properties) {
+			return new ConsulHealthIndicator(consulClient, properties);
 		}
 
 	}
