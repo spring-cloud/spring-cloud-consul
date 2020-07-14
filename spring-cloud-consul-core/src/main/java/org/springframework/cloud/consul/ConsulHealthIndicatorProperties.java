@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul;
 
+import com.ecwid.consul.v1.ConsulClient;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.style.ToStringCreator;
 
@@ -27,12 +29,14 @@ import org.springframework.core.style.ToStringCreator;
 @ConfigurationProperties("spring.cloud.consul.health-indicator")
 public class ConsulHealthIndicatorProperties {
 
+	/**
+	 * Whether or not the indicator should include a query for all registered services
+	 * during its execution. When set to {@code false} the indicator only uses the lighter
+	 * {@link ConsulClient#getStatusLeader()}. This can be helpful in large deployments
+	 * where the number of services returned makes the operation unnecessarily heavy.
+	 */
 	private boolean includeServicesQuery = true;
 
-	/**
-	 * @return whether or not the health indicator should include a query for all
-	 * registered services during its execution.
-	 */
 	boolean isIncludeServicesQuery() {
 		return includeServicesQuery;
 	}
