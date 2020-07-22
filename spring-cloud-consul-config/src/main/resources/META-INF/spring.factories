@@ -4,3 +4,7 @@ org.springframework.cloud.consul.config.ConsulConfigAutoConfiguration
 # Bootstrap Configuration
 org.springframework.cloud.bootstrap.BootstrapConfiguration=\
 org.springframework.cloud.consul.config.ConsulConfigBootstrapConfiguration
+
+# PropertySource Loaders
+org.springframework.boot.env.PropertySourceLoader=\
+org.springframework.cloud.consul.hcl.HclPropertySourceLoader
