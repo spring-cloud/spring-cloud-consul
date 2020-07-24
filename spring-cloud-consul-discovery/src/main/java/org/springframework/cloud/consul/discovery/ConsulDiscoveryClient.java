@@ -127,6 +127,11 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	@Override
+	public void probe() {
+		this.client.getStatusLeader();
+	}
+
+	@Override
 	public int getOrder() {
 		return this.properties.getOrder();
 	}
