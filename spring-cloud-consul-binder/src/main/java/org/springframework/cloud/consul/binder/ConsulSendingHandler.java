@@ -50,8 +50,9 @@ public class ConsulSendingHandler extends AbstractMessageHandler {
 		}
 
 		Object payload = message.getPayload();
-		if (payload instanceof byte[]) {
-			payload = Arrays.toString((byte[]) payload);
+		if (payload instanceof byte[])
+		{
+			payload = Arrays.toString((byte[])payload);
 		}
 
 		// TODO: support headers
