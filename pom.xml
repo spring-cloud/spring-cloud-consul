@@ -6,7 +6,7 @@
 
 	<groupId>org.springframework.cloud</groupId>
 	<artifactId>spring-cloud-consul</artifactId>
-	<version>2.2.4.BUILD-SNAPSHOT</version>
+	<version>2.2.5.BUILD-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Spring Cloud Consul</name>
 	<description>Spring Cloud Consul</description>
@@ -14,20 +14,20 @@
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
 		<artifactId>spring-cloud-build</artifactId>
-		<version>2.3.1.BUILD-SNAPSHOT</version>
+		<version>2.3.1.RELEASE</version>
 		<relativePath/>
 		<!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
 		<joda-time.version>2.10.5</joda-time.version>
-		<spring-cloud-bus.version>2.2.3.BUILD-SNAPSHOT</spring-cloud-bus.version>
-		<spring-cloud-commons.version>2.2.4.BUILD-SNAPSHOT</spring-cloud-commons.version>
-		<spring-cloud-config.version>2.2.4.BUILD-SNAPSHOT</spring-cloud-config.version>
-		<spring-cloud-netflix.version>2.2.4.BUILD-SNAPSHOT</spring-cloud-netflix.version>
+		<spring-cloud-bus.version>2.2.4.BUILD-SNAPSHOT</spring-cloud-bus.version>
+		<spring-cloud-commons.version>2.2.5.BUILD-SNAPSHOT</spring-cloud-commons.version>
+		<spring-cloud-config.version>2.2.5.BUILD-SNAPSHOT</spring-cloud-config.version>
+		<spring-cloud-netflix.version>2.2.5.BUILD-SNAPSHOT</spring-cloud-netflix.version>
 		<spring-cloud-deployer.version>1.0.3.RELEASE</spring-cloud-deployer.version>
-		<spring-cloud-openfeign.version>2.2.4.BUILD-SNAPSHOT</spring-cloud-openfeign.version>
-		<spring-cloud-stream.version>Horsham.SR5</spring-cloud-stream.version>
+		<spring-cloud-openfeign.version>2.2.5.BUILD-SNAPSHOT</spring-cloud-openfeign.version>
+		<spring-cloud-stream.version>Horsham.SR7</spring-cloud-stream.version>
 	</properties>
 
 	<scm>
