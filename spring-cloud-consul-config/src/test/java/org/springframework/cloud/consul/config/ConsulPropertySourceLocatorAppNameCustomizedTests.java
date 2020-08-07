@@ -78,6 +78,7 @@ public class ConsulPropertySourceLocatorAppNameCustomizedTests {
 		this.context = new SpringApplicationBuilder(Config.class)
 				.web(WebApplicationType.NONE)
 				.run("--spring.application.name=testConsulPropertySourceLocatorAppNameCustomized",
+						"--spring.config.use-legacy-processing=true",
 						"--spring.cloud.consul.config.name=" + CONFIG_NAME,
 						"--spring.cloud.consul.config.prefix=" + ROOT);
 
@@ -89,7 +90,9 @@ public class ConsulPropertySourceLocatorAppNameCustomizedTests {
 	@After
 	public void teardown() {
 		this.client.deleteKVValues(PREFIX);
-		this.context.close();
+		if (context != null) {
+			this.context.close();
+		}
 	}
 
 	@Test

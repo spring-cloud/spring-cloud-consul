@@ -41,6 +41,7 @@ public class ConsulPropertySourceLocatorRetryTests {
 		Assert.assertThrows(TransportException.class, () -> {
 			new SpringApplicationBuilder(Config.class).properties(
 					"spring.application.name=testConsulPropertySourceLocatorRetry",
+					"spring.config.use-legacy-processing=true",
 					"spring.cloud.consul.host=53210a7c-4809-42cb-8b30-057d2db85fcc",
 					"logging.level.org.springframework.retry=TRACE", "server.port=0",
 					"spring.cloud.consul.port=65530",

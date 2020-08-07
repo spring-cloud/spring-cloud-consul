@@ -78,6 +78,7 @@ public class ConsulPropertySourceLocatorFilesTests {
 
 		this.context = new SpringApplicationBuilder(Config.class)
 				.web(WebApplicationType.NONE).run("--spring.application.name=" + APP_NAME,
+						"--spring.config.use-legacy-processing=true",
 						"--spring.cloud.consul.config.prefix=" + ROOT,
 						"--spring.cloud.consul.config.format=FILES",
 						"--spring.profiles.active=dev",

@@ -93,6 +93,7 @@ public class ConsulPropertySourceLocatorTests {
 
 		this.context = new SpringApplicationBuilder(Config.class)
 				.web(WebApplicationType.NONE).run("--SPRING_APPLICATION_NAME=" + APP_NAME,
+						"--spring.config.use-legacy-processing=true",
 						"--spring.cloud.consul.config.prefix=" + ROOT,
 						"spring.cloud.consul.config.watch.delay=10");
 
@@ -104,7 +105,9 @@ public class ConsulPropertySourceLocatorTests {
 	@After
 	public void teardown() {
 		this.client.deleteKVValues(PREFIX);
-		this.context.close();
+		if (context != null) {
+			this.context.close();
+		}
 	}
 
 	@Test
@@ -114,7 +117,7 @@ public class ConsulPropertySourceLocatorTests {
 	}
 
 	@Test
-	@Ignore // FIXME broken tests with boot 2.0.0
+	@Ignore // FIXME: broken tests with boot 2.0.0
 	public void propertyLoadedAndUpdated() throws Exception {
 		String testProp = this.environment.getProperty(TEST_PROP_CANONICAL);
 		assertThat(testProp).as("testProp was wrong").isEqualTo(VALUE1);
@@ -132,7 +135,7 @@ public class ConsulPropertySourceLocatorTests {
 	}
 
 	@Test
-	@Ignore // FIXME broken tests with boot 2.0.0
+	@Ignore // FIXME: broken tests with boot 2.0.0
 	public void contextDoesNotExistThenExists() throws Exception {
 		String testProp = this.environment.getProperty(TEST_PROP3_CANONICAL);
 		assertThat(testProp).as("testProp was wrong").isNull();
