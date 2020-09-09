@@ -139,6 +139,8 @@ public class ConsulConfigDataLocationResolver
 			}
 		}
 
+		//TODO: add support for ConsulConfigProperties.prefix
+
 		return ConsulAutoConfiguration.createConsulClient(properties);
 	}
 
