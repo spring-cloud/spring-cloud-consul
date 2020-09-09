@@ -43,11 +43,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Spencer Gibb
  */
 @DirtiesContext
-public class ConsulPropertySourceLocatorTests {
+public class ConsulConfigDataIntegrationTests {
 
-	private static final String APP_NAME = "testConsulPropertySourceLocator";
+	private static final String APP_NAME = "testConsulConfigData";
 
-	private static final String PREFIX = "_propertySourceLocatorTests_config__";
+	private static final String PREFIX = "_configDataIntegrationTests_config__";
 
 	private static final String ROOT = PREFIX + UUID.randomUUID();
 
@@ -89,7 +89,7 @@ public class ConsulPropertySourceLocatorTests {
 
 		context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
 				.run("--spring.application.name=" + APP_NAME,
-						"--spring.config.use-legacy-processing=true",
+						"--spring.config.import=consul:", "--debug",
 						"--spring.cloud.consul.host=" + ConsulTestcontainers.getHost(),
 						"--spring.cloud.consul.port=" + ConsulTestcontainers.getPort(),
 						"--spring.cloud.consul.config.prefix=" + ROOT,

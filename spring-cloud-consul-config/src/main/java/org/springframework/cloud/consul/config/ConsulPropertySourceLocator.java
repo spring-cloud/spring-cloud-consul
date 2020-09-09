@@ -46,7 +46,8 @@ import static org.springframework.cloud.consul.config.ConsulConfigProperties.For
  * @author Spencer Gibb
  */
 @Order(0)
-public class ConsulPropertySourceLocator implements PropertySourceLocator {
+public class ConsulPropertySourceLocator
+		implements PropertySourceLocator, ConsulConfigIndexes {
 
 	private static final Log log = LogFactory.getLog(ConsulPropertySourceLocator.class);
 
@@ -69,7 +70,8 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 		return this.contexts;
 	}
 
-	public LinkedHashMap<String, Long> getContextIndexes() {
+	@Override
+	public LinkedHashMap<String, Long> getIndexes() {
 		return this.contextIndex;
 	}
 
@@ -86,8 +88,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator {
 			ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
 
 			String appName = this.properties.getName();
-
-			if (appName == null) {
+			if (StringUtils.isEmpty(appName)) {
 				appName = env.getProperty("spring.application.name");
 			}
 
