@@ -54,6 +54,10 @@ public class ConsulAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulClient consulClient(ConsulProperties consulProperties) {
+		return createConsulClient(consulProperties);
+	}
+
+	public static ConsulClient createConsulClient(ConsulProperties consulProperties) {
 		final int agentPort = consulProperties.getPort();
 		final String agentHost = !StringUtils.isEmpty(consulProperties.getScheme())
 				? consulProperties.getScheme() + "://" + consulProperties.getHost()

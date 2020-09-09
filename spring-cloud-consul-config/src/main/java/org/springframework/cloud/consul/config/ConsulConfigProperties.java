@@ -25,12 +25,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.validation.annotation.Validated;
 
+import static org.springframework.cloud.consul.config.ConsulConfigProperties.PREFIX;
+
 /**
  * @author Spencer Gibb
  */
-@ConfigurationProperties("spring.cloud.consul.config")
+@ConfigurationProperties(PREFIX)
 @Validated
 public class ConsulConfigProperties {
+
+	/**
+	 * Prefix for configuration properties.
+	 */
+	public static final String PREFIX = "spring.cloud.consul.config";
 
 	private boolean enabled = true;
 

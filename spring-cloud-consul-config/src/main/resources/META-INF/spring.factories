@@ -4,3 +4,11 @@ org.springframework.cloud.consul.config.ConsulConfigAutoConfiguration
 # Bootstrap Configuration
 org.springframework.cloud.bootstrap.BootstrapConfiguration=\
 org.springframework.cloud.consul.config.ConsulConfigBootstrapConfiguration
+
+# ConfigData Location Resolvers
+org.springframework.boot.context.config.ConfigDataLocationResolver=\
+org.springframework.cloud.consul.config.ConsulConfigDataLocationResolver
+
+# ConfigData Loaders
+org.springframework.boot.context.config.ConfigDataLoader=\
+org.springframework.cloud.consul.config.ConsulConfigDataLoader
