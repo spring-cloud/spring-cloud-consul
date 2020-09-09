@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.ecwid.consul.v1.ConsulClient;
 
@@ -102,14 +103,9 @@ public class ConsulConfigDataLocationResolver
 
 		Collections.reverse(contexts);
 
-		// TODO use location for host:port
-		ConsulClient consul = createConsulClient(context, location);
+		registerBean(context, ConsulClient.class, () -> createConsulClient(context, location));
 
-		registerBean(context, ConsulClient.class, consul);
-
-		ConsulConfigDataIndexes indexes = new ConsulConfigDataIndexes();
-
-		registerBean(context, ConsulConfigIndexes.class, indexes);
+		registerBean(context, ConsulConfigIndexes.class, ConsulConfigDataIndexes::new);
 
 		ArrayList<ConsulConfigDataLocation> locations = new ArrayList<>();
 		contexts.forEach(
@@ -120,8 +116,8 @@ public class ConsulConfigDataLocationResolver
 	}
 
 	protected <T> void registerBean(ConfigDataLocationResolverContext context,
-			Class<T> type, T instance) {
-		context.getBootstrapRegistry().register(type, () -> instance)
+			Class<T> type, Supplier<T> supplier) {
+		context.getBootstrapRegistry().register(type, supplier)
 				.onApplicationContextPrepared(
 						(ctxt, consulClient) -> ctxt.getBeanFactory().registerSingleton(
 								"configData" + type.getSimpleName(), consulClient));
