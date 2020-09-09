@@ -60,7 +60,7 @@ public class ConsulConfigDataLocationResolver
 	public List<ConsulConfigDataLocation> resolveProfileSpecific(
 			ConfigDataLocationResolverContext context, String location, boolean optional,
 			Profiles profiles) throws ConfigDataLocationNotFoundException {
-		//TODO: add support for consul host and port from location
+
 		ConsulConfigProperties properties = loadConfigProperties(context.getBinder());
 
 		String appName = properties.getName();
@@ -103,7 +103,7 @@ public class ConsulConfigDataLocationResolver
 		Collections.reverse(contexts);
 
 		// TODO use location for host:port
-		ConsulClient consul = createConsulClient(context);
+		ConsulClient consul = createConsulClient(context, location);
 
 		registerBean(context, ConsulClient.class, consul);
 
@@ -127,9 +127,19 @@ public class ConsulConfigDataLocationResolver
 								"configData" + type.getSimpleName(), consulClient));
 	}
 
-	protected ConsulClient createConsulClient(ConfigDataLocationResolverContext context) {
-		return ConsulAutoConfiguration
-				.createConsulClient(loadProperties(context.getBinder()));
+	protected ConsulClient createConsulClient(ConfigDataLocationResolverContext context, String location) {
+		ConsulProperties properties = loadProperties(context.getBinder());
+
+		String hostPort = location.substring("consul:".length());
+		if (StringUtils.hasText(hostPort)) {
+			String[] split = hostPort.split(":");
+			if (split.length == 2) { // host and port
+				properties.setHost(split[0]);
+				properties.setPort(Integer.parseInt(split[1]));
+			}
+		}
+
+		return ConsulAutoConfiguration.createConsulClient(properties);
 	}
 
 	protected String getContext(String prefix, String context) {
