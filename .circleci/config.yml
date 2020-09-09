@@ -4,24 +4,23 @@ jobs:
   build:
     machine:
       image: ubuntu-1604:202007-01
-#      - image: springcloud/pipeline-base
-#            user: appuser
     environment:
       _JAVA_OPTIONS: "-Xms1024m -Xmx2048m"
       TERM: dumb
+      CACHE_VERSION: 1
     branches:
       ignore:
         - gh-pages # list of branches to ignore
     steps:
       - checkout
       - restore_cache:
-          key: sc-consul-{{ .Branch }}
+          key: sc-consul-{{ .Environment.CACHE_VERSION }}-{{ .Branch }}
       - run:
           name: "Download dependencies"
           command: |
             ./mvnw -s .settings.xml -U --fail-never dependency:go-offline || true
       - save_cache:
-          key: sc-consul-{{ .Branch }}
+          key: sc-consul-{{ .Environment.CACHE_VERSION }}-{{ .Branch }}
           paths:
             - ~/.m2
       - run:
