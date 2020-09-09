@@ -25,7 +25,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,6 +42,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 				"spring.cloud.consul.discovery.preferIpAddress=true",
 				"spring.cloud.consul.discovery.consistencyMode=STALE" },
 		webEnvironment = RANDOM_PORT)
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulServerListConsistencyModeStaleTests {
 
 	@Autowired

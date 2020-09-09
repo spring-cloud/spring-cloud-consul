@@ -28,6 +28,7 @@
 		<spring-cloud-deployer.version>1.0.3.RELEASE</spring-cloud-deployer.version>
 		<spring-cloud-openfeign.version>2.2.5.BUILD-SNAPSHOT</spring-cloud-openfeign.version>
 		<spring-cloud-stream.version>Horsham.SR7</spring-cloud-stream.version>
+		<testcontainers.version>1.14.3</testcontainers.version>
 	</properties>
 
 	<scm>
@@ -172,6 +173,11 @@
 				</exclusions>
 			</dependency>
 			<!-- end archaius deps -->
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers</artifactId>
+				<version>${testcontainers.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>

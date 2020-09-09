@@ -33,7 +33,9 @@ import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.cloud.consul.support.ConsulHeartbeatAutoConfiguration;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,10 +49,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 				"spring.application.name=myConsulServiceRegistryCheckTtlTestService-S",
 				"spring.cloud.consul.discovery.heartbeat.enabled=true" },
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulServiceRegistryCheckTtlTests {
 
 	@LocalServerPort
-	private int randomServerPort;
+	private int port;
 
 	@Autowired
 	private ConsulDiscoveryProperties discoveryProperties;
@@ -69,7 +72,7 @@ public class ConsulServiceRegistryCheckTtlTests {
 		NewService.Check httpCheck = new NewService.Check();
 		httpCheck.setHttp(
 				String.format("%s://%s:%s%s", this.discoveryProperties.getScheme(),
-						this.discoveryProperties.getHostname(), this.randomServerPort,
+						this.discoveryProperties.getHostname(), this.port,
 						this.discoveryProperties.getHealthCheckPath()));
 		httpCheck.setInterval(this.discoveryProperties.getHealthCheckInterval());
 		NewService httpService = new NewService();

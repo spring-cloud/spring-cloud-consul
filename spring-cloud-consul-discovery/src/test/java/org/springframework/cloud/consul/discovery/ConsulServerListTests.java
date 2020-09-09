@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtilsProperties;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -39,7 +40,8 @@ public class ConsulServerListTests {
 
 	@Test
 	public void tagsWork() {
-		ConsulClient consul = new ConsulClient();
+		ConsulTestcontainers.start();
+		ConsulClient consul = ConsulTestcontainers.client();
 
 		NewService nonTagged = createService("NonTagged", 8080, null);
 

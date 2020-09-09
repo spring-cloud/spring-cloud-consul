@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -80,24 +80,22 @@ public class ConsulPropertySourceLocatorTests {
 
 	private ConsulClient client;
 
-	private ConsulProperties properties;
-
 	@Before
 	public void setup() {
-		this.properties = new ConsulProperties();
-		this.client = new ConsulClient(this.properties.getHost(),
-				this.properties.getPort());
+		ConsulTestcontainers.start();
+		this.client = ConsulTestcontainers.client();
 		this.client.deleteKVValues(PREFIX);
 		this.client.setKVValue(KEY1, VALUE1);
 		this.client.setKVValue(KEY2, VALUE2);
 
 		this.context = new SpringApplicationBuilder(Config.class)
 				.web(WebApplicationType.NONE).run("--SPRING_APPLICATION_NAME=" + APP_NAME,
+						"--spring.cloud.consul.host=" + ConsulTestcontainers.getHost(),
+						"--spring.cloud.consul.port=" + ConsulTestcontainers.getPort(),
 						"--spring.cloud.consul.config.prefix=" + ROOT,
 						"spring.cloud.consul.config.watch.delay=10");
 
 		this.client = this.context.getBean(ConsulClient.class);
-		this.properties = this.context.getBean(ConsulProperties.class);
 		this.environment = this.context.getEnvironment();
 	}
 

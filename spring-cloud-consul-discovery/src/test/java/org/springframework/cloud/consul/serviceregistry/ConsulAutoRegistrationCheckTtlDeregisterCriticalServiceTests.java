@@ -27,7 +27,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.support.ConsulHeartbeatAutoConfiguration;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 				"spring.cloud.consul.discovery.health-check-critical-timeout=1m",
 				"spring.cloud.consul.discovery.heartbeat.enabled=true" },
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoRegistrationCheckTtlDeregisterCriticalServiceTests {
 
 	@Autowired

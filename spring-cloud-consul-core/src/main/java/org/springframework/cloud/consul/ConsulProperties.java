@@ -24,12 +24,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.validation.annotation.Validated;
 
+import static org.springframework.cloud.consul.ConsulProperties.PREFIX;
+
 /**
  * @author Spencer Gibb
  */
-@ConfigurationProperties("spring.cloud.consul")
+@ConfigurationProperties(PREFIX)
 @Validated
 public class ConsulProperties {
+
+	/**
+	 * Prefix for configuration properties.
+	 */
+	public static final String PREFIX = "spring.cloud.consul";
 
 	/** Consul agent hostname. Defaults to 'localhost'. */
 	@NotNull

@@ -21,7 +21,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,8 +31,8 @@ public class ConsulPropertyPrefixTests {
 
 	@Before
 	public void setup() {
-		ConsulProperties properties = new ConsulProperties();
-		this.client = new ConsulClient(properties.getHost(), properties.getPort());
+		ConsulTestcontainers.start();
+		this.client = ConsulTestcontainers.client();
 	}
 
 	@After
