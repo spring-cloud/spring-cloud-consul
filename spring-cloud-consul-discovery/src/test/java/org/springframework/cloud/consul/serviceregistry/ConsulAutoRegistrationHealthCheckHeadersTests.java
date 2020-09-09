@@ -27,7 +27,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,6 +44,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 				"spring.application.name=myTestService-DiscoveryHealthCheckTlsSkipVerify",
 				"spring.cloud.consul.discovery.health-check-headers.X-Config-Token=ACCESSTOKEN" },
 		webEnvironment = RANDOM_PORT)
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoRegistrationHealthCheckHeadersTests {
 
 	@Autowired

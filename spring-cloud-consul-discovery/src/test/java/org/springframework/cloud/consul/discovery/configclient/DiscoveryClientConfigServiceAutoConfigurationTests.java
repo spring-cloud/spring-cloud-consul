@@ -26,6 +26,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.config.client.ConfigClientProperties;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.cloud.test.ClassPathExclusions;
 import org.springframework.cloud.test.ModifiedClassPathRunner;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -63,8 +64,13 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 
 	@Test
 	public void onWhenRequested() throws Exception {
+		ConsulTestcontainers.start();
+		Integer port = ConsulTestcontainers.getPort();
+		String host = ConsulTestcontainers.getHost();
 		setup("server.port=0", "spring.cloud.config.discovery.enabled=true",
+				"spring.cloud.consul.port=" + port, "spring.cloud.consul.host=" + host,
 				"logging.level.org.springframework.cloud.config.client=DEBUG",
+				"spring.cloud.consul.discovery.catalog-services-watch.enabled=false",
 				"spring.cloud.consul.discovery.test.enabled:true",
 				"spring.application.name=discoveryclientconfigservicetest",
 				"spring.jmx.enabled=false", "spring.cloud.consul.discovery.port:7001",
