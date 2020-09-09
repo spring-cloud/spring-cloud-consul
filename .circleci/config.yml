@@ -2,7 +2,8 @@ version: 2
 machine: true
 jobs:
   build:
-#    docker:
+    machine:
+      image: ubuntu-1604:202007-01
 #      - image: springcloud/pipeline-base
 #            user: appuser
     environment:
