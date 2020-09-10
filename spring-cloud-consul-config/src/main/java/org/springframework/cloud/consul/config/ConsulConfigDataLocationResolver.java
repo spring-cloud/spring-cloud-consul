@@ -17,10 +17,12 @@
 package org.springframework.cloud.consul.config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import com.ecwid.consul.v1.ConsulClient;
 
@@ -32,12 +34,20 @@ import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
 
 public class ConsulConfigDataLocationResolver
 		implements ConfigDataLocationResolver<ConsulConfigDataLocation> {
+
+	protected static final List<String> DIR_SUFFIXES = Collections.singletonList("/");
+
+	protected static final List<String> FILES_SUFFIXES = Collections
+			.unmodifiableList(Arrays.asList(".yml", ".yaml", ".properties"));
 
 	@Override
 	public boolean isResolvable(ConfigDataLocationResolverContext context,
@@ -62,7 +72,10 @@ public class ConsulConfigDataLocationResolver
 			ConfigDataLocationResolverContext context, String location, boolean optional,
 			Profiles profiles) throws ConfigDataLocationNotFoundException {
 
-		ConsulConfigProperties properties = loadConfigProperties(context.getBinder());
+		UriComponents locationUri = parseLocation(context, location);
+
+		ConsulConfigProperties properties = loadConfigProperties(context.getBinder(),
+				locationUri);
 
 		String appName = properties.getName();
 		if (StringUtils.isEmpty(appName)) {
@@ -70,74 +83,68 @@ public class ConsulConfigDataLocationResolver
 					.orElse("application");
 		}
 
-		String prefix = properties.getPrefix();
-		List<String> suffixes = new ArrayList<>();
-		if (properties.getFormat() != FILES) {
-			suffixes.add("/");
-		}
-		else {
-			suffixes.add(".yml");
-			suffixes.add(".yaml");
-			suffixes.add(".properties");
+		List<String> contexts = (CollectionUtils.isEmpty(locationUri.getPathSegments()))
+				? getAutomaticContexts(profiles, properties, appName)
+				: getCustomContexts(locationUri, properties);
+
+		registerBean(context, ConsulClient.class,
+				() -> createConsulClient(context, locationUri));
+
+		registerBean(context, ConsulConfigIndexes.class, ConsulConfigDataIndexes::new);
+
+		return contexts.stream()
+				.map(propertySourceContext -> new ConsulConfigDataLocation(properties,
+						propertySourceContext, optional))
+				.collect(Collectors.toList());
+	}
+
+	private List<String> getCustomContexts(UriComponents uriComponents,
+			ConsulConfigProperties properties) {
+		List<String> contexts = new ArrayList<>();
+		if (StringUtils.isEmpty(uriComponents.getPath())) {
+			return contexts;
 		}
 
-		String defaultContext = getContext(prefix, properties.getDefaultContext());
+		for (String path : uriComponents.getPath().split(";")) {
+			for (String suffix : getSuffixes(properties)) {
+				contexts.add(path + suffix);
+			}
+		}
 
+		return contexts;
+	}
+
+	protected List<String> getSuffixes(ConsulConfigProperties properties) {
+		if (properties.getFormat() == FILES) {
+			return FILES_SUFFIXES;
+		}
+		return DIR_SUFFIXES;
+	}
+
+	protected List<String> getAutomaticContexts(Profiles profiles,
+			ConsulConfigProperties properties, String appName) {
 		List<String> contexts = new ArrayList<>();
 
-		for (String suffix : suffixes) {
+		String prefix = properties.getPrefix();
+		String defaultContext = getContext(prefix, properties.getDefaultContext());
+		for (String suffix : getSuffixes(properties)) {
 			contexts.add(defaultContext + suffix);
 		}
-		for (String suffix : suffixes) {
+		for (String suffix : getSuffixes(properties)) {
 			addProfiles(contexts, defaultContext, profiles, suffix, properties);
 		}
 
 		String baseContext = getContext(prefix, appName);
 
-		for (String suffix : suffixes) {
+		for (String suffix : getSuffixes(properties)) {
 			contexts.add(baseContext + suffix);
 		}
-		for (String suffix : suffixes) {
+		for (String suffix : getSuffixes(properties)) {
 			addProfiles(contexts, baseContext, profiles, suffix, properties);
 		}
-
+		// we build them backwards, first wins, so reverse
 		Collections.reverse(contexts);
-
-		registerBean(context, ConsulClient.class, () -> createConsulClient(context, location));
-
-		registerBean(context, ConsulConfigIndexes.class, ConsulConfigDataIndexes::new);
-
-		ArrayList<ConsulConfigDataLocation> locations = new ArrayList<>();
-		contexts.forEach(
-				propertySourceContext -> locations.add(new ConsulConfigDataLocation(
-						properties, propertySourceContext, optional)));
-
-		return locations;
-	}
-
-	protected <T> void registerBean(ConfigDataLocationResolverContext context,
-			Class<T> type, Supplier<T> supplier) {
-		context.getBootstrapRegistry().register(type, supplier)
-				.onApplicationContextPrepared(
-						(ctxt, consulClient) -> ctxt.getBeanFactory().registerSingleton(
-								"configData" + type.getSimpleName(), consulClient));
-	}
-
-	protected ConsulClient createConsulClient(ConfigDataLocationResolverContext context, String location) {
-		ConsulProperties properties = loadProperties(context.getBinder());
-
-		String hostPort = location.substring("consul:".length());
-		if (StringUtils.hasText(hostPort)) {
-			String[] split = hostPort.split(":");
-			if (split.length == 2) { // host and port
-				properties.setHost(split[0]);
-				properties.setPort(Integer.parseInt(split[1]));
-			}
-		}
-
-		//TODO: add support for ConsulConfigProperties.prefix
-
-		return ConsulAutoConfiguration.createConsulClient(properties);
+		return contexts;
 	}
 
 	protected String getContext(String prefix, String context) {
@@ -157,12 +164,52 @@ public class ConsulConfigDataLocationResolver
 		}
 	}
 
-	protected ConsulProperties loadProperties(Binder binder) {
-		return binder.bind(ConsulProperties.PREFIX, Bindable.of(ConsulProperties.class))
-				.orElse(new ConsulProperties());
+	protected UriComponents parseLocation(ConfigDataLocationResolverContext context,
+			String location) {
+		String uri = location.substring("consul:".length());
+		if (!StringUtils.hasText(uri)) {
+			return null;
+		}
+		if (!uri.startsWith("//")) {
+			uri = "consul:" + "//" + uri;
+		}
+		else {
+			uri = location;
+		}
+		return UriComponentsBuilder.fromUriString(uri).build();
 	}
 
-	protected ConsulConfigProperties loadConfigProperties(Binder binder) {
+	protected <T> void registerBean(ConfigDataLocationResolverContext context,
+			Class<T> type, Supplier<T> supplier) {
+		context.getBootstrapRegistry().register(type, supplier)
+				.onApplicationContextPrepared(
+						(ctxt, consulClient) -> ctxt.getBeanFactory().registerSingleton(
+								"configData" + type.getSimpleName(), consulClient));
+	}
+
+	protected ConsulClient createConsulClient(ConfigDataLocationResolverContext context,
+			UriComponents location) {
+		ConsulProperties properties = loadProperties(context.getBinder(), location);
+		return ConsulAutoConfiguration.createConsulClient(properties);
+	}
+
+	protected ConsulProperties loadProperties(Binder binder, UriComponents location) {
+		ConsulProperties consulProperties = binder
+				.bind(ConsulProperties.PREFIX, Bindable.of(ConsulProperties.class))
+				.orElse(new ConsulProperties());
+
+		if (StringUtils.hasText(location.getHost())) {
+			consulProperties.setHost(location.getHost());
+		}
+		if (location.getPort() >= 0) {
+			consulProperties.setPort(location.getPort());
+		}
+
+		return consulProperties;
+	}
+
+	protected ConsulConfigProperties loadConfigProperties(Binder binder,
+			UriComponents location) {
 		return binder
 				.bind(ConsulConfigProperties.PREFIX,
 						Bindable.of(ConsulConfigProperties.class))
