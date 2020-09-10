@@ -89,7 +89,7 @@ public class ConsulPropertySourceLocator
 
 			String appName = this.properties.getName();
 			if (StringUtils.isEmpty(appName)) {
-				appName = env.getProperty("spring.application.name");
+				appName = env.getProperty("spring.application.name", "application");
 			}
 
 			List<String> profiles = Arrays.asList(env.getActiveProfiles());
