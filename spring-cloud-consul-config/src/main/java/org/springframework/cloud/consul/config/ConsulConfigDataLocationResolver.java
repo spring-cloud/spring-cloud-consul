@@ -58,12 +58,16 @@ public class ConsulConfigDataLocationResolver
 	@Override
 	public boolean isResolvable(ConfigDataLocationResolverContext context,
 			String location) {
+		if (!location.startsWith(PREFIX)) {
+			return false;
+		}
+		// only bind if correct prefix
 		boolean enabled = context.getBinder()
 				.bind(ConsulProperties.PREFIX + ".enabled", Boolean.class).orElse(true);
 		boolean configEnabled = context.getBinder()
 				.bind(ConsulConfigProperties.PREFIX + ".enabled", Boolean.class)
 				.orElse(true);
-		return location.startsWith(PREFIX) && configEnabled && enabled;
+		return configEnabled && enabled;
 	}
 
 	@Override
