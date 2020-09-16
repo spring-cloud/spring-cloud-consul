@@ -28,7 +28,6 @@ import org.springframework.boot.context.config.ConfigData;
 import org.springframework.boot.context.config.ConfigDataLoader;
 import org.springframework.boot.context.config.ConfigDataLoaderContext;
 import org.springframework.boot.context.config.ConfigDataLocationNotFoundException;
-import org.springframework.boot.env.BootstrapRegistry.Registration;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
 
@@ -76,11 +75,10 @@ public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigData
 	}
 
 	protected <T> T getBean(ConfigDataLoaderContext context, Class<T> type) {
-		Registration<T> registration = context.getBootstrapRegistry().getRegistration(type);
-		if (registration == null) {
-			return null;
+		if (context.getBootstrapRegistry().isRegistered(type)) {
+			return context.getBootstrapRegistry().get(type);
 		}
-		return registration.get();
+		return null;
 	}
 
 	protected ConsulPropertySource create(ConfigDataLoaderContext context, ConsulConfigDataLocation location) {

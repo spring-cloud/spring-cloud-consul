@@ -91,7 +91,7 @@ public class ConsulConfigDataLocationResolverTests {
 	private ConsulConfigDataLocationResolver createResolver() {
 		ConsulConfigDataLocationResolver resolver = new ConsulConfigDataLocationResolver() {
 			@Override
-			protected <T> void registerBean(ConfigDataLocationResolverContext context, Class<T> type,
+			protected <T> void registerAndPromoteBean(ConfigDataLocationResolverContext context, Class<T> type,
 					Supplier<T> supplier) {
 				// do nothing
 			}
