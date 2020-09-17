@@ -39,8 +39,7 @@ import static org.springframework.util.Base64Utils.decodeFromString;
  */
 public class ConsulInboundMessageProducer extends MessageProducerSupport {
 
-	protected static final Log logger = LogFactory
-			.getLog(ConsulInboundMessageProducer.class);
+	protected static final Log logger = LogFactory.getLog(ConsulInboundMessageProducer.class);
 
 	private final ScheduledExecutorService scheduler;
 
@@ -81,8 +80,7 @@ public class ConsulInboundMessageProducer extends MessageProducerSupport {
 	@Override
 	protected void doStart() {
 		// TODO: make configurable
-		this.eventsHandle = this.scheduler.scheduleWithFixedDelay(this.eventsRunnable,
-				500, 500, TimeUnit.MILLISECONDS);
+		this.eventsHandle = this.scheduler.scheduleWithFixedDelay(this.eventsRunnable, 500, 500, TimeUnit.MILLISECONDS);
 	}
 
 	@Override

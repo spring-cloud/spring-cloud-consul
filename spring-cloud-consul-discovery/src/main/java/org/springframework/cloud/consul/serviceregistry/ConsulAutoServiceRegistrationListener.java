@@ -31,8 +31,7 @@ public class ConsulAutoServiceRegistrationListener implements SmartApplicationLi
 
 	private final ConsulAutoServiceRegistration autoServiceRegistration;
 
-	public ConsulAutoServiceRegistrationListener(
-			ConsulAutoServiceRegistration autoServiceRegistration) {
+	public ConsulAutoServiceRegistrationListener(ConsulAutoServiceRegistration autoServiceRegistration) {
 		this.autoServiceRegistration = autoServiceRegistration;
 	}
 
@@ -53,9 +52,7 @@ public class ConsulAutoServiceRegistrationListener implements SmartApplicationLi
 
 			ApplicationContext context = event.getApplicationContext();
 			if (context instanceof ConfigurableWebServerApplicationContext) {
-				if ("management"
-						.equals(((ConfigurableWebServerApplicationContext) context)
-								.getServerNamespace())) {
+				if ("management".equals(((ConfigurableWebServerApplicationContext) context).getServerNamespace())) {
 					return;
 				}
 			}

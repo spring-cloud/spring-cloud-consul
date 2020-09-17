@@ -68,10 +68,8 @@ public class TestProducer implements ApplicationRunner {
 		 */
 		SubscribableChannel producerChannel = producerChannel();
 		ProducerProperties properties = new ProducerProperties();
-		properties.setPartitionKeyExpression(
-				new SpelExpressionParser().parseExpression("payload"));
-		this.binder.bindProducer(ConsulBinderTests.BINDING_NAME, producerChannel,
-				properties);
+		properties.setPartitionKeyExpression(new SpelExpressionParser().parseExpression("payload"));
+		this.binder.bindProducer(ConsulBinderTests.BINDING_NAME, producerChannel, properties);
 
 		Message<String> message = new GenericMessage<>(ConsulBinderTests.MESSAGE_PAYLOAD);
 		logger.info("Writing message to binder {}", this.binder);
@@ -93,15 +91,13 @@ public class TestProducer implements ApplicationRunner {
 		return stubPartitionSelectorStrategy().invoked;
 	}
 
-	public static class StubPartitionSelectorStrategy
-			implements PartitionSelectorStrategy {
+	public static class StubPartitionSelectorStrategy implements PartitionSelectorStrategy {
 
 		public volatile boolean invoked = false;
 
 		@Override
 		public int selectPartition(Object key, int partitionCount) {
-			logger.info("Selecting partition for key {}; partition count: {}", key,
-					partitionCount);
+			logger.info("Selecting partition for key {}; partition count: {}", key, partitionCount);
 			this.invoked = true;
 			return 1;
 		}

@@ -53,8 +53,7 @@ public class ConsulBinderConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public EventService eventService(ConsulClient consulClient) {
-		return new EventService(null/* consulBinderProperties */, consulClient,
-				this.objectMapper);
+		return new EventService(null/* consulBinderProperties */, consulClient, this.objectMapper);
 	}
 
 	@Bean

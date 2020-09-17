@@ -44,8 +44,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnConsulEnabled
 @ConditionalOnConsulDiscoveryEnabled
 @EnableConfigurationProperties
-@AutoConfigureBefore({ SimpleDiscoveryClientAutoConfiguration.class,
-		CommonsClientAutoConfiguration.class })
+@AutoConfigureBefore({ SimpleDiscoveryClientAutoConfiguration.class, CommonsClientAutoConfiguration.class })
 @AutoConfigureAfter({ UtilAutoConfiguration.class, ConsulAutoConfiguration.class })
 public class ConsulDiscoveryClientConfiguration {
 

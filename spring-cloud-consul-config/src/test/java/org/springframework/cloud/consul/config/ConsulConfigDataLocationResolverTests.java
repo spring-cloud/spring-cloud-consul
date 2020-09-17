@@ -40,14 +40,12 @@ public class ConsulConfigDataLocationResolverTests {
 	@Test
 	public void testParseLocation() {
 		ConsulConfigDataLocationResolver resolver = new ConsulConfigDataLocationResolver();
-		UriComponents uriComponents = resolver.parseLocation(null,
-				"consul:myhost:8501/mypath1;/mypath2;/mypath3");
-		assertThat(uriComponents.toUri()).hasScheme("consul").hasHost("myhost")
-				.hasPort(8501).hasPath("/mypath1;/mypath2;/mypath3");
+		UriComponents uriComponents = resolver.parseLocation(null, "consul:myhost:8501/mypath1;/mypath2;/mypath3");
+		assertThat(uriComponents.toUri()).hasScheme("consul").hasHost("myhost").hasPort(8501)
+				.hasPath("/mypath1;/mypath2;/mypath3");
 
 		uriComponents = resolver.parseLocation(null, "consul:myhost:8501");
-		assertThat(uriComponents.toUri()).hasScheme("consul").hasHost("myhost")
-				.hasPort(8501).hasPath("");
+		assertThat(uriComponents.toUri()).hasScheme("consul").hasHost("myhost").hasPort(8501).hasPath("");
 	}
 
 	@Test
@@ -55,8 +53,7 @@ public class ConsulConfigDataLocationResolverTests {
 		String location = "consul:myhost:8501/mypath1;/mypath2;/mypath3";
 		List<ConsulConfigDataLocation> locations = testResolveProfileSpecific(location);
 		assertThat(locations).hasSize(3);
-		assertThat(toContexts(locations)).containsExactly("/mypath1/", "/mypath2/",
-				"/mypath3/");
+		assertThat(toContexts(locations)).containsExactly("/mypath1/", "/mypath2/", "/mypath3/");
 	}
 
 	@Test
@@ -64,28 +61,25 @@ public class ConsulConfigDataLocationResolverTests {
 		String location = "consul:myhost";
 		List<ConsulConfigDataLocation> locations = testResolveProfileSpecific(location);
 		assertThat(locations).hasSize(4);
-		assertThat(toContexts(locations)).containsExactly("config/testapp,dev/",
-				"config/testapp/", "config/application,dev/", "config/application/");
+		assertThat(toContexts(locations)).containsExactly("config/testapp,dev/", "config/testapp/",
+				"config/application,dev/", "config/application/");
 	}
 
 	@Test
 	public void testLoadProperties() {
-		ConsulProperties properties = createResolver().loadProperties(
-				Binder.get(new MockEnvironment()),
+		ConsulProperties properties = createResolver().loadProperties(Binder.get(new MockEnvironment()),
 				UriComponentsBuilder.fromUriString("consul://myhost:8502").build());
 		assertThat(properties.getHost()).isEqualTo("myhost");
 		assertThat(properties.getPort()).isEqualTo(8502);
 	}
 
 	private List<String> toContexts(List<ConsulConfigDataLocation> locations) {
-		return locations.stream().map(ConsulConfigDataLocation::getContext)
-				.collect(Collectors.toList());
+		return locations.stream().map(ConsulConfigDataLocation::getContext).collect(Collectors.toList());
 	}
 
 	private List<ConsulConfigDataLocation> testResolveProfileSpecific(String location) {
 		ConsulConfigDataLocationResolver resolver = createResolver();
-		ConfigDataLocationResolverContext context = mock(
-				ConfigDataLocationResolverContext.class);
+		ConfigDataLocationResolverContext context = mock(ConfigDataLocationResolverContext.class);
 		MockEnvironment env = new MockEnvironment();
 		env.setProperty("spring.application.name", "testapp");
 		when(context.getBinder()).thenReturn(Binder.get(env));
@@ -97,8 +91,8 @@ public class ConsulConfigDataLocationResolverTests {
 	private ConsulConfigDataLocationResolver createResolver() {
 		ConsulConfigDataLocationResolver resolver = new ConsulConfigDataLocationResolver() {
 			@Override
-			protected <T> void registerBean(ConfigDataLocationResolverContext context,
-					Class<T> type, Supplier<T> supplier) {
+			protected <T> void registerBean(ConfigDataLocationResolverContext context, Class<T> type,
+					Supplier<T> supplier) {
 				// do nothing
 			}
 		};

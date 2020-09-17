@@ -52,8 +52,7 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 
 	private final HeartbeatProperties heartbeatProperties;
 
-	public ConsulServiceRegistry(ConsulClient client,
-			ConsulDiscoveryProperties properties, TtlScheduler ttlScheduler,
+	public ConsulServiceRegistry(ConsulClient client, ConsulDiscoveryProperties properties, TtlScheduler ttlScheduler,
 			HeartbeatProperties heartbeatProperties) {
 		this.client = client;
 		this.properties = properties;
@@ -65,23 +64,19 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 	public void register(ConsulRegistration reg) {
 		log.info("Registering service with consul: " + reg.getService());
 		try {
-			this.client.agentServiceRegister(reg.getService(),
-					this.properties.getAclToken());
+			this.client.agentServiceRegister(reg.getService(), this.properties.getAclToken());
 			NewService service = reg.getService();
-			if (this.heartbeatProperties.isEnabled() && this.ttlScheduler != null
-					&& service.getCheck() != null
+			if (this.heartbeatProperties.isEnabled() && this.ttlScheduler != null && service.getCheck() != null
 					&& service.getCheck().getTtl() != null) {
 				this.ttlScheduler.add(reg.getInstanceId());
 			}
 		}
 		catch (ConsulException e) {
 			if (this.properties.isFailFast()) {
-				log.error("Error registering service with consul: " + reg.getService(),
-						e);
+				log.error("Error registering service with consul: " + reg.getService(), e);
 				ReflectionUtils.rethrowRuntimeException(e);
 			}
-			log.warn("Failfast is false. Error registering service with consul: "
-					+ reg.getService(), e);
+			log.warn("Failfast is false. Error registering service with consul: " + reg.getService(), e);
 		}
 	}
 
@@ -93,8 +88,7 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 		if (log.isInfoEnabled()) {
 			log.info("Deregistering service with consul: " + reg.getInstanceId());
 		}
-		this.client.agentServiceDeregister(reg.getInstanceId(),
-				this.properties.getAclToken());
+		this.client.agentServiceDeregister(reg.getInstanceId(), this.properties.getAclToken());
 	}
 
 	@Override
@@ -120,8 +114,7 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 	public Object getStatus(ConsulRegistration registration) {
 		String serviceId = registration.getServiceId();
 		Response<List<Check>> response = this.client.getHealthChecksForService(serviceId,
-				HealthChecksForServiceRequest.newBuilder()
-						.setQueryParams(QueryParams.DEFAULT).build());
+				HealthChecksForServiceRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
 		List<Check> checks = response.getValue();
 
 		for (Check check : checks) {

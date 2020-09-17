@@ -92,8 +92,8 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 	@Override
 	public void start() {
 		if (this.running.compareAndSet(false, true)) {
-			this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(
-					this::watchConfigKeyValues, this.properties.getWatch().getDelay());
+			this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(this::watchConfigKeyValues,
+					this.properties.getWatch().getDelay());
 		}
 	}
 
@@ -145,8 +145,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 				}
 
 				if (log.isTraceEnabled()) {
-					log.trace("watching consul for context '" + context + "' with index "
-							+ currentIndex);
+					log.trace("watching consul for context '" + context + "' with index " + currentIndex);
 				}
 
 				// use the consul ACL token if found
@@ -155,9 +154,8 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 					aclToken = null;
 				}
 
-				Response<List<GetValue>> response = this.consul.getKVValues(context,
-						aclToken, new QueryParams(
-								this.properties.getWatch().getWaitTime(), currentIndex));
+				Response<List<GetValue>> response = this.consul.getKVValues(context, aclToken,
+						new QueryParams(this.properties.getWatch().getWaitTime(), currentIndex));
 
 				// if response.value == null, response was a 404, otherwise it was a
 				// 200, reducing churn if there wasn't anything
@@ -167,20 +165,15 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 					if (newIndex != null && !newIndex.equals(currentIndex)) {
 						// don't publish the same index again, don't publish the first
 						// time (-1) so index can be primed
-						if (!this.consulIndexes.containsValue(newIndex)
-								&& !currentIndex.equals(-1L)) {
+						if (!this.consulIndexes.containsValue(newIndex) && !currentIndex.equals(-1L)) {
 							if (log.isTraceEnabled()) {
-								log.trace("Context " + context + " has new index "
-										+ newIndex);
+								log.trace("Context " + context + " has new index " + newIndex);
 							}
-							RefreshEventData data = new RefreshEventData(context,
-									currentIndex, newIndex);
-							this.publisher.publishEvent(
-									new RefreshEvent(this, data, data.toString()));
+							RefreshEventData data = new RefreshEventData(context, currentIndex, newIndex);
+							this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
 						}
 						else if (log.isTraceEnabled()) {
-							log.trace("Event for index already published for context "
-									+ context);
+							log.trace("Event for index already published for context " + context);
 						}
 						this.consulIndexes.put(context, newIndex);
 					}
@@ -196,19 +189,17 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 			catch (Exception e) {
 				// only fail fast on the initial query, otherwise just log the error
 				if (this.firstTime && this.properties.isFailFast()) {
-					log.error(
-							"Fail fast is set and there was an error reading configuration from consul.");
+					log.error("Fail fast is set and there was an error reading configuration from consul.");
 					ReflectionUtils.rethrowRuntimeException(e);
 				}
 				else if (log.isTraceEnabled()) {
-					log.trace("Error querying consul Key/Values for context '" + context
-							+ "'", e);
+					log.trace("Error querying consul Key/Values for context '" + context + "'", e);
 				}
 				else if (log.isWarnEnabled()) {
 					// simplified one line log message in the event of an agent
 					// failure
-					log.warn("Error querying consul Key/Values for context '" + context
-							+ "'. Message: " + e.getMessage());
+					log.warn("Error querying consul Key/Values for context '" + context + "'. Message: "
+							+ e.getMessage());
 				}
 			}
 		}
@@ -250,8 +241,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 				return false;
 			}
 			RefreshEventData that = (RefreshEventData) o;
-			return Objects.equals(this.context, that.context)
-					&& Objects.equals(this.prevIndex, that.prevIndex)
+			return Objects.equals(this.context, that.context) && Objects.equals(this.prevIndex, that.prevIndex)
 					&& Objects.equals(this.newIndex, that.newIndex);
 		}
 
@@ -262,9 +252,8 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 		@Override
 		public String toString() {
-			return new ToStringCreator(this).append("context", this.context)
-					.append("prevIndex", this.prevIndex).append("newIndex", this.newIndex)
-					.toString();
+			return new ToStringCreator(this).append("context", this.context).append("prevIndex", this.prevIndex)
+					.append("newIndex", this.newIndex).toString();
 		}
 
 	}

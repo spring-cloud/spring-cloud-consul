@@ -32,8 +32,7 @@ public class PropertySourcesLocatedEvent extends ApplicationEvent {
 	 * @param source the object on which the event initially occurred (never {@code null})
 	 * @param contextsToIndexes contexts to indexes
 	 */
-	public PropertySourcesLocatedEvent(Object source,
-			LinkedHashMap<String, Long> contextsToIndexes) {
+	public PropertySourcesLocatedEvent(Object source, LinkedHashMap<String, Long> contextsToIndexes) {
 		super(source);
 		this.contextsToIndexes = contextsToIndexes;
 	}

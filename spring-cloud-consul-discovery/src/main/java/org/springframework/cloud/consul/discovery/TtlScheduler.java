@@ -40,8 +40,7 @@ public class TtlScheduler {
 
 	private final Map<String, ScheduledFuture> serviceHeartbeats = new ConcurrentHashMap<>();
 
-	private final TaskScheduler scheduler = new ConcurrentTaskScheduler(
-			Executors.newSingleThreadScheduledExecutor());
+	private final TaskScheduler scheduler = new ConcurrentTaskScheduler(Executors.newSingleThreadScheduledExecutor());
 
 	private HeartbeatProperties configuration;
 
@@ -62,8 +61,7 @@ public class TtlScheduler {
 	 * @param instanceId instance id
 	 */
 	public void add(String instanceId) {
-		ScheduledFuture task = this.scheduler.scheduleAtFixedRate(
-				new ConsulHeartbeatTask(instanceId),
+		ScheduledFuture task = this.scheduler.scheduleAtFixedRate(new ConsulHeartbeatTask(instanceId),
 				this.configuration.computeHeartbeatInterval().toMillis());
 		ScheduledFuture previousTask = this.serviceHeartbeats.put(instanceId, task);
 		if (previousTask != null) {

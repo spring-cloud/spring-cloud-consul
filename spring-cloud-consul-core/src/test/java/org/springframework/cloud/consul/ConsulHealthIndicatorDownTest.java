@@ -41,8 +41,7 @@ public class ConsulHealthIndicatorDownTest {
 
 	@Test
 	public void doHealthCheck() {
-		assertThat(this.healthEndpoint.health().getStatus())
-				.as("health status was not DOWN").isEqualTo(Status.DOWN);
+		assertThat(this.healthEndpoint.health().getStatus()).as("health status was not DOWN").isEqualTo(Status.DOWN);
 	}
 
 	@EnableAutoConfiguration

@@ -44,8 +44,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Jin Zhang
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		classes = ConsulAutoServiceRegistrationCustomizedInstanceGroupTests.TestConfig.class,
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedInstanceGroupTests.TestConfig.class,
 		properties = { "spring.application.name=myTestService-WithGroup",
 				"spring.cloud.consul.discovery.instanceId=myTestService1-WithGroup",
 				"spring.cloud.consul.discovery.instanceGroup=test" },
@@ -67,10 +66,8 @@ public class ConsulAutoServiceRegistrationCustomizedInstanceGroupTests {
 		Service service = services.get("myTestService1-WithGroup");
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
-		assertThat(service.getId()).as("service id was wrong")
-				.isEqualTo("myTestService1-WithGroup");
-		assertThat(service.getTags().contains("group=test")).as("service group was wrong")
-				.isTrue();
+		assertThat(service.getId()).as("service id was wrong").isEqualTo("myTestService1-WithGroup");
+		assertThat(service.getTags().contains("group=test")).as("service group was wrong").isTrue();
 
 		// ConsulServerList serverList = new ConsulServerList(this.consul,
 		// this.properties);
@@ -86,8 +83,7 @@ public class ConsulAutoServiceRegistrationCustomizedInstanceGroupTests {
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
-			ConsulAutoConfiguration.class,
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestConfig {
 

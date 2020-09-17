@@ -43,8 +43,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = "spring.cloud.consul.discovery.query-passing=true",
-		webEnvironment = RANDOM_PORT)
+@SpringBootTest(properties = "spring.cloud.consul.discovery.query-passing=true", webEnvironment = RANDOM_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulServiceRegistryTests {
 
@@ -66,8 +65,7 @@ public class ConsulServiceRegistryTests {
 	@Test
 	public void contextLoads() {
 
-		assertThat(this.autoRegistration).as("autoRegistration created erroneously")
-				.isNull();
+		assertThat(this.autoRegistration).as("autoRegistration created erroneously").isNull();
 
 		String serviceId = "myNonAutoRegisteredService";
 
@@ -78,8 +76,7 @@ public class ConsulServiceRegistryTests {
 		service.setPort(this.port);
 		service.setTags(Collections.singletonList("mytag"));
 
-		ConsulRegistration registration = new ConsulRegistration(service,
-				this.properties);
+		ConsulRegistration registration = new ConsulRegistration(service, this.properties);
 		Throwable t = null;
 		try {
 			this.serviceRegistry.register(registration);

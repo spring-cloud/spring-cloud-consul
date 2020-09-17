@@ -60,14 +60,12 @@ public class ConsulAutoConfiguration {
 	public static ConsulClient createConsulClient(ConsulProperties consulProperties) {
 		final int agentPort = consulProperties.getPort();
 		final String agentHost = !StringUtils.isEmpty(consulProperties.getScheme())
-				? consulProperties.getScheme() + "://" + consulProperties.getHost()
-				: consulProperties.getHost();
+				? consulProperties.getScheme() + "://" + consulProperties.getHost() : consulProperties.getHost();
 
 		if (consulProperties.getTls() != null) {
 			ConsulProperties.TLSConfig tls = consulProperties.getTls();
-			TLSConfig tlsConfig = new TLSConfig(tls.getKeyStoreInstanceType(),
-					tls.getCertificatePath(), tls.getCertificatePassword(),
-					tls.getKeyStorePath(), tls.getKeyStorePassword());
+			TLSConfig tlsConfig = new TLSConfig(tls.getKeyStoreInstanceType(), tls.getCertificatePath(),
+					tls.getCertificatePassword(), tls.getKeyStorePath(), tls.getKeyStorePassword());
 			return new ConsulClient(agentHost, agentPort, tlsConfig);
 		}
 		return new ConsulClient(agentHost, agentPort);
@@ -98,18 +96,15 @@ public class ConsulAutoConfiguration {
 	@EnableRetry(proxyTargetClass = true)
 	@Import(AopAutoConfiguration.class)
 	@EnableConfigurationProperties(RetryProperties.class)
-	@ConditionalOnProperty(value = "spring.cloud.consul.retry.enabled",
-			matchIfMissing = true)
+	@ConditionalOnProperty(value = "spring.cloud.consul.retry.enabled", matchIfMissing = true)
 	protected static class RetryConfiguration {
 
 		@Bean(name = "consulRetryInterceptor")
 		@ConditionalOnMissingBean(name = "consulRetryInterceptor")
-		public RetryOperationsInterceptor consulRetryInterceptor(
-				RetryProperties properties) {
-			return RetryInterceptorBuilder.stateless()
-					.backOffOptions(properties.getInitialInterval(),
-							properties.getMultiplier(), properties.getMaxInterval())
-					.maxAttempts(properties.getMaxAttempts()).build();
+		public RetryOperationsInterceptor consulRetryInterceptor(RetryProperties properties) {
+			return RetryInterceptorBuilder.stateless().backOffOptions(properties.getInitialInterval(),
+					properties.getMultiplier(), properties.getMaxInterval()).maxAttempts(properties.getMaxAttempts())
+					.build();
 		}
 
 	}

@@ -31,16 +31,14 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 
-public class ConsulTestcontainers
-		implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+public class ConsulTestcontainers implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
 	static final Logger logger = LoggerFactory.getLogger(ConsulTestcontainers.class);
 
 	public static GenericContainer<?> consul = new GenericContainer<>("consul:1.7.2")
 			.withLogConsumer(new Slf4jLogConsumer(logger).withSeparateOutputStreams())
 			.waitingFor(Wait.forHttp("/v1/status/leader")).withExposedPorts(8500)
-			.withCommand("agent", "-dev", "-server", "-bootstrap", "-client", "0.0.0.0",
-					"-log-level", "trace");
+			.withCommand("agent", "-dev", "-server", "-bootstrap", "-client", "0.0.0.0", "-log-level", "trace");
 
 	@Override
 	public void initialize(ConfigurableApplicationContext context) {

@@ -88,8 +88,7 @@ public class TestConsumer implements ApplicationRunner {
 			group = args.getOptionValues("group").get(0);
 		}
 
-		this.binder.bindConsumer(ConsulBinderTests.BINDING_NAME, group, consumerChannel,
-				new ConsumerProperties());
+		this.binder.bindConsumer(ConsulBinderTests.BINDING_NAME, group, consumerChannel, new ConsumerProperties());
 		this.isBound = true;
 	}
 

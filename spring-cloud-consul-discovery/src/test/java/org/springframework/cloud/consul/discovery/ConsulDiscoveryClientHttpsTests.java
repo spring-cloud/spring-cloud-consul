@@ -40,10 +40,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @RunWith(SpringRunner.class)
 @SpringBootTest(
 		properties = { "spring.application.name=testConsulDiscoveryHttps",
-				"spring.cloud.consul.discovery.prefer-ip-address=true",
-				"spring.cloud.consul.discovery.scheme=https" },
-		classes = ConsulDiscoveryClientHttpsTests.MyTestConfig.class,
-		webEnvironment = RANDOM_PORT)
+				"spring.cloud.consul.discovery.prefer-ip-address=true", "spring.cloud.consul.discovery.scheme=https" },
+		classes = ConsulDiscoveryClientHttpsTests.MyTestConfig.class, webEnvironment = RANDOM_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulDiscoveryClientHttpsTests {
 
@@ -52,8 +50,7 @@ public class ConsulDiscoveryClientHttpsTests {
 
 	@Test
 	public void getInstancesForServiceWorks() {
-		List<ServiceInstance> instances = this.discoveryClient
-				.getInstances("testConsulDiscoveryHttps");
+		List<ServiceInstance> instances = this.discoveryClient.getInstances("testConsulDiscoveryHttps");
 		assertThat(instances).as("instances was null").isNotNull();
 		assertThat(instances.isEmpty()).as("instances was empty").isFalse();
 

@@ -49,22 +49,15 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Venil Noronha
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		classes = ConsulAutoServiceRegistrationCustomizedPropsTests.TestPropsConfig.class,
-		properties = { "spring.application.name=myTestService-B",
-				"spring.cloud.consul.discovery.instanceId=myTestService1-B",
-				"spring.cloud.consul.discovery.port=4452",
-				"spring.cloud.consul.discovery.hostname=myhost",
-				"spring.cloud.consul.discovery.ipAddress=10.0.0.1",
-				"spring.cloud.consul.discovery.registerHealthCheck=false",
-				"spring.cloud.consul.discovery.failFast=false",
-				"spring.cloud.consul.discovery.default-zone-metadata-name=mydefaultzonemetadataname",
-				"spring.cloud.consul.discovery.instance-zone=myzone",
-				"spring.cloud.consul.discovery.instance-group=mygroup",
-				"spring.cloud.consul.discovery.tags[0]=mytag",
-				"spring.cloud.consul.discovery.enableTagOverride=true",
-				"spring.cloud.consul.discovery.metadata.key1=value1",
-				"spring.cloud.consul.discovery.metadata.key2=value2" },
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedPropsTests.TestPropsConfig.class, properties = {
+		"spring.application.name=myTestService-B", "spring.cloud.consul.discovery.instanceId=myTestService1-B",
+		"spring.cloud.consul.discovery.port=4452", "spring.cloud.consul.discovery.hostname=myhost",
+		"spring.cloud.consul.discovery.ipAddress=10.0.0.1", "spring.cloud.consul.discovery.registerHealthCheck=false",
+		"spring.cloud.consul.discovery.failFast=false",
+		"spring.cloud.consul.discovery.default-zone-metadata-name=mydefaultzonemetadataname",
+		"spring.cloud.consul.discovery.instance-zone=myzone", "spring.cloud.consul.discovery.instance-group=mygroup",
+		"spring.cloud.consul.discovery.tags[0]=mytag", "spring.cloud.consul.discovery.enableTagOverride=true",
+		"spring.cloud.consul.discovery.metadata.key1=value1", "spring.cloud.consul.discovery.metadata.key2=value2" },
 		webEnvironment = RANDOM_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoServiceRegistrationCustomizedPropsTests {
@@ -81,22 +74,14 @@ public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 		Map<String, Service> services = response.getValue();
 		Service service = services.get("myTestService1-B");
 		assertThat(service).as("service was null").isNotNull();
-		assertThat(service.getPort()).as("service port is discovery port")
-				.isEqualTo(4452);
-		assertThat("myTestService1-B").as("service id was wrong")
-				.isEqualTo(service.getId());
-		assertThat("myTestService-B").as("service name was wrong")
-				.isEqualTo(service.getService());
-		assertThat("myhost").as("property hostname was wrong")
-				.isEqualTo(this.properties.getHostname());
-		assertThat("10.0.0.1").as("property ipAddress was wrong")
-				.isEqualTo(this.properties.getIpAddress());
-		assertThat("myhost").as("service address was wrong")
-				.isEqualTo(service.getAddress());
-		assertThat(service.getEnableTagOverride())
-				.as("property enableTagOverride was wrong").isTrue();
-		assertThat(service.getTags()).as("property tags contains the wrong values")
-				.containsExactly("mytag");
+		assertThat(service.getPort()).as("service port is discovery port").isEqualTo(4452);
+		assertThat("myTestService1-B").as("service id was wrong").isEqualTo(service.getId());
+		assertThat("myTestService-B").as("service name was wrong").isEqualTo(service.getService());
+		assertThat("myhost").as("property hostname was wrong").isEqualTo(this.properties.getHostname());
+		assertThat("10.0.0.1").as("property ipAddress was wrong").isEqualTo(this.properties.getIpAddress());
+		assertThat("myhost").as("service address was wrong").isEqualTo(service.getAddress());
+		assertThat(service.getEnableTagOverride()).as("property enableTagOverride was wrong").isTrue();
+		assertThat(service.getTags()).as("property tags contains the wrong values").containsExactly("mytag");
 		HashMap<String, String> entries = new HashMap<>();
 		entries.put("key1", "value1");
 		entries.put("key2", "value2");
@@ -106,23 +91,20 @@ public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 		assertThat(service.getMeta()).as("property metadata contains the wrong entries")
 				.containsExactlyInAnyOrderEntriesOf(entries);
 
-		Response<List<Check>> checkResponse = this.consul.getHealthChecksForService(
-				"myTestService-B", HealthChecksForServiceRequest.newBuilder()
-						.setQueryParams(QueryParams.DEFAULT).build());
+		Response<List<Check>> checkResponse = this.consul.getHealthChecksForService("myTestService-B",
+				HealthChecksForServiceRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
 		List<Check> checks = checkResponse.getValue();
 		assertThat(checks).as("checks was wrong size").hasSize(0);
 	}
 
 	@Test
 	public void testFailFastDisabled() {
-		assertThat(this.properties.isFailFast()).as("property failFast was wrong")
-				.isFalse();
+		assertThat(this.properties.isFailFast()).as("property failFast was wrong").isFalse();
 	}
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
-			ConsulAutoConfiguration.class,
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestPropsConfig {
 

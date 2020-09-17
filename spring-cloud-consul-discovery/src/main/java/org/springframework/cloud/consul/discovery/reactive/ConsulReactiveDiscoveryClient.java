@@ -47,15 +47,13 @@ import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findH
  */
 public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(ConsulReactiveDiscoveryClient.class);
+	private static final Logger logger = LoggerFactory.getLogger(ConsulReactiveDiscoveryClient.class);
 
 	private final ConsulClient client;
 
 	private final ConsulDiscoveryProperties properties;
 
-	public ConsulReactiveDiscoveryClient(ConsulClient client,
-			ConsulDiscoveryProperties properties) {
+	public ConsulReactiveDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties) {
 		this.client = client;
 		this.properties = properties;
 	}
@@ -80,19 +78,15 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 	}
 
 	private List<HealthService> getHealthServices(String serviceId) {
-		HealthServicesRequest request = HealthServicesRequest.newBuilder()
-				.setTag(this.properties.getDefaultQueryTag())
-				.setPassing(this.properties.isQueryPassing())
-				.setQueryParams(QueryParams.DEFAULT)
+		HealthServicesRequest request = HealthServicesRequest.newBuilder().setTag(this.properties.getDefaultQueryTag())
+				.setPassing(this.properties.isQueryPassing()).setQueryParams(QueryParams.DEFAULT)
 				.setToken(this.properties.getAclToken()).build();
 
-		Response<List<HealthService>> services = client.getHealthServices(serviceId,
-				request);
+		Response<List<HealthService>> services = client.getHealthServices(serviceId, request);
 		return services == null ? Collections.emptyList() : services.getValue();
 	}
 
-	private ServiceInstance mapToServiceInstance(HealthService service,
-			String serviceId) {
+	private ServiceInstance mapToServiceInstance(HealthService service, String serviceId) {
 		String host = findHost(service);
 		Map<String, String> metadata = service.getService().getMeta();
 		if (metadata == null) {
@@ -102,20 +96,17 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 		if (metadata.containsKey("secure")) {
 			secure = Boolean.parseBoolean(metadata.get("secure"));
 		}
-		return new DefaultServiceInstance(service.getService().getId(), serviceId, host,
-				service.getService().getPort(), secure, metadata);
+		return new DefaultServiceInstance(service.getService().getId(), serviceId, host, service.getService().getPort(),
+				secure, metadata);
 	}
 
 	@Override
 	public Flux<String> getServices() {
 		return Flux.defer(() -> {
-			CatalogServicesRequest request = CatalogServicesRequest.newBuilder()
-					.setToken(properties.getAclToken())
+			CatalogServicesRequest request = CatalogServicesRequest.newBuilder().setToken(properties.getAclToken())
 					.setQueryParams(QueryParams.DEFAULT).build();
-			Response<Map<String, List<String>>> services = client
-					.getCatalogServices(request);
-			return services == null ? Flux.empty()
-					: Flux.fromIterable(services.getValue().keySet());
+			Response<Map<String, List<String>>> services = client.getCatalogServices(request);
+			return services == null ? Flux.empty() : Flux.fromIterable(services.getValue().keySet());
 		}).onErrorResume(exception -> {
 			logger.error("Error getting services from Consul.", exception);
 			return Flux.empty();

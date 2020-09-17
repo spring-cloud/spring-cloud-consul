@@ -69,8 +69,7 @@ public class ConsulBinderApplicationTests {
 	@Before
 	public void setUp() throws Exception {
 
-		this.wireMock.stubFor(put(urlPathMatching("/v1/event/fire/purchases"))
-				.willReturn(aResponse().withStatus(200)));
+		this.wireMock.stubFor(put(urlPathMatching("/v1/event/fire/purchases")).willReturn(aResponse().withStatus(200)));
 
 		/*
 		 * wireMock.stubFor(get(urlPathMatching("/v1/event/list"))
@@ -89,8 +88,7 @@ public class ConsulBinderApplicationTests {
 	public void shouldPublishTextConsulMessage() {
 
 		// given
-		final Message<String> message = MessageBuilder.withPayload("Hello Consul!")
-				.build();
+		final Message<String> message = MessageBuilder.withPayload("Hello Consul!").build();
 
 		// when
 		this.events.purchases().send(message);

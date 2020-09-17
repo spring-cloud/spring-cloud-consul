@@ -40,8 +40,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Piotr Wielgolaski
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		classes = ConsulAutoServiceRegistrationCustomizedServletContextTests.TestConfig.class,
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedServletContextTests.TestConfig.class,
 		properties = { "spring.application.name=myTestService-WithServletContext",
 				"spring.cloud.consul.discovery.instanceId=myTestService1-WithServletContext",
 				"server.servlet.context-path=/customContext" },
@@ -59,10 +58,8 @@ public class ConsulAutoServiceRegistrationCustomizedServletContextTests {
 		Service service = services.get("myTestService1-WithServletContext");
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
-		assertThat(service.getId()).as("service id was wrong")
-				.isEqualTo("myTestService1-WithServletContext");
-		assertThat(service.getTags()).as("contextPath tag missing")
-				.contains("contextPath=/customContext");
+		assertThat(service.getId()).as("service id was wrong").isEqualTo("myTestService1-WithServletContext");
+		assertThat(service.getTags()).as("contextPath tag missing").contains("contextPath=/customContext");
 	}
 
 	@EnableDiscoveryClient

@@ -48,11 +48,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Stéphane Leroy
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TtlSchedulerRemoveTests.TtlSchedulerRemoveTestConfig.class,
-		properties = { "spring.application.name=ttlSchedulerRemove",
-				"spring.cloud.consul.discovery.instance-id=ttlSchedulerRemove-id",
-				"spring.cloud.consul.discovery.heartbeat.enabled=true",
-				"spring.cloud.consul.discovery.heartbeat.ttlValue=2" },
+@SpringBootTest(classes = TtlSchedulerRemoveTests.TtlSchedulerRemoveTestConfig.class, properties = {
+		"spring.application.name=ttlSchedulerRemove", "spring.cloud.consul.discovery.instance-id=ttlSchedulerRemove-id",
+		"spring.cloud.consul.discovery.heartbeat.enabled=true", "spring.cloud.consul.discovery.heartbeat.ttlValue=2" },
 		webEnvironment = RANDOM_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class TtlSchedulerRemoveTests {
@@ -68,21 +66,18 @@ public class TtlSchedulerRemoveTests {
 	public void should_not_send_check_if_service_removed() throws InterruptedException {
 		Thread.sleep(1000); // wait for Ttlscheduler to send a check to consul.
 		Check serviceCheck = getCheckForService("ttlSchedulerRemove");
-		assertThat(serviceCheck.getStatus()).as("Service check is in wrong state")
-				.isEqualTo(PASSING);
+		assertThat(serviceCheck.getStatus()).as("Service check is in wrong state").isEqualTo(PASSING);
 
 		// Remove service from TtlScheduler and wait for TTL to expired.
 		this.ttlScheduler.remove("ttlSchedulerRemove-id");
 		Thread.sleep(2100);
 		serviceCheck = getCheckForService("ttlSchedulerRemove");
-		assertThat(serviceCheck.getStatus()).as("Service check is in wrong state")
-				.isEqualTo(CRITICAL);
+		assertThat(serviceCheck.getStatus()).as("Service check is in wrong state").isEqualTo(CRITICAL);
 	}
 
 	private Check getCheckForService(String serviceId) {
-		Response<List<Check>> checkResponse = this.consul
-				.getHealthChecksForService(serviceId, HealthChecksForServiceRequest
-						.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
+		Response<List<Check>> checkResponse = this.consul.getHealthChecksForService(serviceId,
+				HealthChecksForServiceRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
 		if (checkResponse.getValue().size() > 0) {
 			return checkResponse.getValue().get(0);
 		}
@@ -92,8 +87,7 @@ public class TtlSchedulerRemoveTests {
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@Import({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
-			ConsulDiscoveryClientConfiguration.class,
-			ConsulHeartbeatAutoConfiguration.class })
+			ConsulDiscoveryClientConfiguration.class, ConsulHeartbeatAutoConfiguration.class })
 	public static class TtlSchedulerRemoveTestConfig {
 
 	}

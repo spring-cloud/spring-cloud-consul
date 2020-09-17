@@ -67,30 +67,23 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 		ConsulTestcontainers.start();
 		Integer port = ConsulTestcontainers.getPort();
 		String host = ConsulTestcontainers.getHost();
-		setup("server.port=0", "spring.cloud.config.discovery.enabled=true",
-				"spring.cloud.consul.port=" + port, "spring.cloud.consul.host=" + host,
-				"logging.level.org.springframework.cloud.config.client=DEBUG",
+		setup("server.port=0", "spring.cloud.config.discovery.enabled=true", "spring.cloud.consul.port=" + port,
+				"spring.cloud.consul.host=" + host, "logging.level.org.springframework.cloud.config.client=DEBUG",
 				"spring.cloud.consul.discovery.catalog-services-watch.enabled=false",
 				"spring.cloud.consul.discovery.test.enabled:true",
-				"spring.application.name=discoveryclientconfigservicetest",
-				"spring.jmx.enabled=false", "spring.cloud.consul.discovery.port:7001",
-				"spring.cloud.consul.discovery.hostname:foo",
+				"spring.application.name=discoveryclientconfigservicetest", "spring.jmx.enabled=false",
+				"spring.cloud.consul.discovery.port:7001", "spring.cloud.consul.discovery.hostname:foo",
 				"spring.cloud.config.discovery.service-id:configserver");
 
-		assertThat(this.context
-				.getBeanNamesForType(ConsulConfigServerAutoConfiguration.class).length)
-						.isEqualTo(1);
-		ConsulDiscoveryClient client = this.context.getParent()
-				.getBean(ConsulDiscoveryClient.class);
+		assertThat(this.context.getBeanNamesForType(ConsulConfigServerAutoConfiguration.class).length).isEqualTo(1);
+		ConsulDiscoveryClient client = this.context.getParent().getBean(ConsulDiscoveryClient.class);
 		verify(client, atLeast(2)).getInstances("configserver");
-		ConfigClientProperties locator = this.context
-				.getBean(ConfigClientProperties.class);
+		ConfigClientProperties locator = this.context.getBean(ConfigClientProperties.class);
 		assertThat(locator.getUri()[0]).isEqualTo("http://foo:7001/");
 	}
 
 	private void setup(String... env) {
-		this.context = new SpringApplicationBuilder(TestConfig.class).properties(env)
-				.run();
+		this.context = new SpringApplicationBuilder(TestConfig.class).properties(env).run();
 	}
 
 	@Configuration(proxyBeanMethods = false)

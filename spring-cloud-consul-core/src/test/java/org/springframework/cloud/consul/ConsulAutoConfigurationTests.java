@@ -49,12 +49,10 @@ public class ConsulAutoConfigurationTests {
 
 	@Test
 	public void tlsConfigured() {
-		CatalogConsulClient client = (CatalogConsulClient) ReflectionTestUtils
-				.getField(this.consulClient, "catalogClient");
-		ConsulRawClient rawClient = (ConsulRawClient) ReflectionTestUtils.getField(client,
-				"rawClient");
-		HttpTransport httpTransport = (HttpTransport) ReflectionTestUtils
-				.getField(rawClient, "httpTransport");
+		CatalogConsulClient client = (CatalogConsulClient) ReflectionTestUtils.getField(this.consulClient,
+				"catalogClient");
+		ConsulRawClient rawClient = (ConsulRawClient) ReflectionTestUtils.getField(client, "rawClient");
+		HttpTransport httpTransport = (HttpTransport) ReflectionTestUtils.getField(rawClient, "httpTransport");
 		assertThat(httpTransport).isInstanceOf(DefaultHttpsTransport.class);
 	}
 

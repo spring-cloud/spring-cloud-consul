@@ -41,8 +41,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulAutoServiceRegistrationNonWebTests.TestConfig.class,
-		properties = { "spring.application.name=consulNonWebTest", "server.port=32111" },
-		webEnvironment = NONE)
+		properties = { "spring.application.name=consulNonWebTest", "server.port=32111" }, webEnvironment = NONE)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoServiceRegistrationNonWebTests {
 
@@ -54,8 +53,7 @@ public class ConsulAutoServiceRegistrationNonWebTests {
 
 	@Test
 	public void contextLoads() {
-		assertThat(this.autoServiceRegistration)
-				.as("ConsulAutoServiceRegistration was created").isNotNull();
+		assertThat(this.autoServiceRegistration).as("ConsulAutoServiceRegistration was created").isNotNull();
 
 		Response<Map<String, Service>> response = this.consul.getAgentServices();
 		Map<String, Service> services = response.getValue();

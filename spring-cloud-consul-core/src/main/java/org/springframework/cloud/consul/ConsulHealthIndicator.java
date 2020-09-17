@@ -42,10 +42,8 @@ public class ConsulHealthIndicator extends AbstractHealthIndicator {
 	protected void doHealthCheck(Health.Builder builder) throws Exception {
 		final Response<String> leaderStatus = this.consul.getStatusLeader();
 		final Response<Map<String, List<String>>> services = this.consul
-				.getCatalogServices(CatalogServicesRequest.newBuilder()
-						.setQueryParams(QueryParams.DEFAULT).build());
-		builder.up().withDetail("leader", leaderStatus.getValue()).withDetail("services",
-				services.getValue());
+				.getCatalogServices(CatalogServicesRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
+		builder.up().withDetail("leader", leaderStatus.getValue()).withDetail("services", services.getValue());
 	}
 
 }

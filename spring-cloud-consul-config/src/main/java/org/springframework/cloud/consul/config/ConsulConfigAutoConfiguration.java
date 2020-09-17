@@ -53,17 +53,14 @@ public class ConsulConfigAutoConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(RefreshEndpoint.class)
-	@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled",
-			matchIfMissing = true)
+	@ConditionalOnProperty(name = "spring.cloud.consul.config.watch.enabled", matchIfMissing = true)
 	protected static class ConsulRefreshConfiguration {
 
 		@Bean
 		@ConditionalOnBean(ConsulConfigIndexes.class)
-		public ConfigWatch configWatch(ConsulConfigProperties properties,
-				ConsulConfigIndexes indexes, ConsulClient consul,
-				@Qualifier(CONFIG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
-			return new ConfigWatch(properties, consul, indexes.getIndexes(),
-					taskScheduler);
+		public ConfigWatch configWatch(ConsulConfigProperties properties, ConsulConfigIndexes indexes,
+				ConsulClient consul, @Qualifier(CONFIG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
+			return new ConfigWatch(properties, consul, indexes.getIndexes(), taskScheduler);
 		}
 
 		@Bean(name = CONFIG_WATCH_TASK_SCHEDULER_NAME)

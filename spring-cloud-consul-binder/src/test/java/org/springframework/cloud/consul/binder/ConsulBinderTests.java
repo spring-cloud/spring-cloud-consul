@@ -164,9 +164,7 @@ public class ConsulBinderTests {
 			if (groups != null) {
 				args.add(String.format("--group=%s", groups[i]));
 			}
-			consumers.add(
-					new AppId(launchApplication(TestConsumer.class, appProperties, args),
-							consumerPort));
+			consumers.add(new AppId(launchApplication(TestConsumer.class, appProperties, args), consumerPort));
 		}
 		for (AppId app : consumers) {
 			waitForConsumer(app.port);
@@ -191,8 +189,7 @@ public class ConsulBinderTests {
 		args.add(String.format("--partitioned=%b", false));
 		args.add("--debug");
 
-		return new AppId(launchApplication(TestProducer.class, appProperties, args),
-				producerPort);
+		return new AppId(launchApplication(TestProducer.class, appProperties, args), producerPort);
 	}
 
 	/**
@@ -222,8 +219,7 @@ public class ConsulBinderTests {
 	 */
 	private boolean isConsumerBound(int port) {
 		try {
-			return this.restTemplate.getForObject(
-					String.format("http://localhost:%d/is-bound", port), Boolean.class);
+			return this.restTemplate.getForObject(String.format("http://localhost:%d/is-bound", port), Boolean.class);
 		}
 		catch (ResourceAccessException e) {
 			logger.trace("isConsumerBound", e);
@@ -238,8 +234,7 @@ public class ConsulBinderTests {
 	 */
 	private String getConsumerMessagePayload(int port) {
 		try {
-			return this.restTemplate.getForObject(
-					String.format("http://localhost:%d/message-payload", port),
+			return this.restTemplate.getForObject(String.format("http://localhost:%d/message-payload", port),
 					String.class);
 		}
 		catch (ResourceAccessException e) {
@@ -255,8 +250,7 @@ public class ConsulBinderTests {
 	 */
 	private boolean partitionSelectorUsed(int port) {
 		try {
-			return this.restTemplate.getForObject(
-					String.format("http://localhost:%d/partition-strategy-invoked", port),
+			return this.restTemplate.getForObject(String.format("http://localhost:%d/partition-strategy-invoked", port),
 					Boolean.class);
 		}
 		catch (ResourceAccessException e) {
@@ -294,21 +288,17 @@ public class ConsulBinderTests {
 	 * @param args the command line arguments for the application
 	 * @return a string identifier for the application
 	 */
-	private String launchApplication(Class<?> clz, Map<String, String> properties,
-			List<String> args) {
-		Resource resource = new UrlResource(
-				clz.getProtectionDomain().getCodeSource().getLocation());
+	private String launchApplication(Class<?> clz, Map<String, String> properties, List<String> args) {
+		Resource resource = new UrlResource(clz.getProtectionDomain().getCodeSource().getLocation());
 
 		properties.put(AppDeployer.GROUP_PROPERTY_KEY, "test-group");
 		properties.put("main", clz.getName());
 		properties.put("classpath", System.getProperty("java.class.path"));
 
-		String appName = String.format("%s-%s", clz.getSimpleName(),
-				properties.get("server.port"));
+		String appName = String.format("%s-%s", clz.getSimpleName(), properties.get("server.port"));
 		AppDefinition definition = new AppDefinition(appName, properties);
 
-		AppDeploymentRequest request = new AppDeploymentRequest(definition, resource,
-				properties, args);
+		AppDeploymentRequest request = new AppDeploymentRequest(definition, resource, properties, args);
 		return this.deployer.deploy(request);
 	}
 
@@ -336,8 +326,7 @@ public class ConsulBinderTests {
 		 * @param request the request
 		 * @return the string[]
 		 */
-		protected String[] buildJarExecutionCommand(String jarPath,
-				AppDeploymentRequest request) {
+		protected String[] buildJarExecutionCommand(String jarPath, AppDeploymentRequest request) {
 
 			ArrayList<String> commands = new ArrayList<>();
 			commands.add(super.getLocalDeployerProperties().getJavaCmd());

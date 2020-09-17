@@ -42,8 +42,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Sixian Liu
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		classes = ConsulAutoServiceRegistrationCustomizedInstanceZoneTests.TestConfig.class,
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedInstanceZoneTests.TestConfig.class,
 		properties = { "spring.application.name=myTestService-WithZone",
 				"spring.cloud.consul.discovery.instanceId=myTestService1-WithZone",
 				"spring.cloud.consul.discovery.instanceZone=zone1",
@@ -62,16 +61,13 @@ public class ConsulAutoServiceRegistrationCustomizedInstanceZoneTests {
 		Service service = services.get("myTestService1-WithZone");
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
-		assertThat(service.getId()).as("service id was wrong")
-				.isEqualTo("myTestService1-WithZone");
-		assertThat(service.getMeta()).as("service zone was wrong").containsEntry("myZone",
-				"zone1");
+		assertThat(service.getId()).as("service id was wrong").isEqualTo("myTestService1-WithZone");
+		assertThat(service.getMeta()).as("service zone was wrong").containsEntry("myZone", "zone1");
 	}
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
-			ConsulAutoConfiguration.class,
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestConfig {
 

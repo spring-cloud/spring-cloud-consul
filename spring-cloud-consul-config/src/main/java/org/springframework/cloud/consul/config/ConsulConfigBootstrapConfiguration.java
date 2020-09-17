@@ -39,8 +39,7 @@ public class ConsulConfigBootstrapConfiguration {
 	@Configuration(proxyBeanMethods = false)
 	@EnableConfigurationProperties
 	@Import(ConsulAutoConfiguration.class)
-	@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled",
-			matchIfMissing = true)
+	@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled", matchIfMissing = true)
 	protected static class ConsulPropertySourceConfiguration {
 
 		@Autowired
@@ -53,8 +52,7 @@ public class ConsulConfigBootstrapConfiguration {
 		}
 
 		@Bean
-		public ConsulPropertySourceLocator consulPropertySourceLocator(
-				ConsulConfigProperties consulConfigProperties) {
+		public ConsulPropertySourceLocator consulPropertySourceLocator(ConsulConfigProperties consulConfigProperties) {
 			return new ConsulPropertySourceLocator(this.consul, consulConfigProperties);
 		}
 

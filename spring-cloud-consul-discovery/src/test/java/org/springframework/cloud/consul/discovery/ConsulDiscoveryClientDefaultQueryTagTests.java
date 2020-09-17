@@ -44,8 +44,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Piotr Wielgolaski
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = MOCK,
-		classes = ConsulDiscoveryClientDefaultQueryTagTests.TestConfig.class,
+@SpringBootTest(webEnvironment = MOCK, classes = ConsulDiscoveryClientDefaultQueryTagTests.TestConfig.class,
 		properties = { "spring.application.name=consulServiceDefaultTag",
 				"spring.cloud.consul.discovery.catalogServicesWatch.enabled=false",
 				"spring.cloud.consul.discovery.defaultQueryTag=intg" })

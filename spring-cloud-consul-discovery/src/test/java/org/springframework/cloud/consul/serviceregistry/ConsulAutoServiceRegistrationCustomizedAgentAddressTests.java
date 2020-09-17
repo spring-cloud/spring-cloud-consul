@@ -43,8 +43,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		classes = ConsulAutoServiceRegistrationCustomizedAgentAddressTests.TestConfig.class,
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedAgentAddressTests.TestConfig.class,
 		properties = { "spring.application.name=myTestService-AA",
 				"spring.cloud.consul.discovery.instanceId=myTestService1-AA",
 				"spring.cloud.consul.discovery.serviceName=myprefix-${spring.application.name}",
@@ -63,18 +62,14 @@ public class ConsulAutoServiceRegistrationCustomizedAgentAddressTests {
 		Service service = services.get("myTestService1-AA");
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
-		assertThat(service.getId()).as("service id was wrong")
-				.isEqualTo("myTestService1-AA");
-		assertThat(service.getService()).as("service name was wrong")
-				.isEqualTo("myprefix-myTestService-AA");
-		assertThat(StringUtils.isEmpty(service.getAddress()))
-				.as("service address must be empty").isTrue();
+		assertThat(service.getId()).as("service id was wrong").isEqualTo("myTestService1-AA");
+		assertThat(service.getService()).as("service name was wrong").isEqualTo("myprefix-myTestService-AA");
+		assertThat(StringUtils.isEmpty(service.getAddress())).as("service address must be empty").isTrue();
 	}
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
-			ConsulAutoConfiguration.class,
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestConfig {
 

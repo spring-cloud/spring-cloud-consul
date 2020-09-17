@@ -87,12 +87,11 @@ public class ConsulConfigDataIntegrationTests {
 		client.setKVValue(KEY1, VALUE1);
 		client.setKVValue(KEY2, VALUE2);
 
-		context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
-				.run("--spring.application.name=" + APP_NAME,
-						"--spring.config.import=consul:" + ConsulTestcontainers.getHost()
-								+ ":" + ConsulTestcontainers.getPort(),
-						"--spring.cloud.consul.config.prefix=" + ROOT,
-						"--spring.cloud.consul.config.watch.delay=10");
+		context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE).run(
+				"--spring.application.name=" + APP_NAME,
+				"--spring.config.import=consul:" + ConsulTestcontainers.getHost() + ":"
+						+ ConsulTestcontainers.getPort(),
+				"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.watch.delay=10");
 
 		client = context.getBean(ConsulClient.class);
 		environment = context.getEnvironment();
@@ -124,8 +123,7 @@ public class ConsulConfigDataIntegrationTests {
 		assertThat(receivedEvent).as("listener didn't receive event").isTrue();
 
 		testProp = environment.getProperty(TEST_PROP_CANONICAL);
-		assertThat(testProp).as("testProp was wrong after update")
-				.isEqualTo("testPropValUpdate");
+		assertThat(testProp).as("testProp was wrong after update").isEqualTo("testPropValUpdate");
 	}
 
 	@Test
@@ -140,8 +138,7 @@ public class ConsulConfigDataIntegrationTests {
 		assertThat(receivedEvent).as("listener didn't receive event").isTrue();
 
 		testProp = environment.getProperty(TEST_PROP3_CANONICAL);
-		assertThat(testProp).as(TEST_PROP3 + " was wrong after update")
-				.isEqualTo("testPropValInsert");
+		assertThat(testProp).as(TEST_PROP3 + " was wrong after update").isEqualTo("testPropValInsert");
 	}
 
 	@Configuration

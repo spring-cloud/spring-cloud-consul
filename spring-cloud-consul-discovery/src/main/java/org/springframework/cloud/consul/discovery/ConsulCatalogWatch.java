@@ -41,8 +41,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 /**
  * @author Spencer Gibb
  */
-public class ConsulCatalogWatch
-		implements ApplicationEventPublisherAware, SmartLifecycle {
+public class ConsulCatalogWatch implements ApplicationEventPublisherAware, SmartLifecycle {
 
 	private static final Log log = LogFactory.getLog(ConsulDiscoveryClient.class);
 
@@ -64,8 +63,7 @@ public class ConsulCatalogWatch
 		this(properties, consul, getTaskScheduler());
 	}
 
-	public ConsulCatalogWatch(ConsulDiscoveryProperties properties, ConsulClient consul,
-			TaskScheduler taskScheduler) {
+	public ConsulCatalogWatch(ConsulDiscoveryProperties properties, ConsulClient consul, TaskScheduler taskScheduler) {
 		this.properties = properties;
 		this.consul = consul;
 		this.taskScheduler = taskScheduler;
@@ -96,8 +94,7 @@ public class ConsulCatalogWatch
 	@Override
 	public void start() {
 		if (this.running.compareAndSet(false, true)) {
-			this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(
-					this::catalogServicesWatch,
+			this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(this::catalogServicesWatch,
 					this.properties.getCatalogServicesWatchDelay());
 		}
 	}
@@ -128,19 +125,16 @@ public class ConsulCatalogWatch
 			}
 
 			CatalogServicesRequest request = CatalogServicesRequest.newBuilder()
-					.setQueryParams(new QueryParams(
-							this.properties.getCatalogServicesWatchTimeout(), index))
+					.setQueryParams(new QueryParams(this.properties.getCatalogServicesWatchTimeout(), index))
 					.setToken(this.properties.getAclToken()).build();
-			Response<Map<String, List<String>>> response = this.consul
-					.getCatalogServices(request);
+			Response<Map<String, List<String>>> response = this.consul.getCatalogServices(request);
 			Long consulIndex = response.getConsulIndex();
 			if (consulIndex != null) {
 				this.catalogServicesIndex.set(BigInteger.valueOf(consulIndex));
 			}
 
 			if (log.isTraceEnabled()) {
-				log.trace("Received services update from consul: " + response.getValue()
-						+ ", index: " + consulIndex);
+				log.trace("Received services update from consul: " + response.getValue() + ", index: " + consulIndex);
 			}
 			this.publisher.publishEvent(new HeartbeatEvent(this, consulIndex));
 		}

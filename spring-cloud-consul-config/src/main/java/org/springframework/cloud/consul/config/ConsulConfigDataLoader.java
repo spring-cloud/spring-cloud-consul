@@ -32,26 +32,23 @@ import org.springframework.boot.env.BootstrapRegistry.Registration;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
 
-public class ConsulConfigDataLoader
-		implements ConfigDataLoader<ConsulConfigDataLocation> {
+public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigDataLocation> {
 
 	private static final Log log = LogFactory.getLog(ConsulConfigDataLoader.class);
 
 	@Override
-	public ConfigData load(ConfigDataLoaderContext context,
-			ConsulConfigDataLocation location) {
+	public ConfigData load(ConfigDataLoaderContext context, ConsulConfigDataLocation location) {
 		try {
 			ConsulClient consul = getBean(context, ConsulClient.class);
 			ConsulConfigProperties properties = location.getProperties();
 			ConsulPropertySource propertySource = null;
 
 			if (properties.getFormat() == FILES) {
-				Response<GetValue> response = consul.getKVValue(location.getContext(),
-						properties.getAclToken());
+				Response<GetValue> response = consul.getKVValue(location.getContext(), properties.getAclToken());
 				addIndex(context, location, response.getConsulIndex());
 				if (response.getValue() != null) {
-					ConsulFilesPropertySource filesPropertySource = new ConsulFilesPropertySource(
-							location.getContext(), consul, properties);
+					ConsulFilesPropertySource filesPropertySource = new ConsulFilesPropertySource(location.getContext(),
+							consul, properties);
 					filesPropertySource.init(response.getValue());
 					propertySource = filesPropertySource;
 				}
@@ -79,26 +76,22 @@ public class ConsulConfigDataLoader
 	}
 
 	protected <T> T getBean(ConfigDataLoaderContext context, Class<T> type) {
-		Registration<T> registration = context.getBootstrapRegistry()
-				.getRegistration(type);
+		Registration<T> registration = context.getBootstrapRegistry().getRegistration(type);
 		if (registration == null) {
 			return null;
 		}
 		return registration.get();
 	}
 
-	protected ConsulPropertySource create(ConfigDataLoaderContext context,
-			ConsulConfigDataLocation location) {
-		ConsulPropertySource propertySource = new ConsulPropertySource(
-				location.getContext(), getBean(context, ConsulClient.class),
-				location.getProperties());
+	protected ConsulPropertySource create(ConfigDataLoaderContext context, ConsulConfigDataLocation location) {
+		ConsulPropertySource propertySource = new ConsulPropertySource(location.getContext(),
+				getBean(context, ConsulClient.class), location.getProperties());
 		propertySource.init();
 		addIndex(context, location, propertySource.getInitialIndex());
 		return propertySource;
 	}
 
-	private void addIndex(ConfigDataLoaderContext context,
-			ConsulConfigDataLocation location, Long consulIndex) {
+	private void addIndex(ConfigDataLoaderContext context, ConsulConfigDataLocation location, Long consulIndex) {
 		ConsulConfigIndexes indexes = getBean(context, ConsulConfigIndexes.class);
 		if (indexes != null) { // should never be the case
 			indexes.getIndexes().put(location.getContext(), consulIndex);

@@ -46,8 +46,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 				"spring.cloud.consul.discovery.instanceId=testConsulDiscovery2Id",
 				"spring.cloud.consul.discovery.hostname=testConsulDiscovery2Host",
 				"spring.cloud.consul.discovery.registerHealthCheck=false",
-				"spring.cloud.consul.discovery.tags=plaintag",
-				"spring.cloud.consul.discovery.metadata[foo]=bar",
+				"spring.cloud.consul.discovery.tags=plaintag", "spring.cloud.consul.discovery.metadata[foo]=bar",
 				"spring.cloud.consul.discovery.metadata[foo2]=bar2" },
 		webEnvironment = RANDOM_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
@@ -64,14 +63,12 @@ public class ConsulDiscoveryClientCustomizedTests {
 	}
 
 	private void assertNotIpAddress(ServiceInstance instance) {
-		assertThat(InetAddressUtils.isIPv4Address(instance.getHost()))
-				.as("host is an ip address").isFalse();
+		assertThat(InetAddressUtils.isIPv4Address(instance.getHost())).as("host is an ip address").isFalse();
 	}
 
 	@Test
 	public void getMetadataWorks() throws InterruptedException {
-		List<ServiceInstance> instances = this.discoveryClient
-				.getInstances("testConsulDiscovery2");
+		List<ServiceInstance> instances = this.discoveryClient.getInstances("testConsulDiscovery2");
 		assertThat(instances).as("instances was null").isNotNull();
 		assertThat(instances.isEmpty()).as("instances was empty").isFalse();
 
@@ -80,10 +77,8 @@ public class ConsulDiscoveryClientCustomizedTests {
 	}
 
 	private void assertInstance(ServiceInstance instance) {
-		assertThat(instance.getInstanceId()).as("instance id was wrong")
-				.isEqualTo("testConsulDiscovery2Id");
-		assertThat(instance.getServiceId()).as("service id was wrong")
-				.isEqualTo("testConsulDiscovery2");
+		assertThat(instance.getInstanceId()).as("instance id was wrong").isEqualTo("testConsulDiscovery2Id");
+		assertThat(instance.getServiceId()).as("service id was wrong").isEqualTo("testConsulDiscovery2");
 
 		Map<String, String> metadata = instance.getMetadata();
 		assertThat(metadata).as("metadata was null").isNotNull();

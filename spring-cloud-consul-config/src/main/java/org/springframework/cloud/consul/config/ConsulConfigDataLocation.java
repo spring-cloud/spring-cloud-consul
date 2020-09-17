@@ -29,8 +29,7 @@ public class ConsulConfigDataLocation extends ConfigDataLocation {
 
 	private final boolean optional;
 
-	public ConsulConfigDataLocation(ConsulConfigProperties properties, String context,
-			boolean optional) {
+	public ConsulConfigDataLocation(ConsulConfigProperties properties, String context, boolean optional) {
 		this.properties = properties;
 		this.context = context;
 		this.optional = optional;
@@ -68,8 +67,8 @@ public class ConsulConfigDataLocation extends ConfigDataLocation {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this).append("context", context)
-				.append("optional", optional).append("properties", properties).toString();
+		return new ToStringCreator(this).append("context", context).append("optional", optional)
+				.append("properties", properties).toString();
 
 	}
 

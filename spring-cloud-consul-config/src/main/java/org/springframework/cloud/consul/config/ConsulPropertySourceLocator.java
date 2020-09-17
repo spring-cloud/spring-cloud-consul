@@ -46,8 +46,7 @@ import static org.springframework.cloud.consul.config.ConsulConfigProperties.For
  * @author Spencer Gibb
  */
 @Order(0)
-public class ConsulPropertySourceLocator
-		implements PropertySourceLocator, ConsulConfigIndexes {
+public class ConsulPropertySourceLocator implements PropertySourceLocator, ConsulConfigIndexes {
 
 	private static final Log log = LogFactory.getLog(ConsulPropertySourceLocator.class);
 
@@ -59,8 +58,7 @@ public class ConsulPropertySourceLocator
 
 	private final LinkedHashMap<String, Long> contextIndex = new LinkedHashMap<>();
 
-	public ConsulPropertySourceLocator(ConsulClient consul,
-			ConsulConfigProperties properties) {
+	public ConsulPropertySourceLocator(ConsulClient consul, ConsulConfigProperties properties) {
 		this.consul = consul;
 		this.properties = properties;
 	}
@@ -106,8 +104,7 @@ public class ConsulPropertySourceLocator
 				suffixes.add(".properties");
 			}
 
-			String defaultContext = getContext(prefix,
-					this.properties.getDefaultContext());
+			String defaultContext = getContext(prefix, this.properties.getDefaultContext());
 
 			for (String suffix : suffixes) {
 				this.contexts.add(defaultContext + suffix);
@@ -133,8 +130,8 @@ public class ConsulPropertySourceLocator
 				try {
 					ConsulPropertySource propertySource = null;
 					if (this.properties.getFormat() == FILES) {
-						Response<GetValue> response = this.consul.getKVValue(
-								propertySourceContext, this.properties.getAclToken());
+						Response<GetValue> response = this.consul.getKVValue(propertySourceContext,
+								this.properties.getAclToken());
 						addIndex(propertySourceContext, response.getConsulIndex());
 						if (response.getValue() != null) {
 							ConsulFilesPropertySource filesPropertySource = new ConsulFilesPropertySource(
@@ -152,13 +149,11 @@ public class ConsulPropertySourceLocator
 				}
 				catch (Exception e) {
 					if (this.properties.isFailFast()) {
-						log.error(
-								"Fail fast is set and there was an error reading configuration from consul.");
+						log.error("Fail fast is set and there was an error reading configuration from consul.");
 						ReflectionUtils.rethrowRuntimeException(e);
 					}
 					else {
-						log.warn("Unable to load consul config from "
-								+ propertySourceContext, e);
+						log.warn("Unable to load consul config from " + propertySourceContext, e);
 					}
 				}
 			}
@@ -182,18 +177,15 @@ public class ConsulPropertySourceLocator
 	}
 
 	private ConsulPropertySource create(String context, Map<String, Long> contextIndex) {
-		ConsulPropertySource propertySource = new ConsulPropertySource(context,
-				this.consul, this.properties);
+		ConsulPropertySource propertySource = new ConsulPropertySource(context, this.consul, this.properties);
 		propertySource.init();
 		addIndex(context, propertySource.getInitialIndex());
 		return propertySource;
 	}
 
-	private void addProfiles(List<String> contexts, String baseContext,
-			List<String> profiles, String suffix) {
+	private void addProfiles(List<String> contexts, String baseContext, List<String> profiles, String suffix) {
 		for (String profile : profiles) {
-			contexts.add(baseContext + this.properties.getProfileSeparator() + profile
-					+ suffix);
+			contexts.add(baseContext + this.properties.getProfileSeparator() + profile + suffix);
 		}
 	}
 

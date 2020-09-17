@@ -43,10 +43,8 @@ public class ConsulPropertySourceLocatorRetryTests {
 					"spring.application.name=testConsulPropertySourceLocatorRetry",
 					"spring.config.use-legacy-processing=true",
 					"spring.cloud.consul.host=53210a7c-4809-42cb-8b30-057d2db85fcc",
-					"logging.level.org.springframework.retry=TRACE", "server.port=0",
-					"spring.cloud.consul.port=65530",
-					"spring.cloud.consul.retry.maxAttempts=1",
-					"spring.cloud.consul.config.failFast=true").run();
+					"logging.level.org.springframework.retry=TRACE", "server.port=0", "spring.cloud.consul.port=65530",
+					"spring.cloud.consul.retry.maxAttempts=1", "spring.cloud.consul.config.failFast=true").run();
 			Assert.fail("Did not throw TransportException");
 		});
 		assertThat(output).contains("RetryContext retrieved");

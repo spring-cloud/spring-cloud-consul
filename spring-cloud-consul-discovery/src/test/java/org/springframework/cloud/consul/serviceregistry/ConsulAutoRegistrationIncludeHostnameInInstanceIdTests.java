@@ -39,10 +39,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author varnson
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		classes = ConsulAutoRegistrationIncludeHostnameInInstanceIdTests.TestConfig.class,
-		properties = {
-				"spring.application.name=myTestService-IncludeHostnameInInstanceId",
+@SpringBootTest(classes = ConsulAutoRegistrationIncludeHostnameInInstanceIdTests.TestConfig.class,
+		properties = { "spring.application.name=myTestService-IncludeHostnameInInstanceId",
 				"spring.cloud.consul.discovery.include-hostname-in-instance-id=true",
 				"spring.cloud.client.hostname=testhostname" },
 		webEnvironment = RANDOM_PORT)
@@ -63,15 +61,13 @@ public class ConsulAutoRegistrationIncludeHostnameInInstanceIdTests {
 		NewService.Check check = service.getCheck();
 		assertThat(service.getId()).as("id is null").isNotNull();
 		assertThat(service.getId()).as("id no include hostname").contains("testhostname");
-		assertThat(service.getId()).as("service id was wrong")
-				.isEqualTo(this.registration.getInstanceId());
+		assertThat(service.getId()).as("service id was wrong").isEqualTo(this.registration.getInstanceId());
 
 	}
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
-			ConsulAutoConfiguration.class,
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestConfig {
 

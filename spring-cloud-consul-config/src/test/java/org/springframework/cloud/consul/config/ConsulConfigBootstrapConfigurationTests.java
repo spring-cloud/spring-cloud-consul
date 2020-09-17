@@ -36,16 +36,11 @@ public class ConsulConfigBootstrapConfigurationTests {
 	 */
 	@Test
 	public void testConfigPropsBeanBacksOff() {
-		this.contextRunner.withUserConfiguration(TestConfig.class)
-				.withInitializer(new ConsulTestcontainers())
-				.withUserConfiguration(ConsulConfigBootstrapConfiguration.class)
-				.run(context -> {
-					ConsulConfigProperties config = context
-							.getBean(ConsulConfigProperties.class);
-					assertThat(config.getPrefix()).as("Prefix did not match")
-							.isEqualTo("platform-config");
-					assertThat(config.getDefaultContext())
-							.as("Default context did not match").isEqualTo("defaults");
+		this.contextRunner.withUserConfiguration(TestConfig.class).withInitializer(new ConsulTestcontainers())
+				.withUserConfiguration(ConsulConfigBootstrapConfiguration.class).run(context -> {
+					ConsulConfigProperties config = context.getBean(ConsulConfigProperties.class);
+					assertThat(config.getPrefix()).as("Prefix did not match").isEqualTo("platform-config");
+					assertThat(config.getDefaultContext()).as("Default context did not match").isEqualTo("defaults");
 				});
 	}
 
@@ -57,12 +52,9 @@ public class ConsulConfigBootstrapConfigurationTests {
 	public void testConfigPropsBeanKicksIn() {
 		this.contextRunner.withUserConfiguration(ConsulConfigBootstrapConfiguration.class)
 				.withInitializer(new ConsulTestcontainers()).run(context -> {
-					ConsulConfigProperties config = context
-							.getBean(ConsulConfigProperties.class);
-					assertThat(config.getPrefix()).as("Prefix did not match")
-							.isEqualTo("config");
-					assertThat(config.getDefaultContext())
-							.as("Default context did not match").isEqualTo("application");
+					ConsulConfigProperties config = context.getBean(ConsulConfigProperties.class);
+					assertThat(config.getPrefix()).as("Prefix did not match").isEqualTo("config");
+					assertThat(config.getDefaultContext()).as("Default context did not match").isEqualTo("application");
 				});
 	}
 

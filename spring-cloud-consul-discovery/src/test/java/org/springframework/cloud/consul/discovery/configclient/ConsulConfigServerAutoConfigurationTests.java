@@ -45,31 +45,22 @@ public class ConsulConfigServerAutoConfigurationTests {
 
 	@Test
 	public void offByDefault() {
-		this.context = new AnnotationConfigApplicationContext(
-				ConsulConfigServerAutoConfiguration.class);
-		assertThat(
-				this.context.getBeanNamesForType(ConsulDiscoveryProperties.class).length)
-						.isEqualTo(0);
+		this.context = new AnnotationConfigApplicationContext(ConsulConfigServerAutoConfiguration.class);
+		assertThat(this.context.getBeanNamesForType(ConsulDiscoveryProperties.class).length).isEqualTo(0);
 	}
 
 	@Test
 	public void onWhenRequested() {
-		setup("spring.cloud.config.server.prefix=/config",
-				"spring.cloud.consul.discovery.tags-as-metadata=false");
-		assertThat(
-				this.context.getBeanNamesForType(ConsulDiscoveryProperties.class).length)
-						.isEqualTo(1);
-		ConsulDiscoveryProperties properties = this.context
-				.getBean(ConsulDiscoveryProperties.class);
+		setup("spring.cloud.config.server.prefix=/config", "spring.cloud.consul.discovery.tags-as-metadata=false");
+		assertThat(this.context.getBeanNamesForType(ConsulDiscoveryProperties.class).length).isEqualTo(1);
+		ConsulDiscoveryProperties properties = this.context.getBean(ConsulDiscoveryProperties.class);
 		assertThat(properties.getMetadata()).containsEntry("configPath", "/config");
 	}
 
 	private void setup(String... env) {
-		this.context = new SpringApplicationBuilder(
-				PropertyPlaceholderAutoConfiguration.class,
+		this.context = new SpringApplicationBuilder(PropertyPlaceholderAutoConfiguration.class,
 				ConsulConfigServerAutoConfiguration.class, ConfigServerProperties.class,
-				ConsulDiscoveryProperties.class).web(WebApplicationType.NONE)
-						.properties(env).run();
+				ConsulDiscoveryProperties.class).web(WebApplicationType.NONE).properties(env).run();
 	}
 
 }

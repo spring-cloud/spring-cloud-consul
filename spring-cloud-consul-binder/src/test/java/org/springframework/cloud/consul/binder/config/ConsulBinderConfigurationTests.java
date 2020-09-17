@@ -43,8 +43,7 @@ public class ConsulBinderConfigurationTests {
 	@Ignore // FIXME 2.0.0 need stream fix
 	public void consulBinderDisabledWorks() {
 		this.exception.expectMessage(containsString("no proper implementation found"));
-		new SpringApplicationBuilder(Application.class)
-				.initializers(new ConsulTestcontainers())
+		new SpringApplicationBuilder(Application.class).initializers(new ConsulTestcontainers())
 				.properties("spring.cloud.consul.binder.enabled=false").run();
 	}
 
@@ -52,8 +51,7 @@ public class ConsulBinderConfigurationTests {
 	@Ignore // FIXME 2.0.0 need stream fix
 	public void consulDisabledDisablesBinder() {
 		this.exception.expectMessage(containsString("no proper implementation found"));
-		new SpringApplicationBuilder(Application.class)
-				.initializers(new ConsulTestcontainers())
+		new SpringApplicationBuilder(Application.class).initializers(new ConsulTestcontainers())
 				.properties("spring.cloud.consul.enabled=false").run();
 	}
 

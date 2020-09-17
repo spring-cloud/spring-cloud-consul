@@ -45,8 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulServiceRegistryCheckTtlTests.TestConfig.class,
-		properties = {
-				"spring.application.name=myConsulServiceRegistryCheckTtlTestService-S",
+		properties = { "spring.application.name=myConsulServiceRegistryCheckTtlTestService-S",
 				"spring.cloud.consul.discovery.heartbeat.enabled=true" },
 		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
@@ -70,10 +69,8 @@ public class ConsulServiceRegistryCheckTtlTests {
 	private ConsulRegistration createHttpRegistration() {
 		NewService service = this.registration.getService();
 		NewService.Check httpCheck = new NewService.Check();
-		httpCheck.setHttp(
-				String.format("%s://%s:%s%s", this.discoveryProperties.getScheme(),
-						this.discoveryProperties.getHostname(), this.port,
-						this.discoveryProperties.getHealthCheckPath()));
+		httpCheck.setHttp(String.format("%s://%s:%s%s", this.discoveryProperties.getScheme(),
+				this.discoveryProperties.getHostname(), this.port, this.discoveryProperties.getHealthCheckPath()));
 		httpCheck.setInterval(this.discoveryProperties.getHealthCheckInterval());
 		NewService httpService = new NewService();
 		httpService.setId(service.getId() + "-http");
@@ -87,18 +84,13 @@ public class ConsulServiceRegistryCheckTtlTests {
 		ConsulRegistration httpRegistration = createHttpRegistration();
 		try {
 			this.consulServiceRegistry.register(httpRegistration);
-			Field serviceHeartbeatsField = TtlScheduler.class
-					.getDeclaredField("serviceHeartbeats");
+			Field serviceHeartbeatsField = TtlScheduler.class.getDeclaredField("serviceHeartbeats");
 			serviceHeartbeatsField.setAccessible(true);
 			Map serviceHeartbeats = (Map) serviceHeartbeatsField.get(this.ttlScheduler);
-			assertThat(serviceHeartbeats.keySet()
-					.contains(this.registration.getInstanceId())).as(
-							"Service with heartbeat check not registered in TTL scheduler")
-							.isTrue();
-			assertThat(
-					serviceHeartbeats.keySet().contains(httpRegistration.getInstanceId()))
-							.as("Service with HTTP check registered in TTL scheduler")
-							.isFalse();
+			assertThat(serviceHeartbeats.keySet().contains(this.registration.getInstanceId()))
+					.as("Service with heartbeat check not registered in TTL scheduler").isTrue();
+			assertThat(serviceHeartbeats.keySet().contains(httpRegistration.getInstanceId()))
+					.as("Service with HTTP check registered in TTL scheduler").isFalse();
 		}
 		finally {
 			this.consulServiceRegistry.deregister(httpRegistration);
@@ -107,10 +99,8 @@ public class ConsulServiceRegistryCheckTtlTests {
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
-			ConsulAutoConfiguration.class,
-			ConsulAutoServiceRegistrationAutoConfiguration.class,
-			ConsulHeartbeatAutoConfiguration.class })
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
+			ConsulAutoServiceRegistrationAutoConfiguration.class, ConsulHeartbeatAutoConfiguration.class })
 	protected static class TestConfig {
 
 	}

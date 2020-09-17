@@ -45,8 +45,7 @@ public class ConsulDiscoveryClientConfigurationTests {
 
 	@Test
 	public void consulConfigNotLoadedWhenDiscoveryClientDisabled() {
-		TestPropertyValues.of("spring.cloud.discovery.enabled=false")
-				.applyTo(this.context);
+		TestPropertyValues.of("spring.cloud.discovery.enabled=false").applyTo(this.context);
 		setupContext();
 		assertBeanNotPresent(ConsulDiscoveryProperties.class);
 		assertBeanNotPresent(ConsulDiscoveryClient.class);
@@ -55,9 +54,8 @@ public class ConsulDiscoveryClientConfigurationTests {
 
 	private void setupContext(Class<?>... config) {
 		ConfigurationPropertySources.attach(this.context.getEnvironment());
-		this.context.register(UtilAutoConfiguration.class,
-				PropertyPlaceholderAutoConfiguration.class, ConsulAutoConfiguration.class,
-				ConsulDiscoveryClientConfiguration.class);
+		this.context.register(UtilAutoConfiguration.class, PropertyPlaceholderAutoConfiguration.class,
+				ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class);
 		for (Class<?> value : config) {
 			this.context.register(value);
 		}

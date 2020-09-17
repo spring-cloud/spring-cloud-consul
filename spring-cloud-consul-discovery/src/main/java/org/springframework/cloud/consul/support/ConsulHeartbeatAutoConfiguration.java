@@ -52,8 +52,7 @@ public class ConsulHeartbeatAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties,
-			ConsulClient consulClient) {
+	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties, ConsulClient consulClient) {
 		return new TtlScheduler(heartbeatProperties, consulClient);
 	}
 

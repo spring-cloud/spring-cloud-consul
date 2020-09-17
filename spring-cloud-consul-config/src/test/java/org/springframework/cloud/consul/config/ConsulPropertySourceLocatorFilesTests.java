@@ -66,22 +66,17 @@ public class ConsulPropertySourceLocatorFilesTests {
 		ConsulTestcontainers.start();
 		this.client = ConsulTestcontainers.client();
 		this.client.setKVValue(ROOT + APPLICATION_YML, "foo: bar\nmy.baz: ${foo}");
-		this.client.setKVValue(ROOT + APPLICATION_DEV_YML,
-				"foo: bar-dev\nmy.baz: ${foo}");
+		this.client.setKVValue(ROOT + APPLICATION_DEV_YML, "foo: bar-dev\nmy.baz: ${foo}");
 		this.client.setKVValue(ROOT + "/master.ref", UUID.randomUUID().toString());
 		this.client.setKVValue(ROOT + APP_NAME_PROPS, "foo: bar-app\nmy.baz: ${foo}");
-		this.client.setKVValue(ROOT + APP_NAME_DEV_PROPS,
-				"foo: bar-app-dev\nmy.baz: ${foo}");
+		this.client.setKVValue(ROOT + APP_NAME_DEV_PROPS, "foo: bar-app-dev\nmy.baz: ${foo}");
 
-		this.context = new SpringApplicationBuilder(Config.class)
-				.web(WebApplicationType.NONE).run("--spring.application.name=" + APP_NAME,
-						"--spring.config.use-legacy-processing=true",
-						"--spring.cloud.consul.host=" + ConsulTestcontainers.getHost(),
-						"--spring.cloud.consul.port=" + ConsulTestcontainers.getPort(),
-						"--spring.cloud.consul.config.prefix=" + ROOT,
-						"--spring.cloud.consul.config.format=FILES",
-						"--spring.profiles.active=dev",
-						"spring.cloud.consul.config.watch.delay=1");
+		this.context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE).run(
+				"--spring.application.name=" + APP_NAME, "--spring.config.use-legacy-processing=true",
+				"--spring.cloud.consul.host=" + ConsulTestcontainers.getHost(),
+				"--spring.cloud.consul.port=" + ConsulTestcontainers.getPort(),
+				"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.format=FILES",
+				"--spring.profiles.active=dev", "spring.cloud.consul.config.watch.delay=1");
 
 		this.client = this.context.getBean(ConsulClient.class);
 		this.environment = this.context.getEnvironment();
@@ -111,10 +106,8 @@ public class ConsulPropertySourceLocatorFilesTests {
 		assertFilePropertySourceExists(propertySources, APPLICATION_YML);
 	}
 
-	private void assertFilePropertySourceExists(MutablePropertySources propertySources,
-			String name) {
-		boolean found = propertySources.stream()
-				.anyMatch(propertySource -> propertySource.getName().endsWith(name));
+	private void assertFilePropertySourceExists(MutablePropertySources propertySources, String name) {
+		boolean found = propertySources.stream().anyMatch(propertySource -> propertySource.getName().endsWith(name));
 		assertThat(found).as("missing consul filesource: " + name).isTrue();
 	}
 

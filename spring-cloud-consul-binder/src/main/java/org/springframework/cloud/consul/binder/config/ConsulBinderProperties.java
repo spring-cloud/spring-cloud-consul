@@ -40,8 +40,7 @@ public class ConsulBinderProperties {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this).append("eventTimeout", this.eventTimeout)
-				.toString();
+		return new ToStringCreator(this).append("eventTimeout", this.eventTimeout).toString();
 	}
 
 }

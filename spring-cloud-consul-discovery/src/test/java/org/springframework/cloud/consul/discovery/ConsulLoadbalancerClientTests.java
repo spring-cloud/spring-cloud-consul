@@ -40,8 +40,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @RunWith(SpringRunner.class)
 @SpringBootTest(
 		properties = { "spring.application.name=testConsulLoadBalancer",
-				"spring.cloud.consul.discovery.prefer-ip-address=true",
-				"spring.cloud.consul.discovery.tags=foo=bar" },
+				"spring.cloud.consul.discovery.prefer-ip-address=true", "spring.cloud.consul.discovery.tags=foo=bar" },
 		webEnvironment = RANDOM_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulLoadbalancerClientTests {
@@ -61,8 +60,7 @@ public class ConsulLoadbalancerClientTests {
 	}
 
 	private void assertIpAddress(ServiceInstance instance) {
-		assertThat(Character.isDigit(instance.getHost().charAt(0)))
-				.as("host isn't an ip address").isTrue();
+		assertThat(Character.isDigit(instance.getHost().charAt(0))).as("host isn't an ip address").isTrue();
 	}
 
 	@SpringBootConfiguration

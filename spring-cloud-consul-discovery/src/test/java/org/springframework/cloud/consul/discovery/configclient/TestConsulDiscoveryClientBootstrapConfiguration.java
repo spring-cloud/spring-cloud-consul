@@ -29,17 +29,15 @@ import org.springframework.context.annotation.Configuration;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-@ConditionalOnProperty(value = "spring.cloud.consul.discovery.test.enabled",
-		matchIfMissing = false)
+@ConditionalOnProperty(value = "spring.cloud.consul.discovery.test.enabled", matchIfMissing = false)
 @Configuration(proxyBeanMethods = false)
 public class TestConsulDiscoveryClientBootstrapConfiguration {
 
 	@Bean
-	public ConsulDiscoveryClient consulDiscoveryClient(
-			ConsulDiscoveryProperties properties) {
+	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties properties) {
 		ConsulDiscoveryClient client = mock(ConsulDiscoveryClient.class);
-		ServiceInstance instance = new DefaultServiceInstance("configserver1",
-				"configserver", properties.getHostname(), properties.getPort(), false);
+		ServiceInstance instance = new DefaultServiceInstance("configserver1", "configserver", properties.getHostname(),
+				properties.getPort(), false);
 		given(client.getInstances("configserver")).willReturn(Arrays.asList(instance));
 		return client;
 	}

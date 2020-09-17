@@ -43,12 +43,11 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Alexey Savchuk (devpreview)
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {
-		ConsulAutoServiceRegistrationManagementCustomizerTests.TestConfig.class,
-		ConsulAutoServiceRegistrationManagementCustomizerTests.ManagementConfig.class },
+@SpringBootTest(
+		classes = { ConsulAutoServiceRegistrationManagementCustomizerTests.TestConfig.class,
+				ConsulAutoServiceRegistrationManagementCustomizerTests.ManagementConfig.class },
 		properties = { "spring.application.name=myTestService-SS",
-				"spring.cloud.consul.discovery.registerHealthCheck=false",
-				"management.server.port=4453" },
+				"spring.cloud.consul.discovery.registerHealthCheck=false", "management.server.port=4453" },
 		webEnvironment = RANDOM_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoServiceRegistrationManagementCustomizerTests {
@@ -61,17 +60,11 @@ public class ConsulAutoServiceRegistrationManagementCustomizerTests {
 
 	@Test
 	public void contextLoads() {
-		ConsulAutoRegistration managementRegistration = this.autoRegistration
-				.managementRegistration();
+		ConsulAutoRegistration managementRegistration = this.autoRegistration.managementRegistration();
 		List<NewService.Check> checks = managementRegistration.getService().getChecks();
-		List<String> ttls = checks.stream().map(NewService.Check::getTtl)
-				.collect(Collectors.toList());
-		assertThat(ttls.contains("39s"))
-				.as("Management registration not customized with 'foo' customizer")
-				.isTrue();
-		assertThat(ttls.contains("36s"))
-				.as("Management registration not customized with 'bar' customizer")
-				.isTrue();
+		List<String> ttls = checks.stream().map(NewService.Check::getTtl).collect(Collectors.toList());
+		assertThat(ttls.contains("39s")).as("Management registration not customized with 'foo' customizer").isTrue();
+		assertThat(ttls.contains("36s")).as("Management registration not customized with 'bar' customizer").isTrue();
 	}
 
 	@Configuration(proxyBeanMethods = false)
@@ -105,8 +98,7 @@ public class ConsulAutoServiceRegistrationManagementCustomizerTests {
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
-			ConsulAutoConfiguration.class,
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestConfig {
 

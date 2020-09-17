@@ -47,8 +47,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Lomesh Patel (lomeshpatel)
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		classes = ConsulAutoServiceRegistrationCustomizedManagementServicePortTests.TestConfig.class,
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedManagementServicePortTests.TestConfig.class,
 		properties = { "spring.application.name=myTestService-GG",
 				"spring.cloud.consul.discovery.instanceId=myTestService1-GG",
 				"spring.cloud.consul.discovery.registerHealthCheck=false",
@@ -76,37 +75,30 @@ public class ConsulAutoServiceRegistrationCustomizedManagementServicePortTests {
 		final Service service = services.get("myTestService1-GG");
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort().intValue()).as("service port was 0").isNotEqualTo(0);
-		assertThat(service.getId()).as("service id was wrong")
-				.isEqualTo("myTestService1-GG");
-		assertThat(service.getService()).as("service name was wrong")
-				.isEqualTo("myprefix-myTestService-GG");
-		assertThat(StringUtils.isEmpty(service.getAddress()))
-				.as("service address must not be empty").isFalse();
-		assertThat(service.getAddress())
-				.as("service address must equals hostname from discovery properties")
+		assertThat(service.getId()).as("service id was wrong").isEqualTo("myTestService1-GG");
+		assertThat(service.getService()).as("service name was wrong").isEqualTo("myprefix-myTestService-GG");
+		assertThat(StringUtils.isEmpty(service.getAddress())).as("service address must not be empty").isFalse();
+		assertThat(service.getAddress()).as("service address must equals hostname from discovery properties")
 				.isEqualTo(this.discoveryProperties.getHostname());
 
 		final Service managementService = services.get("myTestService1-GG-management");
 		assertThat(managementService).as("management service was null").isNotNull();
-		assertThat(managementService.getPort().intValue())
-				.as("management service port is not 4452").isEqualTo(4452);
-		assertThat(this.managementServerProperties.getPort().intValue())
-				.as("management port is not 0").isEqualTo(0);
+		assertThat(managementService.getPort().intValue()).as("management service port is not 4452").isEqualTo(4452);
+		assertThat(this.managementServerProperties.getPort().intValue()).as("management port is not 0").isEqualTo(0);
 		assertThat(managementService.getId()).as("management service id was wrong")
 				.isEqualTo("myTestService1-GG-management");
 		assertThat(managementService.getService()).as("management service name was wrong")
 				.isEqualTo("myprefix-myTestService-GG-management");
 		assertThat(StringUtils.isEmpty(managementService.getAddress()))
 				.as("management service address must not be empty").isFalse();
-		assertThat(managementService.getAddress()).as(
-				"management service address must equals hostname from discovery properties")
+		assertThat(managementService.getAddress())
+				.as("management service address must equals hostname from discovery properties")
 				.isEqualTo(this.discoveryProperties.getHostname());
 	}
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
-			ConsulAutoConfiguration.class,
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestConfig {
 

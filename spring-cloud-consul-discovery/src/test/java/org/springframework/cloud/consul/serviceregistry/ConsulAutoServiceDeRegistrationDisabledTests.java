@@ -62,10 +62,8 @@ public class ConsulAutoServiceDeRegistrationDisabledTests {
 
 	@Test
 	public void contextLoads() {
-		assertThat(this.autoServiceRegistration)
-				.as("ConsulAutoServiceRegistration was not created").isNotNull();
-		assertThat(this.discoveryProperties)
-				.as("ConsulDiscoveryProperties was not created").isNotNull();
+		assertThat(this.autoServiceRegistration).as("ConsulAutoServiceRegistration was not created").isNotNull();
+		assertThat(this.discoveryProperties).as("ConsulDiscoveryProperties was not created").isNotNull();
 
 		checkService(true);
 		this.autoServiceRegistration.deregister();
@@ -89,8 +87,7 @@ public class ConsulAutoServiceDeRegistrationDisabledTests {
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
-			ConsulAutoConfiguration.class,
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestConfig {
 

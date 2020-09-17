@@ -31,8 +31,7 @@ public class ConsulServletRegistrationCustomizer implements ConsulRegistrationCu
 
 	private ObjectProvider<ServletContext> servletContext;
 
-	public ConsulServletRegistrationCustomizer(
-			ObjectProvider<ServletContext> servletContext) {
+	public ConsulServletRegistrationCustomizer(ObjectProvider<ServletContext> servletContext) {
 		this.servletContext = servletContext;
 	}
 
