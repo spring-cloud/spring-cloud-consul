@@ -75,8 +75,8 @@ public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigData
 	}
 
 	protected <T> T getBean(ConfigDataLoaderContext context, Class<T> type) {
-		if (context.getBootstrapRegistry().isRegistered(type)) {
-			return context.getBootstrapRegistry().get(type);
+		if (context.getBootstrapContext().isRegistered(type)) {
+			return context.getBootstrapContext().get(type);
 		}
 		return null;
 	}
