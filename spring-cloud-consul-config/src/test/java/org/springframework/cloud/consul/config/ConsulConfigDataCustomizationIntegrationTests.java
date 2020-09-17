@@ -54,7 +54,7 @@ public class ConsulConfigDataCustomizationIntegrationTests {
 
 		SpringApplication application = new SpringApplication(Config.class);
 		application.setWebApplicationType(WebApplicationType.NONE);
-		application.addBootstrapper(ConsulBootstrapper.withConsulClient(TestConsulClient::new));
+		application.addBootstrapper(ConsulBootstrapper.fromConsulProperties(TestConsulClient::new));
 		context = application.run("--spring.application.name=" + APP_NAME,
 				"--spring.config.import=consul:" + ConsulTestcontainers.getHost() + ":"
 						+ ConsulTestcontainers.getPort(),

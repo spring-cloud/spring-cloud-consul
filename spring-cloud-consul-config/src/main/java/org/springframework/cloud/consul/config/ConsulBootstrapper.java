@@ -20,16 +20,21 @@ import java.util.function.Function;
 
 import com.ecwid.consul.v1.ConsulClient;
 
+import org.springframework.boot.BootstrapContext;
 import org.springframework.boot.Bootstrapper;
 import org.springframework.cloud.consul.ConsulProperties;
 
 public abstract class ConsulBootstrapper {
 
-	static Bootstrapper withConsulClient(Function<ConsulProperties, ConsulClient> factory) {
+	static Bootstrapper fromConsulProperties(Function<ConsulProperties, ConsulClient> factory) {
 		return registry -> registry.register(ConsulClient.class, context -> {
 			ConsulProperties properties = context.get(ConsulProperties.class);
 			return factory.apply(properties);
 		});
+	}
+
+	static Bootstrapper fromBootstrapContext(Function<BootstrapContext, ConsulClient> factory) {
+		return registry -> registry.register(ConsulClient.class, factory::apply);
 	}
 
 }
