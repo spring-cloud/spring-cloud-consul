@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.context.config.ConfigDataLocationResolverContext;
@@ -39,7 +40,7 @@ public class ConsulConfigDataLocationResolverTests {
 
 	@Test
 	public void testParseLocation() {
-		ConsulConfigDataLocationResolver resolver = new ConsulConfigDataLocationResolver();
+		ConsulConfigDataLocationResolver resolver = new ConsulConfigDataLocationResolver(LogFactory.getLog(getClass()));
 		UriComponents uriComponents = resolver.parseLocation(null, "consul:myhost:8501/mypath1;/mypath2;/mypath3");
 		assertThat(uriComponents.toUri()).hasScheme("consul").hasHost("myhost").hasPort(8501)
 				.hasPath("/mypath1;/mypath2;/mypath3");
@@ -89,7 +90,7 @@ public class ConsulConfigDataLocationResolverTests {
 	}
 
 	private ConsulConfigDataLocationResolver createResolver() {
-		ConsulConfigDataLocationResolver resolver = new ConsulConfigDataLocationResolver() {
+		return new ConsulConfigDataLocationResolver(LogFactory.getLog(getClass())) {
 			@Override
 			public <T> void registerBean(ConfigDataLocationResolverContext context, Class<T> type, T instance) {
 
@@ -107,7 +108,6 @@ public class ConsulConfigDataLocationResolverTests {
 				// do nothing
 			}
 		};
-		return resolver;
 	}
 
 }

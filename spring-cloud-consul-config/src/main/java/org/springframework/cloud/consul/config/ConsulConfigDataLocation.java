@@ -29,14 +29,14 @@ public class ConsulConfigDataLocation extends ConfigDataLocation {
 
 	private final boolean optional;
 
-	public ConsulConfigDataLocation(ConsulConfigProperties properties, String context, boolean optional) {
+	private final ConsulPropertySources consulPropertySources;
+
+	public ConsulConfigDataLocation(String context, boolean optional, ConsulConfigProperties properties,
+			ConsulPropertySources consulPropertySources) {
 		this.properties = properties;
 		this.context = context;
 		this.optional = optional;
-	}
-
-	public ConsulConfigProperties getProperties() {
-		return this.properties;
+		this.consulPropertySources = consulPropertySources;
 	}
 
 	public String getContext() {
@@ -45,6 +45,14 @@ public class ConsulConfigDataLocation extends ConfigDataLocation {
 
 	public boolean isOptional() {
 		return this.optional;
+	}
+
+	public ConsulConfigProperties getProperties() {
+		return this.properties;
+	}
+
+	public ConsulPropertySources getConsulPropertySources() {
+		return this.consulPropertySources;
 	}
 
 	@Override
@@ -56,13 +64,12 @@ public class ConsulConfigDataLocation extends ConfigDataLocation {
 			return false;
 		}
 		ConsulConfigDataLocation that = (ConsulConfigDataLocation) o;
-		return this.optional == that.optional && this.properties.equals(that.properties)
-				&& this.context.equals(that.context);
+		return this.optional == that.optional && this.context.equals(that.context);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.properties, this.context, this.optional);
+		return Objects.hash(this.context, this.optional);
 	}
 
 	@Override

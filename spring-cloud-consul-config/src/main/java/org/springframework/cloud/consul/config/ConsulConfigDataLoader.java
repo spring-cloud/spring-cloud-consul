@@ -19,59 +19,34 @@ package org.springframework.cloud.consul.config;
 import java.util.Collections;
 
 import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.kv.model.GetValue;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import org.springframework.boot.context.config.ConfigData;
 import org.springframework.boot.context.config.ConfigDataLoader;
 import org.springframework.boot.context.config.ConfigDataLoaderContext;
 import org.springframework.boot.context.config.ConfigDataLocationNotFoundException;
 
-import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
-
 public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigDataLocation> {
 
-	private static final Log log = LogFactory.getLog(ConsulConfigDataLoader.class);
+	private final Log log;
+
+	public ConsulConfigDataLoader(Log log) {
+		this.log = log;
+	}
 
 	@Override
 	public ConfigData load(ConfigDataLoaderContext context, ConsulConfigDataLocation location) {
 		try {
 			ConsulClient consul = getBean(context, ConsulClient.class);
-			ConsulConfigProperties properties = location.getProperties();
-			ConsulPropertySource propertySource = null;
+			ConsulConfigIndexes indexes = getBean(context, ConsulConfigIndexes.class);
 
-			if (properties.getFormat() == FILES) {
-				Response<GetValue> response = consul.getKVValue(location.getContext(), properties.getAclToken());
-				addIndex(context, location, response.getConsulIndex());
-				if (response.getValue() != null) {
-					ConsulFilesPropertySource filesPropertySource = new ConsulFilesPropertySource(location.getContext(),
-							consul, properties);
-					filesPropertySource.init(response.getValue());
-					propertySource = filesPropertySource;
-				}
-				else if (!location.isOptional()) {
-					throw new ConfigDataLocationNotFoundException(location);
-				}
-			}
-			else {
-				propertySource = create(context, location);
-			}
+			ConsulPropertySource propertySource = location.getConsulPropertySources().createPropertySource(
+					location.getContext(), location.isOptional(), consul, indexes.getIndexes()::put);
 			return new ConfigData(Collections.singletonList(propertySource));
 		}
-		catch (ConfigDataLocationNotFoundException e) {
-			throw e;
-		}
 		catch (Exception e) {
-			if (location.getProperties().isFailFast() || !location.isOptional()) {
-				throw new ConfigDataLocationNotFoundException(location, e);
-			}
-			else {
-				log.warn("Unable to load consul config from " + location.getContext(), e);
-			}
+			throw new ConfigDataLocationNotFoundException(location, e);
 		}
-		return null;
 	}
 
 	protected <T> T getBean(ConfigDataLoaderContext context, Class<T> type) {
@@ -79,21 +54,6 @@ public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigData
 			return context.getBootstrapContext().get(type);
 		}
 		return null;
-	}
-
-	protected ConsulPropertySource create(ConfigDataLoaderContext context, ConsulConfigDataLocation location) {
-		ConsulPropertySource propertySource = new ConsulPropertySource(location.getContext(),
-				getBean(context, ConsulClient.class), location.getProperties());
-		propertySource.init();
-		addIndex(context, location, propertySource.getInitialIndex());
-		return propertySource;
-	}
-
-	private void addIndex(ConfigDataLoaderContext context, ConsulConfigDataLocation location, Long consulIndex) {
-		ConsulConfigIndexes indexes = getBean(context, ConsulConfigIndexes.class);
-		if (indexes != null) { // should never be the case
-			indexes.getIndexes().put(location.getContext(), consulIndex);
-		}
 	}
 
 }

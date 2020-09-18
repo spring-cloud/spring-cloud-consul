@@ -21,7 +21,6 @@ import com.ecwid.consul.v1.ConsulClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
@@ -44,12 +43,6 @@ public class ConsulConfigAutoConfiguration {
 	 * Name of the config watch task scheduler bean.
 	 */
 	public static final String CONFIG_WATCH_TASK_SCHEDULER_NAME = "configWatchTaskScheduler";
-
-	@Bean
-	@ConditionalOnMissingBean
-	public ConsulConfigProperties consulConfigProperties() {
-		return new ConsulConfigProperties();
-	}
 
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(RefreshEndpoint.class)
