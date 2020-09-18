@@ -96,7 +96,8 @@ public class ConsulConfigDataLocationResolverTests {
 			}
 
 			@Override
-			protected <T> void registerBean(ConfigDataLocationResolverContext context, Class<T> type, Supplier<T> supplier) {
+			protected <T> void registerBean(ConfigDataLocationResolverContext context, Class<T> type,
+					Supplier<T> supplier) {
 
 			}
 
