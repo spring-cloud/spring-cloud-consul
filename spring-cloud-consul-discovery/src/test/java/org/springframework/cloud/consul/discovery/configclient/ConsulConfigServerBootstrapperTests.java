@@ -40,7 +40,7 @@ public class ConsulConfigServerBootstrapperTests {
 	}
 
 	@Test
-	public void enabledDoesAddsInstanceProviderFn() {
+	public void enabledAddsInstanceProviderFn() {
 		new SpringApplicationBuilder(TestConfig.class)
 				.properties("spring.cloud.config.discovery.enabled=true",
 						"spring.cloud.service-registry.auto-registration.enabled=false")
