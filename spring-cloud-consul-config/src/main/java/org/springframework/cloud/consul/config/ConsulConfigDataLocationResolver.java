@@ -21,12 +21,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.ecwid.consul.v1.ConsulClient;
 import org.apache.commons.logging.Log;
 
+import org.springframework.boot.BootstrapContext;
 import org.springframework.boot.BootstrapRegistry.InstanceSupplier;
 import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.config.ConfigDataLocationNotFoundException;
@@ -82,12 +82,12 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 	}
 
 	@Override
-	public List<ConsulConfigDataLocation> resolveProfileSpecific(ConfigDataLocationResolverContext context,
+	public List<ConsulConfigDataLocation> resolveProfileSpecific(ConfigDataLocationResolverContext resolverContext,
 			String location, boolean optional, Profiles profiles) throws ConfigDataLocationNotFoundException {
 
-		UriComponents locationUri = parseLocation(context, location);
+		UriComponents locationUri = parseLocation(resolverContext, location);
 
-		ConsulConfigProperties properties = loadConfigProperties(context.getBinder());
+		ConsulConfigProperties properties = loadConfigProperties(resolverContext.getBinder());
 
 		ConsulPropertySources consulPropertySources = new ConsulPropertySources(properties, log);
 
@@ -95,13 +95,14 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 				? consulPropertySources.getAutomaticContexts(profiles.getAccepted())
 				: getCustomContexts(locationUri, properties);
 
-		registerBean(context, ConsulProperties.class, loadProperties(context.getBinder(), locationUri));
+		registerBean(resolverContext, ConsulProperties.class, loadProperties(resolverContext.getBinder(), locationUri));
 
-		registerAndPromoteBean(context, ConsulConfigProperties.class, () -> properties);
+		registerAndPromoteBean(resolverContext, ConsulConfigProperties.class, InstanceSupplier.of(properties));
 
-		registerAndPromoteBean(context, ConsulClient.class, () -> createConsulClient(context));
+		registerAndPromoteBean(resolverContext, ConsulClient.class, this::createConsulClient);
 
-		registerAndPromoteBean(context, ConsulConfigIndexes.class, ConsulConfigDataIndexes::new);
+		registerAndPromoteBean(resolverContext, ConsulConfigIndexes.class,
+				InstanceSupplier.from(ConsulConfigDataIndexes::new));
 
 		return contexts.stream().map(propertySourceContext -> new ConsulConfigDataLocation(propertySourceContext,
 				optional, properties, consulPropertySources)).collect(Collectors.toList());
@@ -144,12 +145,8 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		return UriComponentsBuilder.fromUriString(uri).build();
 	}
 
-	public <T> void registerBean(ConfigDataLocationResolverContext context, Class<T> type, T instance) {
-		context.getBootstrapContext().registerIfAbsent(type, InstanceSupplier.of(instance));
-	}
-
 	protected <T> void registerAndPromoteBean(ConfigDataLocationResolverContext context, Class<T> type,
-			Supplier<T> supplier) {
+			InstanceSupplier<T> supplier) {
 		registerBean(context, type, supplier);
 		context.getBootstrapContext().addCloseListener(event -> {
 			T instance = event.getBootstrapContext().get(type);
@@ -158,13 +155,18 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		});
 	}
 
-	protected <T> void registerBean(ConfigDataLocationResolverContext context, Class<T> type, Supplier<T> supplier) {
-		ConfigurableBootstrapContext bootstrapContext = context.getBootstrapContext();
-		bootstrapContext.registerIfAbsent(type, InstanceSupplier.from(supplier));
+	public <T> void registerBean(ConfigDataLocationResolverContext context, Class<T> type, T instance) {
+		context.getBootstrapContext().registerIfAbsent(type, InstanceSupplier.of(instance));
 	}
 
-	protected ConsulClient createConsulClient(ConfigDataLocationResolverContext context) {
-		ConsulProperties properties = context.getBootstrapContext().get(ConsulProperties.class);
+	protected <T> void registerBean(ConfigDataLocationResolverContext context, Class<T> type,
+			InstanceSupplier<T> supplier) {
+		ConfigurableBootstrapContext bootstrapContext = context.getBootstrapContext();
+		bootstrapContext.registerIfAbsent(type, supplier);
+	}
+
+	protected ConsulClient createConsulClient(BootstrapContext context) {
+		ConsulProperties properties = context.get(ConsulProperties.class);
 
 		return ConsulAutoConfiguration.createConsulClient(properties);
 	}

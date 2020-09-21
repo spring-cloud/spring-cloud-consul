@@ -18,12 +18,12 @@ package org.springframework.cloud.consul.config;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.boot.BootstrapRegistry.InstanceSupplier;
 import org.springframework.boot.context.config.ConfigDataLocationResolverContext;
 import org.springframework.boot.context.config.Profiles;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -93,18 +93,18 @@ public class ConsulConfigDataLocationResolverTests {
 		return new ConsulConfigDataLocationResolver(LogFactory.getLog(getClass())) {
 			@Override
 			public <T> void registerBean(ConfigDataLocationResolverContext context, Class<T> type, T instance) {
-
+				// do nothing
 			}
 
 			@Override
 			protected <T> void registerBean(ConfigDataLocationResolverContext context, Class<T> type,
-					Supplier<T> supplier) {
-
+					InstanceSupplier<T> supplier) {
+				// do nothing
 			}
 
 			@Override
 			protected <T> void registerAndPromoteBean(ConfigDataLocationResolverContext context, Class<T> type,
-					Supplier<T> supplier) {
+					InstanceSupplier<T> supplier) {
 				// do nothing
 			}
 		};

@@ -38,8 +38,13 @@ import org.springframework.core.style.ToStringCreator;
  * @author Venil Noronha
  * @author Richard Kettelerij
  */
-@ConfigurationProperties("spring.cloud.consul.discovery")
+@ConfigurationProperties(ConsulDiscoveryProperties.PREFIX)
 public class ConsulDiscoveryProperties {
+
+	/**
+	 * Consul discovery properties prefix.
+	 */
+	public static final String PREFIX = "spring.cloud.consul.discovery";
 
 	protected static final String MANAGEMENT = "management";
 
