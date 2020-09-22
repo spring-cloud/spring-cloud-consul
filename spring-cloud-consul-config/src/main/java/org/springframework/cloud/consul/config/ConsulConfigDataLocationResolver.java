@@ -84,9 +84,14 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 	@Override
 	public List<ConsulConfigDataLocation> resolveProfileSpecific(ConfigDataLocationResolverContext resolverContext,
 			String location, boolean optional, Profiles profiles) throws ConfigDataLocationNotFoundException {
-
 		UriComponents locationUri = parseLocation(resolverContext, location);
 
+		// create consul client
+		registerBean(resolverContext, ConsulProperties.class, loadProperties(resolverContext.getBinder(), locationUri));
+
+		registerAndPromoteBean(resolverContext, ConsulClient.class, this::createConsulClient);
+
+		// create locations
 		ConsulConfigProperties properties = loadConfigProperties(resolverContext.getBinder());
 
 		ConsulPropertySources consulPropertySources = new ConsulPropertySources(properties, log);
@@ -95,11 +100,7 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 				? consulPropertySources.getAutomaticContexts(profiles.getAccepted())
 				: getCustomContexts(locationUri, properties);
 
-		registerBean(resolverContext, ConsulProperties.class, loadProperties(resolverContext.getBinder(), locationUri));
-
 		registerAndPromoteBean(resolverContext, ConsulConfigProperties.class, InstanceSupplier.of(properties));
-
-		registerAndPromoteBean(resolverContext, ConsulClient.class, this::createConsulClient);
 
 		registerAndPromoteBean(resolverContext, ConsulConfigIndexes.class,
 				InstanceSupplier.from(ConsulConfigDataIndexes::new));
