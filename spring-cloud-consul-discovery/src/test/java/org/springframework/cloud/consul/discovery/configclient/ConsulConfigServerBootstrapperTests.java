@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.config.client.ConfigServerInstanceProvider;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -48,15 +47,15 @@ public class ConsulConfigServerBootstrapperTests {
 	public void enabledAddsInstanceProviderFn() {
 		AtomicReference<ConsulDiscoveryClient> bootstrapDiscoveryClient = new AtomicReference<>();
 		ConfigurableApplicationContext context = new SpringApplicationBuilder(TestConfig.class)
-			.properties("--server.port=0", "spring.cloud.config.discovery.enabled=true",
-				"spring.cloud.service-registry.auto-registration.enabled=false")
-			.addBootstrapper(registry -> registry.addCloseListener(event -> {
-				bootstrapDiscoveryClient.set(event.getBootstrapContext().get(ConsulDiscoveryClient.class));
-				ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
-					.get(ConfigServerInstanceProvider.Function.class);
-				assertThat(providerFn).as("ConfigServerInstanceProvider.Function was not created when it should.")
-					.isNotNull();
-			})).run();
+				.properties("--server.port=0", "spring.cloud.config.discovery.enabled=true",
+						"spring.cloud.service-registry.auto-registration.enabled=false")
+				.addBootstrapper(registry -> registry.addCloseListener(event -> {
+					bootstrapDiscoveryClient.set(event.getBootstrapContext().get(ConsulDiscoveryClient.class));
+					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
+							.get(ConfigServerInstanceProvider.Function.class);
+					assertThat(providerFn).as("ConfigServerInstanceProvider.Function was not created when it should.")
+							.isNotNull();
+				})).run();
 		ConsulDiscoveryClient discoveryClient = context.getBean(ConsulDiscoveryClient.class);
 		assertThat(discoveryClient == bootstrapDiscoveryClient.get()).isTrue();
 		context.close();
