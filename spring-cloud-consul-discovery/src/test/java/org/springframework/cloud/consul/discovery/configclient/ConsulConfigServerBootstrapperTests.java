@@ -30,7 +30,7 @@ public class ConsulConfigServerBootstrapperTests {
 	@Test
 	public void notEnabledDoesNotAddInstanceProviderFn() {
 		new SpringApplicationBuilder(TestConfig.class)
-				.properties("spring.cloud.service-registry.auto-registration.enabled=false")
+				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false")
 				.addBootstrapper(registry -> registry.addCloseListener(event -> {
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
 							.get(ConfigServerInstanceProvider.Function.class);
@@ -42,7 +42,7 @@ public class ConsulConfigServerBootstrapperTests {
 	@Test
 	public void enabledAddsInstanceProviderFn() {
 		new SpringApplicationBuilder(TestConfig.class)
-				.properties("spring.cloud.config.discovery.enabled=true",
+				.properties("--server.port=0", "spring.cloud.config.discovery.enabled=true",
 						"spring.cloud.service-registry.auto-registration.enabled=false")
 				.addBootstrapper(registry -> registry.addCloseListener(event -> {
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
