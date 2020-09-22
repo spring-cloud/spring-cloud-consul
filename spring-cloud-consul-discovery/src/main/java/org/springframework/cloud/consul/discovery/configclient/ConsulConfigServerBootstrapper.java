@@ -29,11 +29,15 @@ import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.util.ClassUtils;
 
 public class ConsulConfigServerBootstrapper implements Bootstrapper {
 
 	@Override
 	public void intitialize(BootstrapRegistry registry) {
+		if (!ClassUtils.isPresent("org.springframework.cloud.config.client.ConfigServerInstanceProvider", null)) {
+			return;
+		}
 		registry.registerIfAbsent(ConsulProperties.class, context -> {
 			Binder binder = context.get(Binder.class);
 			return binder.bind(ConsulProperties.PREFIX, ConsulProperties.class).orElseGet(ConsulProperties::new);
