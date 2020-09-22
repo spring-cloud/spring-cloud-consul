@@ -38,6 +38,7 @@ public class ConsulConfigServerBootstrapper implements Bootstrapper {
 		if (!ClassUtils.isPresent("org.springframework.cloud.config.client.ConfigServerInstanceProvider", null)) {
 			return;
 		}
+		// create consul client
 		registry.registerIfAbsent(ConsulProperties.class, context -> {
 			Binder binder = context.get(Binder.class);
 			return binder.bind(ConsulProperties.PREFIX, ConsulProperties.class).orElseGet(ConsulProperties::new);
@@ -46,19 +47,37 @@ public class ConsulConfigServerBootstrapper implements Bootstrapper {
 			ConsulProperties consulProperties = context.get(ConsulProperties.class);
 			return ConsulAutoConfiguration.createConsulClient(consulProperties);
 		});
-		registry.registerIfAbsent(ConfigServerInstanceProvider.Function.class, context -> {
+		registry.registerIfAbsent(ConsulDiscoveryClient.class, context -> {
 			Binder binder = context.get(Binder.class);
-			boolean enabled = binder.bind(ConfigClientProperties.CONFIG_DISCOVERY_ENABLED, Boolean.class).orElse(false);
-			if (!enabled) {
+			if (!isDiscoveryEnabled(binder)) {
 				return null;
 			}
 			ConsulClient consulClient = context.get(ConsulClient.class);
 			ConsulDiscoveryProperties properties = binder
 					.bind(ConsulDiscoveryProperties.PREFIX, ConsulDiscoveryProperties.class)
 					.orElseGet(() -> new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties())));
-			return new ConsulDiscoveryClient(consulClient, properties)::getInstances;
+			return new ConsulDiscoveryClient(consulClient, properties);
+		});
+		// promote discovery client if created
+		registry.addCloseListener(event -> {
+			ConsulDiscoveryClient discoveryClient = event.getBootstrapContext().get(ConsulDiscoveryClient.class);
+			if (discoveryClient != null) {
+				event.getApplicationContext().getBeanFactory()
+					.registerSingleton("consulDiscoveryClient", discoveryClient);
+			}
+		});
+		registry.registerIfAbsent(ConfigServerInstanceProvider.Function.class, context -> {
+			if (!isDiscoveryEnabled(context.get(Binder.class))) {
+				return null;
+			}
+			ConsulDiscoveryClient discoveryClient = context.get(ConsulDiscoveryClient.class);
+			return discoveryClient::getInstances;
 		});
 
+	}
+
+	private boolean isDiscoveryEnabled(Binder binder) {
+		return binder.bind(ConfigClientProperties.CONFIG_DISCOVERY_ENABLED, Boolean.class).orElse(false);
 	}
 
 }
