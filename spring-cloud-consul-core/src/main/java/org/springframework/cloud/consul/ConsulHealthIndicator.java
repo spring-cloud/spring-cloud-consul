@@ -34,16 +34,24 @@ public class ConsulHealthIndicator extends AbstractHealthIndicator {
 
 	private ConsulClient consul;
 
-	public ConsulHealthIndicator(ConsulClient consul) {
+	private ConsulHealthIndicatorProperties properties;
+
+	public ConsulHealthIndicator(ConsulClient consul,
+			ConsulHealthIndicatorProperties properties) {
 		this.consul = consul;
+		this.properties = properties;
 	}
 
 	@Override
-	protected void doHealthCheck(Health.Builder builder) throws Exception {
+	protected void doHealthCheck(Health.Builder builder) {
 		final Response<String> leaderStatus = this.consul.getStatusLeader();
-		final Response<Map<String, List<String>>> services = this.consul
-				.getCatalogServices(CatalogServicesRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
-		builder.up().withDetail("leader", leaderStatus.getValue()).withDetail("services", services.getValue());
+		builder.up().withDetail("leader", leaderStatus.getValue());
+		if (properties.isIncludeServicesQuery()) {
+			final Response<Map<String, List<String>>> services = this.consul
+					.getCatalogServices(CatalogServicesRequest.newBuilder()
+							.setQueryParams(QueryParams.DEFAULT).build());
+			builder.withDetail("services", services.getValue());
+		}
 	}
 
 }

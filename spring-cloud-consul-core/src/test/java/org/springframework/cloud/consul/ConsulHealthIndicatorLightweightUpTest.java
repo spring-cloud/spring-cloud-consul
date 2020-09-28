@@ -17,7 +17,6 @@
 package org.springframework.cloud.consul;
 
 import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,47 +27,41 @@ import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
- * Integration test for {@link ConsulHealthIndicator} when its in the DOWN status.
+ * Integration test for {@link ConsulHealthIndicator} using its lightweight check when its
+ * in the UP status.
  *
  * @author Lomesh Patel (lomeshpatel)
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
-public class ConsulHealthIndicatorDownTest {
+@SpringBootTest(
+		properties = "spring.cloud.consul.health-indicator.include-services-query=false")
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
+public class ConsulHealthIndicatorLightweightUpTest {
 
-	@MockBean
+	@SpyBean
 	private ConsulClient consulClient;
 
 	@Autowired
 	private HealthEndpoint healthEndpoint;
 
 	@Test
-	public void statusIsDownWhenConsulClientFailsToGetLeaderStatus() {
-		when(consulClient.getStatusLeader()).thenThrow(new RuntimeException("no leader"));
+	public void statusIsUp() {
 		assertThat(this.healthEndpoint.health().getStatus())
-				.as("health status was not DOWN").isEqualTo(Status.DOWN);
+				.as("health status was not UP").isEqualTo(Status.UP);
 		verify(consulClient).getStatusLeader();
-	}
-
-	@Test
-	public void statusIsDownWhenConsulClientFailsToGetServices() {
-		Response<String> leaderStatus = new Response<>("OK", 5150L, true,
-				System.currentTimeMillis());
-		when(consulClient.getStatusLeader()).thenReturn(leaderStatus);
-		when(consulClient.getCatalogServices(any(CatalogServicesRequest.class)))
-				.thenThrow(new RuntimeException("no services"));
-		assertThat(this.healthEndpoint.health().getStatus())
-				.as("health status was not DOWN").isEqualTo(Status.DOWN);
-		verify(consulClient).getCatalogServices(any(CatalogServicesRequest.class));
+		verify(consulClient, never())
+				.getCatalogServices(any(CatalogServicesRequest.class));
 	}
 
 	@EnableAutoConfiguration
