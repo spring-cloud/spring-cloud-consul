@@ -44,8 +44,7 @@ import static org.mockito.Mockito.verify;
  * @author Lomesh Patel (lomeshpatel)
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		properties = "spring.cloud.consul.health-indicator.include-services-query=false")
+@SpringBootTest(properties = "spring.cloud.consul.health-indicator.include-services-query=false")
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulHealthIndicatorLightweightUpTest {
 
@@ -57,11 +56,9 @@ public class ConsulHealthIndicatorLightweightUpTest {
 
 	@Test
 	public void statusIsUp() {
-		assertThat(this.healthEndpoint.health().getStatus())
-				.as("health status was not UP").isEqualTo(Status.UP);
+		assertThat(this.healthEndpoint.health().getStatus()).as("health status was not UP").isEqualTo(Status.UP);
 		verify(consulClient).getStatusLeader();
-		verify(consulClient, never())
-				.getCatalogServices(any(CatalogServicesRequest.class));
+		verify(consulClient, never()).getCatalogServices(any(CatalogServicesRequest.class));
 	}
 
 	@EnableAutoConfiguration

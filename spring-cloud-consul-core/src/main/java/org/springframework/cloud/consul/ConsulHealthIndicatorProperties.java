@@ -47,8 +47,7 @@ public class ConsulHealthIndicatorProperties {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this)
-				.append("includeServicesQuery", this.includeServicesQuery).toString();
+		return new ToStringCreator(this).append("includeServicesQuery", this.includeServicesQuery).toString();
 	}
 
 }

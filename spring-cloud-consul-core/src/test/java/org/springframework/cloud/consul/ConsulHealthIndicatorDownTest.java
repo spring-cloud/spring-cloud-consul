@@ -54,20 +54,17 @@ public class ConsulHealthIndicatorDownTest {
 	@Test
 	public void statusIsDownWhenConsulClientFailsToGetLeaderStatus() {
 		when(consulClient.getStatusLeader()).thenThrow(new RuntimeException("no leader"));
-		assertThat(this.healthEndpoint.health().getStatus())
-				.as("health status was not DOWN").isEqualTo(Status.DOWN);
+		assertThat(this.healthEndpoint.health().getStatus()).as("health status was not DOWN").isEqualTo(Status.DOWN);
 		verify(consulClient).getStatusLeader();
 	}
 
 	@Test
 	public void statusIsDownWhenConsulClientFailsToGetServices() {
-		Response<String> leaderStatus = new Response<>("OK", 5150L, true,
-				System.currentTimeMillis());
+		Response<String> leaderStatus = new Response<>("OK", 5150L, true, System.currentTimeMillis());
 		when(consulClient.getStatusLeader()).thenReturn(leaderStatus);
 		when(consulClient.getCatalogServices(any(CatalogServicesRequest.class)))
 				.thenThrow(new RuntimeException("no services"));
-		assertThat(this.healthEndpoint.health().getStatus())
-				.as("health status was not DOWN").isEqualTo(Status.DOWN);
+		assertThat(this.healthEndpoint.health().getStatus()).as("health status was not DOWN").isEqualTo(Status.DOWN);
 		verify(consulClient).getCatalogServices(any(CatalogServicesRequest.class));
 	}
 
