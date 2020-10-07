@@ -25,12 +25,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.validation.annotation.Validated;
 
+import static org.springframework.cloud.consul.config.ConsulConfigProperties.PREFIX;
+
 /**
  * @author Spencer Gibb
  */
-@ConfigurationProperties("spring.cloud.consul.config")
+@ConfigurationProperties(PREFIX)
 @Validated
 public class ConsulConfigProperties {
+
+	/**
+	 * Prefix for configuration properties.
+	 */
+	public static final String PREFIX = "spring.cloud.consul.config";
 
 	private boolean enabled = true;
 
@@ -159,13 +166,10 @@ public class ConsulConfigProperties {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this).append("enabled", this.enabled)
-				.append("prefix", this.prefix)
-				.append("defaultContext", this.defaultContext)
-				.append("profileSeparator", this.profileSeparator)
-				.append("format", this.format).append("dataKey", this.dataKey)
-				.append("aclToken", this.aclToken).append("watch", this.watch)
-				.append("failFast", this.failFast).append("name", this.name).toString();
+		return new ToStringCreator(this).append("enabled", this.enabled).append("prefix", this.prefix)
+				.append("defaultContext", this.defaultContext).append("profileSeparator", this.profileSeparator)
+				.append("format", this.format).append("dataKey", this.dataKey).append("aclToken", this.aclToken)
+				.append("watch", this.watch).append("failFast", this.failFast).append("name", this.name).toString();
 	}
 
 	/**
@@ -266,9 +270,8 @@ public class ConsulConfigProperties {
 
 		@Override
 		public String toString() {
-			return new ToStringCreator(this).append("waitTime", this.waitTime)
-					.append("enabled", this.enabled).append("delay", this.delay)
-					.toString();
+			return new ToStringCreator(this).append("waitTime", this.waitTime).append("enabled", this.enabled)
+					.append("delay", this.delay).toString();
 		}
 
 	}

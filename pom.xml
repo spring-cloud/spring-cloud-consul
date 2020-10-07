@@ -25,7 +25,8 @@
 		<spring-cloud-config.version>3.0.0-SNAPSHOT</spring-cloud-config.version>
 		<spring-cloud-deployer.version>1.0.3.RELEASE</spring-cloud-deployer.version>
 		<spring-cloud-openfeign.version>3.0.0-SNAPSHOT</spring-cloud-openfeign.version>
-		<spring-cloud-stream.version>3.1.0.BUILD-SNAPSHOT</spring-cloud-stream.version>
+		<spring-cloud-stream.version>3.1.0-SNAPSHOT</spring-cloud-stream.version>
+		<testcontainers.version>1.14.3</testcontainers.version>
 	</properties>
 
 	<scm>
@@ -163,6 +164,11 @@
 				</exclusions>
 			</dependency>
 			<!-- end archaius deps -->
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers</artifactId>
+				<version>${testcontainers.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -180,7 +186,7 @@
 				<repository>
 					<id>spring-snapshots</id>
 					<name>Spring Snapshots</name>
-					<url>https://repo.spring.io/libs-snapshot-local</url>
+					<url>https://repo.spring.io/snapshot</url>
 					<snapshots>
 						<enabled>true</enabled>
 					</snapshots>
@@ -209,7 +215,7 @@
 				<pluginRepository>
 					<id>spring-snapshots</id>
 					<name>Spring Snapshots</name>
-					<url>https://repo.spring.io/libs-snapshot-local</url>
+					<url>https://repo.spring.io/snapshot</url>
 					<snapshots>
 						<enabled>true</enabled>
 					</snapshots>

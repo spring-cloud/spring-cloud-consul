@@ -39,18 +39,15 @@ public class ConsulDiscoveryPropertiesTests {
 
 	private static final String SERVICE_NAME_NOT_IN_MAP = "serviceNameNotInMap";
 
-	private final Map<String, String> serverListQueryTags = Collections
-			.singletonMap(SERVICE_NAME_IN_MAP, MAP_TAG);
+	private final Map<String, String> serverListQueryTags = Collections.singletonMap(SERVICE_NAME_IN_MAP, MAP_TAG);
 
-	private final Map<String, String> datacenters = Collections
-			.singletonMap(SERVICE_NAME_IN_MAP, MAP_DC);
+	private final Map<String, String> datacenters = Collections.singletonMap(SERVICE_NAME_IN_MAP, MAP_DC);
 
 	private ConsulDiscoveryProperties properties;
 
 	@Before
 	public void setUp() {
-		this.properties = new ConsulDiscoveryProperties(
-				new InetUtils(new InetUtilsProperties()));
+		this.properties = new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties()));
 		this.properties.setDefaultQueryTag(DEFAULT_TAG);
 		this.properties.setServerListQueryTags(this.serverListQueryTags);
 		this.properties.setDatacenters(this.datacenters);
@@ -60,39 +57,33 @@ public class ConsulDiscoveryPropertiesTests {
 	public void testReturnsNullWhenNoDefaultAndNotInMap() {
 		this.properties.setDefaultQueryTag(null);
 
-		assertThat(this.properties.getQueryTagForService(SERVICE_NAME_NOT_IN_MAP))
-				.isNull();
+		assertThat(this.properties.getQueryTagForService(SERVICE_NAME_NOT_IN_MAP)).isNull();
 	}
 
 	@Test
 	public void testGetTagReturnsDefaultWhenNotInMap() {
-		assertThat(this.properties.getQueryTagForService(SERVICE_NAME_NOT_IN_MAP))
-				.isEqualTo(DEFAULT_TAG);
+		assertThat(this.properties.getQueryTagForService(SERVICE_NAME_NOT_IN_MAP)).isEqualTo(DEFAULT_TAG);
 	}
 
 	@Test
 	public void testGetTagReturnsMapValueWhenInMap() {
-		assertThat(this.properties.getQueryTagForService(SERVICE_NAME_IN_MAP))
-				.isEqualTo(MAP_TAG);
+		assertThat(this.properties.getQueryTagForService(SERVICE_NAME_IN_MAP)).isEqualTo(MAP_TAG);
 	}
 
 	@Test
 	public void testGetDcReturnsNullWhenNotInMap() {
-		assertThat(this.properties.getDatacenters().get(SERVICE_NAME_NOT_IN_MAP))
-				.isNull();
+		assertThat(this.properties.getDatacenters().get(SERVICE_NAME_NOT_IN_MAP)).isNull();
 	}
 
 	@Test
 	public void testGetDcReturnsMapValueWhenInMap() {
-		assertThat(this.properties.getDatacenters().get(SERVICE_NAME_IN_MAP))
-				.isEqualTo(MAP_DC);
+		assertThat(this.properties.getDatacenters().get(SERVICE_NAME_IN_MAP)).isEqualTo(MAP_DC);
 	}
 
 	@Test
 	public void testAddManagementTag() {
 		this.properties.getManagementTags().add("newTag");
-		assertThat(this.properties.getManagementTags())
-				.containsOnly(ConsulDiscoveryProperties.MANAGEMENT, "newTag");
+		assertThat(this.properties.getManagementTags()).containsOnly(ConsulDiscoveryProperties.MANAGEMENT, "newTag");
 	}
 
 }

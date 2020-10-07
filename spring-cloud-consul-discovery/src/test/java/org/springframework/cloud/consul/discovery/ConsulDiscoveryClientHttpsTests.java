@@ -26,7 +26,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,10 +40,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @RunWith(SpringRunner.class)
 @SpringBootTest(
 		properties = { "spring.application.name=testConsulDiscoveryHttps",
-				"spring.cloud.consul.discovery.prefer-ip-address=true",
-				"spring.cloud.consul.discovery.scheme=https" },
-		classes = ConsulDiscoveryClientHttpsTests.MyTestConfig.class,
-		webEnvironment = RANDOM_PORT)
+				"spring.cloud.consul.discovery.prefer-ip-address=true", "spring.cloud.consul.discovery.scheme=https" },
+		classes = ConsulDiscoveryClientHttpsTests.MyTestConfig.class, webEnvironment = RANDOM_PORT)
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulDiscoveryClientHttpsTests {
 
 	@Autowired
@@ -49,8 +50,7 @@ public class ConsulDiscoveryClientHttpsTests {
 
 	@Test
 	public void getInstancesForServiceWorks() {
-		List<ServiceInstance> instances = this.discoveryClient
-				.getInstances("testConsulDiscoveryHttps");
+		List<ServiceInstance> instances = this.discoveryClient.getInstances("testConsulDiscoveryHttps");
 		assertThat(instances).as("instances was null").isNotNull();
 		assertThat(instances.isEmpty()).as("instances was empty").isFalse();
 

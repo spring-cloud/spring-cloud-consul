@@ -34,8 +34,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnClass(ConfigServicePropertySourceLocator.class)
 @ConditionalOnProperty("spring.cloud.config.discovery.enabled")
 @Configuration(proxyBeanMethods = false)
-@ImportAutoConfiguration({ ConsulAutoConfiguration.class,
-		ConsulDiscoveryClientConfiguration.class,
+@ImportAutoConfiguration({ ConsulAutoConfiguration.class, ConsulDiscoveryClientConfiguration.class,
 		ConsulReactiveDiscoveryClientConfiguration.class })
 public class ConsulDiscoveryClientConfigServiceBootstrapConfiguration {
 

@@ -27,6 +27,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,9 +40,9 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @RunWith(SpringRunner.class)
 @SpringBootTest(
 		properties = { "spring.application.name=testConsulLoadBalancer",
-				"spring.cloud.consul.discovery.prefer-ip-address=true",
-				"spring.cloud.consul.discovery.tags=foo=bar" },
+				"spring.cloud.consul.discovery.prefer-ip-address=true", "spring.cloud.consul.discovery.tags=foo=bar" },
 		webEnvironment = RANDOM_PORT)
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulLoadbalancerClientTests {
 
 	@Autowired
@@ -58,8 +60,7 @@ public class ConsulLoadbalancerClientTests {
 	}
 
 	private void assertIpAddress(ServiceInstance instance) {
-		assertThat(Character.isDigit(instance.getHost().charAt(0)))
-				.as("host isn't an ip address").isTrue();
+		assertThat(Character.isDigit(instance.getHost().charAt(0))).as("host isn't an ip address").isTrue();
 	}
 
 	@SpringBootConfiguration

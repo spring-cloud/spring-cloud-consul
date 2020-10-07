@@ -21,7 +21,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,8 +31,8 @@ public class ConsulPropertyPrefixTests {
 
 	@Before
 	public void setup() {
-		ConsulProperties properties = new ConsulProperties();
-		this.client = new ConsulClient(properties.getHost(), properties.getPort());
+		ConsulTestcontainers.start();
+		this.client = ConsulTestcontainers.client();
 	}
 
 	@After
@@ -47,24 +47,18 @@ public class ConsulPropertyPrefixTests {
 		this.client.setKVValue(kvContext + "/fooprop", "fookvval");
 		this.client.setKVValue(kvContext + "/bar/prop", "8080");
 
-		ConsulPropertySource source = getConsulPropertySource(
-				new ConsulConfigProperties(), kvContext);
+		ConsulPropertySource source = getConsulPropertySource(new ConsulConfigProperties(), kvContext);
 		assertProperties(source, "fookvval", "8080");
 	}
 
-	private void assertProperties(ConsulPropertySource source, Object fooval,
-			Object barval) {
-		assertThat(source.getProperty("fooprop")).as("fooprop was wrong")
-				.isEqualTo(fooval);
-		assertThat(source.getProperty("bar.prop")).as("bar.prop was wrong")
-				.isEqualTo(barval);
+	private void assertProperties(ConsulPropertySource source, Object fooval, Object barval) {
+		assertThat(source.getProperty("fooprop")).as("fooprop was wrong").isEqualTo(fooval);
+		assertThat(source.getProperty("bar.prop")).as("bar.prop was wrong").isEqualTo(barval);
 	}
 
 	@SuppressWarnings("Duplicates")
-	private ConsulPropertySource getConsulPropertySource(
-			ConsulConfigProperties configProperties, String context) {
-		ConsulPropertySource source = new ConsulPropertySource(context, this.client,
-				configProperties);
+	private ConsulPropertySource getConsulPropertySource(ConsulConfigProperties configProperties, String context) {
+		ConsulPropertySource source = new ConsulPropertySource(context, this.client, configProperties);
 		source.init();
 		String[] names = source.getPropertyNames();
 		assertThat(names).as("names was null").isNotNull();

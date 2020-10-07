@@ -9,14 +9,14 @@
 		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>spring-cloud-consul-docs</artifactId>
-	<packaging>pom</packaging>
+	<packaging>jar</packaging>
 	<name>Spring Cloud Consul Docs</name>
 	<description>Spring Cloud Docs</description>
 	<properties>
 		<docs.main>spring-cloud-consul</docs.main>
 		<main.basedir>${basedir}/..</main.basedir>
-		<docs.whitelisted.branches>2.1.x,2.2.x</docs.whitelisted.branches>
 		<configprops.inclusionPattern>spring.cloud.consul.*</configprops.inclusionPattern>
+		<upload-docs-zip.phase>deploy</upload-docs-zip.phase>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -28,6 +28,9 @@
 			<artifactId>spring-cloud-starter-consul-all</artifactId>
 		</dependency>
 	</dependencies>
+	<build>
+		<sourceDirectory>src/main/asciidoc</sourceDirectory>
+	</build>
 	<profiles>
 		<profile>
 			<id>docs</id>
@@ -58,8 +61,7 @@
 						<artifactId>maven-antrun-plugin</artifactId>
 					</plugin>
 					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
+						<artifactId>maven-deploy-plugin</artifactId>
 					</plugin>
 				</plugins>
 			</build>

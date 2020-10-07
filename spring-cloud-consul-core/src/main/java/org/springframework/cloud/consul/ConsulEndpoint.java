@@ -54,19 +54,16 @@ public class ConsulEndpoint {
 		data.setAgentServices(agentServices.getValue());
 
 		Response<Map<String, List<String>>> catalogServices = this.consul
-				.getCatalogServices(CatalogServicesRequest.newBuilder()
-						.setQueryParams(QueryParams.DEFAULT).build());
+				.getCatalogServices(CatalogServicesRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
 
 		for (String serviceId : catalogServices.getValue().keySet()) {
-			Response<List<CatalogService>> response = this.consul
-					.getCatalogService(serviceId, CatalogServiceRequest.newBuilder()
-							.setQueryParams(QueryParams.DEFAULT).build());
+			Response<List<CatalogService>> response = this.consul.getCatalogService(serviceId,
+					CatalogServiceRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
 			data.getCatalogServices().put(serviceId, response.getValue());
 		}
 
 		Response<List<Node>> catalogNodes = this.consul
-				.getCatalogNodes(CatalogNodesRequest.newBuilder()
-						.setQueryParams(QueryParams.DEFAULT).build());
+				.getCatalogNodes(CatalogNodesRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
 		data.setCatalogNodes(catalogNodes.getValue());
 
 		return data;
@@ -90,8 +87,7 @@ public class ConsulEndpoint {
 			return this.catalogServices;
 		}
 
-		public void setCatalogServices(
-				Map<String, List<CatalogService>> catalogServices) {
+		public void setCatalogServices(Map<String, List<CatalogService>> catalogServices) {
 			this.catalogServices = catalogServices;
 		}
 
@@ -113,10 +109,8 @@ public class ConsulEndpoint {
 
 		@Override
 		public String toString() {
-			return new ToStringCreator(this)
-					.append("catalogServices", this.catalogServices)
-					.append("agentServices", this.agentServices)
-					.append("catalogNodes", this.catalogNodes).toString();
+			return new ToStringCreator(this).append("catalogServices", this.catalogServices)
+					.append("agentServices", this.agentServices).append("catalogNodes", this.catalogNodes).toString();
 		}
 
 	}

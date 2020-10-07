@@ -30,7 +30,9 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,12 +42,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		classes = ConsulAutoServiceRegistrationCustomizedServiceNameTests.TestConfig.class,
+@SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedServiceNameTests.TestConfig.class,
 		properties = { "spring.application.name=myTestService-CC",
 				"spring.cloud.consul.discovery.instanceId=myTestService1-CC",
 				"spring.cloud.consul.discovery.serviceName=myprefix-${spring.application.name}" },
 		webEnvironment = RANDOM_PORT)
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoServiceRegistrationCustomizedServiceNameTests {
 
 	@Autowired
@@ -58,16 +60,13 @@ public class ConsulAutoServiceRegistrationCustomizedServiceNameTests {
 		Service service = services.get("myTestService1-CC");
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
-		assertThat(service.getId()).as("service id was wrong")
-				.isEqualTo("myTestService1-CC");
-		assertThat(service.getService()).as("service name was wrong")
-				.isEqualTo("myprefix-myTestService-CC");
+		assertThat(service.getId()).as("service id was wrong").isEqualTo("myTestService1-CC");
+		assertThat(service.getService()).as("service name was wrong").isEqualTo("myprefix-myTestService-CC");
 	}
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
-			ConsulAutoConfiguration.class,
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestConfig {
 

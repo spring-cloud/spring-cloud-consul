@@ -31,7 +31,7 @@ To activate Consul Service Discovery use the starter with group `org.springframe
 
 === Registering with Consul
 
-When a client registers with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An HTTP https://www.consul.io/docs/agent/checks.html[Check] is created by default that Consul hits the `/health` endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.
+When a client registers with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An HTTP https://www.consul.io/docs/agent/checks.html[Check] is created by default that Consul hits the `/actuator/health` endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.
 
 Example Consul client:
 
@@ -149,9 +149,13 @@ spring.cloud.consul.discovery.management-suffix
 spring.cloud.consul.discovery.management-tags
 ----
 
-=== HTTP Health Check
+==== HTTP Health Check
 
-The health check for a Consul instance defaults to "/health", which is the default locations of a useful endpoint in a Spring Boot Actuator application. You need to change these, even for an Actuator application if you use a non-default context path or servlet path (e.g. `server.servletPath=/foo`) or management endpoint path (e.g. `management.server.servlet.context-path=/admin`). The interval that Consul uses to check the health endpoint may also be configured.  "10s" and "1m" represent 10 seconds and 1 minute respectively.  Example:
+The health check for a Consul instance defaults to "/actuator/health", which is the default location of the health endpoint in a Spring Boot Actuator application. You need to change this, even for an Actuator application, if you use a non-default context path or servlet path (e.g. `server.servletPath=/foo`) or management endpoint path (e.g. `management.server.servlet.context-path=/admin`).
+
+The interval that Consul uses to check the health endpoint may also be configured. "10s" and "1m" represent 10 seconds and 1 minute respectively.
+
+This example illustrates the above (see the `spring.cloud.consul.discovery.health-check-*` properties in link:appendix.html[the appendix page] for more options).
 
 .application.yml
 ----
@@ -159,11 +163,57 @@ spring:
   cloud:
     consul:
       discovery:
-        healthCheckPath: ${management.server.servlet.context-path}/health
+        healthCheckPath: ${management.server.servlet.context-path}/actuator/health
         healthCheckInterval: 15s
 ----
 
-You can disable the health check by setting `management.health.consul.enabled=false`.
+You can disable the HTTP health check entirely by setting `spring.cloud.consul.discovery.register-health-check=false`.
+
+===== Applying Headers
+Headers can be applied to health check requests. For example, if you're trying to register a https://cloud.spring.io/spring-cloud-config/[Spring Cloud Config] server that uses https://github.com/spring-cloud/spring-cloud-config/blob/master/docs/src/main/asciidoc/spring-cloud-config.adoc#vault-backend[Vault Backend]:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        health-check-headers:
+          X-Config-Token: 6442e58b-d1ea-182e-cfa5-cf9cddef0722
+----
+
+According to the HTTP standard, each header can have more than one values, in which case, an array can be supplied:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        health-check-headers:
+          X-Config-Token:
+            - "6442e58b-d1ea-182e-cfa5-cf9cddef0722"
+            - "Some other value"
+----
+
+==== Actuator Health Indicator(s)
+If the service instance is a Spring Boot Actuator application, it may be provided the following Actuator health indicators.
+
+===== DiscoveryClientHealthIndicator
+When Consul Service Discovery is active, a https://cloud.spring.io/spring-cloud-commons/2.2.x/reference/html/#health-indicator[DiscoverClientHealthIndicator] is configured and made available to the Actuator health endpoint.
+See https://cloud.spring.io/spring-cloud-commons/2.2.x/reference/html/#health-indicator[here] for configuration options.
+
+===== ConsulHealthIndicator
+An indicator is configured that verifies the health of the `ConsulClient`.
+
+By default, it retrieves the Consul leader node status and all registered services.
+In deployments that have many registered services it may be costly to retrieve all services on every health check.
+To skip the service retrieval and only check the leader node status set `spring.cloud.consul.health-indicator.include-services-query=false`.
+
+To disable the indicator set `management.health.consul.enabled=false`.
+
+WARNING: When the application runs in https://cloud.spring.io/spring-cloud-commons/2.2.x/reference/html/#the-bootstrap-application-context[bootstrap context mode] (the default),
+this indicator is loaded into the bootstrap context and is not made available to the Actuator health endpoint.
 
 ==== Metadata
 
@@ -217,34 +267,6 @@ spring:
 ----
 
 With this metadata, and multiple service instances deployed on localhost, the random value will kick in there to make the instance unique. In Cloudfoundry the `vcap.application.instance_id` will be populated automatically in a Spring Boot application, so the random value will not be needed.
-
-==== Applying Headers to Health Check Requests
-
-Headers can be applied to health check requests. For example, if you're trying to register a https://cloud.spring.io/spring-cloud-config/[Spring Cloud Config] server that uses https://github.com/spring-cloud/spring-cloud-config/blob/master/docs/src/main/asciidoc/spring-cloud-config.adoc#vault-backend[Vault Backend]:
-
-.application.yml
-----
-spring:
-  cloud:
-    consul:
-      discovery:
-        health-check-headers:
-          X-Config-Token: 6442e58b-d1ea-182e-cfa5-cf9cddef0722
-----
-
-According to the HTTP standard, each header can have more than one values, in which case, an array can be supplied:
-
-.application.yml
-----
-spring:
-  cloud:
-    consul:
-      discovery:
-        health-check-headers:
-          X-Config-Token:
-            - "6442e58b-d1ea-182e-cfa5-cf9cddef0722"
-            - "Some other value"
-----
 
 === Looking up services
 

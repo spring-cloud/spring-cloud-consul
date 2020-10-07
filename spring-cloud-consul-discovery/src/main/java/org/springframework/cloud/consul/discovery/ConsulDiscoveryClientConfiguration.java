@@ -44,17 +44,9 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnConsulEnabled
 @ConditionalOnConsulDiscoveryEnabled
 @EnableConfigurationProperties
-@AutoConfigureBefore({ SimpleDiscoveryClientAutoConfiguration.class,
-		CommonsClientAutoConfiguration.class })
+@AutoConfigureBefore({ SimpleDiscoveryClientAutoConfiguration.class, CommonsClientAutoConfiguration.class })
 @AutoConfigureAfter({ UtilAutoConfiguration.class, ConsulAutoConfiguration.class })
 public class ConsulDiscoveryClientConfiguration {
-
-	/**
-	 * Name of the catalog watch task scheduler bean.
-	 * @Deprecated Moved to {@link ConsulCatalogWatchAutoConfiguration}.
-	 */
-	@Deprecated
-	public static final String CATALOG_WATCH_TASK_SCHEDULER_NAME = ConsulCatalogWatchAutoConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME;
 
 	@Bean
 	@ConditionalOnMissingBean

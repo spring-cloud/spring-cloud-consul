@@ -31,7 +31,7 @@ public class HeartbeatPropertiesTests {
 	@Test
 	public void computeHeartbeatIntervalWorks() {
 		HeartbeatProperties properties = new HeartbeatProperties();
-		Duration period = properties.computeHearbeatInterval();
+		Duration period = properties.computeHeartbeatInterval();
 
 		assertThat(period).isNotNull();
 		assertThat(period.get(ChronoUnit.SECONDS)).isEqualTo(20);
@@ -41,7 +41,7 @@ public class HeartbeatPropertiesTests {
 	public void computeShortHeartbeat() {
 		HeartbeatProperties properties = new HeartbeatProperties();
 		properties.setTtl(Duration.ofSeconds(2));
-		Duration period = properties.computeHearbeatInterval();
+		Duration period = properties.computeHeartbeatInterval();
 
 		assertThat(period).isNotNull();
 		assertThat(period.get(ChronoUnit.SECONDS)).isEqualTo(1);

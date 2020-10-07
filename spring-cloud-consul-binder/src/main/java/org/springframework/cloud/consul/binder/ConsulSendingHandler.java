@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.binder;
 
+import java.util.Arrays;
+
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
@@ -48,12 +50,15 @@ public class ConsulSendingHandler extends AbstractMessageHandler {
 		}
 
 		Object payload = message.getPayload();
+		if (payload instanceof byte[]) {
+			payload = Arrays.toString((byte[]) payload);
+		}
+
 		// TODO: support headers
 		// TODO: support consul event filters: NodeFilter, ServiceFilter, TagFilter
-		Response<Event> event = this.consul.eventFire(this.eventName, (String) payload,
-				new EventParams(), QueryParams.DEFAULT);
+		Response<Event> event = this.consul.eventFire(this.eventName, (String) payload, new EventParams(),
+				QueryParams.DEFAULT);
 		// TODO: return event?
-		// return null;
 	}
 
 }

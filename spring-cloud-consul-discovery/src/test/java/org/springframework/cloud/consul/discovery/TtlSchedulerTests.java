@@ -32,8 +32,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.support.ConsulHeartbeatAutoConfiguration;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static com.ecwid.consul.v1.health.model.Check.CheckStatus.PASSING;
@@ -48,23 +50,21 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 		properties = { "spring.application.name=ttlScheduler",
 				"spring.cloud.consul.discovery.instance-id=ttlScheduler-id",
 				"spring.cloud.consul.discovery.heartbeat.enabled=true",
-				"spring.cloud.consul.discovery.heartbeat.ttlValue=2",
-				"management.server.port=0" },
+				"spring.cloud.consul.discovery.heartbeat.ttlValue=2", "management.server.port=0" },
 		webEnvironment = RANDOM_PORT)
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class TtlSchedulerTests {
 
 	@Autowired
 	private ConsulClient consul;
 
 	@Test
-	public void should_send_a_check_before_ttl_for_all_services()
-			throws InterruptedException {
+	public void should_send_a_check_before_ttl_for_all_services() throws InterruptedException {
 		Thread.sleep(2100); // Wait for TTL to expired (TTL is set to 2 seconds)
 
 		Check serviceCheck = getCheckForService("ttlScheduler");
 		assertThat(serviceCheck).isNotNull();
-		assertThat(serviceCheck.getStatus()).isEqualTo(PASSING)
-				.as("Service check is in wrong state");
+		assertThat(serviceCheck.getStatus()).isEqualTo(PASSING).as("Service check is in wrong state");
 		Check serviceManagementCheck = getCheckForService("ttlScheduler-management");
 		assertThat(serviceManagementCheck).isNotNull();
 		assertThat(serviceManagementCheck.getStatus()).isEqualTo(PASSING)
@@ -72,9 +72,8 @@ public class TtlSchedulerTests {
 	}
 
 	private Check getCheckForService(String serviceId) {
-		Response<List<Check>> checkResponse = this.consul
-				.getHealthChecksForService(serviceId, HealthChecksForServiceRequest
-						.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
+		Response<List<Check>> checkResponse = this.consul.getHealthChecksForService(serviceId,
+				HealthChecksForServiceRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
 		if (checkResponse.getValue().size() > 0) {
 			return checkResponse.getValue().get(0);
 		}
@@ -84,8 +83,7 @@ public class TtlSchedulerTests {
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	@Import({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
-			ConsulDiscoveryClientConfiguration.class,
-			ConsulHeartbeatAutoConfiguration.class })
+			ConsulDiscoveryClientConfiguration.class, ConsulHeartbeatAutoConfiguration.class })
 	public static class TtlSchedulerTestConfig {
 
 	}

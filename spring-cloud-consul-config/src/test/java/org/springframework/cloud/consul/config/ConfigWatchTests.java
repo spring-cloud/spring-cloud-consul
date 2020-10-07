@@ -60,8 +60,7 @@ public class ConfigWatchTests {
 	public void watchPublishesEventWithAcl() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		setupWatch(eventPublisher, new GetValue(), "/app/",
-				"2ee647bd-bd69-4118-9f34-b9a6e9e60746");
+		setupWatch(eventPublisher, new GetValue(), "/app/", "2ee647bd-bd69-4118-9f34-b9a6e9e60746");
 
 		verify(eventPublisher, atLeastOnce()).publishEvent(any(RefreshEvent.class));
 	}
@@ -94,13 +93,12 @@ public class ConfigWatchTests {
 		verify(eventPublisher, atLeastOnce()).publishEvent(any(RefreshEvent.class));
 	}
 
-	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue,
-			String context) {
+	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue, String context) {
 		setupWatch(eventPublisher, getValue, context, null);
 	}
 
-	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue,
-			String context, String aclToken) {
+	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue, String context,
+			String aclToken) {
 		ConsulClient consul = mock(ConsulClient.class);
 		List<GetValue> getValues = null;
 
@@ -109,8 +107,7 @@ public class ConfigWatchTests {
 		}
 
 		Response<List<GetValue>> response = new Response<>(getValues, 1L, false, 1L);
-		when(consul.getKVValues(eq(context), nullable(String.class),
-				any(QueryParams.class))).thenReturn(response);
+		when(consul.getKVValues(eq(context), nullable(String.class), any(QueryParams.class))).thenReturn(response);
 
 		if (StringUtils.hasText(aclToken)) {
 			this.configProperties.setAclToken(aclToken);
@@ -118,8 +115,7 @@ public class ConfigWatchTests {
 
 		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
 		initialIndexes.put(context, 0L);
-		ConfigWatch watch = new ConfigWatch(this.configProperties, consul,
-				initialIndexes);
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes);
 		watch.setApplicationEventPublisher(eventPublisher);
 		watch.start();
 
@@ -137,11 +133,9 @@ public class ConfigWatchTests {
 		List<GetValue> getValues = Collections.singletonList(getValue);
 
 		Response<List<GetValue>> response = new Response<>(getValues, 1L, false, 1L);
-		when(consul.getKVValues(eq(context), anyString(), any(QueryParams.class)))
-				.thenReturn(response);
+		when(consul.getKVValues(eq(context), anyString(), any(QueryParams.class))).thenReturn(response);
 
-		ConfigWatch watch = new ConfigWatch(this.configProperties, consul,
-				new LinkedHashMap<String, Long>());
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, new LinkedHashMap<String, Long>());
 		watch.setApplicationEventPublisher(eventPublisher);
 
 		watch.watchConfigKeyValues();

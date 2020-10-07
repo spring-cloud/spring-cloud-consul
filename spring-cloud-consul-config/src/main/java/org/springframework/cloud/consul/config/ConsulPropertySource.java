@@ -52,8 +52,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 	private Long initialIndex;
 
-	public ConsulPropertySource(String context, ConsulClient source,
-			ConsulConfigProperties configProperties) {
+	public ConsulPropertySource(String context, ConsulClient source, ConsulConfigProperties configProperties) {
 		super(context, source);
 		this.context = context;
 		this.configProperties = configProperties;
@@ -65,8 +64,8 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 			this.context = this.context + "/";
 		}
 
-		Response<List<GetValue>> response = this.source.getKVValues(this.context,
-				this.configProperties.getAclToken(), QueryParams.DEFAULT);
+		Response<List<GetValue>> response = this.source.getKVValues(this.context, this.configProperties.getAclToken(),
+				QueryParams.DEFAULT);
 
 		this.initialIndex = response.getConsulIndex();
 
@@ -112,8 +111,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 	 * @param values values to parse
 	 * @param format format in which the values should be parsed
 	 */
-	protected void parsePropertiesWithNonKeyValueFormat(List<GetValue> values,
-			ConsulConfigProperties.Format format) {
+	protected void parsePropertiesWithNonKeyValueFormat(List<GetValue> values, ConsulConfigProperties.Format format) {
 		if (values == null) {
 			return;
 		}
@@ -139,8 +137,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		}
 	}
 
-	protected Properties generateProperties(String value,
-			ConsulConfigProperties.Format format) {
+	protected Properties generateProperties(String value, ConsulConfigProperties.Format format) {
 		final Properties props = new Properties();
 
 		if (format == PROPERTIES) {
@@ -150,16 +147,14 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 				props.load(new ByteArrayInputStream(value.getBytes("ISO-8859-1")));
 			}
 			catch (IOException e) {
-				throw new IllegalArgumentException(
-						value + " can't be encoded using ISO-8859-1");
+				throw new IllegalArgumentException(value + " can't be encoded using ISO-8859-1");
 			}
 
 			return props;
 		}
 		else if (format == YAML) {
 			final YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
-			yaml.setResources(
-					new ByteArrayResource(value.getBytes(Charset.forName("UTF-8"))));
+			yaml.setResources(new ByteArrayResource(value.getBytes(Charset.forName("UTF-8"))));
 
 			return yaml.getObject();
 		}

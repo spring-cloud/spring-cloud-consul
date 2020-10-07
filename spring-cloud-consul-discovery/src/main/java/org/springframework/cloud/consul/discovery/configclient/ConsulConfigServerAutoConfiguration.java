@@ -35,8 +35,7 @@ import org.springframework.util.StringUtils;
  */
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties
-@ConditionalOnClass({ ConsulDiscoveryProperties.class, ConsulClient.class,
-		ConfigServerProperties.class })
+@ConditionalOnClass({ ConsulDiscoveryProperties.class, ConsulClient.class, ConfigServerProperties.class })
 public class ConsulConfigServerAutoConfiguration {
 
 	/**

@@ -30,8 +30,7 @@ import org.springframework.util.StringUtils;
 /**
  * @author Spencer Gibb
  */
-public class ConsulAutoServiceRegistration
-		extends AbstractAutoServiceRegistration<ConsulRegistration> {
+public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistration<ConsulRegistration> {
 
 	private static Log log = LogFactory.getLog(ConsulAutoServiceRegistration.class);
 
@@ -40,8 +39,8 @@ public class ConsulAutoServiceRegistration
 	private ConsulAutoRegistration registration;
 
 	public ConsulAutoServiceRegistration(ConsulServiceRegistry serviceRegistry,
-			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
-			ConsulDiscoveryProperties properties, ConsulAutoRegistration registration) {
+			AutoServiceRegistrationProperties autoServiceRegistrationProperties, ConsulDiscoveryProperties properties,
+			ConsulAutoRegistration registration) {
 		super(serviceRegistry, autoServiceRegistrationProperties);
 		this.properties = properties;
 		this.registration = registration;
@@ -53,12 +52,10 @@ public class ConsulAutoServiceRegistration
 
 	@Override
 	protected ConsulAutoRegistration getRegistration() {
-		if (this.registration.getService().getPort() == null
-				&& this.getPort().get() > 0) {
+		if (this.registration.getService().getPort() == null && this.getPort().get() > 0) {
 			this.registration.initializePort(this.getPort().get());
 		}
-		Assert.notNull(this.registration.getService().getPort(),
-				"service.port has not been set");
+		Assert.notNull(this.registration.getService().getPort(), "service.port has not been set");
 		return this.registration;
 	}
 

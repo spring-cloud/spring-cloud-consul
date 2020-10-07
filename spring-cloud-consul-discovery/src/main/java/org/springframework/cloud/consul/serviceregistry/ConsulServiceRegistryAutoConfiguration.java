@@ -45,11 +45,9 @@ public class ConsulServiceRegistryAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulServiceRegistry consulServiceRegistry(ConsulClient consulClient,
-			ConsulDiscoveryProperties properties, HeartbeatProperties heartbeatProperties,
-			@Autowired(required = false) TtlScheduler ttlScheduler) {
-		return new ConsulServiceRegistry(consulClient, properties, ttlScheduler,
-				heartbeatProperties);
+	public ConsulServiceRegistry consulServiceRegistry(ConsulClient consulClient, ConsulDiscoveryProperties properties,
+			HeartbeatProperties heartbeatProperties, @Autowired(required = false) TtlScheduler ttlScheduler) {
+		return new ConsulServiceRegistry(consulClient, properties, ttlScheduler, heartbeatProperties);
 	}
 
 	@Bean
@@ -65,21 +63,18 @@ public class ConsulServiceRegistryAutoConfiguration {
 		return new ConsulDiscoveryProperties(inetUtils);
 	}
 
-	protected static class OnConsulRegistrationEnabledCondition
-			extends AllNestedConditions {
+	protected static class OnConsulRegistrationEnabledCondition extends AllNestedConditions {
 
 		OnConsulRegistrationEnabledCondition() {
 			super(ConfigurationPhase.REGISTER_BEAN);
 		}
 
-		@ConditionalOnProperty(value = "spring.cloud.service-registry.enabled",
-				matchIfMissing = true)
+		@ConditionalOnProperty(value = "spring.cloud.service-registry.enabled", matchIfMissing = true)
 		static class ServiceRegistryEnabledClass {
 
 		}
 
-		@ConditionalOnProperty(value = "spring.cloud.consul.service-registry.enabled",
-				matchIfMissing = true)
+		@ConditionalOnProperty(value = "spring.cloud.consul.service-registry.enabled", matchIfMissing = true)
 		static class ConsulServiceRegistryEnabledClass {
 
 		}

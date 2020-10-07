@@ -27,7 +27,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,13 +39,12 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author varnson
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		classes = ConsulAutoRegistrationIncludeHostnameInInstanceIdTests.TestConfig.class,
-		properties = {
-				"spring.application.name=myTestService-IncludeHostnameInInstanceId",
+@SpringBootTest(classes = ConsulAutoRegistrationIncludeHostnameInInstanceIdTests.TestConfig.class,
+		properties = { "spring.application.name=myTestService-IncludeHostnameInInstanceId",
 				"spring.cloud.consul.discovery.include-hostname-in-instance-id=true",
 				"spring.cloud.client.hostname=testhostname" },
 		webEnvironment = RANDOM_PORT)
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoRegistrationIncludeHostnameInInstanceIdTests {
 
 	@Autowired
@@ -60,15 +61,13 @@ public class ConsulAutoRegistrationIncludeHostnameInInstanceIdTests {
 		NewService.Check check = service.getCheck();
 		assertThat(service.getId()).as("id is null").isNotNull();
 		assertThat(service.getId()).as("id no include hostname").contains("testhostname");
-		assertThat(service.getId()).as("service id was wrong")
-				.isEqualTo(this.registration.getInstanceId());
+		assertThat(service.getId()).as("service id was wrong").isEqualTo(this.registration.getInstanceId());
 
 	}
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
-			ConsulAutoConfiguration.class,
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	public static class TestConfig {
 

@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.runner.WebApplicationContextRunner;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,21 +38,18 @@ public class ConsulServiceRegistryDisabledTests {
 
 	@Test
 	public void disabledViaSpringCloudProperty() {
-		testAutoRegistrationDisabled("serviceRegistryDisabledTest1",
-				"spring.cloud.service-registry.enabled");
+		testAutoRegistrationDisabled("serviceRegistryDisabledTest1", "spring.cloud.service-registry.enabled");
 	}
 
 	@Test
 	public void disabledViaConsulProperty() {
-		testAutoRegistrationDisabled("serviceRegistryDisabledTest2",
-				"spring.cloud.consul.service-registry.enabled");
+		testAutoRegistrationDisabled("serviceRegistryDisabledTest2", "spring.cloud.consul.service-registry.enabled");
 	}
 
 	private void testAutoRegistrationDisabled(String testName, String disableProperty) {
 		new WebApplicationContextRunner().withUserConfiguration(TestConfig.class)
-				.withPropertyValues("spring.application.name=" + testName,
-						disableProperty + "=false", "server.port=0")
-				.run(context -> {
+				.withPropertyValues("spring.application.name=" + testName, disableProperty + "=false", "server.port=0")
+				.withInitializer(new ConsulTestcontainers()).run(context -> {
 					assertThat(context).doesNotHaveBean(ConsulServiceRegistry.class);
 					assertThat(context).doesNotHaveBean(HeartbeatProperties.class);
 

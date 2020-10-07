@@ -33,8 +33,7 @@ public class ConsulInboundMessageProducerTests {
 		EventService eventService = mock(EventService.class);
 		when(eventService.watch()).thenThrow(new OperationException(500, "error", ""));
 
-		ConsulInboundMessageProducer producer = new ConsulInboundMessageProducer(
-				eventService);
+		ConsulInboundMessageProducer producer = new ConsulInboundMessageProducer(eventService);
 
 		try {
 			producer.getEvents();

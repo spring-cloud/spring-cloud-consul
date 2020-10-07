@@ -43,12 +43,10 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnBean(AutoServiceRegistrationProperties.class)
-@ConditionalOnMissingBean(
-		type = "org.springframework.cloud.consul.discovery.ConsulLifecycle")
+@ConditionalOnMissingBean(type = "org.springframework.cloud.consul.discovery.ConsulLifecycle")
 @ConditionalOnConsulEnabled
 @Conditional(ConsulAutoServiceRegistrationAutoConfiguration.OnConsulRegistrationEnabledCondition.class)
-@AutoConfigureAfter({ AutoServiceRegistrationConfiguration.class,
-		ConsulServiceRegistryAutoConfiguration.class })
+@AutoConfigureAfter({ AutoServiceRegistrationConfiguration.class, ConsulServiceRegistryAutoConfiguration.class })
 public class ConsulAutoServiceRegistrationAutoConfiguration {
 
 	@Autowired
@@ -56,13 +54,11 @@ public class ConsulAutoServiceRegistrationAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulAutoServiceRegistration consulAutoServiceRegistration(
-			ConsulServiceRegistry registry,
-			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
-			ConsulDiscoveryProperties properties,
+	public ConsulAutoServiceRegistration consulAutoServiceRegistration(ConsulServiceRegistry registry,
+			AutoServiceRegistrationProperties autoServiceRegistrationProperties, ConsulDiscoveryProperties properties,
 			ConsulAutoRegistration consulRegistration) {
-		return new ConsulAutoServiceRegistration(registry,
-				autoServiceRegistrationProperties, properties, consulRegistration);
+		return new ConsulAutoServiceRegistration(registry, autoServiceRegistrationProperties, properties,
+				consulRegistration);
 	}
 
 	@Bean
@@ -74,14 +70,14 @@ public class ConsulAutoServiceRegistrationAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulAutoRegistration consulRegistration(
-			AutoServiceRegistrationProperties autoServiceRegistrationProperties,
-			ConsulDiscoveryProperties properties, ApplicationContext applicationContext,
+			AutoServiceRegistrationProperties autoServiceRegistrationProperties, ConsulDiscoveryProperties properties,
+			ApplicationContext applicationContext,
 			ObjectProvider<List<ConsulRegistrationCustomizer>> registrationCustomizers,
 			ObjectProvider<List<ConsulManagementRegistrationCustomizer>> managementRegistrationCustomizers,
 			HeartbeatProperties heartbeatProperties) {
-		return ConsulAutoRegistration.registration(autoServiceRegistrationProperties,
-				properties, applicationContext, registrationCustomizers.getIfAvailable(),
-				managementRegistrationCustomizers.getIfAvailable(), heartbeatProperties);
+		return ConsulAutoRegistration.registration(autoServiceRegistrationProperties, properties, applicationContext,
+				registrationCustomizers.getIfAvailable(), managementRegistrationCustomizers.getIfAvailable(),
+				heartbeatProperties);
 	}
 
 	@Configuration(proxyBeanMethods = false)
@@ -89,42 +85,35 @@ public class ConsulAutoServiceRegistrationAutoConfiguration {
 	protected static class ConsulServletConfiguration {
 
 		@Bean
-		public ConsulRegistrationCustomizer servletConsulCustomizer(
-				ObjectProvider<ServletContext> servletContext) {
+		public ConsulRegistrationCustomizer servletConsulCustomizer(ObjectProvider<ServletContext> servletContext) {
 			return new ConsulServletRegistrationCustomizer(servletContext);
 		}
 
 	}
 
-	protected static class OnConsulRegistrationEnabledCondition
-			extends AllNestedConditions {
+	protected static class OnConsulRegistrationEnabledCondition extends AllNestedConditions {
 
 		OnConsulRegistrationEnabledCondition() {
 			super(ConfigurationPhase.REGISTER_BEAN);
 		}
 
-		@ConditionalOnProperty(
-				value = "spring.cloud.service-registry.auto-registration.enabled",
-				matchIfMissing = true)
+		@ConditionalOnProperty(value = "spring.cloud.service-registry.auto-registration.enabled", matchIfMissing = true)
 		static class AutoRegistrationEnabledClass {
 
 		}
 
-		@ConditionalOnProperty(
-				value = "spring.cloud.consul.service-registry.auto-registration.enabled",
+		@ConditionalOnProperty(value = "spring.cloud.consul.service-registry.auto-registration.enabled",
 				matchIfMissing = true)
 		static class ConsulAutoRegistrationEnabledClass {
 
 		}
 
-		@ConditionalOnProperty(value = "spring.cloud.service-registry.enabled",
-				matchIfMissing = true)
+		@ConditionalOnProperty(value = "spring.cloud.service-registry.enabled", matchIfMissing = true)
 		static class ServiceRegistryEnabledClass {
 
 		}
 
-		@ConditionalOnProperty(value = "spring.cloud.consul.service-registry.enabled",
-				matchIfMissing = true)
+		@ConditionalOnProperty(value = "spring.cloud.consul.service-registry.enabled", matchIfMissing = true)
 		static class ConsulServiceRegistryEnabledClass {
 
 		}

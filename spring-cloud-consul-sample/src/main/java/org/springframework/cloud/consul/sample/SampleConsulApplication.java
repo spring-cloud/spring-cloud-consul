@@ -92,8 +92,7 @@ public class SampleConsulApplication /*
 
 	@RequestMapping("/rest")
 	public String rest() {
-		return this.restTemplate.getForObject("http://" + this.appName + "/me",
-				String.class);
+		return this.restTemplate.getForObject("http://" + this.appName + "/me", String.class);
 	}
 
 	@RequestMapping("/choose")

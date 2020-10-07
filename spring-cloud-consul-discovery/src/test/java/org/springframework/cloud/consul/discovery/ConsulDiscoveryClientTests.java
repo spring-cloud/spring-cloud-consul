@@ -29,7 +29,9 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,12 +42,10 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Joe Athman
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		properties = { "spring.application.name=testConsulDiscovery",
-				"spring.cloud.consul.discovery.prefer-ip-address=true",
-				"spring.cloud.consul.discovery.metadata[foo]=bar" },
-		classes = ConsulDiscoveryClientTests.MyTestConfig.class,
-		webEnvironment = RANDOM_PORT)
+@SpringBootTest(properties = { "spring.application.name=testConsulDiscovery",
+		"spring.cloud.consul.discovery.prefer-ip-address=true", "spring.cloud.consul.discovery.metadata[foo]=bar" },
+		classes = ConsulDiscoveryClientTests.MyTestConfig.class, webEnvironment = RANDOM_PORT)
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulDiscoveryClientTests {
 
 	@Autowired
@@ -56,8 +56,7 @@ public class ConsulDiscoveryClientTests {
 
 	@Test
 	public void getInstancesForServiceWorks() {
-		List<ServiceInstance> instances = this.discoveryClient
-				.getInstances("testConsulDiscovery");
+		List<ServiceInstance> instances = this.discoveryClient.getInstances("testConsulDiscovery");
 		assertThat(instances).as("instances was null").isNotNull();
 		assertThat(instances.isEmpty()).as("instances was empty").isFalse();
 
@@ -69,13 +68,12 @@ public class ConsulDiscoveryClientTests {
 
 	@Test
 	public void getInstancesForServiceRespectsQueryParams() {
-		Response<List<String>> catalogDatacenters = this.consulClient
-				.getCatalogDatacenters();
+		Response<List<String>> catalogDatacenters = this.consulClient.getCatalogDatacenters();
 
 		List<String> dataCenterList = catalogDatacenters.getValue();
 		assertThat(dataCenterList.isEmpty()).as("no data centers found").isFalse();
-		List<ServiceInstance> instances = this.discoveryClient.getInstances(
-				"testConsulDiscovery", new QueryParams(dataCenterList.get(0)));
+		List<ServiceInstance> instances = this.discoveryClient.getInstances("testConsulDiscovery",
+				new QueryParams(dataCenterList.get(0)));
 		assertThat(instances.isEmpty()).as("instances was empty").isFalse();
 
 		ServiceInstance instance = instances.get(0);
@@ -83,8 +81,7 @@ public class ConsulDiscoveryClientTests {
 	}
 
 	private void assertIpAddress(ServiceInstance instance) {
-		assertThat(Character.isDigit(instance.getHost().charAt(0)))
-				.as("host isn't an ip address").isTrue();
+		assertThat(Character.isDigit(instance.getHost().charAt(0))).as("host isn't an ip address").isTrue();
 	}
 
 	@Configuration(proxyBeanMethods = false)

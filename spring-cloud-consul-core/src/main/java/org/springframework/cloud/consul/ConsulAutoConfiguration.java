@@ -54,16 +54,18 @@ public class ConsulAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulClient consulClient(ConsulProperties consulProperties) {
+		return createConsulClient(consulProperties);
+	}
+
+	public static ConsulClient createConsulClient(ConsulProperties consulProperties) {
 		final int agentPort = consulProperties.getPort();
 		final String agentHost = !StringUtils.isEmpty(consulProperties.getScheme())
-				? consulProperties.getScheme() + "://" + consulProperties.getHost()
-				: consulProperties.getHost();
+				? consulProperties.getScheme() + "://" + consulProperties.getHost() : consulProperties.getHost();
 
 		if (consulProperties.getTls() != null) {
 			ConsulProperties.TLSConfig tls = consulProperties.getTls();
-			TLSConfig tlsConfig = new TLSConfig(tls.getKeyStoreInstanceType(),
-					tls.getCertificatePath(), tls.getCertificatePassword(),
-					tls.getKeyStorePath(), tls.getKeyStorePassword());
+			TLSConfig tlsConfig = new TLSConfig(tls.getKeyStoreInstanceType(), tls.getCertificatePath(),
+					tls.getCertificatePassword(), tls.getKeyStorePath(), tls.getKeyStorePassword());
 			return new ConsulClient(agentHost, agentPort, tlsConfig);
 		}
 		return new ConsulClient(agentHost, agentPort);
@@ -71,6 +73,7 @@ public class ConsulAutoConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(Endpoint.class)
+	@EnableConfigurationProperties(ConsulHealthIndicatorProperties.class)
 	protected static class ConsulHealthConfig {
 
 		@Bean
@@ -83,8 +86,9 @@ public class ConsulAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean
 		@ConditionalOnEnabledHealthIndicator("consul")
-		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient) {
-			return new ConsulHealthIndicator(consulClient);
+		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient,
+				ConsulHealthIndicatorProperties properties) {
+			return new ConsulHealthIndicator(consulClient, properties);
 		}
 
 	}
@@ -94,18 +98,15 @@ public class ConsulAutoConfiguration {
 	@EnableRetry(proxyTargetClass = true)
 	@Import(AopAutoConfiguration.class)
 	@EnableConfigurationProperties(RetryProperties.class)
-	@ConditionalOnProperty(value = "spring.cloud.consul.retry.enabled",
-			matchIfMissing = true)
+	@ConditionalOnProperty(value = "spring.cloud.consul.retry.enabled", matchIfMissing = true)
 	protected static class RetryConfiguration {
 
 		@Bean(name = "consulRetryInterceptor")
 		@ConditionalOnMissingBean(name = "consulRetryInterceptor")
-		public RetryOperationsInterceptor consulRetryInterceptor(
-				RetryProperties properties) {
-			return RetryInterceptorBuilder.stateless()
-					.backOffOptions(properties.getInitialInterval(),
-							properties.getMultiplier(), properties.getMaxInterval())
-					.maxAttempts(properties.getMaxAttempts()).build();
+		public RetryOperationsInterceptor consulRetryInterceptor(RetryProperties properties) {
+			return RetryInterceptorBuilder.stateless().backOffOptions(properties.getInitialInterval(),
+					properties.getMultiplier(), properties.getMaxInterval()).maxAttempts(properties.getMaxAttempts())
+					.build();
 		}
 
 	}

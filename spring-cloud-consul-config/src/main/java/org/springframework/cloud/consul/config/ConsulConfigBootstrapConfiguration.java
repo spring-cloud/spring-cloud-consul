@@ -27,6 +27,8 @@ import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Spencer Gibb
@@ -39,8 +41,7 @@ public class ConsulConfigBootstrapConfiguration {
 	@Configuration(proxyBeanMethods = false)
 	@EnableConfigurationProperties
 	@Import(ConsulAutoConfiguration.class)
-	@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled",
-			matchIfMissing = true)
+	@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled", matchIfMissing = true)
 	protected static class ConsulPropertySourceConfiguration {
 
 		@Autowired
@@ -48,13 +49,16 @@ public class ConsulConfigBootstrapConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		public ConsulConfigProperties consulConfigProperties() {
-			return new ConsulConfigProperties();
+		public ConsulConfigProperties consulConfigProperties(Environment env) {
+			ConsulConfigProperties properties = new ConsulConfigProperties();
+			if (StringUtils.isEmpty(properties.getName())) {
+				properties.setName(env.getProperty("spring.application.name", "application"));
+			}
+			return properties;
 		}
 
 		@Bean
-		public ConsulPropertySourceLocator consulPropertySourceLocator(
-				ConsulConfigProperties consulConfigProperties) {
+		public ConsulPropertySourceLocator consulPropertySourceLocator(ConsulConfigProperties consulConfigProperties) {
 			return new ConsulPropertySourceLocator(this.consul, consulConfigProperties);
 		}
 

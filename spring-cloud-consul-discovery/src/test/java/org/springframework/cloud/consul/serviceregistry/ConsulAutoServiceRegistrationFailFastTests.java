@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import com.ecwid.consul.ConsulException;
 import com.ecwid.consul.v1.ConsulClient;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -28,33 +29,36 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ContextConfiguration;
+
+import static org.hamcrest.Matchers.isA;
 
 /**
  * @author Spencer Gibb
  * @author Venil Noronha
  */
 @DirtiesContext
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoServiceRegistrationFailFastTests {
 
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
+	@Ignore
 	@Test
 	public void testFailFastEnabled() {
-		this.exception.expect(ConsulException.class);
-		new SpringApplicationBuilder(TestConfig.class)
-				.properties("spring.application.name=testregistrationfails-fast",
-						"spring.jmx.default-domain=testautoregfailfast", "server.port=0",
-						"spring.cloud.consul.discovery.failFast=true")
-				.run();
+		this.exception.expectCause(isA(ConsulException.class));
+		new SpringApplicationBuilder(TestConfig.class).properties("spring.application.name=testregistrationfails-fast",
+				"spring.jmx.default-domain=testautoregfailfast", "server.port=0",
+				"spring.cloud.consul.discovery.failFast=true").run();
 	}
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
-	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class,
-			ConsulAutoConfiguration.class,
+	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	protected static class TestConfig {
 

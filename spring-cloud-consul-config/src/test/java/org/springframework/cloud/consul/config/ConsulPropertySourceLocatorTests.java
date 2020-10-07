@@ -21,20 +21,19 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import com.ecwid.consul.v1.ConsulClient;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.cloud.context.environment.EnvironmentChangeEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -74,84 +73,77 @@ public class ConsulPropertySourceLocatorTests {
 
 	private static final String KEY3 = ROOT + "/" + APP_NAME + "/" + TEST_PROP3;
 
-	private ConfigurableApplicationContext context;
+	private static ConfigurableApplicationContext context;
 
-	private ConfigurableEnvironment environment;
+	private static ConfigurableEnvironment environment;
 
-	private ConsulClient client;
+	private static ConsulClient client;
 
-	private ConsulProperties properties;
+	@BeforeAll
+	public static void setup() {
+		ConsulTestcontainers.start();
+		client = ConsulTestcontainers.client();
+		client.deleteKVValues(PREFIX);
+		client.setKVValue(KEY1, VALUE1);
+		client.setKVValue(KEY2, VALUE2);
 
-	@Before
-	public void setup() {
-		this.properties = new ConsulProperties();
-		this.client = new ConsulClient(this.properties.getHost(),
-				this.properties.getPort());
-		this.client.deleteKVValues(PREFIX);
-		this.client.setKVValue(KEY1, VALUE1);
-		this.client.setKVValue(KEY2, VALUE2);
+		context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE).run(
+				"--spring.application.name=" + APP_NAME, "--spring.config.use-legacy-processing=true",
+				"--spring.cloud.consul.host=" + ConsulTestcontainers.getHost(),
+				"--spring.cloud.consul.port=" + ConsulTestcontainers.getPort(),
+				"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.watch.delay=10");
 
-		this.context = new SpringApplicationBuilder(Config.class)
-				.web(WebApplicationType.NONE).run("--SPRING_APPLICATION_NAME=" + APP_NAME,
-						"--spring.cloud.consul.config.prefix=" + ROOT,
-						"spring.cloud.consul.config.watch.delay=10");
-
-		this.client = this.context.getBean(ConsulClient.class);
-		this.properties = this.context.getBean(ConsulProperties.class);
-		this.environment = this.context.getEnvironment();
+		client = context.getBean(ConsulClient.class);
+		environment = context.getEnvironment();
 	}
 
-	@After
-	public void teardown() {
-		this.client.deleteKVValues(PREFIX);
-		this.context.close();
+	@AfterAll
+	public static void teardown() {
+		client.deleteKVValues(PREFIX);
+		if (context != null) {
+			context.close();
+		}
 	}
 
 	@Test
-	public void propertyLoaded() throws Exception {
-		String testProp = this.environment.getProperty(TEST_PROP2_CANONICAL);
+	public void propertyLoaded() {
+		String testProp = environment.getProperty(TEST_PROP2_CANONICAL);
 		assertThat(testProp).as("testProp was wrong").isEqualTo(VALUE2);
 	}
 
 	@Test
-	@Ignore // FIXME broken tests with boot 2.0.0
 	public void propertyLoadedAndUpdated() throws Exception {
-		String testProp = this.environment.getProperty(TEST_PROP_CANONICAL);
+		String testProp = environment.getProperty(TEST_PROP_CANONICAL);
 		assertThat(testProp).as("testProp was wrong").isEqualTo(VALUE1);
 
-		this.client.setKVValue(KEY1, "testPropValUpdate");
+		client.setKVValue(KEY1, "testPropValUpdate");
 
-		CountDownLatch latch = this.context.getBean("countDownLatch1",
-				CountDownLatch.class);
+		CountDownLatch latch = context.getBean("countDownLatch1", CountDownLatch.class);
 		boolean receivedEvent = latch.await(15, TimeUnit.SECONDS);
 		assertThat(receivedEvent).as("listener didn't receive event").isTrue();
 
-		testProp = this.environment.getProperty(TEST_PROP_CANONICAL);
-		assertThat(testProp).as("testProp was wrong after update")
-				.isEqualTo("testPropValUpdate");
+		testProp = environment.getProperty(TEST_PROP_CANONICAL);
+		assertThat(testProp).as("testProp was wrong after update").isEqualTo("testPropValUpdate");
 	}
 
 	@Test
-	@Ignore // FIXME broken tests with boot 2.0.0
 	public void contextDoesNotExistThenExists() throws Exception {
-		String testProp = this.environment.getProperty(TEST_PROP3_CANONICAL);
+		String testProp = environment.getProperty(TEST_PROP3_CANONICAL);
 		assertThat(testProp).as("testProp was wrong").isNull();
 
-		this.client.setKVValue(KEY3, "testPropValInsert");
+		client.setKVValue(KEY3, "testPropValInsert");
 
-		CountDownLatch latch = this.context.getBean("countDownLatch2",
-				CountDownLatch.class);
+		CountDownLatch latch = context.getBean("countDownLatch2", CountDownLatch.class);
 		boolean receivedEvent = latch.await(15, TimeUnit.SECONDS);
 		assertThat(receivedEvent).as("listener didn't receive event").isTrue();
 
-		testProp = this.environment.getProperty(TEST_PROP3_CANONICAL);
-		assertThat(testProp).as(TEST_PROP3 + " was wrong after update")
-				.isEqualTo("testPropValInsert");
+		testProp = environment.getProperty(TEST_PROP3_CANONICAL);
+		assertThat(testProp).as(TEST_PROP3 + " was wrong after update").isEqualTo("testPropValInsert");
 	}
 
-	@Configuration(proxyBeanMethods = false)
+	@Configuration
 	@EnableAutoConfiguration
-	static class Config {
+	static class Config implements ApplicationListener<EnvironmentChangeEvent> {
 
 		@Bean
 		public CountDownLatch countDownLatch1() {
@@ -163,8 +155,8 @@ public class ConsulPropertySourceLocatorTests {
 			return new CountDownLatch(1);
 		}
 
-		@EventListener
-		public void handle(EnvironmentChangeEvent event) {
+		@Override
+		public void onApplicationEvent(EnvironmentChangeEvent event) {
 			if (event.getKeys().contains(TEST_PROP)) {
 				countDownLatch1().countDown();
 			}

@@ -23,7 +23,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,8 +34,6 @@ public class ConsulPropertySourceTests {
 
 	private ConsulClient client;
 
-	private ConsulProperties properties;
-
 	private String prefix;
 
 	private String kvContext;
@@ -44,11 +42,9 @@ public class ConsulPropertySourceTests {
 
 	@Before
 	public void setup() {
-		this.properties = new ConsulProperties();
-		this.prefix = "consulPropertySourceTests"
-				+ new Random().nextInt(Integer.MAX_VALUE);
-		this.client = new ConsulClient(this.properties.getHost(),
-				this.properties.getPort());
+		ConsulTestcontainers.start();
+		this.prefix = "consulPropertySourceTests" + new Random().nextInt(Integer.MAX_VALUE);
+		this.client = ConsulTestcontainers.client();
 	}
 
 	@After
@@ -63,31 +59,25 @@ public class ConsulPropertySourceTests {
 		this.client.setKVValue(this.kvContext + "/fooprop", "fookvval");
 		this.client.setKVValue(this.prefix + "/kv" + "/bar/prop", "8080");
 
-		ConsulPropertySource source = getConsulPropertySource(
-				new ConsulConfigProperties(), this.kvContext);
+		ConsulPropertySource source = getConsulPropertySource(new ConsulConfigProperties(), this.kvContext);
 
 		assertProperties(source, "fookvval", "8080");
 	}
 
-	private void assertProperties(ConsulPropertySource source, Object fooval,
-			Object barval) {
-		assertThat(source.getProperty("fooprop")).as("fooprop was wrong")
-				.isEqualTo(fooval);
-		assertThat(source.getProperty("bar.prop")).as("bar.prop was wrong")
-				.isEqualTo(barval);
+	private void assertProperties(ConsulPropertySource source, Object fooval, Object barval) {
+		assertThat(source.getProperty("fooprop")).as("fooprop was wrong").isEqualTo(fooval);
+		assertThat(source.getProperty("bar.prop")).as("bar.prop was wrong").isEqualTo(barval);
 	}
 
 	@Test
 	public void testProperties() {
 		// properties file property
 		this.propertiesContext = this.prefix + "/properties";
-		this.client.setKVValue(this.propertiesContext + "/data",
-				"fooprop=foopropval\nbar.prop=8080");
+		this.client.setKVValue(this.propertiesContext + "/data", "fooprop=foopropval\nbar.prop=8080");
 
 		ConsulConfigProperties configProperties = new ConsulConfigProperties();
 		configProperties.setFormat(ConsulConfigProperties.Format.PROPERTIES);
-		ConsulPropertySource source = getConsulPropertySource(configProperties,
-				this.propertiesContext);
+		ConsulPropertySource source = getConsulPropertySource(configProperties, this.propertiesContext);
 
 		assertProperties(source, "foopropval", "8080");
 	}
@@ -96,13 +86,11 @@ public class ConsulPropertySourceTests {
 	public void testYaml() {
 		// yaml file property
 		String yamlContext = this.prefix + "/yaml";
-		this.client.setKVValue(yamlContext + "/data",
-				"fooprop: fooymlval\nbar:\n  prop: 8080");
+		this.client.setKVValue(yamlContext + "/data", "fooprop: fooymlval\nbar:\n  prop: 8080");
 
 		ConsulConfigProperties configProperties = new ConsulConfigProperties();
 		configProperties.setFormat(ConsulConfigProperties.Format.YAML);
-		ConsulPropertySource source = getConsulPropertySource(configProperties,
-				yamlContext);
+		ConsulPropertySource source = getConsulPropertySource(configProperties, yamlContext);
 
 		assertProperties(source, "fooymlval", 8080);
 	}
@@ -115,16 +103,13 @@ public class ConsulPropertySourceTests {
 
 		ConsulConfigProperties configProperties = new ConsulConfigProperties();
 		configProperties.setFormat(ConsulConfigProperties.Format.YAML);
-		ConsulPropertySource source = new ConsulPropertySource(yamlContext, this.client,
-				configProperties);
+		ConsulPropertySource source = new ConsulPropertySource(yamlContext, this.client, configProperties);
 		// Should NOT throw a NPE
 		source.init();
 	}
 
-	private ConsulPropertySource getConsulPropertySource(
-			ConsulConfigProperties configProperties, String context) {
-		ConsulPropertySource source = new ConsulPropertySource(context, this.client,
-				configProperties);
+	private ConsulPropertySource getConsulPropertySource(ConsulConfigProperties configProperties, String context) {
+		ConsulPropertySource source = new ConsulPropertySource(context, this.client, configProperties);
 		source.init();
 		String[] names = source.getPropertyNames();
 		assertThat(names).as("names was null").isNotNull();

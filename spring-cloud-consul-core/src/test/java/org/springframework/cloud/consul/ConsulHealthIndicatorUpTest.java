@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -25,24 +27,36 @@ import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.health.Status;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.cloud.consul.test.ConsulTestcontainers;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 
 /**
+ * Integration test for {@link ConsulHealthIndicator} when its in the UP status.
+ *
  * @author Lomesh Patel (lomeshpatel)
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulHealthIndicatorUpTest {
+
+	@SpyBean
+	private ConsulClient consulClient;
 
 	@Autowired
 	private HealthEndpoint healthEndpoint;
 
 	@Test
-	public void doHealthCheck() {
-		assertThat(this.healthEndpoint.health().getStatus())
-				.as("health status was not UP").isEqualTo(Status.UP);
+	public void statusIsUp() {
+		assertThat(this.healthEndpoint.health().getStatus()).as("health status was not UP").isEqualTo(Status.UP);
+		verify(consulClient).getStatusLeader();
+		verify(consulClient).getCatalogServices(any(CatalogServicesRequest.class));
 	}
 
 	@EnableAutoConfiguration

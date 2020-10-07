@@ -44,8 +44,7 @@ public class EventService {
 
 	private AtomicReference<Long> lastIndex = new AtomicReference<>();
 
-	public EventService(ConsulBinderProperties properties, ConsulClient consul,
-			ObjectMapper objectMapper) {
+	public EventService(ConsulBinderProperties properties, ConsulClient consul, ObjectMapper objectMapper) {
 		this.properties = properties;
 		this.consul = consul;
 		this.objectMapper = objectMapper;
@@ -72,14 +71,12 @@ public class EventService {
 	}
 
 	public Event fire(String name, String payload) {
-		Response<Event> response = this.consul.eventFire(name, payload, new EventParams(),
-				QueryParams.DEFAULT);
+		Response<Event> response = this.consul.eventFire(name, payload, new EventParams(), QueryParams.DEFAULT);
 		return response.getValue();
 	}
 
 	public Response<List<Event>> getEventsResponse() {
-		return this.consul.eventList(EventListRequest.newBuilder()
-				.setQueryParams(QueryParams.DEFAULT).build());
+		return this.consul.eventList(EventListRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
 	}
 
 	public List<Event> getEvents() {
@@ -104,8 +101,8 @@ public class EventService {
 		if (this.properties != null) {
 			eventTimeout = this.properties.getEventTimeout();
 		}
-		Response<List<Event>> watch = this.consul.eventList(EventListRequest.newBuilder()
-				.setQueryParams(new QueryParams(eventTimeout, index)).build());
+		Response<List<Event>> watch = this.consul
+				.eventList(EventListRequest.newBuilder().setQueryParams(new QueryParams(eventTimeout, index)).build());
 		return filterEvents(readEvents(watch), lastIndex);
 	}
 

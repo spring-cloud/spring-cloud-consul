@@ -38,8 +38,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class HeartbeatProperties {
 
-	private static final Log log = org.apache.commons.logging.LogFactory
-			.getLog(HeartbeatProperties.class);
+	private static final Log log = org.apache.commons.logging.LogFactory.getLog(HeartbeatProperties.class);
 
 	// TODO: change enabled to default to true when I stop seeing messages like
 	// [WARN] agent: Check 'service:testConsulApp:xtest:8080' missed TTL, is now critical
@@ -52,9 +51,10 @@ public class HeartbeatProperties {
 	@DecimalMax("0.9")
 	private double intervalRatio = 2.0 / 3.0;
 
-	// TODO: did heartbeatInterval need to be a field?
-
-	protected Duration computeHearbeatInterval() {
+	/**
+	 * @return the computed heartbeat interval
+	 */
+	protected Duration computeHeartbeatInterval() {
 		// heartbeat rate at ratio * ttl, but no later than ttl -1s and, (under lesser
 		// priority), no sooner than 1s from now
 		double interval = this.ttl.getSeconds() * this.intervalRatio;
@@ -86,16 +86,14 @@ public class HeartbeatProperties {
 		return this.intervalRatio;
 	}
 
-	public void setIntervalRatio(
-			@DecimalMin("0.1") @DecimalMax("0.9") double intervalRatio) {
+	public void setIntervalRatio(@DecimalMin("0.1") @DecimalMax("0.9") double intervalRatio) {
 		this.intervalRatio = intervalRatio;
 	}
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this).append("enabled", this.enabled)
-				.append("ttl", this.ttl).append("intervalRatio", this.intervalRatio)
-				.toString();
+		return new ToStringCreator(this).append("enabled", this.enabled).append("ttl", this.ttl)
+				.append("intervalRatio", this.intervalRatio).toString();
 	}
 
 }
