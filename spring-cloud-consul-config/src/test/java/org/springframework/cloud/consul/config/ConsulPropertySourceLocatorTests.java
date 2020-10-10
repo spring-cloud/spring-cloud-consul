@@ -112,7 +112,6 @@ public class ConsulPropertySourceLocatorTests {
 	}
 
 	@Test
-	@Ignore // FIXME broken tests with boot 2.0.0
 	public void propertyLoadedAndUpdated() throws Exception {
 		String testProp = this.environment.getProperty(TEST_PROP_CANONICAL);
 		assertThat(testProp).as("testProp was wrong").isEqualTo(VALUE1);
@@ -147,7 +146,7 @@ public class ConsulPropertySourceLocatorTests {
 				.isEqualTo("testPropValInsert");
 	}
 
-	@Configuration(proxyBeanMethods = false)
+	@Configuration
 	@EnableAutoConfiguration
 	static class Config {
 
