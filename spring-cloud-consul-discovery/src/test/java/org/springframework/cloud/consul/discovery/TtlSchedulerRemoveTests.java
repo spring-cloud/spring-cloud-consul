@@ -23,7 +23,6 @@ import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.health.HealthChecksForServiceRequest;
 import com.ecwid.consul.v1.health.model.Check;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -42,15 +41,18 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static com.ecwid.consul.v1.health.model.Check.CheckStatus.CRITICAL;
 import static com.ecwid.consul.v1.health.model.Check.CheckStatus.PASSING;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 /**
  * @author Stéphane Leroy
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = TtlSchedulerRemoveTests.TtlSchedulerRemoveTestConfig.class, properties = {
-		"spring.application.name=ttlSchedulerRemove", "spring.cloud.consul.discovery.instance-id=ttlSchedulerRemove-id",
-		"spring.cloud.consul.discovery.heartbeat.enabled=true", "spring.cloud.consul.discovery.heartbeat.ttlValue=2" },
+@SpringBootTest(classes = TtlSchedulerRemoveTests.TtlSchedulerRemoveTestConfig.class,
+		properties = { "spring.cloud.consul.discovery.heartbeat.ttl=5s", "spring.application.name=ttlSchedulerRemove",
+				"spring.cloud.consul.discovery.instance-id=ttlSchedulerRemove-id",
+				"spring.cloud.consul.discovery.heartbeat.enabled=true",
+				"spring.cloud.consul.discovery.heartbeat.ttlValue=2" },
 		webEnvironment = RANDOM_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class TtlSchedulerRemoveTests {
@@ -62,17 +64,18 @@ public class TtlSchedulerRemoveTests {
 	private TtlScheduler ttlScheduler;
 
 	@Test
-	@Ignore // FIXME: 3.0.0
 	public void should_not_send_check_if_service_removed() throws InterruptedException {
-		Thread.sleep(1000); // wait for Ttlscheduler to send a check to consul.
-		Check serviceCheck = getCheckForService("ttlSchedulerRemove");
-		assertThat(serviceCheck.getStatus()).as("Service check is in wrong state").isEqualTo(PASSING);
+		await().untilAsserted(() -> {
+			Check serviceCheck = getCheckForService("ttlSchedulerRemove");
+			assertThat(serviceCheck.getStatus()).as("Service check is in wrong state").isEqualTo(PASSING);
+		});
 
 		// Remove service from TtlScheduler and wait for TTL to expired.
 		this.ttlScheduler.remove("ttlSchedulerRemove-id");
-		Thread.sleep(2100);
-		serviceCheck = getCheckForService("ttlSchedulerRemove");
-		assertThat(serviceCheck.getStatus()).as("Service check is in wrong state").isEqualTo(CRITICAL);
+		await().untilAsserted(() -> {
+			Check serviceCheck = getCheckForService("ttlSchedulerRemove");
+			assertThat(serviceCheck.getStatus()).as("Service check is in wrong state").isEqualTo(CRITICAL);
+		});
 	}
 
 	private Check getCheckForService(String serviceId) {

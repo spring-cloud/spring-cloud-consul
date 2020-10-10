@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -38,9 +37,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(
-		properties = { "spring.application.name=testConsulLoadBalancer",
-				"spring.cloud.consul.discovery.prefer-ip-address=true", "spring.cloud.consul.discovery.tags=foo=bar" },
+@SpringBootTest(properties = { "spring.application.name=testConsulLoadBalancer",
+		"spring.cloud.consul.discovery.prefer-ip-address=true", "spring.cloud.consul.discovery.metadata.foo=bar" },
 		webEnvironment = RANDOM_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulLoadbalancerClientTests {
@@ -49,7 +47,6 @@ public class ConsulLoadbalancerClientTests {
 	private LoadBalancerClient client;
 
 	@Test
-	@Ignore // FIXME: 3.0.0
 	public void chooseWorks() {
 		ServiceInstance instance = this.client.choose("testConsulLoadBalancer");
 		assertThat(instance).isNotNull();
@@ -66,22 +63,7 @@ public class ConsulLoadbalancerClientTests {
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
 	@EnableDiscoveryClient
-	// @RibbonClient(name = "testConsulLoadBalancer", configuration =
-	// MyRibbonConfig.class)
 	public static class MyTestConfig {
-
-	}
-
-	public static class MyRibbonConfig {
-
-		public MyRibbonConfig() {
-			System.err.println("here");
-		}
-
-		// @Bean
-		// public ServerListFilter<Server> ribbonServerListFilter() {
-		// return servers -> servers;
-		// }
 
 	}
 

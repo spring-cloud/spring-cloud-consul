@@ -21,7 +21,6 @@ import java.util.Map;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.agent.model.Service;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -29,9 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
@@ -56,10 +56,9 @@ public class ConsulAutoServiceRegistrationCustomizedInstanceGroupTests {
 	private ConsulClient consul;
 
 	@Autowired
-	private ConsulDiscoveryProperties properties;
+	private LoadBalancerClient client;
 
 	@Test
-	@Ignore // FIXME: 3.0.0
 	public void contextLoads() {
 		Response<Map<String, Service>> response = this.consul.getAgentServices();
 		Map<String, Service> services = response.getValue();
@@ -67,18 +66,11 @@ public class ConsulAutoServiceRegistrationCustomizedInstanceGroupTests {
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
 		assertThat(service.getId()).as("service id was wrong").isEqualTo("myTestService1-WithGroup");
-		assertThat(service.getTags().contains("group=test")).as("service group was wrong").isTrue();
+		assertThat(service.getMeta()).as("service group was wrong").containsEntry("group", "test");
 
-		// ConsulServerList serverList = new ConsulServerList(this.consul,
-		// this.properties);
-		// DefaultClientConfigImpl config = new DefaultClientConfigImpl();
-		// config.setClientName("myTestService-WithGroup");
-		// serverList.initWithNiwsConfig(config);
-		//
-		// List<ConsulServer> servers = serverList.getInitialListOfServers();
-		// assertThat(servers.size()).as("servers was wrong size").isEqualTo(1);
-		// assertThat(servers.get(0).getMetaInfo().getServerGroup())
-		// .as("service group was wrong").isEqualTo("test");
+		ServiceInstance instance = client.choose("myTestService-WithGroup");
+		assertThat(instance).isNotNull();
+		assertThat(instance.getMetadata()).containsEntry("group", "test");
 	}
 
 	@Configuration(proxyBeanMethods = false)
