@@ -135,12 +135,12 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 	@Nullable
 	protected UriComponents parseLocation(ConfigDataLocationResolverContext context, ConfigDataLocation location) {
 		String originalLocation = location.getNonPrefixedValue(PREFIX);
-		String uri = originalLocation;
-		if (!StringUtils.hasText(uri)) {
+		if (!StringUtils.hasText(originalLocation)) {
 			return null;
 		}
-		if (!uri.startsWith("//")) {
-			uri = PREFIX + "//" + uri;
+		String uri;
+		if (!originalLocation.startsWith("//")) {
+			uri = PREFIX + "//" + originalLocation;
 		}
 		else {
 			uri = originalLocation;
