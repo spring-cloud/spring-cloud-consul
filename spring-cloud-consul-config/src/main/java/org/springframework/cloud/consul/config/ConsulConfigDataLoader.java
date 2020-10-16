@@ -24,9 +24,10 @@ import org.apache.commons.logging.Log;
 import org.springframework.boot.context.config.ConfigData;
 import org.springframework.boot.context.config.ConfigDataLoader;
 import org.springframework.boot.context.config.ConfigDataLoaderContext;
+import org.springframework.boot.context.config.ConfigDataLocation;
 import org.springframework.boot.context.config.ConfigDataLocationNotFoundException;
 
-public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigDataLocation> {
+public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigDataResource> {
 
 	private final Log log;
 
@@ -35,17 +36,17 @@ public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigData
 	}
 
 	@Override
-	public ConfigData load(ConfigDataLoaderContext context, ConsulConfigDataLocation location) {
+	public ConfigData load(ConfigDataLoaderContext context, ConsulConfigDataResource resource) {
 		try {
 			ConsulClient consul = getBean(context, ConsulClient.class);
 			ConsulConfigIndexes indexes = getBean(context, ConsulConfigIndexes.class);
 
-			ConsulPropertySource propertySource = location.getConsulPropertySources().createPropertySource(
-					location.getContext(), location.isOptional(), consul, indexes.getIndexes()::put);
+			ConsulPropertySource propertySource = resource.getConsulPropertySources().createPropertySource(
+					resource.getContext(), resource.isOptional(), consul, indexes.getIndexes()::put);
 			return new ConfigData(Collections.singletonList(propertySource));
 		}
 		catch (Exception e) {
-			throw new ConfigDataLocationNotFoundException(location, e);
+			throw new ConfigDataLocationNotFoundException(ConfigDataLocation.of(resource.getContext()), e);
 		}
 	}
 

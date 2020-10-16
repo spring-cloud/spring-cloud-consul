@@ -18,10 +18,10 @@ package org.springframework.cloud.consul.config;
 
 import java.util.Objects;
 
-import org.springframework.boot.context.config.ConfigDataLocation;
+import org.springframework.boot.context.config.ConfigDataResource;
 import org.springframework.core.style.ToStringCreator;
 
-public class ConsulConfigDataLocation extends ConfigDataLocation {
+public class ConsulConfigDataResource extends ConfigDataResource {
 
 	private final ConsulConfigProperties properties;
 
@@ -31,7 +31,7 @@ public class ConsulConfigDataLocation extends ConfigDataLocation {
 
 	private final ConsulPropertySources consulPropertySources;
 
-	public ConsulConfigDataLocation(String context, boolean optional, ConsulConfigProperties properties,
+	public ConsulConfigDataResource(String context, boolean optional, ConsulConfigProperties properties,
 			ConsulPropertySources consulPropertySources) {
 		this.properties = properties;
 		this.context = context;
@@ -63,7 +63,7 @@ public class ConsulConfigDataLocation extends ConfigDataLocation {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		ConsulConfigDataLocation that = (ConsulConfigDataLocation) o;
+		ConsulConfigDataResource that = (ConsulConfigDataResource) o;
 		return this.optional == that.optional && this.context.equals(that.context);
 	}
 
