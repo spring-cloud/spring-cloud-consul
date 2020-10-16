@@ -24,8 +24,7 @@ import org.apache.commons.logging.Log;
 import org.springframework.boot.context.config.ConfigData;
 import org.springframework.boot.context.config.ConfigDataLoader;
 import org.springframework.boot.context.config.ConfigDataLoaderContext;
-import org.springframework.boot.context.config.ConfigDataLocation;
-import org.springframework.boot.context.config.ConfigDataLocationNotFoundException;
+import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 
 public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigDataResource> {
 
@@ -46,7 +45,7 @@ public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigData
 			return new ConfigData(Collections.singletonList(propertySource));
 		}
 		catch (Exception e) {
-			throw new ConfigDataLocationNotFoundException(ConfigDataLocation.of(resource.getContext()), e);
+			throw new ConfigDataResourceNotFoundException(resource, e);
 		}
 	}
 
