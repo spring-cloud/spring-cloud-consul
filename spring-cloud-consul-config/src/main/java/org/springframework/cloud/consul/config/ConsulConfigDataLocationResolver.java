@@ -29,6 +29,7 @@ import org.apache.commons.logging.Log;
 import org.springframework.boot.BootstrapContext;
 import org.springframework.boot.BootstrapRegistry.InstanceSupplier;
 import org.springframework.boot.ConfigurableBootstrapContext;
+import org.springframework.boot.context.config.ConfigDataLocation;
 import org.springframework.boot.context.config.ConfigDataLocationNotFoundException;
 import org.springframework.boot.context.config.ConfigDataLocationResolver;
 import org.springframework.boot.context.config.ConfigDataLocationResolverContext;
@@ -45,7 +46,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
 
-public class ConsulConfigDataLocationResolver implements ConfigDataLocationResolver<ConsulConfigDataLocation> {
+public class ConsulConfigDataLocationResolver implements ConfigDataLocationResolver<ConsulConfigDataResource> {
 
 	/**
 	 * Consul ConfigData prefix.
@@ -64,8 +65,8 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 	}
 
 	@Override
-	public boolean isResolvable(ConfigDataLocationResolverContext context, String location) {
-		if (!location.startsWith(PREFIX)) {
+	public boolean isResolvable(ConfigDataLocationResolverContext context, ConfigDataLocation location) {
+		if (!location.hasPrefix(PREFIX)) {
 			return false;
 		}
 		// only bind if correct prefix
@@ -76,14 +77,14 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 	}
 
 	@Override
-	public List<ConsulConfigDataLocation> resolve(ConfigDataLocationResolverContext context, String location,
-			boolean optional) throws ConfigDataLocationNotFoundException {
+	public List<ConsulConfigDataResource> resolve(ConfigDataLocationResolverContext context,
+			ConfigDataLocation location) throws ConfigDataLocationNotFoundException {
 		return Collections.emptyList();
 	}
 
 	@Override
-	public List<ConsulConfigDataLocation> resolveProfileSpecific(ConfigDataLocationResolverContext resolverContext,
-			String location, boolean optional, Profiles profiles) throws ConfigDataLocationNotFoundException {
+	public List<ConsulConfigDataResource> resolveProfileSpecific(ConfigDataLocationResolverContext resolverContext,
+			ConfigDataLocation location, Profiles profiles) throws ConfigDataLocationNotFoundException {
 		UriComponents locationUri = parseLocation(resolverContext, location);
 
 		// create consul client
@@ -105,8 +106,8 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		registerAndPromoteBean(resolverContext, ConsulConfigIndexes.class,
 				InstanceSupplier.from(ConsulConfigDataIndexes::new));
 
-		return contexts.stream().map(propertySourceContext -> new ConsulConfigDataLocation(propertySourceContext,
-				optional, properties, consulPropertySources)).collect(Collectors.toList());
+		return contexts.stream().map(propertySourceContext -> new ConsulConfigDataResource(propertySourceContext,
+				location.isOptional(), properties, consulPropertySources)).collect(Collectors.toList());
 	}
 
 	private List<String> getCustomContexts(UriComponents uriComponents, ConsulConfigProperties properties) {
@@ -132,16 +133,17 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 	}
 
 	@Nullable
-	protected UriComponents parseLocation(ConfigDataLocationResolverContext context, String location) {
-		String uri = location.substring(PREFIX.length());
-		if (!StringUtils.hasText(uri)) {
+	protected UriComponents parseLocation(ConfigDataLocationResolverContext context, ConfigDataLocation location) {
+		String originalLocation = location.getNonPrefixedValue(PREFIX);
+		if (!StringUtils.hasText(originalLocation)) {
 			return null;
 		}
-		if (!uri.startsWith("//")) {
-			uri = PREFIX + "//" + uri;
+		String uri;
+		if (!originalLocation.startsWith("//")) {
+			uri = PREFIX + "//" + originalLocation;
 		}
 		else {
-			uri = location;
+			uri = originalLocation;
 		}
 		return UriComponentsBuilder.fromUriString(uri).build();
 	}
