@@ -40,6 +40,7 @@ import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findH
  * @author Spencer Gibb
  * @author Joe Athman
  * @author Tim Ysewyn
+ * @author Chris Bono
  */
 public class ConsulDiscoveryClient implements DiscoveryClient {
 
@@ -73,10 +74,14 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	private void addInstancesToList(List<ServiceInstance> instances, String serviceId, QueryParams queryParams) {
-
-		HealthServicesRequest request = HealthServicesRequest.newBuilder().setTag(this.properties.getDefaultQueryTag())
+		HealthServicesRequest.Builder requestBuilder = HealthServicesRequest.newBuilder()
 				.setPassing(this.properties.isQueryPassing()).setQueryParams(queryParams)
-				.setToken(this.properties.getAclToken()).build();
+				.setToken(this.properties.getAclToken());
+		String queryTag = this.properties.getQueryTagForService(serviceId);
+		if (queryTag != null) {
+			requestBuilder.setTag(queryTag);
+		}
+		HealthServicesRequest request = requestBuilder.build();
 		Response<List<HealthService>> services = this.client.getHealthServices(serviceId, request);
 
 		for (HealthService service : services.getValue()) {
