@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.consul.sample;
+package org.springframework.cloud.consul.bootstraptests;
 
 import lombok.Data;
 
