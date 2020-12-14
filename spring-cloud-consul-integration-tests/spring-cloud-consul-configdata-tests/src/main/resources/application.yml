@@ -4,9 +4,8 @@ server:
 spring:
   application:
     name: testConsulConfigDataIntegrationTestApp
-  config:
-    import: 'optional:consul:'
 
 logging:
   level:
     org.springframework.cloud.consul: DEBUG
+    org.springframework.boot.context.config: TRACE
