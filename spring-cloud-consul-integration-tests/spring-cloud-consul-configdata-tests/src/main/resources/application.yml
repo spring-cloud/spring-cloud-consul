@@ -1,0 +1,12 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: testConsulConfigDataIntegrationTestApp
+  config:
+    import: 'optional:consul:'
+
+logging:
+  level:
+    org.springframework.cloud.consul: DEBUG

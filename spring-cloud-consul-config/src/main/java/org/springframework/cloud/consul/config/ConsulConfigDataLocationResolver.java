@@ -38,6 +38,7 @@ import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -153,8 +154,11 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		registerBean(context, type, supplier);
 		context.getBootstrapContext().addCloseListener(event -> {
 			T instance = event.getBootstrapContext().get(type);
-			event.getApplicationContext().getBeanFactory().registerSingleton("configData" + type.getSimpleName(),
-					instance);
+			String name = "configData" + type.getSimpleName();
+			ConfigurableApplicationContext appCtxt = event.getApplicationContext();
+			if (!appCtxt.containsBean(name)) {
+				appCtxt.getBeanFactory().registerSingleton(name, instance);
+			}
 		});
 	}
 
