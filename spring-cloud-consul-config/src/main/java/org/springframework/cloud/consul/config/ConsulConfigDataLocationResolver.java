@@ -117,7 +117,7 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 	}
 
 	private List<String> getCustomContexts(UriComponents uriComponents, ConsulConfigProperties properties) {
-		if (StringUtils.isEmpty(uriComponents.getPath())) {
+		if (!StringUtils.hasText(uriComponents.getPath())) {
 			return Collections.emptyList();
 		}
 
