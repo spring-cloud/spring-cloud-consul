@@ -23,9 +23,15 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.boot.BootstrapRegistry;
+import org.springframework.boot.Bootstrapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.bind.BindContext;
+import org.springframework.boot.context.properties.bind.BindHandler;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -48,12 +54,16 @@ public class ConsulConfigDataCustomizationIntegrationTests {
 
 	private static ConfigurableApplicationContext context;
 
+	private static BindHandlerBootstrapper bindHandlerBootstrapper;
+
 	@BeforeAll
 	public static void setup() {
 		ConsulTestcontainers.start();
 
 		SpringApplication application = new SpringApplication(Config.class);
 		application.setWebApplicationType(WebApplicationType.NONE);
+		bindHandlerBootstrapper = new BindHandlerBootstrapper();
+		application.addBootstrapper(bindHandlerBootstrapper);
 		application.addBootstrapper(ConsulBootstrapper.fromConsulProperties(TestConsulClient::new));
 		context = application.run("--spring.application.name=" + APP_NAME,
 				"--spring.config.import=consul:" + ConsulTestcontainers.getHost() + ":"
@@ -73,6 +83,7 @@ public class ConsulConfigDataCustomizationIntegrationTests {
 	public void consulClientIsCustom() {
 		ConsulClient client = context.getBean(ConsulClient.class);
 		assertThat(client).isInstanceOf(TestConsulClient.class);
+		assertThat(bindHandlerBootstrapper.onSuccessCount).isGreaterThan(0);
 	}
 
 	static class TestConsulClient extends ConsulClient {
@@ -86,6 +97,24 @@ public class ConsulConfigDataCustomizationIntegrationTests {
 	@Configuration
 	@EnableAutoConfiguration
 	static class Config {
+
+	}
+
+	static class BindHandlerBootstrapper implements Bootstrapper {
+
+		private int onSuccessCount = 0;
+
+		@Override
+		public void intitialize(BootstrapRegistry registry) {
+			registry.register(BindHandler.class, context -> new BindHandler() {
+				@Override
+				public Object onSuccess(ConfigurationPropertyName name, Bindable<?> target, BindContext context,
+						Object result) {
+					onSuccessCount++;
+					return result;
+				}
+			});
+		}
 
 	}
 

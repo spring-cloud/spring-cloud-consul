@@ -34,6 +34,7 @@ import org.springframework.boot.context.config.ConfigDataLocationNotFoundExcepti
 import org.springframework.boot.context.config.ConfigDataLocationResolver;
 import org.springframework.boot.context.config.ConfigDataLocationResolverContext;
 import org.springframework.boot.context.config.Profiles;
+import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
@@ -89,12 +90,12 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		UriComponents locationUri = parseLocation(resolverContext, location);
 
 		// create consul client
-		registerBean(resolverContext, ConsulProperties.class, loadProperties(resolverContext.getBinder(), locationUri));
+		registerBean(resolverContext, ConsulProperties.class, loadProperties(resolverContext, locationUri));
 
 		registerAndPromoteBean(resolverContext, ConsulClient.class, this::createConsulClient);
 
 		// create locations
-		ConsulConfigProperties properties = loadConfigProperties(resolverContext.getBinder());
+		ConsulConfigProperties properties = loadConfigProperties(resolverContext);
 
 		ConsulPropertySources consulPropertySources = new ConsulPropertySources(properties, log);
 
@@ -109,6 +110,10 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 
 		return contexts.stream().map(propertySourceContext -> new ConsulConfigDataResource(propertySourceContext,
 				location.isOptional(), properties, consulPropertySources)).collect(Collectors.toList());
+	}
+
+	private BindHandler getBindHandler(ConfigDataLocationResolverContext context) {
+		return context.getBootstrapContext().getOrElse(BindHandler.class, null);
 	}
 
 	private List<String> getCustomContexts(UriComponents uriComponents, ConsulConfigProperties properties) {
@@ -178,9 +183,12 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		return ConsulAutoConfiguration.createConsulClient(properties);
 	}
 
-	protected ConsulProperties loadProperties(Binder binder, UriComponents location) {
-		ConsulProperties consulProperties = binder.bind(ConsulProperties.PREFIX, Bindable.of(ConsulProperties.class))
-				.orElse(new ConsulProperties());
+	protected ConsulProperties loadProperties(ConfigDataLocationResolverContext resolverContext,
+			UriComponents location) {
+		Binder binder = resolverContext.getBinder();
+		ConsulProperties consulProperties = binder
+				.bind(ConsulProperties.PREFIX, Bindable.of(ConsulProperties.class), getBindHandler(resolverContext))
+				.orElseGet(ConsulProperties::new);
 
 		if (location != null) {
 			if (StringUtils.hasText(location.getHost())) {
@@ -194,10 +202,12 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		return consulProperties;
 	}
 
-	protected ConsulConfigProperties loadConfigProperties(Binder binder) {
+	protected ConsulConfigProperties loadConfigProperties(ConfigDataLocationResolverContext resolverContext) {
+		Binder binder = resolverContext.getBinder();
+		BindHandler bindHandler = getBindHandler(resolverContext);
 		ConsulConfigProperties properties = binder
-				.bind(ConsulConfigProperties.PREFIX, Bindable.of(ConsulConfigProperties.class))
-				.orElse(new ConsulConfigProperties());
+				.bind(ConsulConfigProperties.PREFIX, Bindable.of(ConsulConfigProperties.class), bindHandler)
+				.orElseGet(ConsulConfigProperties::new);
 
 		if (StringUtils.isEmpty(properties.getName())) {
 			properties.setName(binder.bind("spring.application.name", String.class).orElse("application"));
