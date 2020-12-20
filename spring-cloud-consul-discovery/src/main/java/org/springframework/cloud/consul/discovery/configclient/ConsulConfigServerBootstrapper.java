@@ -20,6 +20,8 @@ import com.ecwid.consul.v1.ConsulClient;
 
 import org.springframework.boot.BootstrapRegistry;
 import org.springframework.boot.Bootstrapper;
+import org.springframework.boot.context.properties.bind.BindHandler;
+import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtilsProperties;
@@ -41,7 +43,8 @@ public class ConsulConfigServerBootstrapper implements Bootstrapper {
 		// create consul client
 		registry.registerIfAbsent(ConsulProperties.class, context -> {
 			Binder binder = context.get(Binder.class);
-			return binder.bind(ConsulProperties.PREFIX, ConsulProperties.class).orElseGet(ConsulProperties::new);
+			return binder.bind(ConsulProperties.PREFIX, Bindable.of(ConsulProperties.class), getBindHandler(context))
+					.orElseGet(ConsulProperties::new);
 		});
 		registry.registerIfAbsent(ConsulClient.class, context -> {
 			ConsulProperties consulProperties = context.get(ConsulProperties.class);
@@ -54,7 +57,8 @@ public class ConsulConfigServerBootstrapper implements Bootstrapper {
 			}
 			ConsulClient consulClient = context.get(ConsulClient.class);
 			ConsulDiscoveryProperties properties = binder
-					.bind(ConsulDiscoveryProperties.PREFIX, ConsulDiscoveryProperties.class)
+					.bind(ConsulDiscoveryProperties.PREFIX, Bindable.of(ConsulDiscoveryProperties.class),
+							getBindHandler(context))
 					.orElseGet(() -> new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties())));
 			return new ConsulDiscoveryClient(consulClient, properties);
 		});
@@ -74,6 +78,10 @@ public class ConsulConfigServerBootstrapper implements Bootstrapper {
 			return discoveryClient::getInstances;
 		});
 
+	}
+
+	private BindHandler getBindHandler(org.springframework.boot.BootstrapContext context) {
+		return context.getOrElse(BindHandler.class, null);
 	}
 
 	private boolean isDiscoveryEnabled(Binder binder) {
