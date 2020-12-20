@@ -104,16 +104,4 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		return this.properties.getOrder();
 	}
 
-	/**
-	 * Depreacted local resolver.
-	 */
-	@Deprecated
-	public interface LocalResolver {
-
-		String getInstanceId();
-
-		Integer getPort();
-
-	}
-
 }
