@@ -358,7 +358,7 @@ To get started with Consul Configuration use the starter with group `org.springf
 
 Spring Boot 2.4 introduced a new way to import configuration data via the `spring.config.import` property. This is now the default way to get configuration from Consul.
 
-To optionally connect to config server set the following in application.properties:
+To optionally connect to Consul set the following in application.properties:
 
 .application.properties
 [source,properties]
