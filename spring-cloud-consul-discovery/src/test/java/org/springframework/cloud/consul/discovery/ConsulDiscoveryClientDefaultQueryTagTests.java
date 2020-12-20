@@ -84,6 +84,10 @@ public class ConsulDiscoveryClientDefaultQueryTagTests {
 		assertThat(serviceInstance.getPort()).isEqualTo(intgService.getPort());
 		assertThat(serviceInstance.getServiceId()).isEqualTo(intgService.getName());
 		assertThat(serviceInstance.getInstanceId()).isEqualTo(intgService.getId());
+		assertThat(serviceInstance).isInstanceOf(ConsulServiceInstance.class);
+		ConsulServiceInstance consulInstance = (ConsulServiceInstance) serviceInstance;
+		assertThat(consulInstance.getTags()).containsOnly("intg");
+		assertThat(consulInstance.getHealthService()).isNotNull();
 	}
 
 	private NewService serviceForEnvironment(String env, int port) {
