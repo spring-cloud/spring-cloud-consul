@@ -37,8 +37,8 @@ public class TestConsulDiscoveryClientBootstrapConfiguration {
 	@Bean
 	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties properties) {
 		ConsulDiscoveryClient client = mock(ConsulDiscoveryClient.class);
-		ConsulServiceInstance instance = new ConsulServiceInstance("configserver1", "configserver", properties.getHostname(),
-				properties.getPort(), false);
+		ConsulServiceInstance instance = new ConsulServiceInstance("configserver1", "configserver",
+				properties.getHostname(), properties.getPort(), false);
 		instance.setHealthService(mock(HealthService.class));
 		given(client.getInstances("configserver")).willReturn(Arrays.asList(instance));
 		return client;

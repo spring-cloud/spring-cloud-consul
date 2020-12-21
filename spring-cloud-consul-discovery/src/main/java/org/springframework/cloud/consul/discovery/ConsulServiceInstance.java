@@ -34,11 +34,13 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 
 	public ConsulServiceInstance(HealthService healthService, String serviceId) {
 		this(healthService.getService().getId(), serviceId, findHost(healthService),
-			healthService.getService().getPort(), getSecure(healthService), getMetadata(healthService), healthService.getService().getTags());
+				healthService.getService().getPort(), getSecure(healthService), getMetadata(healthService),
+				healthService.getService().getTags());
 		this.healthService = healthService;
 	}
 
-	public ConsulServiceInstance(String instanceId, String serviceId, String host, int port, boolean secure, Map<String, String> metadata, List<String> tags) {
+	public ConsulServiceInstance(String instanceId, String serviceId, String host, int port, boolean secure,
+			Map<String, String> metadata, List<String> tags) {
 		super(instanceId, serviceId, host, port, secure, metadata);
 	}
 
@@ -83,16 +85,11 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this)
-			.append("instanceId", getInstanceId())
-			.append("serviceId", getServiceId())
-			.append("host", getHost())
-			.append("port", getPort())
-			.append("secure", isSecure())
-			.append("metadata", getMetadata())
-			.append("uri", getUri())
-			.append("healthService", healthService)
-			.toString();
+		return new ToStringCreator(this).append("instanceId", getInstanceId()).append("serviceId", getServiceId())
+				.append("host", getHost()).append("port", getPort()).append("secure", isSecure())
+				.append("metadata", getMetadata()).append("uri", getUri()).append("healthService", healthService)
+				.toString();
 
 	}
+
 }
