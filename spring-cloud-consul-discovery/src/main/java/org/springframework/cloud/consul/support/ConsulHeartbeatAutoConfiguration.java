@@ -25,7 +25,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration;
+import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
+import org.springframework.cloud.consul.discovery.ReRegistrationPredicate;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.cloud.consul.serviceregistry.ConsulServiceRegistryAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -52,8 +54,16 @@ public class ConsulHeartbeatAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties, ConsulClient consulClient) {
-		return new TtlScheduler(heartbeatProperties, consulClient);
+	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties,
+			ConsulDiscoveryProperties discoveryProperties, ConsulClient consulClient,
+			ReRegistrationPredicate reRegistrationPredicate) {
+		return new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient, reRegistrationPredicate);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public ReRegistrationPredicate reRegistrationPredicate() {
+		return ReRegistrationPredicate.DEFAULT;
 	}
 
 }
