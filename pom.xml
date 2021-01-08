@@ -28,7 +28,7 @@
 		<spring-cloud-deployer.version>1.0.3.RELEASE</spring-cloud-deployer.version>
 		<spring-cloud-openfeign.version>2.2.7.BUILD-SNAPSHOT</spring-cloud-openfeign.version>
 		<spring-cloud-stream.version>Horsham.SR9</spring-cloud-stream.version>
-		<testcontainers.version>1.14.3</testcontainers.version>
+		<testcontainers.version>1.15.1</testcontainers.version>
 	</properties>
 
 	<scm>
