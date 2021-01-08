@@ -26,7 +26,7 @@
 		<spring-cloud-deployer.version>1.0.3.RELEASE</spring-cloud-deployer.version>
 		<spring-cloud-openfeign.version>3.0.1-SNAPSHOT</spring-cloud-openfeign.version>
 		<spring-cloud-stream.version>3.1.0-SNAPSHOT</spring-cloud-stream.version>
-		<testcontainers.version>1.14.3</testcontainers.version>
+		<testcontainers.version>1.15.1</testcontainers.version>
 	</properties>
 
 	<scm>
