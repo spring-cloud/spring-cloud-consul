@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtils.HostInfo;
+import org.springframework.cloud.commons.util.InetUtilsProperties;
 import org.springframework.core.style.ToStringCreator;
 
 /**
@@ -207,11 +208,11 @@ public class ConsulDiscoveryProperties {
 
 	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {
-		this.managementTags.add(MANAGEMENT);
+		this(new InetUtils(new InetUtilsProperties()));
 	}
 
 	public ConsulDiscoveryProperties(InetUtils inetUtils) {
-		this();
+		this.managementTags.add(MANAGEMENT);
 		this.hostInfo = inetUtils.findFirstNonLoopbackHostInfo();
 		this.ipAddress = this.hostInfo.getIpAddress();
 		this.hostname = this.hostInfo.getHostname();

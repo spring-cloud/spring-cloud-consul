@@ -55,6 +55,7 @@ public class ConsulConfigServerBootstrapperTests {
 		BindHandlerBootstrapper bindHandlerBootstrapper = new BindHandlerBootstrapper();
 		ConfigurableApplicationContext context = new SpringApplicationBuilder(TestConfig.class)
 				.properties("--server.port=0", "spring.cloud.config.discovery.enabled=true",
+						"spring.cloud.consul.discovery.hostname=myhost",
 						"spring.cloud.service-registry.auto-registration.enabled=false",
 						"spring.cloud.consul.host=localhost")
 				.addBootstrapper(bindHandlerBootstrapper)
