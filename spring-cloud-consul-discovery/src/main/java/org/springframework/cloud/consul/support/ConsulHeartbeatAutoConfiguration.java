@@ -27,7 +27,7 @@ import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClientConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
-import org.springframework.cloud.consul.discovery.ReRegistrationPredicate;
+import org.springframework.cloud.consul.discovery.ReregistrationPredicate;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.cloud.consul.serviceregistry.ConsulServiceRegistryAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -56,14 +56,14 @@ public class ConsulHeartbeatAutoConfiguration {
 	@ConditionalOnMissingBean
 	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties,
 			ConsulDiscoveryProperties discoveryProperties, ConsulClient consulClient,
-			ReRegistrationPredicate reRegistrationPredicate) {
+			ReregistrationPredicate reRegistrationPredicate) {
 		return new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient, reRegistrationPredicate);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ReRegistrationPredicate reRegistrationPredicate() {
-		return ReRegistrationPredicate.DEFAULT;
+	public ReregistrationPredicate reRegistrationPredicate() {
+		return ReregistrationPredicate.DEFAULT;
 	}
 
 }

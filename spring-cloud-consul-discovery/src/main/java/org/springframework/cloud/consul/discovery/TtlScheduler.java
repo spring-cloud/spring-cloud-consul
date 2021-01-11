@@ -49,16 +49,16 @@ public class TtlScheduler {
 
 	private ConsulClient client;
 
-	private ReRegistrationPredicate reRegistrationPredicate;
+	private ReregistrationPredicate reregistrationPredicate;
 
 	private NewService registeredService;
 
 	public TtlScheduler(HeartbeatProperties heartbeatProperties, ConsulDiscoveryProperties discoveryProperties,
-			ConsulClient client, ReRegistrationPredicate reRegistrationPredicate) {
+			ConsulClient client, ReregistrationPredicate reregistrationPredicate) {
 		this.heartbeatProperties = heartbeatProperties;
 		this.discoveryProperties = discoveryProperties;
 		this.client = client;
-		this.reRegistrationPredicate = reRegistrationPredicate;
+		this.reregistrationPredicate = reregistrationPredicate;
 	}
 
 	public void add(final NewService service) {
@@ -110,8 +110,8 @@ public class TtlScheduler {
 				}
 			}
 			catch (OperationException e) {
-				if (this.ttlScheduler.heartbeatProperties.isReRegisterServiceOnFailure()
-						&& this.ttlScheduler.reRegistrationPredicate.isEligible(e)) {
+				if (this.ttlScheduler.heartbeatProperties.isReregisterServiceOnFailure()
+						&& this.ttlScheduler.reregistrationPredicate.isEligible(e)) {
 					log.warn(e.getMessage());
 					if (this.ttlScheduler.registeredService != null) {
 						if (log.isInfoEnabled()) {

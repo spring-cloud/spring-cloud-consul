@@ -23,7 +23,7 @@ import com.ecwid.consul.v1.OperationException;
  *
  * @author Toshiaki Maki
  */
-public interface ReRegistrationPredicate {
+public interface ReregistrationPredicate {
 
 	/**
 	 * test if the exception is eligible for re-registration.
@@ -35,6 +35,6 @@ public interface ReRegistrationPredicate {
 	/**
 	 * Default implementation that performs re-registration when the status code is 500.
 	 */
-	ReRegistrationPredicate DEFAULT = e -> e.getStatusCode() == 500;
+	ReregistrationPredicate DEFAULT = e -> e.getStatusCode() == 500;
 
 }

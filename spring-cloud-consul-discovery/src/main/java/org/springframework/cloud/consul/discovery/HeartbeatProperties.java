@@ -51,7 +51,7 @@ public class HeartbeatProperties {
 	@DecimalMax("0.9")
 	private double intervalRatio = 2.0 / 3.0;
 
-	private boolean reRegisterServiceOnFailure = false;
+	private boolean reregisterServiceOnFailure = false;
 
 	/**
 	 * @return the computed heartbeat interval
@@ -92,12 +92,12 @@ public class HeartbeatProperties {
 		this.intervalRatio = intervalRatio;
 	}
 
-	public boolean isReRegisterServiceOnFailure() {
-		return this.reRegisterServiceOnFailure;
+	public boolean isReregisterServiceOnFailure() {
+		return this.reregisterServiceOnFailure;
 	}
 
-	public void setReRegisterServiceOnFailure(boolean reRegisterServiceOnFailure) {
-		this.reRegisterServiceOnFailure = reRegisterServiceOnFailure;
+	public void setReregisterServiceOnFailure(boolean reregisterServiceOnFailure) {
+		this.reregisterServiceOnFailure = reregisterServiceOnFailure;
 	}
 
 	@Override

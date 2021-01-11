@@ -59,9 +59,9 @@ public class ConsulHeartbeatTaskTests {
 	@Test
 	public void enableReRegistration() {
 		TtlScheduler ttlScheduler = new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient,
-				ReRegistrationPredicate.DEFAULT);
+				ReregistrationPredicate.DEFAULT);
 		ConsulHeartbeatTask consulHeartbeatTask = new ConsulHeartbeatTask(serviceId, ttlScheduler);
-		heartbeatProperties.setReRegisterServiceOnFailure(true);
+		heartbeatProperties.setReregisterServiceOnFailure(true);
 		NewService service = new NewService();
 		service.setId(serviceId);
 		ttlScheduler.add(service);
@@ -77,9 +77,9 @@ public class ConsulHeartbeatTaskTests {
 	@Test
 	public void notEligibleForReRegistration() {
 		TtlScheduler ttlScheduler = new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient,
-				ReRegistrationPredicate.DEFAULT);
+				ReregistrationPredicate.DEFAULT);
 		ConsulHeartbeatTask consulHeartbeatTask = new ConsulHeartbeatTask(serviceId, ttlScheduler);
-		heartbeatProperties.setReRegisterServiceOnFailure(true);
+		heartbeatProperties.setReregisterServiceOnFailure(true);
 		NewService service = new NewService();
 		service.setId(serviceId);
 		ttlScheduler.add(service);
@@ -94,7 +94,7 @@ public class ConsulHeartbeatTaskTests {
 		TtlScheduler ttlScheduler = new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient,
 				e -> e.getStatusContent().endsWith("does not have associated TTL"));
 		ConsulHeartbeatTask consulHeartbeatTask = new ConsulHeartbeatTask(serviceId, ttlScheduler);
-		heartbeatProperties.setReRegisterServiceOnFailure(true);
+		heartbeatProperties.setReregisterServiceOnFailure(true);
 		NewService service = new NewService();
 		service.setId(serviceId);
 		ttlScheduler.add(service);
@@ -110,9 +110,9 @@ public class ConsulHeartbeatTaskTests {
 	@Test
 	public void disableReRegistration() {
 		TtlScheduler ttlScheduler = new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient,
-				ReRegistrationPredicate.DEFAULT);
+				ReregistrationPredicate.DEFAULT);
 		ConsulHeartbeatTask consulHeartbeatTask = new ConsulHeartbeatTask(serviceId, ttlScheduler);
-		heartbeatProperties.setReRegisterServiceOnFailure(false);
+		heartbeatProperties.setReregisterServiceOnFailure(false);
 		NewService service = new NewService();
 		service.setId(serviceId);
 		ttlScheduler.add(service);
