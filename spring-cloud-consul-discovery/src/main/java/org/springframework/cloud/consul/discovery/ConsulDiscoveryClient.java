@@ -67,13 +67,13 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	private void addInstancesToList(List<ServiceInstance> instances, String serviceId, QueryParams queryParams) {
 		HealthServicesRequest.Builder requestBuilder = HealthServicesRequest.newBuilder()
-				.setPassing(this.properties.isQueryPassing()).setQueryParams(queryParams)
-				.setToken(this.properties.getAclToken());
-		String queryTag = this.properties.getQueryTagForService(serviceId);
-		if (queryTag != null) {
-			requestBuilder.setTag(queryTag);
+				.setPassing(properties.isQueryPassing()).setQueryParams(queryParams).setToken(properties.getAclToken());
+		String[] queryTags = properties.getQueryTagsForService(serviceId);
+		if (queryTags != null) {
+			requestBuilder.setTags(queryTags);
 		}
 		HealthServicesRequest request = requestBuilder.build();
+
 		Response<List<HealthService>> services = this.client.getHealthServices(serviceId, request);
 
 		for (HealthService service : services.getValue()) {
