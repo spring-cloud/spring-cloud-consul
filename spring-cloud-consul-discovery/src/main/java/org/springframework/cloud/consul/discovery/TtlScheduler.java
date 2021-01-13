@@ -43,15 +43,15 @@ public class TtlScheduler {
 
 	private final TaskScheduler scheduler = new ConcurrentTaskScheduler(Executors.newSingleThreadScheduledExecutor());
 
-	private HeartbeatProperties heartbeatProperties;
+	private final HeartbeatProperties heartbeatProperties;
 
-	private ConsulDiscoveryProperties discoveryProperties;
+	private final ConsulDiscoveryProperties discoveryProperties;
 
-	private ConsulClient client;
+	private final ConsulClient client;
 
-	private ReregistrationPredicate reregistrationPredicate;
+	private final ReregistrationPredicate reregistrationPredicate;
 
-	private NewService registeredService;
+	private final Map<String, NewService> registeredServices = new ConcurrentHashMap<>();
 
 	public TtlScheduler(HeartbeatProperties heartbeatProperties, ConsulDiscoveryProperties discoveryProperties,
 			ConsulClient client, ReregistrationPredicate reregistrationPredicate) {
@@ -63,7 +63,7 @@ public class TtlScheduler {
 
 	public void add(final NewService service) {
 		add(service.getId());
-		this.registeredService = service;
+		this.registeredServices.put(service.getId(), service);
 	}
 
 	/**
@@ -85,18 +85,24 @@ public class TtlScheduler {
 			task.cancel(true);
 		}
 		this.serviceHeartbeats.remove(instanceId);
+		this.registeredServices.remove(instanceId);
 	}
 
 	static class ConsulHeartbeatTask implements Runnable {
 
-		private String checkId;
+		private final String serviceId;
 
-		private TtlScheduler ttlScheduler;
+		private final String checkId;
+
+		private final TtlScheduler ttlScheduler;
 
 		ConsulHeartbeatTask(String serviceId, TtlScheduler ttlScheduler) {
-			this.checkId = serviceId;
-			if (!this.checkId.startsWith("service:")) {
-				this.checkId = "service:" + this.checkId;
+			this.serviceId = serviceId;
+			if (!this.serviceId.startsWith("service:")) {
+				this.checkId = "service:" + this.serviceId;
+			}
+			else {
+				this.checkId = this.serviceId;
 			}
 			this.ttlScheduler = ttlScheduler;
 		}
@@ -113,11 +119,12 @@ public class TtlScheduler {
 				if (this.ttlScheduler.heartbeatProperties.isReregisterServiceOnFailure()
 						&& this.ttlScheduler.reregistrationPredicate.isEligible(e)) {
 					log.warn(e.getMessage());
-					if (this.ttlScheduler.registeredService != null) {
+					NewService registeredService = this.ttlScheduler.registeredServices.get(this.serviceId);
+					if (registeredService != null) {
 						if (log.isInfoEnabled()) {
-							log.info("Re-register " + this.ttlScheduler.registeredService);
+							log.info("Re-register " + registeredService);
 						}
-						this.ttlScheduler.client.agentServiceRegister(this.ttlScheduler.registeredService,
+						this.ttlScheduler.client.agentServiceRegister(registeredService,
 								this.ttlScheduler.discoveryProperties.getAclToken());
 					}
 					else {
