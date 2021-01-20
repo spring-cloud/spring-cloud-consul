@@ -16,7 +16,10 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.ecwid.consul.v1.health.model.HealthService;
 
