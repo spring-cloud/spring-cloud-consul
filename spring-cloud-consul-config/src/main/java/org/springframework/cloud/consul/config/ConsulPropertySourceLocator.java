@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.ecwid.consul.v1.ConsulClient;
 import org.apache.commons.logging.Log;
@@ -46,7 +47,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 
 	private final ConsulConfigProperties properties;
 
-	private final List<String> contexts = new ArrayList<>();
+	private final List<ConsulPropertyContext> contexts = new ArrayList<>();
 
 	private final LinkedHashMap<String, Long> contextIndex = new LinkedHashMap<>();
 
@@ -57,7 +58,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 
 	@Deprecated
 	public List<String> getContexts() {
-		return this.contexts;
+		return this.contexts.stream().map(ConsulPropertyContext::getContext).collect(Collectors.toList());
 	}
 
 	@Override
@@ -84,9 +85,9 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 
 			CompositePropertySource composite = new CompositePropertySource("consul");
 
-			for (String propertySourceContext : this.contexts) {
-				ConsulPropertySource propertySource = sources.createPropertySource(propertySourceContext, true,
-						this.consul, contextIndex::put);
+			for (ConsulPropertyContext propertySourceContext : this.contexts) {
+				ConsulPropertySource propertySource = sources.createPropertySource(propertySourceContext.getContext(),
+						true, this.consul, contextIndex::put, propertySourceContext.getFormat());
 				if (propertySource != null) {
 					composite.addPropertySource(propertySource);
 				}

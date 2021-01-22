@@ -99,9 +99,10 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 
 		ConsulPropertySources consulPropertySources = new ConsulPropertySources(properties, log);
 
-		List<String> contexts = (locationUri == null || CollectionUtils.isEmpty(locationUri.getPathSegments()))
-				? consulPropertySources.getAutomaticContexts(profiles.getAccepted())
-				: getCustomContexts(locationUri, properties);
+		List<ConsulPropertyContext> contexts = (locationUri == null
+				|| CollectionUtils.isEmpty(locationUri.getPathSegments()))
+						? consulPropertySources.getAutomaticContexts(profiles.getAccepted())
+						: getCustomContexts(locationUri, properties);
 
 		registerAndPromoteBean(resolverContext, ConsulConfigProperties.class, InstanceSupplier.of(properties));
 
@@ -116,15 +117,15 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		return context.getBootstrapContext().getOrElse(BindHandler.class, null);
 	}
 
-	private List<String> getCustomContexts(UriComponents uriComponents, ConsulConfigProperties properties) {
+	private List<ConsulPropertyContext> getCustomContexts(UriComponents uriComponents, ConsulConfigProperties properties) {
 		if (!StringUtils.hasText(uriComponents.getPath())) {
 			return Collections.emptyList();
 		}
 
-		List<String> contexts = new ArrayList<>();
+		List<ConsulPropertyContext> contexts = new ArrayList<>();
 		for (String path : uriComponents.getPath().split(";")) {
 			for (String suffix : getSuffixes(properties)) {
-				contexts.add(path + suffix);
+				contexts.add(new ConsulPropertyContext(path + suffix, properties.getFormat()));
 			}
 		}
 

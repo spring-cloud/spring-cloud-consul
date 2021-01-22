@@ -392,7 +392,9 @@ spring:
       config:
         enabled: true
         prefix: configuration
+        format: PROPERTIES
         defaultContext: apps
+        defaultContextFormat: YAML
         profileSeparator: '::'
 ----
 
@@ -400,7 +402,9 @@ CAUTION: If you have set `spring.cloud.bootstrap.enabled=true` or `spring.config
 
 * `enabled` setting this value to "false" disables Consul Config
 * `prefix` sets the base folder for configuration values
+* `format` The data format in Consul, see <<YAML or Properties with Config>> and <<git2consul with Config>>
 * `defaultContext` sets the folder name used by all applications
+* `defaultContextFormat` The data format used by the default context, only needs to be specified if the default context format differs from the app context format
 * `profileSeparator` sets the value of the separator used to separate the profile name in property sources with profiles
 
 [[spring-cloud-consul-config-watch]]
@@ -417,7 +421,7 @@ The watch uses a Spring `TaskScheduler` to schedule the call to consul. By defau
 [[spring-cloud-consul-config-format]]
 === YAML or Properties with Config
 
-It may be more convenient to store a blob of properties in YAML or Properties format as opposed to individual key/value pairs.  Set the `spring.cloud.consul.config.format` property to `YAML` or `PROPERTIES`. For example to use YAML:
+It may be more convenient to store a blob of properties in YAML or Properties format as opposed to individual key/value pairs.  Set the `spring.cloud.consul.config.format` property to `YAML` or `PROPERTIES`. If a different format is used for the `defaultContext` it can be configured with the `spring.cloud.consul.config.default-context-format` property. For example to use YAML:
 
 [source,yaml]
 ----

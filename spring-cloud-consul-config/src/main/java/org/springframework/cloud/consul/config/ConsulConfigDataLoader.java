@@ -41,7 +41,8 @@ public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigData
 			ConsulConfigIndexes indexes = getBean(context, ConsulConfigIndexes.class);
 
 			ConsulPropertySource propertySource = resource.getConsulPropertySources().createPropertySource(
-					resource.getContext(), resource.isOptional(), consul, indexes.getIndexes()::put);
+					resource.getContext().getContext(), resource.isOptional(), consul, indexes.getIndexes()::put,
+					resource.getContext().getFormat());
 			return new ConfigData(Collections.singletonList(propertySource));
 		}
 		catch (Exception e) {
