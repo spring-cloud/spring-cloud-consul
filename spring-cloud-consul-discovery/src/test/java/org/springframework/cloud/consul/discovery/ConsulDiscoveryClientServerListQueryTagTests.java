@@ -16,7 +16,7 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -39,20 +39,25 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK;
+import static org.springframework.cloud.consul.discovery.ConsulDiscoveryClientServerListQueryTagTests.NAME;
 
 /**
- * @author Piotr Wielgolaski
+ * Integration test to verify the
+ * {@link ConsulDiscoveryProperties#getServerListQueryTags()} is respected.
+ *
+ * @author Chris Bono
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = MOCK, classes = ConsulDiscoveryClientDefaultQueryTagTests.TestConfig.class,
-		properties = { "spring.application.name=consulServiceDefaultTag",
+@SpringBootTest(webEnvironment = MOCK, classes = ConsulDiscoveryClientServerListQueryTagTests.TestConfig.class,
+		properties = { "spring.application.name=" + NAME,
 				"spring.cloud.consul.discovery.catalogServicesWatch.enabled=false",
+				"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=uat",
 				"spring.cloud.consul.discovery.defaultQueryTag=intg" })
 @DirtiesContext
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
-public class ConsulDiscoveryClientDefaultQueryTagTests {
+public class ConsulDiscoveryClientServerListQueryTagTests {
 
-	public static final String NAME = "consulServiceDefaultTag";
+	public static final String NAME = "consulServiceServerListQueryTags";
 
 	@Autowired
 	private ConsulDiscoveryClient discoveryClient;
@@ -65,29 +70,25 @@ public class ConsulDiscoveryClientDefaultQueryTagTests {
 	private NewService uatService = serviceForEnvironment("uat", 9080);
 
 	@Before
-	public void setUp() throws Exception {
-		this.consulClient.agentServiceRegister(this.intgService);
-		this.consulClient.agentServiceRegister(this.uatService);
+	public void setUp() {
+		consulClient.agentServiceRegister(intgService);
+		consulClient.agentServiceRegister(uatService);
 	}
 
 	@After
-	public void tearDown() throws Exception {
-		this.consulClient.agentServiceDeregister(this.intgService.getId());
-		this.consulClient.agentServiceDeregister(this.uatService.getId());
+	public void tearDown() {
+		consulClient.agentServiceDeregister(intgService.getId());
+		consulClient.agentServiceDeregister(uatService.getId());
 	}
 
 	@Test
-	public void shouldReturnOnlyIntgInstance() {
-		List<ServiceInstance> instances = this.discoveryClient.getInstances(NAME);
+	public void shouldReturnInstanceWithMatchingServerListQueryTags() {
+		List<ServiceInstance> instances = discoveryClient.getInstances(NAME);
 		assertThat(instances).as("instances was wrong size").hasSize(1);
 		ServiceInstance serviceInstance = instances.get(0);
-		assertThat(serviceInstance.getPort()).isEqualTo(intgService.getPort());
-		assertThat(serviceInstance.getServiceId()).isEqualTo(intgService.getName());
-		assertThat(serviceInstance.getInstanceId()).isEqualTo(intgService.getId());
-		assertThat(serviceInstance).isInstanceOf(ConsulServiceInstance.class);
-		ConsulServiceInstance consulInstance = (ConsulServiceInstance) serviceInstance;
-		assertThat(consulInstance.getTags()).containsOnly("intg");
-		assertThat(consulInstance.getHealthService()).isNotNull();
+		assertThat(serviceInstance.getPort()).isEqualTo(uatService.getPort());
+		assertThat(serviceInstance.getServiceId()).isEqualTo(uatService.getName());
+		assertThat(serviceInstance.getInstanceId()).isEqualTo(uatService.getId());
 	}
 
 	private NewService serviceForEnvironment(String env, int port) {
@@ -96,7 +97,7 @@ public class ConsulDiscoveryClientDefaultQueryTagTests {
 		service.setId(NAME + env);
 		service.setName(NAME);
 		service.setPort(port);
-		service.setTags(Arrays.asList(env));
+		service.setTags(Collections.singletonList(env));
 		return service;
 	}
 

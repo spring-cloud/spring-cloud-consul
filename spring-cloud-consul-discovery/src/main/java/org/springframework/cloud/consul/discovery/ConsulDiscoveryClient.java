@@ -17,7 +17,6 @@
 package org.springframework.cloud.consul.discovery;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,23 +26,17 @@ import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
 import com.ecwid.consul.v1.health.HealthServicesRequest;
 import com.ecwid.consul.v1.health.model.HealthService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
-import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
-
-import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
 
 /**
  * @author Spencer Gibb
  * @author Joe Athman
  * @author Tim Ysewyn
+ * @author Chris Bono
  */
 public class ConsulDiscoveryClient implements DiscoveryClient {
-
-	private static final Log log = LogFactory.getLog(ConsulDiscoveryClient.class);
 
 	private final ConsulClient client;
 
@@ -73,25 +66,18 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	private void addInstancesToList(List<ServiceInstance> instances, String serviceId, QueryParams queryParams) {
-
-		HealthServicesRequest request = HealthServicesRequest.newBuilder().setTag(this.properties.getDefaultQueryTag())
+		HealthServicesRequest.Builder requestBuilder = HealthServicesRequest.newBuilder()
 				.setPassing(this.properties.isQueryPassing()).setQueryParams(queryParams)
-				.setToken(this.properties.getAclToken()).build();
+				.setToken(this.properties.getAclToken());
+		String queryTag = this.properties.getQueryTagForService(serviceId);
+		if (queryTag != null) {
+			requestBuilder.setTag(queryTag);
+		}
+		HealthServicesRequest request = requestBuilder.build();
 		Response<List<HealthService>> services = this.client.getHealthServices(serviceId, request);
 
 		for (HealthService service : services.getValue()) {
-			String host = findHost(service);
-
-			Map<String, String> metadata = service.getService().getMeta();
-			if (metadata == null) {
-				metadata = new LinkedHashMap<>();
-			}
-			boolean secure = false;
-			if (metadata.containsKey("secure")) {
-				secure = Boolean.parseBoolean(metadata.get("secure"));
-			}
-			instances.add(new DefaultServiceInstance(service.getService().getId(), serviceId, host,
-					service.getService().getPort(), secure, metadata));
+			instances.add(new ConsulServiceInstance(service, serviceId));
 		}
 	}
 
@@ -116,18 +102,6 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	@Override
 	public int getOrder() {
 		return this.properties.getOrder();
-	}
-
-	/**
-	 * Depreacted local resolver.
-	 */
-	@Deprecated
-	public interface LocalResolver {
-
-		String getInstanceId();
-
-		Integer getPort();
-
 	}
 
 }

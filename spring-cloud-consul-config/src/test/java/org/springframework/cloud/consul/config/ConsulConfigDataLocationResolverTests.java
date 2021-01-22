@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.BootstrapRegistry.InstanceSupplier;
+import org.springframework.boot.DefaultBootstrapContext;
 import org.springframework.boot.context.config.ConfigDataLocation;
 import org.springframework.boot.context.config.ConfigDataLocationResolverContext;
 import org.springframework.boot.context.config.Profiles;
@@ -70,7 +71,11 @@ public class ConsulConfigDataLocationResolverTests {
 
 	@Test
 	public void testLoadProperties() {
-		ConsulProperties properties = createResolver().loadProperties(Binder.get(new MockEnvironment()),
+		Binder binder = Binder.get(new MockEnvironment());
+		ConfigDataLocationResolverContext resolverContext = mock(ConfigDataLocationResolverContext.class);
+		when(resolverContext.getBinder()).thenReturn(binder);
+		when(resolverContext.getBootstrapContext()).thenReturn(new DefaultBootstrapContext());
+		ConsulProperties properties = createResolver().loadProperties(resolverContext,
 				UriComponentsBuilder.fromUriString("consul://myhost:8502").build());
 		assertThat(properties.getHost()).isEqualTo("myhost");
 		assertThat(properties.getPort()).isEqualTo(8502);
@@ -83,6 +88,7 @@ public class ConsulConfigDataLocationResolverTests {
 	private List<ConsulConfigDataResource> testResolveProfileSpecific(String location) {
 		ConsulConfigDataLocationResolver resolver = createResolver();
 		ConfigDataLocationResolverContext context = mock(ConfigDataLocationResolverContext.class);
+		when(context.getBootstrapContext()).thenReturn(new DefaultBootstrapContext());
 		MockEnvironment env = new MockEnvironment();
 		env.setProperty("spring.application.name", "testapp");
 		when(context.getBinder()).thenReturn(Binder.get(env));

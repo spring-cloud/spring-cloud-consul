@@ -18,11 +18,12 @@ package org.springframework.cloud.consul.discovery.configclient;
 
 import java.util.Arrays;
 
+import com.ecwid.consul.v1.health.model.HealthService;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.client.DefaultServiceInstance;
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.discovery.ConsulServiceInstance;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,8 +37,9 @@ public class TestConsulDiscoveryClientBootstrapConfiguration {
 	@Bean
 	public ConsulDiscoveryClient consulDiscoveryClient(ConsulDiscoveryProperties properties) {
 		ConsulDiscoveryClient client = mock(ConsulDiscoveryClient.class);
-		ServiceInstance instance = new DefaultServiceInstance("configserver1", "configserver", properties.getHostname(),
-				properties.getPort(), false);
+		ConsulServiceInstance instance = new ConsulServiceInstance("configserver1", "configserver",
+				properties.getHostname(), properties.getPort(), false);
+		instance.setHealthService(mock(HealthService.class));
 		given(client.getInstances("configserver")).willReturn(Arrays.asList(instance));
 		return client;
 	}

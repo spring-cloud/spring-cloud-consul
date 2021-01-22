@@ -20,9 +20,15 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.boot.BootstrapRegistry;
+import org.springframework.boot.Bootstrapper;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.properties.bind.BindContext;
+import org.springframework.boot.context.properties.bind.BindHandler;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.cloud.config.client.ConfigServerInstanceProvider;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -46,9 +52,13 @@ public class ConsulConfigServerBootstrapperTests {
 	@Test
 	public void enabledAddsInstanceProviderFn() {
 		AtomicReference<ConsulDiscoveryClient> bootstrapDiscoveryClient = new AtomicReference<>();
+		BindHandlerBootstrapper bindHandlerBootstrapper = new BindHandlerBootstrapper();
 		ConfigurableApplicationContext context = new SpringApplicationBuilder(TestConfig.class)
 				.properties("--server.port=0", "spring.cloud.config.discovery.enabled=true",
-						"spring.cloud.service-registry.auto-registration.enabled=false")
+						"spring.cloud.consul.discovery.hostname=myhost",
+						"spring.cloud.service-registry.auto-registration.enabled=false",
+						"spring.cloud.consul.host=localhost")
+				.addBootstrapper(bindHandlerBootstrapper)
 				.addBootstrapper(registry -> registry.addCloseListener(event -> {
 					bootstrapDiscoveryClient.set(event.getBootstrapContext().get(ConsulDiscoveryClient.class));
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
@@ -58,12 +68,31 @@ public class ConsulConfigServerBootstrapperTests {
 				})).run();
 		ConsulDiscoveryClient discoveryClient = context.getBean(ConsulDiscoveryClient.class);
 		assertThat(discoveryClient == bootstrapDiscoveryClient.get()).isTrue();
+		assertThat(bindHandlerBootstrapper.onSuccessCount).isGreaterThan(0);
 		context.close();
 	}
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
 	static class TestConfig {
+
+	}
+
+	static class BindHandlerBootstrapper implements Bootstrapper {
+
+		private int onSuccessCount = 0;
+
+		@Override
+		public void intitialize(BootstrapRegistry registry) {
+			registry.register(BindHandler.class, context -> new BindHandler() {
+				@Override
+				public Object onSuccess(ConfigurationPropertyName name, Bindable<?> target, BindContext context,
+						Object result) {
+					onSuccessCount++;
+					return result;
+				}
+			});
+		}
 
 	}
 

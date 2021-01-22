@@ -4,68 +4,71 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>spring-cloud-consul-binder</artifactId>
+	<artifactId>spring-cloud-consul-configdata-tests</artifactId>
 	<packaging>jar</packaging>
-	<name>Spring Cloud Consul Binder</name>
-	<description>Spring Cloud Consul Binder</description>
+	<name>Spring Cloud Consul ConfigData Integration Tests</name>
+	<description>Spring Cloud Consul ConfigData Integration Tests</description>
 
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
-		<artifactId>spring-cloud-consul</artifactId>
+		<artifactId>spring-cloud-consul-integration-tests</artifactId>
 		<version>3.0.1-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<!--skip deploy -->
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<optional>true</optional>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-consul-core</artifactId>
-			<optional>true</optional>
+			<artifactId>spring-cloud-starter-consul-config</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-stream</artifactId>
+			<artifactId>spring-cloud-starter-consul-discovery</artifactId>
 		</dependency>
+		<!--<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-consul-bus</artifactId>
+		</dependency>-->
 		<dependency>
-			<groupId>com.ecwid.consul</groupId>
-			<artifactId>consul-api</artifactId>
-			<optional>true</optional>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-deployer-local</artifactId>
-			<scope>test</scope>
+			<!-- Only needed at compile time -->
+			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.vintage</groupId>
-			<artifactId>junit-vintage-engine</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.tomakehurst</groupId>
-			<artifactId>wiremock</artifactId>
-			<version>2.27.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.awaitility</groupId>
-			<artifactId>awaitility</artifactId>
-			<version>4.0.3</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

@@ -1,0 +1,11 @@
+server:
+  port: 0
+
+spring:
+  application:
+    name: testConsulConfigDataIntegrationTestApp
+
+logging:
+  level:
+    org.springframework.cloud.consul: DEBUG
+    org.springframework.boot.context.config: TRACE
