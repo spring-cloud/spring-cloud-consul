@@ -74,7 +74,7 @@ public class ConsulPropertySources {
 	}
 
 	protected String getContext(String prefix, String context) {
-		if (StringUtils.isEmpty(prefix)) {
+		if (!StringUtils.hasText(prefix)) {
 			return context;
 		}
 		else {
@@ -95,8 +95,14 @@ public class ConsulPropertySources {
 		}
 	}
 
+	@Deprecated
 	public ConsulPropertySource createPropertySource(String propertySourceContext, boolean optional,
 			ConsulClient consul, BiConsumer<String, Long> indexConsumer) {
+		return createPropertySource(propertySourceContext, consul, indexConsumer);
+	}
+
+	public ConsulPropertySource createPropertySource(String propertySourceContext, ConsulClient consul,
+			BiConsumer<String, Long> indexConsumer) {
 		try {
 			ConsulPropertySource propertySource = null;
 
@@ -109,9 +115,6 @@ public class ConsulPropertySources {
 					filesPropertySource.init(response.getValue());
 					propertySource = filesPropertySource;
 				}
-				else if (!optional) {
-					throw new PropertySourceNotFoundException(propertySourceContext);
-				}
 			}
 			else {
 				propertySource = create(propertySourceContext, consul, indexConsumer);
@@ -122,7 +125,7 @@ public class ConsulPropertySources {
 			throw e;
 		}
 		catch (Exception e) {
-			if (properties.isFailFast() || !optional) {
+			if (properties.isFailFast()) {
 				throw new PropertySourceNotFoundException(propertySourceContext, e);
 			}
 			else {

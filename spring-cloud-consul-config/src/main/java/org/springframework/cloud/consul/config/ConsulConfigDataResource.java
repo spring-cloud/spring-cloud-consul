@@ -31,6 +31,12 @@ public class ConsulConfigDataResource extends ConfigDataResource {
 
 	private final ConsulPropertySources consulPropertySources;
 
+	public ConsulConfigDataResource(String context, ConsulConfigProperties properties,
+			ConsulPropertySources consulPropertySources) {
+		this(context, true, properties, consulPropertySources);
+	}
+
+	@Deprecated
 	public ConsulConfigDataResource(String context, boolean optional, ConsulConfigProperties properties,
 			ConsulPropertySources consulPropertySources) {
 		this.properties = properties;
@@ -43,6 +49,7 @@ public class ConsulConfigDataResource extends ConfigDataResource {
 		return this.context;
 	}
 
+	@Deprecated
 	public boolean isOptional() {
 		return this.optional;
 	}

@@ -109,7 +109,7 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 				InstanceSupplier.from(ConsulConfigDataIndexes::new));
 
 		return contexts.stream().map(propertySourceContext -> new ConsulConfigDataResource(propertySourceContext,
-				location.isOptional(), properties, consulPropertySources)).collect(Collectors.toList());
+				properties, consulPropertySources)).collect(Collectors.toList());
 	}
 
 	private BindHandler getBindHandler(ConfigDataLocationResolverContext context) {
