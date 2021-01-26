@@ -61,11 +61,15 @@ public class ConsulConfigDataIntegrationTests {
 
 	private static final String VALUE2 = "testPropVal2";
 
+	private static final String VALUE2_DEFAULT = "testPropVal2Default";
+
 	private static final String TEST_PROP2 = "testProp2";
 
 	private static final String TEST_PROP2_CANONICAL = "test-prop2";
 
 	private static final String KEY2 = ROOT + "/application/" + TEST_PROP2;
+
+	private static final String KEY2_APP_NAME = ROOT + "/" + APP_NAME + "/" + TEST_PROP2;
 
 	private static final String TEST_PROP3 = "testProp3";
 
@@ -85,13 +89,16 @@ public class ConsulConfigDataIntegrationTests {
 		client = ConsulTestcontainers.client();
 		client.deleteKVValues(PREFIX);
 		client.setKVValue(KEY1, VALUE1);
-		client.setKVValue(KEY2, VALUE2);
+		client.setKVValue(KEY2, VALUE2_DEFAULT);
+		client.setKVValue(KEY2_APP_NAME, VALUE2);
 
 		context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE).run(
+				"--logging.level.org.springframework.cloud.consul.config.ConfigWatch=TRACE",
 				"--spring.application.name=" + APP_NAME,
 				"--spring.config.import=consul:" + ConsulTestcontainers.getHost() + ":"
 						+ ConsulTestcontainers.getPort(),
-				"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.watch.delay=10");
+				"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.watch.delay=10",
+				"--spring.cloud.consul.config.watch.wait-time=1");
 
 		client = context.getBean(ConsulClient.class);
 		environment = context.getEnvironment();
@@ -107,8 +114,8 @@ public class ConsulConfigDataIntegrationTests {
 
 	@Test
 	public void propertyLoaded() {
-		String testProp = environment.getProperty(TEST_PROP2_CANONICAL);
-		assertThat(testProp).as("testProp was wrong").isEqualTo(VALUE2);
+		String testProp2 = environment.getProperty(TEST_PROP2_CANONICAL);
+		assertThat(testProp2).as(TEST_PROP2 + " was wrong").isEqualTo(VALUE2);
 	}
 
 	@Test

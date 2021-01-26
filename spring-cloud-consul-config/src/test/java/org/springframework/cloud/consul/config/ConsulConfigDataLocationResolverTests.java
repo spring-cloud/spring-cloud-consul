@@ -65,8 +65,8 @@ public class ConsulConfigDataLocationResolverTests {
 		String location = "consul:myhost";
 		List<ConsulConfigDataResource> locations = testResolveProfileSpecific(location);
 		assertThat(locations).hasSize(4);
-		assertThat(toContexts(locations)).containsExactly("config/testapp,dev/", "config/testapp/",
-				"config/application,dev/", "config/application/");
+		assertThat(toContexts(locations)).containsExactly("config/application/", "config/application,dev/",
+				"config/testapp/", "config/testapp,dev/");
 	}
 
 	@Test

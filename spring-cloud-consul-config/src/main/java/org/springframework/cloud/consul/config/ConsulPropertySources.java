@@ -48,6 +48,10 @@ public class ConsulPropertySources {
 	}
 
 	public List<String> getAutomaticContexts(List<String> profiles) {
+		return getAutomaticContexts(profiles, true);
+	}
+
+	public List<String> getAutomaticContexts(List<String> profiles, boolean reverse) {
 		List<String> contexts = new ArrayList<>();
 		String prefix = properties.getPrefix();
 		String defaultContext = getContext(prefix, properties.getDefaultContext());
@@ -68,8 +72,10 @@ public class ConsulPropertySources {
 		for (String suffix : suffixes) {
 			addProfiles(contexts, baseContext, profiles, suffix);
 		}
-		// we build them backwards, first wins, so reverse
-		Collections.reverse(contexts);
+		if (reverse) {
+			// we build them backwards, first wins, so reverse
+			Collections.reverse(contexts);
+		}
 		return contexts;
 	}
 
