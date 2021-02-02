@@ -66,7 +66,7 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 			List<ServiceInstance> instances = new ArrayList<>();
 			for (HealthService healthService : getHealthServices(serviceId)) {
 				instances.add(new ConsulServiceInstance(healthService, serviceId,
-						this.properties.isEnableTagMerge()));
+						this.properties.isMergeTagsEnabled()));
 			}
 			return Flux.fromIterable(instances);
 		}).onErrorResume(exception -> {

@@ -34,16 +34,16 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 
 	private HealthService healthService;
 
-	public ConsulServiceInstance(HealthService healthService, String serviceId, boolean mergeTags) {
-		this(healthService.getService().getId(), serviceId, findHost(healthService),
-				healthService.getService().getPort(), getSecure(healthService), getMetadata(healthService),
-				healthService.getService().getTags(), mergeTags);
-		this.healthService = healthService;
-	}
-
 	public ConsulServiceInstance(String instanceId, String serviceId, String host, int port, boolean secure,
 			Map<String, String> metadata, List<String> tags) {
 		this(instanceId, serviceId, host, port, secure, metadata, tags, false);
+	}
+
+	public ConsulServiceInstance(HealthService healthService, String serviceId, boolean mergeTags) {
+		this(healthService.getService().getId(), serviceId, findHost(healthService),
+			healthService.getService().getPort(), getSecure(healthService), getMetadata(healthService),
+			healthService.getService().getTags(), mergeTags);
+		this.healthService = healthService;
 	}
 
 	public ConsulServiceInstance(String instanceId, String serviceId, String host, int port, boolean secure,

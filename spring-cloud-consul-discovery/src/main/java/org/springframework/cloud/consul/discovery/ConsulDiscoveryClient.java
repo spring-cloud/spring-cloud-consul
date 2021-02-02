@@ -78,7 +78,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 		for (HealthService service : services.getValue()) {
 			instances
-					.add(new ConsulServiceInstance(service, serviceId, this.properties.isEnableTagMerge()));
+					.add(new ConsulServiceInstance(service, serviceId, this.properties.isMergeTagsEnabled()));
 		}
 	}
 
