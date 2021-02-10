@@ -130,6 +130,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 		if (!this.running.get()) {
 			return;
 		}
+		int waitTime = this.properties.getWatch().getWaitTime();
 		for (String context : this.consulIndexes.keySet()) {
 
 			// turn the context into a Consul folder path (unless our config format
@@ -155,7 +156,8 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 				}
 
 				Response<List<GetValue>> response = this.consul.getKVValues(context, aclToken,
-						new QueryParams(this.properties.getWatch().getWaitTime(), currentIndex));
+						new QueryParams(waitTime, currentIndex));
+				waitTime = 1;
 
 				// if response.value == null, response was a 404, otherwise it was a
 				// 200, reducing churn if there wasn't anything
