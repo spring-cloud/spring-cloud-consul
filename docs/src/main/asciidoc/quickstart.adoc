@@ -1,11 +1,11 @@
 This quick start walks through using Spring Cloud Consul for Service Discovery and Distributed Configuration.
 
-First, run Consul Agent on your machine, then you can access it and use as Service Registry and Configuration source with Spring Cloud Consul.
+First, run Consul Agent on your machine. Then you can access it and use it as a Service Registry and Configuration source with Spring Cloud Consul.
 
 === Discovery Client Usage
 
 To use these features in an application, you can build it as a Spring Boot application that depends on `spring-cloud-consul-core`.
-The most convenient way to add the dependency is with a Spring Boot starter `org.springframework.cloud:spring-cloud-starter-consul-discovery`.
+The most convenient way to add the dependency is with a Spring Boot starter: `org.springframework.cloud:spring-cloud-starter-consul-discovery`.
 We recommend using dependency management and `spring-boot-starter-parent`.
 The following example shows a typical Maven configuration:
 
@@ -53,7 +53,7 @@ The following example shows a typical Maven configuration:
 </project>
 ----
 
-The example below shows a typical Gradle setup:
+The following example shows a typical Gradle setup:
 
 [source,groovy,indent=0]
 .build.gradle
@@ -99,7 +99,7 @@ public class Application {
 ----
 
 When this HTTP server runs, it connects to Consul Agent running at the default local 8500 port.
-To modify the startup behavior, you can change the location of Consul Agent by using `application.properties` as shown in the following example:
+To modify the startup behavior, you can change the location of Consul Agent by using `application.properties`, as shown in the following example:
 
 ----
 spring:
@@ -109,7 +109,7 @@ spring:
       port: 8500
 ----
 
-You can now use `DiscoveryClient`, `@LoadBalanced RestTemplate` or `@LoadBalanced WebClient.Builder` to retrieve services and instances data from Consul, as shown in the following example:
+You can now use `DiscoveryClient`, `@LoadBalanced RestTemplate`, or `@LoadBalanced WebClient.Builder` to retrieve services and instances data from Consul, as shown in the following example:
 
 [source,java,indent=0]
 ----
@@ -128,7 +128,7 @@ public String serviceUrl() {
 === Distributed Configuration Usage
 
 To use these features in an application, you can build it as a Spring Boot application that depends on `spring-cloud-consul-core` and `spring-cloud-consul-config`.
-The most convenient way to add the dependency is with a Spring Boot starter `org.springframework.cloud:spring-cloud-starter-consul-config`.
+The most convenient way to add the dependency is with a Spring Boot starter: `org.springframework.cloud:spring-cloud-starter-consul-config`.
 We recommend using dependency management and `spring-boot-starter-parent`.
 The following example shows a typical Maven configuration:
 
@@ -176,7 +176,7 @@ The following example shows a typical Maven configuration:
 </project>
 ----
 
-The example below shows a typical Gradle setup:
+The following example shows a typical Gradle setup:
 
 [source,groovy,indent=0]
 .build.gradle
@@ -221,4 +221,4 @@ public class Application {
 }
 ----
 
-The application will retrieve configuration data from Consul.
+The application retrieves configuration data from Consul.
