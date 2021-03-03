@@ -3,6 +3,10 @@ image::https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/master/grap
 
 include::intro.adoc[]
 
+== Quick Start
+
+include::quickstart.adoc[]
+
 == Consul overview
 
 Features of Consul
