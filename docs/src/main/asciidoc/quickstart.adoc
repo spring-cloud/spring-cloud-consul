@@ -1,0 +1,227 @@
+This quick start walks through using Spring Cloud Consul for Service Discovery and Distributed Configuration.
+
+First, run Consul Agent on your machine. Then you can access it and use it as a Service Registry and Configuration source with Spring Cloud Consul.
+
+=== Discovery Client Usage
+
+To use these features in an application, you can build it as a Spring Boot application that depends on `spring-cloud-consul-core`.
+The most convenient way to add the dependency is with a Spring Boot starter: `org.springframework.cloud:spring-cloud-starter-consul-discovery`.
+We recommend using dependency management and `spring-boot-starter-parent`.
+The following example shows a typical Maven configuration:
+
+[source,xml,indent=0]
+.pom.xml
+----
+<project>
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>{spring-boot-version}</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring-cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+----
+
+The following example shows a typical Gradle setup:
+
+[source,groovy,indent=0]
+.build.gradle
+----
+plugins {
+  id 'org.springframework.boot' version ${spring-boot-version}
+  id 'io.spring.dependency-management' version ${spring-dependency-management-version}
+  id 'java'
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+  }
+}
+----
+
+Now you can create a standard Spring Boot application, such as the following HTTP server:
+
+----
+@SpringBootApplication
+@RestController
+public class Application {
+
+    @GetMapping("/")
+    public String home() {
+        return "Hello World!";
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+}
+----
+
+When this HTTP server runs, it connects to Consul Agent running at the default local 8500 port.
+To modify the startup behavior, you can change the location of Consul Agent by using `application.properties`, as shown in the following example:
+
+----
+spring:
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+----
+
+You can now use `DiscoveryClient`, `@LoadBalanced RestTemplate`, or `@LoadBalanced WebClient.Builder` to retrieve services and instances data from Consul, as shown in the following example:
+
+[source,java,indent=0]
+----
+@Autowired
+private DiscoveryClient discoveryClient;
+
+public String serviceUrl() {
+    List<ServiceInstance> list = discoveryClient.getInstances("STORES");
+    if (list != null && list.size() > 0 ) {
+        return list.get(0).getUri().toString();
+    }
+    return null;
+}
+----
+
+=== Distributed Configuration Usage
+
+To use these features in an application, you can build it as a Spring Boot application that depends on `spring-cloud-consul-core` and `spring-cloud-consul-config`.
+The most convenient way to add the dependency is with a Spring Boot starter: `org.springframework.cloud:spring-cloud-starter-consul-config`.
+We recommend using dependency management and `spring-boot-starter-parent`.
+The following example shows a typical Maven configuration:
+
+[source,xml,indent=0]
+.pom.xml
+----
+<project>
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>{spring-boot-version}</version>
+    <relativePath/> <!-- lookup parent from repository -->
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-consul-config</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring-cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+----
+
+The following example shows a typical Gradle setup:
+
+[source,groovy,indent=0]
+.build.gradle
+----
+plugins {
+  id 'org.springframework.boot' version ${spring-boot-version}
+  id 'io.spring.dependency-management' version ${spring-dependency-management-version}
+  id 'java'
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'org.springframework.cloud:spring-cloud-starter-consul-config'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+  }
+}
+----
+
+Now you can create a standard Spring Boot application, such as the following HTTP server:
+
+----
+@SpringBootApplication
+@RestController
+public class Application {
+
+    @GetMapping("/")
+    public String home() {
+        return "Hello World!";
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+}
+----
+
+The application retrieves configuration data from Consul.
+
+WARNING: If you use Spring Cloud Consul Config, you need to set the `spring.config.import` property in order to bind to Consul.
+You can read more about it in the <<config-data-import,Spring Boot Config Data Import section>>.
