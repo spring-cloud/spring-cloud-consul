@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul;
 
+import java.net.URL;
+
 import com.ecwid.consul.transport.DefaultHttpsTransport;
 import com.ecwid.consul.transport.HttpTransport;
 import com.ecwid.consul.v1.ConsulClient;
@@ -56,6 +58,22 @@ public class ConsulAutoConfigurationTests {
 				.run(context -> assertThat(context).hasNotFailed().doesNotHaveBean(ConsulProperties.class)
 						.doesNotHaveBean(ConsulClient.class).doesNotHaveBean(ConsulHealthIndicator.class)
 						.doesNotHaveBean(ConsulEndpoint.class));
+	}
+
+	@Test
+	public void customPathConfigured() {
+		appContextRunner.withPropertyValues("spring.cloud.consul.path=/consul/proxy/").run(context -> {
+			assertThat(context).hasNotFailed().hasSingleBean(ConsulClient.class);
+
+			ConsulClient consulClient = context.getBean(ConsulClient.class);
+			CatalogConsulClient client = (CatalogConsulClient) ReflectionTestUtils.getField(consulClient,
+					"catalogClient");
+			ConsulRawClient rawClient = (ConsulRawClient) ReflectionTestUtils.getField(client, "rawClient");
+			String agentAddress = (String) ReflectionTestUtils.getField(rawClient, "agentAddress");
+
+			assertThat(agentAddress).isNotNull();
+			assertThat(new URL(agentAddress).getPath()).isEqualTo("/consul/proxy");
+		});
 	}
 
 	@Test

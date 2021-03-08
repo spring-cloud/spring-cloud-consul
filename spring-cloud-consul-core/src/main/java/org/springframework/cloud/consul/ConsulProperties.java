@@ -55,8 +55,11 @@ public class ConsulProperties {
 	/** Is spring cloud consul enabled. */
 	private boolean enabled = true;
 
-	/** configuration for TLS. */
+	/** Configuration for TLS. */
 	private TLSConfig tls;
+
+	/** Custom path if consul is under non-root. */
+	private String path;
 
 	public String getHost() {
 		return this.host;
@@ -98,10 +101,18 @@ public class ConsulProperties {
 		this.tls = tls;
 	}
 
+	public String getPath() {
+		return path;
+	}
+
+	public void setPath(String path) {
+		this.path = path;
+	}
+
 	@Override
 	public String toString() {
 		return "ConsulProperties{" + "host='" + this.host + '\'' + ", port=" + this.port + ", scheme=" + this.scheme
-				+ ", tls=" + this.tls + ", enabled=" + this.enabled + '}';
+				+ ", tls=" + this.tls + ", enabled=" + this.enabled + "}, path=" + this.path + '}';
 	}
 
 	/**
