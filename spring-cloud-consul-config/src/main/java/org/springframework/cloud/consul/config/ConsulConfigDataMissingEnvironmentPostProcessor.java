@@ -89,7 +89,7 @@ public class ConsulConfigDataMissingEnvironmentPostProcessor implements Environm
 				description = "No spring.config.import property has been defined";
 			}
 			String action = "Add a spring.config.import=consul: property to your configuration.\n"
-					+ "\tIf configuration in not required add spring.config.import=optional:consul: instead.\n"
+					+ "\tIf configuration is not required add spring.config.import=optional:consul: instead.\n"
 					+ "\tTo disable this check, set spring.cloud.consul.config.enabled=false or \n"
 					+ "\tspring.cloud.consul.config.import-check.enabled=false.";
 			return new FailureAnalysis(description, action, cause);
