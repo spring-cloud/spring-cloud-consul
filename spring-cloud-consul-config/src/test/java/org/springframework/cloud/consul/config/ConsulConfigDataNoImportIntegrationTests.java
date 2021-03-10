@@ -80,6 +80,15 @@ public class ConsulConfigDataNoImportIntegrationTests {
 	}
 
 	@Test
+	public void noExceptionThrownIfConsulDisabled() {
+		try (ConfigurableApplicationContext context = new SpringApplicationBuilder(Config.class)
+				.web(WebApplicationType.NONE)
+				.run("--spring.cloud.consul.enabled=false", "--spring.application.name=" + APP_NAME)) {
+			// nothing to do
+		}
+	}
+
+	@Test
 	public void noExceptionThrownIfConsulConfigDisabled() {
 		try (ConfigurableApplicationContext context = new SpringApplicationBuilder(Config.class)
 				.web(WebApplicationType.NONE)

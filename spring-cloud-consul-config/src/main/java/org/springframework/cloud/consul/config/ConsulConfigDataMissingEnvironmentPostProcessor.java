@@ -21,6 +21,7 @@ import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcesso
 import org.springframework.boot.diagnostics.AbstractFailureAnalyzer;
 import org.springframework.boot.diagnostics.FailureAnalysis;
 import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.util.StringUtils;
@@ -48,14 +49,12 @@ public class ConsulConfigDataMissingEnvironmentPostProcessor implements Environm
 		if (bootstrapEnabled(environment) || useLegacyProcessing(environment)) {
 			return;
 		}
+		boolean coreEnabled = environment.getProperty(ConsulProperties.PREFIX + ".enabled", Boolean.class, true);
 		boolean configEnabled = environment.getProperty(ConsulConfigProperties.PREFIX + ".enabled", Boolean.class,
 				true);
-		if (!configEnabled) {
-			return;
-		}
 		boolean importCheckEnabled = environment.getProperty(ConsulConfigProperties.PREFIX + ".import-check.enabled",
 				Boolean.class, true);
-		if (!importCheckEnabled) {
+		if (!coreEnabled || !configEnabled || !importCheckEnabled) {
 			return;
 		}
 		String property = environment.getProperty("spring.config.import");
