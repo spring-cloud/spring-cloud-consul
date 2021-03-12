@@ -41,6 +41,7 @@ import org.springframework.cloud.consul.discovery.ConsulServiceInstance;
  * Consul version of {@link ReactiveDiscoveryClient}.
  *
  * @author Tim Ysewyn
+ * @author Chris Bono
  */
 public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 
@@ -75,11 +76,17 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 	}
 
 	private List<HealthService> getHealthServices(String serviceId) {
-		HealthServicesRequest request = HealthServicesRequest.newBuilder().setTag(this.properties.getDefaultQueryTag())
-				.setPassing(this.properties.isQueryPassing()).setQueryParams(QueryParams.DEFAULT)
-				.setToken(this.properties.getAclToken()).build();
+		HealthServicesRequest.Builder requestBuilder = HealthServicesRequest.newBuilder()
+				.setPassing(properties.isQueryPassing()).setQueryParams(QueryParams.DEFAULT)
+				.setToken(properties.getAclToken());
+		String[] queryTags = properties.getQueryTagsForService(serviceId);
+		if (queryTags != null) {
+			requestBuilder.setTags(queryTags);
+		}
+		HealthServicesRequest request = requestBuilder.build();
 
 		Response<List<HealthService>> services = client.getHealthServices(serviceId, request);
+
 		return services == null ? Collections.emptyList() : services.getValue();
 	}
 

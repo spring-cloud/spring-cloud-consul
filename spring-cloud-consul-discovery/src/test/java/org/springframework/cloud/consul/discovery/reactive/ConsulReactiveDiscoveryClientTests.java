@@ -40,6 +40,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -127,7 +128,7 @@ class ConsulReactiveDiscoveryClientTests {
 		Flux<ServiceInstance> instances = client.getInstances("existing-service");
 		StepVerifier.create(instances).expectNextCount(1).expectComplete().verify();
 		verify(properties).getAclToken();
-		verify(properties).getDefaultQueryTag();
+		verify(properties).getQueryTagsForService("existing-service");
 		verify(properties).isQueryPassing();
 		verify(consulClient).getHealthServices(eq("existing-service"), any());
 	}
@@ -142,7 +143,7 @@ class ConsulReactiveDiscoveryClientTests {
 		Flux<ServiceInstance> instances = client.getInstances("existing-service");
 		StepVerifier.create(instances).expectNextCount(1).expectComplete().verify();
 		verify(properties, times(1)).getAclToken();
-		verify(properties).getDefaultQueryTag();
+		verify(properties).getQueryTagsForService("existing-service");
 		verify(properties).isQueryPassing();
 		verify(consulClient).getHealthServices(eq("existing-service"), any());
 	}
@@ -152,7 +153,7 @@ class ConsulReactiveDiscoveryClientTests {
 	}
 
 	private void configureCommonProperties() {
-		when(properties.getDefaultQueryTag()).thenReturn("queryTag");
+		when(properties.getQueryTagsForService(anyString())).thenReturn(new String[] { "queryTag" });
 		when(properties.isQueryPassing()).thenReturn(false);
 	}
 

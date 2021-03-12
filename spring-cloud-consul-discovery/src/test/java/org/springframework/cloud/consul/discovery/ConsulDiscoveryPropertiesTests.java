@@ -19,15 +19,20 @@ package org.springframework.cloud.consul.discovery;
 import java.util.Collections;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtilsProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ConsulDiscoveryPropertiesTests {
+/**
+ * Unit tests for {@link ConsulDiscoveryProperties}.
+ *
+ * @author Chris Bono
+ */
+class ConsulDiscoveryPropertiesTests {
 
 	private static final String DEFAULT_TAG = "defaultTag";
 
@@ -45,45 +50,96 @@ public class ConsulDiscoveryPropertiesTests {
 
 	private ConsulDiscoveryProperties properties;
 
-	@Before
-	public void setUp() {
+	@BeforeEach
+	void setUp() {
 		this.properties = new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties()));
-		this.properties.setDefaultQueryTag(DEFAULT_TAG);
-		this.properties.setServerListQueryTags(this.serverListQueryTags);
-		this.properties.setDatacenters(this.datacenters);
+		properties.setDefaultQueryTag(DEFAULT_TAG);
+		properties.setServerListQueryTags(this.serverListQueryTags);
+		properties.setDatacenters(this.datacenters);
 	}
 
 	@Test
-	public void testReturnsNullWhenNoDefaultAndNotInMap() {
-		this.properties.setDefaultQueryTag(null);
-
-		assertThat(this.properties.getQueryTagForService(SERVICE_NAME_NOT_IN_MAP)).isNull();
+	void getTagReturnsNullWhenNoDefaultAndNotInMap() {
+		properties.setDefaultQueryTag(null);
+		assertThat(properties.getQueryTagForService(SERVICE_NAME_NOT_IN_MAP)).isNull();
 	}
 
 	@Test
-	public void testGetTagReturnsDefaultWhenNotInMap() {
-		assertThat(this.properties.getQueryTagForService(SERVICE_NAME_NOT_IN_MAP)).isEqualTo(DEFAULT_TAG);
+	void getTagReturnsDefaultWhenNotInMap() {
+		assertThat(properties.getQueryTagForService(SERVICE_NAME_NOT_IN_MAP)).isEqualTo(DEFAULT_TAG);
 	}
 
 	@Test
-	public void testGetTagReturnsMapValueWhenInMap() {
-		assertThat(this.properties.getQueryTagForService(SERVICE_NAME_IN_MAP)).isEqualTo(MAP_TAG);
+	void getTagReturnsMapValueWhenInMap() {
+		assertThat(properties.getQueryTagForService(SERVICE_NAME_IN_MAP)).isEqualTo(MAP_TAG);
 	}
 
 	@Test
-	public void testGetDcReturnsNullWhenNotInMap() {
-		assertThat(this.properties.getDatacenters().get(SERVICE_NAME_NOT_IN_MAP)).isNull();
+	void getTagsReturnsNullWhenNoDefaultAndNotInMap() {
+		properties.setDefaultQueryTag(null);
+		assertThat(properties.getQueryTagsForService(SERVICE_NAME_NOT_IN_MAP)).isNull();
 	}
 
 	@Test
-	public void testGetDcReturnsMapValueWhenInMap() {
-		assertThat(this.properties.getDatacenters().get(SERVICE_NAME_IN_MAP)).isEqualTo(MAP_DC);
+	void getTagsReturnsNullWhenDefaultIsSetToEmptyStringAndNotInMap() {
+		properties.setDefaultQueryTag("");
+		assertThat(properties.getQueryTagsForService(SERVICE_NAME_NOT_IN_MAP)).isNull();
 	}
 
 	@Test
-	public void testAddManagementTag() {
-		this.properties.getManagementTags().add("newTag");
-		assertThat(this.properties.getManagementTags()).containsOnly(ConsulDiscoveryProperties.MANAGEMENT, "newTag");
+	void getTagsReturnsDefaultWhenNotInMap() {
+		assertThat(properties.getQueryTagsForService(SERVICE_NAME_NOT_IN_MAP)).containsExactly(DEFAULT_TAG);
+	}
+
+	@Test
+	void getTagsReturnsMapValueWhenInMap() {
+		assertThat(properties.getQueryTagsForService(SERVICE_NAME_IN_MAP)).containsExactly(MAP_TAG);
+	}
+
+	@Test
+	void getTagsReturnsNullWhenMapValueIsSetToEmptyStringAndInMap() {
+		properties.setServerListQueryTags(Collections.singletonMap(SERVICE_NAME_IN_MAP, ""));
+		assertThat(properties.getQueryTagsForService(SERVICE_NAME_IN_MAP)).isNull();
+	}
+
+	@Test
+	void getTagsReturnsMultipleFromDefaultQueryTag() {
+		properties.setDefaultQueryTag("foo,bar");
+		assertThat(properties.getQueryTagsForService(SERVICE_NAME_NOT_IN_MAP)).containsExactly("foo", "bar");
+	}
+
+	@Test
+	void getTagsReturnsMultipleFromServerListMapEntry() {
+		properties.setServerListQueryTags(Collections.singletonMap(SERVICE_NAME_IN_MAP, "foo,bar"));
+		assertThat(properties.getQueryTagsForService(SERVICE_NAME_IN_MAP)).containsExactly("foo", "bar");
+	}
+
+	@Test
+	void getDcReturnsNullWhenNotInMap() {
+		assertThat(properties.getDatacenters().get(SERVICE_NAME_NOT_IN_MAP)).isNull();
+	}
+
+	@Test
+	void getTagsReturnsSingleTrimmedEntryFromTagWithExtraWhitespace() {
+		properties.setServerListQueryTags(Collections.singletonMap(SERVICE_NAME_IN_MAP, "  foo  "));
+		assertThat(properties.getQueryTagsForService(SERVICE_NAME_IN_MAP)).containsExactly("foo");
+	}
+
+	@Test
+	void getTagsReturnsMultipleTrimmedEntriesFromTagsWithExtraWhitespace() {
+		properties.setServerListQueryTags(Collections.singletonMap(SERVICE_NAME_IN_MAP, "  foo  ,  bar   "));
+		assertThat(properties.getQueryTagsForService(SERVICE_NAME_IN_MAP)).containsExactly("foo", "bar");
+	}
+
+	@Test
+	void getDcReturnsMapValueWhenInMap() {
+		assertThat(properties.getDatacenters().get(SERVICE_NAME_IN_MAP)).isEqualTo(MAP_DC);
+	}
+
+	@Test
+	void addManagementTag() {
+		properties.getManagementTags().add("newTag");
+		assertThat(properties.getManagementTags()).containsOnly(ConsulDiscoveryProperties.MANAGEMENT, "newTag");
 	}
 
 }

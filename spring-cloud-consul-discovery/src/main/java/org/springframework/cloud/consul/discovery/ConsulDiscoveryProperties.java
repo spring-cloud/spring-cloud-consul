@@ -30,6 +30,8 @@ import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtils.HostInfo;
 import org.springframework.cloud.commons.util.InetUtilsProperties;
 import org.springframework.core.style.ToStringCreator;
+import org.springframework.lang.Nullable;
+import org.springframework.util.StringUtils;
 
 /**
  * Defines configuration for service discovery and registration.
@@ -160,7 +162,8 @@ public class ConsulDiscoveryProperties {
 
 	/**
 	 * Map of serviceId's -> tag to query for in server list. This allows filtering
-	 * services by a single tag.
+	 * services by one more tags. Multiple tags can be specified with a comma separated
+	 * value.
 	 */
 	private Map<String, String> serverListQueryTags = new HashMap<>();
 
@@ -170,7 +173,10 @@ public class ConsulDiscoveryProperties {
 	 */
 	private Map<String, String> datacenters = new HashMap<>();
 
-	/** Tag to query for in service list if one is not listed in serverListQueryTags. */
+	/**
+	 * Tag to query for in service list if one is not listed in serverListQueryTags.
+	 * Multiple tags can be specified with a comma separated value.
+	 */
 	private String defaultQueryTag;
 
 	/**
@@ -219,12 +225,42 @@ public class ConsulDiscoveryProperties {
 	}
 
 	/**
-	 * @param serviceId The service who's filtering tag is being looked up
-	 * @return The tag the given service id should be filtered by, or null.
+	 * Gets the tag to use when looking up the instances for a particular service. If the
+	 * service has an entry in {@link #serverListQueryTags} that will be used. Otherwise
+	 * the content of {@link #defaultQueryTag} will be used.
+	 * @param serviceId the service whose instances are being looked up
+	 * @return the tag to filter the service instances by or null if no tags are
+	 * configured for the service and the default query tag is not configured
 	 */
 	public String getQueryTagForService(String serviceId) {
 		String tag = this.serverListQueryTags.get(serviceId);
 		return tag != null ? tag : this.defaultQueryTag;
+	}
+
+	/**
+	 * Gets the array of tags to use when looking up the instances for a particular
+	 * service. If the service has an entry in {@link #serverListQueryTags} that will be
+	 * used. Otherwise the content of {@link #defaultQueryTag} will be used. This differs
+	 * from {@link #getQueryTagForService(String)} in that it assumes the configured tag
+	 * property value may represent multiple tags when separated by commas. When the tag
+	 * property is set to a single tag then this method behaves identical to its
+	 * aforementioned counterpart except that it returns a single element array with the
+	 * single tag value.
+	 * <p>
+	 * The expected format of the tag property value is {@code tag1,tag2,..,tagN}.
+	 * Whitespace will be trimmed off each entry.
+	 * @param serviceId the service whose instances are being looked up
+	 * @return the array of tags to filter the service instances by - it will be null if
+	 * no tags are configured for the service and the default query tag is not configured
+	 * or if a single tag is configured and it is the empty string
+	 */
+	@Nullable
+	public String[] getQueryTagsForService(String serviceId) {
+		String queryTagStr = getQueryTagForService(serviceId);
+		if (queryTagStr == null || queryTagStr.isEmpty()) {
+			return null;
+		}
+		return StringUtils.tokenizeToStringArray(queryTagStr, ",");
 	}
 
 	public String getHostname() {
