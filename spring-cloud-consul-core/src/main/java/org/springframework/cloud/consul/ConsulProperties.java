@@ -112,7 +112,7 @@ public class ConsulProperties {
 	@Override
 	public String toString() {
 		return "ConsulProperties{" + "host='" + this.host + '\'' + ", port=" + this.port + ", scheme=" + this.scheme
-				+ ", tls=" + this.tls + ", enabled=" + this.enabled + "}, path=" + this.path + '}';
+				+ ", tls=" + this.tls + ", enabled=" + this.enabled + ", path=" + this.path + "}";
 	}
 
 	/**
