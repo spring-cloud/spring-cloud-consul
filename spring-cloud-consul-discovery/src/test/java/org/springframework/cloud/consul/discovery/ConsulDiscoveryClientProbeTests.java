@@ -46,18 +46,17 @@ public class ConsulDiscoveryClientProbeTests {
 
 	@Test
 	public void probeSucceeds() {
-		when(consulClient.getStatusLeader()).thenReturn(
-				new Response<>("5150", 5150L, false, System.currentTimeMillis()));
+		when(consulClient.getStatusLeader())
+				.thenReturn(new Response<>("5150", 5150L, false, System.currentTimeMillis()));
 		discoveryClient.probe();
 		verify(consulClient).getStatusLeader();
 	}
 
 	@Test
 	public void probeFails() {
-		when(consulClient.getStatusLeader())
-				.thenThrow(new OperationException(5150, "5150", "No leader"));
-		assertThatThrownBy(() -> discoveryClient.probe())
-				.isInstanceOf(OperationException.class).hasMessageContaining("No leader");
+		when(consulClient.getStatusLeader()).thenThrow(new OperationException(5150, "5150", "No leader"));
+		assertThatThrownBy(() -> discoveryClient.probe()).isInstanceOf(OperationException.class)
+				.hasMessageContaining("No leader");
 		verify(consulClient).getStatusLeader();
 	}
 
