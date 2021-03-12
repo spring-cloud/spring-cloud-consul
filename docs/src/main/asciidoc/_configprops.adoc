@@ -61,6 +61,7 @@
 |spring.cloud.consul.enabled | `true` | Is spring cloud consul enabled.
 |spring.cloud.consul.host | `localhost` | Consul agent hostname. Defaults to 'localhost'.
 |spring.cloud.consul.port | `8500` | Consul agent port. Defaults to '8500'.
+|spring.cloud.consul.path |  | Custom path in case consul is running behind a reverse proxy under non-root path.
 |spring.cloud.consul.retry.enabled | `true` | If consul retry is enabled.
 |spring.cloud.consul.retry.initial-interval | `1000` | Initial retry interval in milliseconds.
 |spring.cloud.consul.retry.max-attempts | `6` | Maximum number of attempts.

@@ -18,6 +18,7 @@ package org.springframework.cloud.consul;
 
 import com.ecwid.consul.transport.TLSConfig;
 import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.ConsulRawClient;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
@@ -58,17 +59,27 @@ public class ConsulAutoConfiguration {
 	}
 
 	public static ConsulClient createConsulClient(ConsulProperties consulProperties) {
-		final int agentPort = consulProperties.getPort();
-		final String agentHost = !StringUtils.isEmpty(consulProperties.getScheme())
+		final String agentPath = consulProperties.getPath();
+		final String agentHost = StringUtils.hasLength(consulProperties.getScheme())
 				? consulProperties.getScheme() + "://" + consulProperties.getHost() : consulProperties.getHost();
+		final ConsulRawClient.Builder builder = ConsulRawClient.Builder.builder().setHost(agentHost)
+				.setPort(consulProperties.getPort());
 
 		if (consulProperties.getTls() != null) {
 			ConsulProperties.TLSConfig tls = consulProperties.getTls();
 			TLSConfig tlsConfig = new TLSConfig(tls.getKeyStoreInstanceType(), tls.getCertificatePath(),
 					tls.getCertificatePassword(), tls.getKeyStorePath(), tls.getKeyStorePassword());
-			return new ConsulClient(agentHost, agentPort, tlsConfig);
+			builder.setTlsConfig(tlsConfig);
 		}
-		return new ConsulClient(agentHost, agentPort);
+
+		if (StringUtils.hasLength(agentPath)) {
+			String normalizedAgentPath = StringUtils.trimTrailingCharacter(agentPath, '/');
+			normalizedAgentPath = StringUtils.trimLeadingCharacter(normalizedAgentPath, '/');
+
+			builder.setPath(normalizedAgentPath);
+		}
+
+		return new ConsulClient(builder.build());
 	}
 
 	@Configuration(proxyBeanMethods = false)
