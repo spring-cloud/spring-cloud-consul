@@ -80,6 +80,11 @@ public class ConsulDiscoveryClientTests {
 		assertIpAddress(instance);
 	}
 
+	@Test
+	public void probeWorks() {
+		discoveryClient.probe();
+	}
+
 	private void assertIpAddress(ServiceInstance instance) {
 		assertThat(Character.isDigit(instance.getHost().charAt(0))).as("host isn't an ip address").isTrue();
 	}
