@@ -18,7 +18,7 @@
 |spring.cloud.consul.discovery.catalog-services-watch-timeout | `2` | The number of seconds to block while watching consul catalog, default is 2.
 |spring.cloud.consul.discovery.consistency-mode |  | Consistency mode for health service request.
 |spring.cloud.consul.discovery.datacenters |  | Map of serviceId's -> datacenter to query for in server list. This allows looking up services in another datacenters.
-|spring.cloud.consul.discovery.default-query-tag |  | Tag to query for in service list if one is not listed in serverListQueryTags.
+|spring.cloud.consul.discovery.default-query-tag |  | Tag to query for in service list if one is not listed in serverListQueryTags. Multiple tags can be specified with a comma separated value.
 |spring.cloud.consul.discovery.default-zone-metadata-name | `zone` | Service instance zone comes from metadata. This allows changing the metadata tag name.
 |spring.cloud.consul.discovery.deregister | `true` | Disable automatic de-registration of service in consul.
 |spring.cloud.consul.discovery.enable-tag-override |  | Enable tag override for the registered service.
@@ -55,13 +55,13 @@
 |spring.cloud.consul.discovery.register | `true` | Register as a service in consul.
 |spring.cloud.consul.discovery.register-health-check | `true` | Register health check in consul. Useful during development of a service.
 |spring.cloud.consul.discovery.scheme | `http` | Whether to register an http or https service.
-|spring.cloud.consul.discovery.server-list-query-tags |  | Map of serviceId's -> tag to query for in server list. This allows filtering services by a single tag.
+|spring.cloud.consul.discovery.server-list-query-tags |  | Map of serviceId's -> tag to query for in server list. This allows filtering services by one more tags. Multiple tags can be specified with a comma separated value.
 |spring.cloud.consul.discovery.service-name |  | Service name.
 |spring.cloud.consul.discovery.tags |  | Tags to use when registering service.
 |spring.cloud.consul.enabled | `true` | Is spring cloud consul enabled.
 |spring.cloud.consul.host | `localhost` | Consul agent hostname. Defaults to 'localhost'.
+|spring.cloud.consul.path |  | Custom path if consul is under non-root.
 |spring.cloud.consul.port | `8500` | Consul agent port. Defaults to '8500'.
-|spring.cloud.consul.path |  | Custom path in case consul is running behind a reverse proxy under non-root path.
 |spring.cloud.consul.retry.enabled | `true` | If consul retry is enabled.
 |spring.cloud.consul.retry.initial-interval | `1000` | Initial retry interval in milliseconds.
 |spring.cloud.consul.retry.max-attempts | `6` | Maximum number of attempts.
