@@ -16,13 +16,19 @@
 
 package org.springframework.cloud.consul.config;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 import org.springframework.core.style.ToStringCreator;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.PREFIX;
@@ -41,7 +47,7 @@ public class ConsulConfigProperties {
 
 	private boolean enabled = true;
 
-	private String prefix = "config";
+	private List<String> prefixes = new ArrayList<>(Collections.singletonList("config"));
 
 	@NotEmpty
 	private String defaultContext = "application";
@@ -92,12 +98,31 @@ public class ConsulConfigProperties {
 		this.enabled = enabled;
 	}
 
-	public String getPrefix() {
-		return this.prefix;
+	public List<String> getPrefixes() {
+		return this.prefixes;
 	}
 
+	public void setPrefixes(List<String> prefixes) {
+		this.prefixes = prefixes;
+	}
+
+	@DeprecatedConfigurationProperty(reason = "replaced to support multiple prefixes",
+			replacement = PREFIX + ".prefixes")
+	public String getPrefix() {
+		if (CollectionUtils.isEmpty(this.prefixes)) {
+			return null;
+		}
+		return this.prefixes.get(0);
+	}
+
+	@Deprecated
 	public void setPrefix(String prefix) {
-		this.prefix = prefix;
+		if (prefix != null) {
+			this.prefixes = new ArrayList<>(Collections.singletonList(prefix));
+		}
+		else {
+			this.prefixes = new ArrayList<>();
+		}
 	}
 
 	public @NotEmpty String getDefaultContext() {
@@ -166,7 +191,7 @@ public class ConsulConfigProperties {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this).append("enabled", this.enabled).append("prefix", this.prefix)
+		return new ToStringCreator(this).append("enabled", this.enabled).append("prefixes", this.prefixes)
 				.append("defaultContext", this.defaultContext).append("profileSeparator", this.profileSeparator)
 				.append("format", this.format).append("dataKey", this.dataKey).append("aclToken", this.aclToken)
 				.append("watch", this.watch).append("failFast", this.failFast).append("name", this.name).toString();

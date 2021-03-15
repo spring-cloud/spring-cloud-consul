@@ -68,7 +68,7 @@ public class ConsulConfigDataCustomizationIntegrationTests {
 		context = application.run("--spring.application.name=" + APP_NAME,
 				"--spring.config.import=consul:" + ConsulTestcontainers.getHost() + ":"
 						+ ConsulTestcontainers.getPort(),
-				"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.watch.delay=10");
+				"--spring.cloud.consul.config.prefixes=" + ROOT, "--spring.cloud.consul.config.watch.delay=10");
 
 	}
 

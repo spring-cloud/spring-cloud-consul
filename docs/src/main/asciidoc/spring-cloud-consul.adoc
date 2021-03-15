@@ -339,7 +339,7 @@ The watch uses a Spring `TaskScheduler` to schedule the call to consul. By defau
 [[spring-cloud-consul-config]]
 == Distributed Configuration with Consul
 
-Consul provides a https://consul.io/docs/agent/http/kv.html[Key/Value Store] for storing configuration and other metadata.  Spring Cloud Consul Config is an alternative to the https://github.com/spring-cloud/spring-cloud-config[Config Server and Client].  Configuration is loaded into the Spring Environment during the special "bootstrap" phase.  Configuration is stored in the `/config` folder by default.  Multiple `PropertySource` instances are created based on the application's name and the active profiles that mimicks the Spring Cloud Config order of resolving properties.  For example, an application with the name "testApp" and with the "dev" profile will have the following property sources created:
+Consul provides a https://consul.io/docs/agent/http/kv.html[Key/Value Store] for storing configuration and other metadata.  Spring Cloud Consul Config is an alternative to the https://github.com/spring-cloud/spring-cloud-config[Config Server and Client].  Configuration is loaded into the Spring Environment during the special "bootstrap" phase.  Configuration is stored in the `/config` folder by default.  Multiple `PropertySource` instances are created based on the application's name and the active profiles that mimics the Spring Cloud Config order of resolving properties.  For example, an application with the name "testApp" and with the "dev" profile will have the following property sources created:
 
 ----
 config/testApp,dev/

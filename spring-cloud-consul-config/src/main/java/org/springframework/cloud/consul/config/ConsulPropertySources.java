@@ -53,24 +53,25 @@ public class ConsulPropertySources {
 
 	public List<String> getAutomaticContexts(List<String> profiles, boolean reverse) {
 		List<String> contexts = new ArrayList<>();
-		String prefix = properties.getPrefix();
-		String defaultContext = getContext(prefix, properties.getDefaultContext());
-		List<String> suffixes = getSuffixes();
-		for (String suffix : suffixes) {
-			contexts.add(defaultContext + suffix);
-		}
-		for (String suffix : suffixes) {
-			addProfiles(contexts, defaultContext, profiles, suffix);
-		}
+		for (String prefix : this.properties.getPrefixes()) {
+			String defaultContext = getContext(prefix, properties.getDefaultContext());
+			List<String> suffixes = getSuffixes();
+			for (String suffix : suffixes) {
+				contexts.add(defaultContext + suffix);
+			}
+			for (String suffix : suffixes) {
+				addProfiles(contexts, defaultContext, profiles, suffix);
+			}
 
-		// getName() defaults to ${spring.application.name} or application
-		String baseContext = getContext(prefix, properties.getName());
+			// getName() defaults to ${spring.application.name} or application
+			String baseContext = getContext(prefix, properties.getName());
 
-		for (String suffix : suffixes) {
-			contexts.add(baseContext + suffix);
-		}
-		for (String suffix : suffixes) {
-			addProfiles(contexts, baseContext, profiles, suffix);
+			for (String suffix : suffixes) {
+				contexts.add(baseContext + suffix);
+			}
+			for (String suffix : suffixes) {
+				addProfiles(contexts, baseContext, profiles, suffix);
+			}
 		}
 		if (reverse) {
 			// we build them backwards, first wins, so reverse
