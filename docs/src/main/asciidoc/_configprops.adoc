@@ -34,7 +34,8 @@
 |spring.cloud.consul.discovery.health-check-url |  | Custom health check url to override default.
 |spring.cloud.consul.discovery.heartbeat.enabled | `false` | 
 |spring.cloud.consul.discovery.heartbeat.interval-ratio |  | 
-|spring.cloud.consul.discovery.heartbeat.ttl | `30s` | 
+|spring.cloud.consul.discovery.heartbeat.ttl | `30s` |
+|spring.cloud.consul.discovery.heartbeat.reregister-service-on-failure | `false` | Enables service re-registration when the heartbeat fails.
 |spring.cloud.consul.discovery.hostname |  | Hostname to use when accessing server.
 |spring.cloud.consul.discovery.include-hostname-in-instance-id | `false` | Whether hostname is included into the default instance id when registering service.
 |spring.cloud.consul.discovery.instance-group |  | Service instance group.

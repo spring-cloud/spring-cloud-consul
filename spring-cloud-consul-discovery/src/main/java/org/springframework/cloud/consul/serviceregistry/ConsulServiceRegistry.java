@@ -68,7 +68,7 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 			NewService service = reg.getService();
 			if (this.heartbeatProperties.isEnabled() && this.ttlScheduler != null && service.getCheck() != null
 					&& service.getCheck().getTtl() != null) {
-				this.ttlScheduler.add(reg.getInstanceId());
+				this.ttlScheduler.add(reg.getService());
 			}
 		}
 		catch (ConsulException e) {

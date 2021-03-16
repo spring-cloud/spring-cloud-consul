@@ -22,6 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 
 import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.OperationException;
 import com.ecwid.consul.v1.agent.model.NewService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,18 +43,27 @@ public class TtlScheduler {
 
 	private final TaskScheduler scheduler = new ConcurrentTaskScheduler(Executors.newSingleThreadScheduledExecutor());
 
-	private HeartbeatProperties configuration;
+	private final HeartbeatProperties heartbeatProperties;
 
-	private ConsulClient client;
+	private final ConsulDiscoveryProperties discoveryProperties;
 
-	public TtlScheduler(HeartbeatProperties configuration, ConsulClient client) {
-		this.configuration = configuration;
+	private final ConsulClient client;
+
+	private final ReregistrationPredicate reregistrationPredicate;
+
+	private final Map<String, NewService> registeredServices = new ConcurrentHashMap<>();
+
+	public TtlScheduler(HeartbeatProperties heartbeatProperties, ConsulDiscoveryProperties discoveryProperties,
+			ConsulClient client, ReregistrationPredicate reregistrationPredicate) {
+		this.heartbeatProperties = heartbeatProperties;
+		this.discoveryProperties = discoveryProperties;
 		this.client = client;
+		this.reregistrationPredicate = reregistrationPredicate;
 	}
 
-	@Deprecated
 	public void add(final NewService service) {
 		add(service.getId());
+		this.registeredServices.put(service.getId(), service);
 	}
 
 	/**
@@ -61,8 +71,8 @@ public class TtlScheduler {
 	 * @param instanceId instance id
 	 */
 	public void add(String instanceId) {
-		ScheduledFuture task = this.scheduler.scheduleAtFixedRate(new ConsulHeartbeatTask(instanceId),
-				this.configuration.computeHeartbeatInterval().toMillis());
+		ScheduledFuture task = this.scheduler.scheduleAtFixedRate(new ConsulHeartbeatTask(instanceId, this),
+				this.heartbeatProperties.computeHeartbeatInterval().toMillis());
 		ScheduledFuture previousTask = this.serviceHeartbeats.put(instanceId, task);
 		if (previousTask != null) {
 			previousTask.cancel(true);
@@ -75,24 +85,55 @@ public class TtlScheduler {
 			task.cancel(true);
 		}
 		this.serviceHeartbeats.remove(instanceId);
+		this.registeredServices.remove(instanceId);
 	}
 
-	private class ConsulHeartbeatTask implements Runnable {
+	static class ConsulHeartbeatTask implements Runnable {
 
-		private String checkId;
+		private final String serviceId;
 
-		ConsulHeartbeatTask(String serviceId) {
-			this.checkId = serviceId;
-			if (!this.checkId.startsWith("service:")) {
-				this.checkId = "service:" + this.checkId;
+		private final String checkId;
+
+		private final TtlScheduler ttlScheduler;
+
+		ConsulHeartbeatTask(String serviceId, TtlScheduler ttlScheduler) {
+			this.serviceId = serviceId;
+			if (!this.serviceId.startsWith("service:")) {
+				this.checkId = "service:" + this.serviceId;
 			}
+			else {
+				this.checkId = this.serviceId;
+			}
+			this.ttlScheduler = ttlScheduler;
 		}
 
 		@Override
 		public void run() {
-			TtlScheduler.this.client.agentCheckPass(this.checkId);
-			if (log.isDebugEnabled()) {
-				log.debug("Sending consul heartbeat for: " + this.checkId);
+			try {
+				this.ttlScheduler.client.agentCheckPass(this.checkId);
+				if (log.isDebugEnabled()) {
+					log.debug("Sending consul heartbeat for: " + this.checkId);
+				}
+			}
+			catch (OperationException e) {
+				if (this.ttlScheduler.heartbeatProperties.isReregisterServiceOnFailure()
+						&& this.ttlScheduler.reregistrationPredicate.isEligible(e)) {
+					log.warn(e.getMessage());
+					NewService registeredService = this.ttlScheduler.registeredServices.get(this.serviceId);
+					if (registeredService != null) {
+						if (log.isInfoEnabled()) {
+							log.info("Re-register " + registeredService);
+						}
+						this.ttlScheduler.client.agentServiceRegister(registeredService,
+								this.ttlScheduler.discoveryProperties.getAclToken());
+					}
+					else {
+						log.warn("The service to re-register is not found.");
+					}
+				}
+				else {
+					throw e;
+				}
 			}
 		}
 
