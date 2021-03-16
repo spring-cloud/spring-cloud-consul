@@ -22,8 +22,13 @@ import org.springframework.core.style.ToStringCreator;
 /**
  * @author Spencer Gibb
  */
-@ConfigurationProperties("spring.cloud.consul.retry")
+@ConfigurationProperties(RetryProperties.PREFIX)
 public class RetryProperties {
+
+	/**
+	 * Consul Retry Properties prefix.
+	 */
+	public static final String PREFIX = "spring.cloud.consul.retry";
 
 	/** If consul retry is enabled. */
 	private boolean enabled = true;

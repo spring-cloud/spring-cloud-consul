@@ -25,6 +25,9 @@ import org.springframework.boot.context.config.ConfigData;
 import org.springframework.boot.context.config.ConfigDataLoader;
 import org.springframework.boot.context.config.ConfigDataLoaderContext;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.cloud.consul.config.ConsulBootstrapper.LoadContext;
+import org.springframework.cloud.consul.config.ConsulBootstrapper.LoaderInterceptor;
 
 public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigDataResource> {
 
@@ -36,6 +39,17 @@ public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigData
 
 	@Override
 	public ConfigData load(ConfigDataLoaderContext context, ConsulConfigDataResource resource) {
+		if (context.getBootstrapContext().isRegistered(LoaderInterceptor.class)) {
+			LoaderInterceptor interceptor = context.getBootstrapContext().get(LoaderInterceptor.class);
+			if (interceptor != null) {
+				Binder binder = context.getBootstrapContext().get(Binder.class);
+				return interceptor.apply(new LoadContext(context, resource, binder, this::doLoad));
+			}
+		}
+		return doLoad(context, resource);
+	}
+
+	public ConfigData doLoad(ConfigDataLoaderContext context, ConsulConfigDataResource resource) {
 		try {
 			ConsulClient consul = getBean(context, ConsulClient.class);
 			ConsulConfigIndexes indexes = getBean(context, ConsulConfigIndexes.class);
@@ -48,6 +62,9 @@ public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigData
 			return new ConfigData(Collections.singletonList(propertySource));
 		}
 		catch (Exception e) {
+			if (log.isDebugEnabled()) {
+				log.debug("Error getting properties from consul: " + resource, e);
+			}
 			throw new ConfigDataResourceNotFoundException(resource, e);
 		}
 	}

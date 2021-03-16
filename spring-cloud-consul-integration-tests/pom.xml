@@ -17,5 +17,6 @@
 	<modules>
 		<module>spring-cloud-consul-bootstrap-tests</module>
 		<module>spring-cloud-consul-configdata-tests</module>
+		<module>spring-cloud-consul-configdata-retry-tests</module>
 	</modules>
 </project>
