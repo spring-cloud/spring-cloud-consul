@@ -16,21 +16,18 @@
 
 package org.springframework.cloud.consul.config;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
 import org.springframework.boot.diagnostics.AbstractFailureAnalyzer;
 import org.springframework.boot.diagnostics.FailureAnalysis;
-import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.cloud.commons.ConfigDataMissingEnvironmentPostProcessor;
 import org.springframework.cloud.consul.ConsulProperties;
-import org.springframework.core.Ordered;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.util.StringUtils;
+import org.springframework.core.env.Environment;
 
 import static org.springframework.cloud.consul.config.ConsulConfigDataLocationResolver.PREFIX;
 import static org.springframework.cloud.util.PropertyUtils.bootstrapEnabled;
 import static org.springframework.cloud.util.PropertyUtils.useLegacyProcessing;
 
-public class ConsulConfigDataMissingEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
+public class ConsulConfigDataMissingEnvironmentPostProcessor extends ConfigDataMissingEnvironmentPostProcessor {
 
 	/**
 	 * Order of post processor, set to run after
@@ -44,10 +41,10 @@ public class ConsulConfigDataMissingEnvironmentPostProcessor implements Environm
 	}
 
 	@Override
-	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+	protected boolean shouldProcessEnvironment(Environment environment) {
 		// don't run if using bootstrap or legacy processing
 		if (bootstrapEnabled(environment) || useLegacyProcessing(environment)) {
-			return;
+			return false;
 		}
 		boolean coreEnabled = environment.getProperty(ConsulProperties.PREFIX + ".enabled", Boolean.class, true);
 		boolean configEnabled = environment.getProperty(ConsulConfigProperties.PREFIX + ".enabled", Boolean.class,
@@ -55,26 +52,14 @@ public class ConsulConfigDataMissingEnvironmentPostProcessor implements Environm
 		boolean importCheckEnabled = environment.getProperty(ConsulConfigProperties.PREFIX + ".import-check.enabled",
 				Boolean.class, true);
 		if (!coreEnabled || !configEnabled || !importCheckEnabled) {
-			return;
+			return false;
 		}
-		String property = environment.getProperty("spring.config.import");
-		if (!StringUtils.hasText(property)) {
-			throw new ImportException("No spring.config.import set", false);
-		}
-		if (!property.contains(PREFIX)) {
-			throw new ImportException("spring.config.import missing " + PREFIX, true);
-		}
+		return true;
 	}
 
-	static class ImportException extends RuntimeException {
-
-		final boolean missingPrefix;
-
-		ImportException(String message, boolean missingPrefix) {
-			super(message);
-			this.missingPrefix = missingPrefix;
-		}
-
+	@Override
+	protected String getPrefix() {
+		return PREFIX;
 	}
 
 	static class ImportExceptionFailureAnalyzer extends AbstractFailureAnalyzer<ImportException> {
