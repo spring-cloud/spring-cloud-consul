@@ -48,9 +48,9 @@ public class ConsulConfigDataMissingEnvironmentPostProcessor extends ConfigDataM
 		}
 		boolean coreEnabled = environment.getProperty(ConsulProperties.PREFIX + ".enabled", Boolean.class, true);
 		boolean configEnabled = environment.getProperty(ConsulConfigProperties.PREFIX + ".enabled", Boolean.class,
-			true);
+				true);
 		boolean importCheckEnabled = environment.getProperty(ConsulConfigProperties.PREFIX + ".import-check.enabled",
-			Boolean.class, true);
+				Boolean.class, true);
 		if (!coreEnabled || !configEnabled || !importCheckEnabled) {
 			return false;
 		}

@@ -62,8 +62,10 @@ public class ConsulConfigDataNoImportIntegrationTests {
 
 	@Test
 	public void exceptionThrownIfNoImport(CapturedOutput output) {
-		Assertions.assertThatThrownBy(() -> new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
-				.run("--spring.application.name=" + APP_NAME)).isInstanceOf(ConfigDataMissingEnvironmentPostProcessor.ImportException.class);
+		Assertions
+				.assertThatThrownBy(() -> new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
+						.run("--spring.application.name=" + APP_NAME))
+				.isInstanceOf(ConfigDataMissingEnvironmentPostProcessor.ImportException.class);
 
 		assertThat(output).contains("No spring.config.import property has been defined")
 				.contains("Add a spring.config.import=consul: property to your configuration");
@@ -71,8 +73,10 @@ public class ConsulConfigDataNoImportIntegrationTests {
 
 	@Test
 	public void exceptionThrownIfImportMissingConsul(CapturedOutput output) {
-		Assertions.assertThatThrownBy(() -> new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE).run(
-				"--spring.config.import=optional:file:somefile.properties", "--spring.application.name=" + APP_NAME))
+		Assertions
+				.assertThatThrownBy(() -> new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE).run(
+						"--spring.config.import=optional:file:somefile.properties",
+						"--spring.application.name=" + APP_NAME))
 				.isInstanceOf(ConfigDataMissingEnvironmentPostProcessor.ImportException.class);
 
 		assertThat(output).contains("spring.config.import property is missing a " + PREFIX)
