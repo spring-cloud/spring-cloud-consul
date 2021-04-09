@@ -35,7 +35,7 @@ To activate Consul Service Discovery use the starter with group `org.springframe
 
 === Registering with Consul
 
-When a client registers with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An HTTP https://www.consul.io/docs/agent/checks.html[Check] is created by default that Consul hits the `/actuator/health` endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.
+When a client registers with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An https://www.consul.io/docs/discovery/checks#http-interval[HTTP Check] is created by default that Consul hits the `/actuator/health` endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.
 
 Example Consul client:
 
@@ -198,6 +198,78 @@ spring:
           X-Config-Token:
             - "6442e58b-d1ea-182e-cfa5-cf9cddef0722"
             - "Some other value"
+----
+
+==== TTL Health Check
+
+A Consul https://www.consul.io/docs/discovery/checks#ttl[TTL Check] can be used instead of the default configured HTTP check.
+The main difference is that the application sends a heartbeat signal to the Consul agent rather than the Consul agent sending a request to the application.
+
+The interval the application uses to send the ping may also be configured. "10s" and "1m" represent 10 seconds and 1 minute respectively.
+The default is 30 seconds.
+
+This example illustrates the above (see the `spring.cloud.consul.discovery.heartbeat.*` properties in link:appendix.html[the appendix page] for more options).
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        heartbeat:
+          enabled: true
+          ttl: 10s
+----
+
+===== TTL Application Status
+
+For a Spring Boot Actuator application the status is determined from its available health endpoint.
+When the health endpoint is not available (either disabled or not a Spring Boot Actuator application) it assumes the application is in good health.
+
+When querying the health endpoint, the root https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#production-ready-health-groups[health group] is used by default.
+A different health group can be used by setting the following property:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        heartbeat:
+          actuator-health-group: <your-custom-group-goes-here>
+----
+
+You can disable the use of the health endpoint entirely by setting the following property:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        heartbeat:
+          use-actuator-health: false
+----
+
+====== Custom TTL Application Status
+
+If you want to configure your own application status mechanism, simply implement the `ApplicationStatusProvider` interface
+
+.MyCustomApplicationStatusProvider.java
+----
+@Bean
+public class MyCustomApplicationStatusProvider implements ApplicationStatusProvider {
+	public CheckStatus currentStatus() {
+        return yourMethodToDetermineAppStatusGoesHere();
+    }
+}
+----
+and make it available to the application context:
+----
+@Bean
+public CustomApplicationStatusProvider customAppStatusProvider() {
+     return new MyCustomApplicationStatusProvider();
+}
 ----
 
 ==== Actuator Health Indicator(s)
