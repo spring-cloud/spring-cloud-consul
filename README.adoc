@@ -13,8 +13,8 @@ and binding to the Spring Environment and other Spring programming model idioms.
 simple annotations you can quickly enable and configure the common patterns inside your
 application and build large distributed systems with Consul based components. The
 patterns provided include Service Discovery, Control Bus and Configuration.
-Intelligent Routing (Zuul) and Client Side Load Balancing (Ribbon), Circuit Breaker
-(Hystrix) are provided by integration with Spring Cloud Netflix.
+Intelligent Routing and Client Side Load Balancing, Circuit Breaker
+ are provided by integration with other Spring Cloud projects.
 
 
 == Quick Start
@@ -263,7 +263,7 @@ See the https://consul.io/intro/index.html[intro] for more information.
 == Spring Cloud Consul Features
 
 * Spring Cloud `DiscoveryClient` implementation
-** supports Ribbon and Zuul
+** supports Spring Cloud Gateway
 ** supports Spring Cloud LoadBalancer
 * Consul based `PropertySource` loaded during the 'bootstrap' phase.
 * Spring Cloud Bus implementation based on Consul https://www.consul.io/docs/agent/http/event.html[events]

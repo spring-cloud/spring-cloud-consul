@@ -23,7 +23,7 @@ See the https://consul.io/intro/index.html[intro] for more information.
 == Spring Cloud Consul Features
 
 * Spring Cloud `DiscoveryClient` implementation
-** supports Ribbon and Zuul
+** supports Spring Cloud Gateway
 ** supports Spring Cloud LoadBalancer
 * Consul based `PropertySource` loaded during the 'bootstrap' phase.
 * Spring Cloud Bus implementation based on Consul https://www.consul.io/docs/agent/http/event.html[events]

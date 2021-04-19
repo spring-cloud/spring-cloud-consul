@@ -1,12 +1,6 @@
 {
   "properties": [
     {
-      "name": "spring.cloud.consul.ribbon.enabled",
-      "type": "java.lang.Boolean",
-      "description": "Enables Consul and Ribbon integration.",
-      "defaultValue": "true"
-    },
-    {
       "name": "spring.cloud.service-registry.enabled",
       "type": "java.lang.Boolean",
       "description": "Enables Service Registry functionality.",
