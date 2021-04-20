@@ -14,7 +14,7 @@ simple annotations you can quickly enable and configure the common patterns insi
 application and build large distributed systems with Consul based components. The
 patterns provided include Service Discovery, Control Bus and Configuration.
 Intelligent Routing and Client Side Load Balancing, Circuit Breaker
- are provided by integration with other Spring Cloud projects.
+are provided by integration with other Spring Cloud projects.
 
 
 == Quick Start
