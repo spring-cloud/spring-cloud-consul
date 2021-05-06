@@ -21,12 +21,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.kv.model.GetValue;
 import org.apache.commons.logging.Log;
 
+import org.springframework.core.style.ToStringCreator;
 import org.springframework.util.StringUtils;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
@@ -52,12 +54,16 @@ public class ConsulPropertySources {
 	}
 
 	public List<String> getAutomaticContexts(List<String> profiles, boolean reverse) {
-		List<String> contexts = new ArrayList<>();
+		return generateAutomaticContexts(profiles, reverse).stream().map(Context::getPath).collect(Collectors.toList());
+	}
+
+	public List<Context> generateAutomaticContexts(List<String> profiles, boolean reverse) {
+		List<Context> contexts = new ArrayList<>();
 		for (String prefix : this.properties.getPrefixes()) {
 			String defaultContext = getContext(prefix, properties.getDefaultContext());
 			List<String> suffixes = getSuffixes();
 			for (String suffix : suffixes) {
-				contexts.add(defaultContext + suffix);
+				contexts.add(new Context(defaultContext + suffix));
 			}
 			for (String suffix : suffixes) {
 				addProfiles(contexts, defaultContext, profiles, suffix);
@@ -67,7 +73,7 @@ public class ConsulPropertySources {
 			String baseContext = getContext(prefix, properties.getName());
 
 			for (String suffix : suffixes) {
-				contexts.add(baseContext + suffix);
+				contexts.add(new Context(baseContext + suffix));
 			}
 			for (String suffix : suffixes) {
 				addProfiles(contexts, baseContext, profiles, suffix);
@@ -96,9 +102,10 @@ public class ConsulPropertySources {
 		return DIR_SUFFIXES;
 	}
 
-	private void addProfiles(List<String> contexts, String baseContext, List<String> profiles, String suffix) {
+	private void addProfiles(List<Context> contexts, String baseContext, List<String> profiles, String suffix) {
 		for (String profile : profiles) {
-			contexts.add(baseContext + properties.getProfileSeparator() + profile + suffix);
+			String path = baseContext + properties.getProfileSeparator() + profile + suffix;
+			contexts.add(new Context(path, profile));
 		}
 	}
 
@@ -148,6 +155,38 @@ public class ConsulPropertySources {
 		propertySource.init();
 		indexConsumer.accept(context, propertySource.getInitialIndex());
 		return propertySource;
+	}
+
+	public static class Context {
+
+		private final String path;
+
+		private final String profile;
+
+		public Context(String path) {
+			this.path = path;
+			this.profile = null;
+		}
+
+		public Context(String path, String profile) {
+			this.path = path;
+			this.profile = profile;
+		}
+
+		public String getPath() {
+			return this.path;
+		}
+
+		public String getProfile() {
+			return this.profile;
+		}
+
+		@Override
+		public String toString() {
+			return new ToStringCreator(this).append("path", path).append("profile", profile).toString();
+
+		}
+
 	}
 
 	static class PropertySourceNotFoundException extends RuntimeException {

@@ -78,4 +78,11 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 		return new ConsulClient(getHost(), getPort());
 	}
 
+	public static void initializeSystemProperties() {
+		start();
+
+		System.setProperty(ConsulProperties.PREFIX + ".port", getPort().toString());
+		System.setProperty(ConsulProperties.PREFIX + ".host", getHost());
+	}
+
 }

@@ -28,6 +28,7 @@ import org.springframework.boot.Bootstrapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.config.ConfigData;
 import org.springframework.boot.context.properties.bind.BindContext;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
@@ -36,7 +37,9 @@ import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.PropertySource;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.util.StringUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -65,6 +68,23 @@ public class ConsulConfigDataCustomizationIntegrationTests {
 		bindHandlerBootstrapper = new BindHandlerBootstrapper();
 		application.addBootstrapper(bindHandlerBootstrapper);
 		application.addBootstrapper(ConsulBootstrapper.fromConsulProperties(TestConsulClient::new));
+		application.addBootstrapper(
+				registry -> registry.register(ConsulBootstrapper.LoaderInterceptor.class, context1 -> loadContext -> {
+					ConfigData configData = loadContext.getInvocation().apply(loadContext.getLoaderContext(),
+							loadContext.getResource());
+					assertThat(configData).as("ConfigData was null for location %s", loadContext.getResource())
+							.isNotNull();
+					assertThat(configData.getPropertySources()).hasSize(1);
+					PropertySource<?> propertySource = configData.getPropertySources().iterator().next();
+					ConfigData.Options options = configData.getOptions(propertySource);
+					assertThat(options).as("ConfigData.options was null for location %s property source %s",
+							loadContext.getResource(), propertySource.getName()).isNotNull();
+					assertThat(options.contains(ConfigData.Option.IGNORE_IMPORTS)).isTrue();
+					assertThat(options.contains(ConfigData.Option.IGNORE_PROFILES)).isTrue();
+					boolean hasProfile = StringUtils.hasText(loadContext.getResource().getProfile());
+					assertThat(options.contains(ConfigData.Option.PROFILE_SPECIFIC)).isEqualTo(hasProfile);
+					return configData;
+				}));
 		context = application.run("--spring.application.name=" + APP_NAME,
 				"--spring.config.import=consul:" + ConsulTestcontainers.getHost() + ":"
 						+ ConsulTestcontainers.getPort(),
