@@ -30,8 +30,7 @@ public class ConsulCatalogWatchTests {
 
 	@Test
 	public void isRunningReportsCorrectly() {
-		ConsulDiscoveryProperties properties = new ConsulDiscoveryProperties(
-				new InetUtils(new InetUtilsProperties()));
+		ConsulDiscoveryProperties properties = new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties()));
 		ConsulCatalogWatch watch = new ConsulCatalogWatch(properties, null) {
 			@Override
 			public void catalogServicesWatch() {
