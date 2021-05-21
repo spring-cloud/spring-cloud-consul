@@ -111,7 +111,7 @@ public class ConsulCatalogWatch
 
 	@Override
 	public boolean isRunning() {
-		return false;
+		return this.running.get();
 	}
 
 	@Override
