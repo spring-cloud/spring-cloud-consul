@@ -45,10 +45,16 @@ public class ConsulConfigServerBootstrapper implements Bootstrapper {
 		// create consul client
 		registry.registerIfAbsent(ConsulProperties.class, context -> {
 			Binder binder = context.get(Binder.class);
+			if (!isDiscoveryEnabled(binder)) {
+				return null;
+			}
 			return binder.bind(ConsulProperties.PREFIX, Bindable.of(ConsulProperties.class), getBindHandler(context))
 					.orElseGet(ConsulProperties::new);
 		});
 		registry.registerIfAbsent(ConsulClient.class, context -> {
+			if (!isDiscoveryEnabled(context.get(Binder.class))) {
+				return null;
+			}
 			ConsulProperties consulProperties = context.get(ConsulProperties.class);
 			return ConsulAutoConfiguration.createConsulClient(consulProperties);
 		});
@@ -66,6 +72,9 @@ public class ConsulConfigServerBootstrapper implements Bootstrapper {
 		});
 		// promote discovery client if created
 		registry.addCloseListener(event -> {
+			if (!isDiscoveryEnabled(event.getBootstrapContext().get(Binder.class))) {
+				return;
+			}
 			ConsulDiscoveryClient discoveryClient = event.getBootstrapContext().get(ConsulDiscoveryClient.class);
 			if (discoveryClient != null) {
 				event.getApplicationContext().getBeanFactory().registerSingleton("consulDiscoveryClient",
