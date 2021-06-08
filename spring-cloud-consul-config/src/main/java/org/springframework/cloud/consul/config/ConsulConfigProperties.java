@@ -112,7 +112,7 @@ public class ConsulConfigProperties {
 	}
 
 	@DeprecatedConfigurationProperty(reason = "replaced to support multiple prefixes",
-		replacement = PREFIX + ".prefixes")
+			replacement = PREFIX + ".prefixes")
 	public String getPrefix() {
 		if (CollectionUtils.isEmpty(this.prefixes)) {
 			return null;
@@ -124,7 +124,8 @@ public class ConsulConfigProperties {
 	public void setPrefix(String prefix) {
 		if (prefix != null) {
 			this.prefixes = new ArrayList<>(Collections.singletonList(prefix));
-		} else {
+		}
+		else {
 			this.prefixes = new ArrayList<>();
 		}
 	}
@@ -310,7 +311,7 @@ public class ConsulConfigProperties {
 		@Override
 		public String toString() {
 			return new ToStringCreator(this).append("waitTime", this.waitTime).append("enabled", this.enabled)
-				.append("delay", this.delay).toString();
+					.append("delay", this.delay).toString();
 		}
 
 	}

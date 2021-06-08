@@ -38,7 +38,7 @@ public class ConsulPropertySources {
 	protected static final List<String> DIR_SUFFIXES = Collections.singletonList("/");
 
 	protected static final List<String> FILES_SUFFIXES = Collections
-		.unmodifiableList(Arrays.asList(".yml", ".yaml", ".properties"));
+			.unmodifiableList(Arrays.asList(".yml", ".yaml", ".properties"));
 
 	private final ConsulConfigProperties properties;
 
@@ -97,7 +97,8 @@ public class ConsulPropertySources {
 	protected String getContext(String prefix, String context) {
 		if (!StringUtils.hasText(prefix)) {
 			return context;
-		} else {
+		}
+		else {
 			return prefix + "/" + context;
 		}
 	}
@@ -118,12 +119,12 @@ public class ConsulPropertySources {
 
 	@Deprecated
 	public ConsulPropertySource createPropertySource(String propertySourceContext, boolean optional,
-													 ConsulClient consul, BiConsumer<String, Long> indexConsumer) {
+			ConsulClient consul, BiConsumer<String, Long> indexConsumer) {
 		return createPropertySource(propertySourceContext, consul, indexConsumer);
 	}
 
 	public ConsulPropertySource createPropertySource(String propertySourceContext, ConsulClient consul,
-													 BiConsumer<String, Long> indexConsumer) {
+			BiConsumer<String, Long> indexConsumer) {
 		try {
 			ConsulPropertySource propertySource = null;
 
@@ -132,20 +133,24 @@ public class ConsulPropertySources {
 				indexConsumer.accept(propertySourceContext, response.getConsulIndex());
 				if (response.getValue() != null) {
 					ConsulFilesPropertySource filesPropertySource = new ConsulFilesPropertySource(propertySourceContext,
-						consul, properties);
+							consul, properties);
 					filesPropertySource.init(response.getValue());
 					propertySource = filesPropertySource;
 				}
-			} else {
+			}
+			else {
 				propertySource = create(propertySourceContext, consul, indexConsumer);
 			}
 			return propertySource;
-		} catch (PropertySourceNotFoundException e) {
+		}
+		catch (PropertySourceNotFoundException e) {
 			throw e;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			if (properties.isFailFast()) {
 				throw new PropertySourceNotFoundException(propertySourceContext, e);
-			} else {
+			}
+			else {
 				log.warn("Unable to load consul config from " + propertySourceContext, e);
 			}
 		}
@@ -153,7 +158,7 @@ public class ConsulPropertySources {
 	}
 
 	private ConsulPropertySource create(String context, ConsulClient consulClient,
-										BiConsumer<String, Long> indexConsumer) {
+			BiConsumer<String, Long> indexConsumer) {
 		ConsulPropertySource propertySource = new ConsulPropertySource(context, consulClient, this.properties);
 		propertySource.init();
 		indexConsumer.accept(context, propertySource.getInitialIndex());

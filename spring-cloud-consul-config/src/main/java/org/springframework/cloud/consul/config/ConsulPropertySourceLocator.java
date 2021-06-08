@@ -25,6 +25,7 @@ import java.util.List;
 import com.ecwid.consul.v1.ConsulClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.CompositePropertySource;
@@ -92,7 +93,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 
 			for (String propertySourceContext : this.contexts) {
 				ConsulPropertySource propertySource = sources.createPropertySource(propertySourceContext, this.consul,
-					contextIndex::put);
+						contextIndex::put);
 				if (propertySource != null) {
 					composite.addPropertySource(propertySource);
 				}
