@@ -16,16 +16,9 @@
 
 package org.springframework.cloud.consul.config;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import com.ecwid.consul.v1.ConsulClient;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.CompositePropertySource;
@@ -33,6 +26,8 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.retry.annotation.Retryable;
+
+import java.util.*;
 
 /**
  * @author Spencer Gibb
@@ -50,9 +45,18 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 
 	private final LinkedHashMap<String, Long> contextIndex = new LinkedHashMap<>();
 
+	private final ConsulPropertySources sources;
+
 	public ConsulPropertySourceLocator(ConsulClient consul, ConsulConfigProperties properties) {
 		this.consul = consul;
 		this.properties = properties;
+		sources = new ConsulPropertySources(properties, log);
+	}
+
+	public ConsulPropertySourceLocator(ConsulClient consul, ConsulConfigProperties properties, ConsulPropertySources sources) {
+		this.consul = consul;
+		this.properties = properties;
+		this.sources = sources;
 	}
 
 	@Deprecated
@@ -77,8 +81,6 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 		if (environment instanceof ConfigurableEnvironment) {
 			ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
 
-			ConsulPropertySources sources = new ConsulPropertySources(properties, log);
-
 			List<String> profiles = Arrays.asList(env.getActiveProfiles());
 			this.contexts.addAll(sources.getAutomaticContexts(profiles));
 
@@ -86,7 +88,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 
 			for (String propertySourceContext : this.contexts) {
 				ConsulPropertySource propertySource = sources.createPropertySource(propertySourceContext, this.consul,
-						contextIndex::put);
+					contextIndex::put);
 				if (propertySource != null) {
 					composite.addPropertySource(propertySource);
 				}

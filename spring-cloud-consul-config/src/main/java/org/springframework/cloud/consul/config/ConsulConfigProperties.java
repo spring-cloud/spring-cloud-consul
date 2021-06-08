@@ -16,20 +16,19 @@
 
 package org.springframework.cloud.consul.config;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
+
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.PREFIX;
 
@@ -80,6 +79,8 @@ public class ConsulConfigProperties {
 	 */
 	private String name;
 
+	private String[] sharedContexts;
+
 	public ConsulConfigProperties() {
 	}
 
@@ -107,7 +108,7 @@ public class ConsulConfigProperties {
 	}
 
 	@DeprecatedConfigurationProperty(reason = "replaced to support multiple prefixes",
-			replacement = PREFIX + ".prefixes")
+		replacement = PREFIX + ".prefixes")
 	public String getPrefix() {
 		if (CollectionUtils.isEmpty(this.prefixes)) {
 			return null;
@@ -119,8 +120,7 @@ public class ConsulConfigProperties {
 	public void setPrefix(String prefix) {
 		if (prefix != null) {
 			this.prefixes = new ArrayList<>(Collections.singletonList(prefix));
-		}
-		else {
+		} else {
 			this.prefixes = new ArrayList<>();
 		}
 	}
@@ -189,12 +189,22 @@ public class ConsulConfigProperties {
 		this.name = name;
 	}
 
+	public String[] getSharedContexts() {
+		return sharedContexts;
+	}
+
+	public void setSharedContexts(String[] sharedContexts) {
+		this.sharedContexts = sharedContexts;
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("enabled", this.enabled).append("prefixes", this.prefixes)
-				.append("defaultContext", this.defaultContext).append("profileSeparator", this.profileSeparator)
-				.append("format", this.format).append("dataKey", this.dataKey).append("aclToken", this.aclToken)
-				.append("watch", this.watch).append("failFast", this.failFast).append("name", this.name).toString();
+			.append("defaultContext", this.defaultContext).append("profileSeparator", this.profileSeparator)
+			.append("format", this.format).append("dataKey", this.dataKey).append("aclToken", this.aclToken)
+			.append("watch", this.watch).append("failFast", this.failFast)
+			.append("name", this.name).append("sharedContexts", this.sharedContexts)
+			.toString();
 	}
 
 	/**
@@ -212,7 +222,7 @@ public class ConsulConfigProperties {
 	 * as whole configuration " a.b.c=something a.b.d=something else "</li>
 	 * <li>as Json or YML. You get it.</li>
 	 * </ol>
-	 *
+	 * <p>
 	 * This enum specifies the different Formats/styles supported for loading the
 	 * configuration.
 	 *
@@ -260,10 +270,14 @@ public class ConsulConfigProperties {
 		 */
 		private int waitTime = 55;
 
-		/** If the watch is enabled. Defaults to true. */
+		/**
+		 * If the watch is enabled. Defaults to true.
+		 */
 		private boolean enabled = true;
 
-		/** The value of the fixed delay for the watch in millis. Defaults to 1000. */
+		/**
+		 * The value of the fixed delay for the watch in millis. Defaults to 1000.
+		 */
 		private int delay = 1000;
 
 		public Watch() {
@@ -296,7 +310,7 @@ public class ConsulConfigProperties {
 		@Override
 		public String toString() {
 			return new ToStringCreator(this).append("waitTime", this.waitTime).append("enabled", this.enabled)
-					.append("delay", this.delay).toString();
+				.append("delay", this.delay).toString();
 		}
 
 	}

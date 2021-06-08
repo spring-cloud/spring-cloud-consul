@@ -16,20 +16,19 @@
 
 package org.springframework.cloud.consul.config;
 
+import com.ecwid.consul.v1.ConsulClient;
+import com.ecwid.consul.v1.Response;
+import com.ecwid.consul.v1.kv.model.GetValue;
+import org.apache.commons.logging.Log;
+import org.springframework.core.style.ToStringCreator;
+import org.springframework.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
-
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.kv.model.GetValue;
-import org.apache.commons.logging.Log;
-
-import org.springframework.core.style.ToStringCreator;
-import org.springframework.util.StringUtils;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
 
@@ -38,7 +37,7 @@ public class ConsulPropertySources {
 	protected static final List<String> DIR_SUFFIXES = Collections.singletonList("/");
 
 	protected static final List<String> FILES_SUFFIXES = Collections
-			.unmodifiableList(Arrays.asList(".yml", ".yaml", ".properties"));
+		.unmodifiableList(Arrays.asList(".yml", ".yaml", ".properties"));
 
 	private final ConsulConfigProperties properties;
 
@@ -60,6 +59,14 @@ public class ConsulPropertySources {
 	public List<Context> generateAutomaticContexts(List<String> profiles, boolean reverse) {
 		List<Context> contexts = new ArrayList<>();
 		for (String prefix : this.properties.getPrefixes()) {
+			// contexts which shared with each other
+			final String[] sharedContexts = properties.getSharedContexts();
+			if (sharedContexts != null) {
+				for (String sharedContext : sharedContexts) {
+					contexts.add(new Context(getContext(prefix, sharedContext)));
+				}
+			}
+
 			String defaultContext = getContext(prefix, properties.getDefaultContext());
 			List<String> suffixes = getSuffixes();
 			for (String suffix : suffixes) {
@@ -89,8 +96,7 @@ public class ConsulPropertySources {
 	protected String getContext(String prefix, String context) {
 		if (!StringUtils.hasText(prefix)) {
 			return context;
-		}
-		else {
+		} else {
 			return prefix + "/" + context;
 		}
 	}
@@ -111,12 +117,12 @@ public class ConsulPropertySources {
 
 	@Deprecated
 	public ConsulPropertySource createPropertySource(String propertySourceContext, boolean optional,
-			ConsulClient consul, BiConsumer<String, Long> indexConsumer) {
+													 ConsulClient consul, BiConsumer<String, Long> indexConsumer) {
 		return createPropertySource(propertySourceContext, consul, indexConsumer);
 	}
 
 	public ConsulPropertySource createPropertySource(String propertySourceContext, ConsulClient consul,
-			BiConsumer<String, Long> indexConsumer) {
+													 BiConsumer<String, Long> indexConsumer) {
 		try {
 			ConsulPropertySource propertySource = null;
 
@@ -125,24 +131,20 @@ public class ConsulPropertySources {
 				indexConsumer.accept(propertySourceContext, response.getConsulIndex());
 				if (response.getValue() != null) {
 					ConsulFilesPropertySource filesPropertySource = new ConsulFilesPropertySource(propertySourceContext,
-							consul, properties);
+						consul, properties);
 					filesPropertySource.init(response.getValue());
 					propertySource = filesPropertySource;
 				}
-			}
-			else {
+			} else {
 				propertySource = create(propertySourceContext, consul, indexConsumer);
 			}
 			return propertySource;
-		}
-		catch (PropertySourceNotFoundException e) {
+		} catch (PropertySourceNotFoundException e) {
 			throw e;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			if (properties.isFailFast()) {
 				throw new PropertySourceNotFoundException(propertySourceContext, e);
-			}
-			else {
+			} else {
 				log.warn("Unable to load consul config from " + propertySourceContext, e);
 			}
 		}
@@ -150,7 +152,7 @@ public class ConsulPropertySources {
 	}
 
 	private ConsulPropertySource create(String context, ConsulClient consulClient,
-			BiConsumer<String, Long> indexConsumer) {
+										BiConsumer<String, Long> indexConsumer) {
 		ConsulPropertySource propertySource = new ConsulPropertySource(context, consulClient, this.properties);
 		propertySource.init();
 		indexConsumer.accept(context, propertySource.getInitialIndex());
