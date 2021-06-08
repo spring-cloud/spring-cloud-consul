@@ -16,19 +16,20 @@
 
 package org.springframework.cloud.consul.config;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
-
-import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.PREFIX;
 
@@ -225,7 +226,7 @@ public class ConsulConfigProperties {
 	 * as whole configuration " a.b.c=something a.b.d=something else "</li>
 	 * <li>as Json or YML. You get it.</li>
 	 * </ol>
-	 * <p>
+	 *
 	 * This enum specifies the different Formats/styles supported for loading the
 	 * configuration.
 	 *
@@ -273,14 +274,10 @@ public class ConsulConfigProperties {
 		 */
 		private int waitTime = 55;
 
-		/**
-		 * If the watch is enabled. Defaults to true.
-		 */
+		/** If the watch is enabled. Defaults to true. */
 		private boolean enabled = true;
 
-		/**
-		 * The value of the fixed delay for the watch in millis. Defaults to 1000.
-		 */
+		/** The value of the fixed delay for the watch in millis. Defaults to 1000. */
 		private int delay = 1000;
 
 		public Watch() {
