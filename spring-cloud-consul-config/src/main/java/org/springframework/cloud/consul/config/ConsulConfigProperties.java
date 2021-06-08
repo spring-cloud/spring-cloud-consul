@@ -79,6 +79,9 @@ public class ConsulConfigProperties {
 	 */
 	private String name;
 
+	/**
+	 * contexts which shared with each other, lowest priority
+	 */
 	private String[] sharedContexts;
 
 	public ConsulConfigProperties() {
