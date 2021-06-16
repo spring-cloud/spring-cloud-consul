@@ -154,8 +154,8 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 					aclToken = null;
 				}
 
-				Response<List<GetValue>> response = this.consul.getKVValues(context, aclToken,
-						new QueryParams(this.properties.getWatch().getWaitTime(), currentIndex));
+				Response<List<String>> response = this.consul.getKVKeysOnly(context, this.properties.getProfileSeparator(), aclToken
+						,new QueryParams(this.properties.getWatch().getWaitTime(), currentIndex));
 
 				// if response.value == null, response was a 404, otherwise it was a
 				// 200, reducing churn if there wasn't anything
