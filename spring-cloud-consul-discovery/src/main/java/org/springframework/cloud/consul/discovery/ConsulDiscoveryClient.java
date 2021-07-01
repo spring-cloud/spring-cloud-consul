@@ -95,7 +95,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 			Map<String, String> metadata = getMetadata(service,
 					this.properties.isTagsAsMetadata());
 			boolean secure = false;
-			if (metadata.containsKey("secure")) {
+			if (metadata != null && metadata.containsKey("secure")) {
 				secure = Boolean.parseBoolean(metadata.get("secure"));
 			}
 			instances.add(new DefaultServiceInstance(service.getService().getId(),
