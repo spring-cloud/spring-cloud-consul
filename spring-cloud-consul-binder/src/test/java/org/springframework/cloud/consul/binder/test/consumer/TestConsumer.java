@@ -35,7 +35,7 @@ import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.ExecutorSubscribableChannel;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -92,12 +92,12 @@ public class TestConsumer implements ApplicationRunner {
 		this.isBound = true;
 	}
 
-	@RequestMapping("/is-bound")
+	@GetMapping("/is-bound")
 	public boolean isBound() {
 		return this.isBound;
 	}
 
-	@RequestMapping("/message-payload")
+	@GetMapping("/message-payload")
 	public String getMessagePayload() {
 		return this.messagePayload;
 	}
