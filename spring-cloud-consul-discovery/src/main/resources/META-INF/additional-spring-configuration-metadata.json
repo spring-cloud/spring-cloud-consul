@@ -29,6 +29,12 @@
       "type": "java.lang.Boolean",
       "description": "Enables Consul Service Registry Auto-registration.",
       "defaultValue": "true"
+    },
+    {
+      "name": "spring.cloud.consul.discovery.heartbeat.use-actuator-health",
+      "type": "java.lang.Boolean",
+      "description": "Whether or not to take the current system health (as reported via the Actuator Health endpoint) into account when reporting the application status to the Consul TTL check. Actuator Health endpoint also has to be available to the application.",
+      "defaultValue": "true"
     }
   ]
 }

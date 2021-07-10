@@ -30,9 +30,10 @@ import org.springframework.core.style.ToStringCreator;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Properties related to hearbeat verification.
+ * Properties related to heartbeat verification.
  *
  * @author Spencer Gibb
+ * @author Chris Bono
  */
 @ConfigurationProperties(prefix = "spring.cloud.consul.discovery.heartbeat")
 @Validated
@@ -52,6 +53,19 @@ public class HeartbeatProperties {
 	private double intervalRatio = 2.0 / 3.0;
 
 	private boolean reregisterServiceOnFailure = false;
+
+	/**
+	 * Whether or not to take the current system health (as reported via the Actuator
+	 * Health endpoint) into account when reporting the application status to the Consul
+	 * TTL check. Actuator Health endpoint also has to be available to the application.
+	 */
+	private boolean useActuatorHealth = true;
+
+	/**
+	 * The actuator health group to use (null for the root group) when determining system
+	 * health via Actuator.
+	 */
+	private String actuatorHealthGroup;
 
 	/**
 	 * @return the computed heartbeat interval
@@ -100,10 +114,27 @@ public class HeartbeatProperties {
 		this.reregisterServiceOnFailure = reregisterServiceOnFailure;
 	}
 
+	public boolean isUseActuatorHealth() {
+		return useActuatorHealth;
+	}
+
+	public void setUseActuatorHealth(boolean useActuatorHealth) {
+		this.useActuatorHealth = useActuatorHealth;
+	}
+
+	public String getActuatorHealthGroup() {
+		return actuatorHealthGroup;
+	}
+
+	public void setActuatorHealthGroup(String actuatorHealthGroup) {
+		this.actuatorHealthGroup = actuatorHealthGroup;
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("enabled", this.enabled).append("ttl", this.ttl)
-				.append("intervalRatio", this.intervalRatio).toString();
+				.append("intervalRatio", this.intervalRatio).append("useActuatorHealth", this.useActuatorHealth)
+				.append("healthGroup", this.actuatorHealthGroup).toString();
 	}
 
 }
