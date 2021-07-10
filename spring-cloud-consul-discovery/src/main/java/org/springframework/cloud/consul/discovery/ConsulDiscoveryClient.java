@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.util.CollectionUtils;
 
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.getMetadata;
@@ -63,8 +64,17 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<ServiceInstance> getInstances(final String serviceId) {
-		return getInstances(serviceId,
-				new QueryParams(this.properties.getConsistencyMode()));
+
+		List<ServiceInstance> instances = getInstances(serviceId,
+			new QueryParams(this.properties.getConsistencyMode()));
+
+		if (CollectionUtils.isEmpty(instances) && !CollectionUtils.isEmpty(this.properties.getFailoverDataCenters())) {
+			for (String dc : this.properties.getFailoverDataCenters()) {
+				instances.addAll(getInstances(serviceId, new QueryParams(dc, this.properties.getConsistencyMode())));
+			}
+		}
+
+		return instances;
 	}
 
 	public List<ServiceInstance> getInstances(final String serviceId,

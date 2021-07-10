@@ -204,6 +204,12 @@ public class ConsulDiscoveryProperties {
 	 */
 	private int order = 0;
 
+	/**
+	 * List of data centers to look for service instances in, if there are
+	 * no instances of wanted service in local data center.
+	 */
+	private List<String> failoverDataCenters;
+
 	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {
 		this.managementTags.add(MANAGEMENT);
@@ -589,6 +595,14 @@ public class ConsulDiscoveryProperties {
 		this.managementEnableTagOverride = managementEnableTagOverride;
 	}
 
+	public List<String> getFailoverDataCenters() {
+		return this.failoverDataCenters;
+	}
+
+	public void setFailoverDataCenters(List<String> failoverDataCenters) {
+		this.failoverDataCenters = failoverDataCenters;
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("hostInfo", this.hostInfo)
@@ -626,6 +640,7 @@ public class ConsulDiscoveryProperties {
 				.append("register", this.register).append("deregister", this.deregister)
 				.append("registerHealthCheck", this.registerHealthCheck)
 				.append("failFast", this.failFast)
+				.append("failoverDataCenters", this.failoverDataCenters)
 				.append("healthCheckTlsSkipVerify", this.healthCheckTlsSkipVerify)
 				.append("order", this.order).append("tagsAsMetadata", this.tagsAsMetadata)
 				.append("enableTagOverride", this.enableTagOverride)
