@@ -1,1 +1,1 @@
-spring-cloud-consul.adoc
+include::spring-cloud-consul.adoc[]
