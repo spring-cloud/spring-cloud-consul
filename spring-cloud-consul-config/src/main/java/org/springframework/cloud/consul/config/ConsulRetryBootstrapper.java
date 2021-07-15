@@ -17,7 +17,7 @@
 package org.springframework.cloud.consul.config;
 
 import org.springframework.boot.BootstrapRegistry;
-import org.springframework.boot.Bootstrapper;
+import org.springframework.boot.BootstrapRegistryInitializer;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.cloud.consul.RetryProperties;
 import org.springframework.cloud.consul.config.ConsulBootstrapper.LoaderInterceptor;
@@ -30,13 +30,13 @@ import org.springframework.util.ClassUtils;
  * @author Spencer Gibb
  * @since 3.0.2
  */
-public class ConsulRetryBootstrapper implements Bootstrapper {
+public class ConsulRetryBootstrapper implements BootstrapRegistryInitializer {
 
 	static final boolean RETRY_IS_PRESENT = ClassUtils.isPresent("org.springframework.retry.annotation.Retryable",
 			null);
 
 	@Override
-	public void intitialize(BootstrapRegistry registry) {
+	public void initialize(BootstrapRegistry registry) {
 		if (!RETRY_IS_PRESENT) {
 			return;
 		}

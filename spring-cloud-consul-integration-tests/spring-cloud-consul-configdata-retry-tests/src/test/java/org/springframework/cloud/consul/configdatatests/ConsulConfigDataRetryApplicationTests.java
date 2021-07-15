@@ -46,24 +46,25 @@ public class ConsulConfigDataRetryApplicationTests {
 
 	@BeforeAll
 	public static void setup() {
-		context = new SpringApplicationBuilder(ConsulConfigDataRetryApplication.class).addBootstrapper(registry -> {
-			registry.register(ConsulBootstrapper.LoaderInterceptor.class, context -> {
-				RetryTemplate retryTemplate = context.get(RetryTemplate.class);
-				if (retryTemplate != null) {
-					return loadContext -> retryTemplate.execute(retryContext -> {
-						count.incrementAndGet();
-						return loadContext.getInvocation().apply(loadContext.getLoaderContext(),
-								loadContext.getResource());
+		context = new SpringApplicationBuilder(ConsulConfigDataRetryApplication.class)
+				.addBootstrapRegistryInitializer(registry -> {
+					registry.register(ConsulBootstrapper.LoaderInterceptor.class, context -> {
+						RetryTemplate retryTemplate = context.get(RetryTemplate.class);
+						if (retryTemplate != null) {
+							return loadContext -> retryTemplate.execute(retryContext -> {
+								count.incrementAndGet();
+								return loadContext.getInvocation().apply(loadContext.getLoaderContext(),
+										loadContext.getResource());
+							});
+						}
+						// disabled
+						return null;
 					});
-				}
-				// disabled
-				return null;
-			});
-		}).run("--spring.application.name=" + APP_NAME, "--spring.cloud.consul.retry.enabled=true",
-				"--spring.cloud.consul.retry.max-attempts=2",
-				// non-existent consul host and port
-				"--spring.config.import=optional:consul:somehost:1234", "--spring.cloud.consul.config.prefix=" + ROOT,
-				"--spring.cloud.consul.config.watch.delay=10");
+				}).run("--spring.application.name=" + APP_NAME, "--spring.cloud.consul.retry.enabled=true",
+						"--spring.cloud.consul.retry.max-attempts=2",
+						// non-existent consul host and port
+						"--spring.config.import=optional:consul:somehost:1234",
+						"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.watch.delay=10");
 
 	}
 

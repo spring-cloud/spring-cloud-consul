@@ -21,5 +21,5 @@ org.springframework.boot.context.config.ConfigDataLoader=\
 org.springframework.cloud.consul.config.ConsulConfigDataLoader
 
 # Spring Boot Bootstrappers
-org.springframework.boot.Bootstrapper=\
+org.springframework.boot.BootstrapRegistryInitializer=\
 org.springframework.cloud.consul.config.ConsulRetryBootstrapper
