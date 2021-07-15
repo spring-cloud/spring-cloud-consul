@@ -17,12 +17,10 @@
 package org.springframework.cloud.consul.discovery;
 
 import org.junit.After;
-import org.junit.Test;
 
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
-import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.cloud.commons.util.UtilAutoConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -42,15 +40,19 @@ public class ConsulDiscoveryClientConfigurationTests {
 			this.context.close();
 		}
 	}
-
-	@Test
-	public void consulConfigNotLoadedWhenDiscoveryClientDisabled() {
-		TestPropertyValues.of("spring.cloud.discovery.enabled=false").applyTo(this.context);
-		setupContext();
-		assertBeanNotPresent(ConsulDiscoveryProperties.class);
-		assertBeanNotPresent(ConsulDiscoveryClient.class);
-		assertBeanNotPresent(HeartbeatProperties.class);
-	}
+	/*
+	 * @Test public void consulConfigNotLoadedWhenCloudDiscoveryClientDisabled() {
+	 * TestPropertyValues.of("spring.cloud.discovery.enabled=false").applyTo(this.context)
+	 * ; setupContext(); assertBeanNotPresent(ConsulDiscoveryProperties.class);
+	 * assertBeanNotPresent(ConsulDiscoveryClient.class);
+	 * assertBeanNotPresent(HeartbeatProperties.class); }
+	 *
+	 * @Test public void consulConfigNotLoadedWhenConsulDiscoveryClientDisabled() {
+	 * TestPropertyValues.of("spring.cloud.consul.discovery.enabled=false").applyTo(this.
+	 * context); setupContext(); assertBeanNotPresent(ConsulDiscoveryProperties.class);
+	 * assertBeanNotPresent(ConsulDiscoveryClient.class);
+	 * assertBeanNotPresent(HeartbeatProperties.class); }
+	 */
 
 	private void setupContext(Class<?>... config) {
 		ConfigurationPropertySources.attach(this.context.getEnvironment());

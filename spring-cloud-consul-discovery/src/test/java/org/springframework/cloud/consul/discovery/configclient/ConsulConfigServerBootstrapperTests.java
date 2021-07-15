@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.BootstrapRegistry;
-import org.springframework.boot.Bootstrapper;
+import org.springframework.boot.BootstrapRegistryInitializer;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -41,7 +41,7 @@ public class ConsulConfigServerBootstrapperTests {
 	public void notEnabledDoesNotAddInstanceProviderFn() {
 		new SpringApplicationBuilder(TestConfig.class)
 				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false")
-				.addBootstrapper(registry -> registry.addCloseListener(event -> {
+				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
 							.get(ConfigServerInstanceProvider.Function.class);
 					assertThat(providerFn).as("ConfigServerInstanceProvider.Function was created when it shouldn't")
@@ -58,8 +58,8 @@ public class ConsulConfigServerBootstrapperTests {
 						"spring.cloud.consul.discovery.hostname=myhost",
 						"spring.cloud.service-registry.auto-registration.enabled=false",
 						"spring.cloud.consul.host=localhost")
-				.addBootstrapper(bindHandlerBootstrapper)
-				.addBootstrapper(registry -> registry.addCloseListener(event -> {
+				.addBootstrapRegistryInitializer(bindHandlerBootstrapper)
+				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
 					bootstrapDiscoveryClient.set(event.getBootstrapContext().get(ConsulDiscoveryClient.class));
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
 							.get(ConfigServerInstanceProvider.Function.class);
@@ -78,12 +78,12 @@ public class ConsulConfigServerBootstrapperTests {
 
 	}
 
-	static class BindHandlerBootstrapper implements Bootstrapper {
+	static class BindHandlerBootstrapper implements BootstrapRegistryInitializer {
 
 		private int onSuccessCount = 0;
 
 		@Override
-		public void intitialize(BootstrapRegistry registry) {
+		public void initialize(BootstrapRegistry registry) {
 			registry.register(BindHandler.class, context -> new BindHandler() {
 				@Override
 				public Object onSuccess(ConfigurationPropertyName name, Bindable<?> target, BindContext context,

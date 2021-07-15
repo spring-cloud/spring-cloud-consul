@@ -19,7 +19,7 @@ package org.springframework.cloud.consul.discovery.configclient;
 import com.ecwid.consul.v1.ConsulClient;
 
 import org.springframework.boot.BootstrapRegistry;
-import org.springframework.boot.Bootstrapper;
+import org.springframework.boot.BootstrapRegistryInitializer;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -33,10 +33,10 @@ import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.util.ClassUtils;
 
-public class ConsulConfigServerBootstrapper implements Bootstrapper {
+public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitializer {
 
 	@Override
-	public void intitialize(BootstrapRegistry registry) {
+	public void initialize(BootstrapRegistry registry) {
 		if (!ClassUtils.isPresent("org.springframework.cloud.config.client.ConfigServerInstanceProvider", null) ||
 		// don't run if bootstrap enabled, how to check the property?
 				ClassUtils.isPresent("org.springframework.cloud.bootstrap.marker.Marker", null)) {

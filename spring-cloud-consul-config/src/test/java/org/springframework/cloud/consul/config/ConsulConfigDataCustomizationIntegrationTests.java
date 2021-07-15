@@ -24,7 +24,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.BootstrapRegistry;
-import org.springframework.boot.Bootstrapper;
+import org.springframework.boot.BootstrapRegistryInitializer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -66,9 +66,9 @@ public class ConsulConfigDataCustomizationIntegrationTests {
 		SpringApplication application = new SpringApplication(Config.class);
 		application.setWebApplicationType(WebApplicationType.NONE);
 		bindHandlerBootstrapper = new BindHandlerBootstrapper();
-		application.addBootstrapper(bindHandlerBootstrapper);
-		application.addBootstrapper(ConsulBootstrapper.fromConsulProperties(TestConsulClient::new));
-		application.addBootstrapper(
+		application.addBootstrapRegistryInitializer(bindHandlerBootstrapper);
+		application.addBootstrapRegistryInitializer(ConsulBootstrapper.fromConsulProperties(TestConsulClient::new));
+		application.addBootstrapRegistryInitializer(
 				registry -> registry.register(ConsulBootstrapper.LoaderInterceptor.class, context1 -> loadContext -> {
 					ConfigData configData = loadContext.getInvocation().apply(loadContext.getLoaderContext(),
 							loadContext.getResource());
@@ -120,12 +120,12 @@ public class ConsulConfigDataCustomizationIntegrationTests {
 
 	}
 
-	static class BindHandlerBootstrapper implements Bootstrapper {
+	static class BindHandlerBootstrapper implements BootstrapRegistryInitializer {
 
 		private int onSuccessCount = 0;
 
 		@Override
-		public void intitialize(BootstrapRegistry registry) {
+		public void initialize(BootstrapRegistry registry) {
 			registry.register(BindHandler.class, context -> new BindHandler() {
 				@Override
 				public Object onSuccess(ConfigurationPropertyName name, Bindable<?> target, BindContext context,
