@@ -141,7 +141,7 @@ public class ConsulDiscoveryClientConfigurationTests {
 			context.getBean(beanClass);
 		}
 		catch (NoSuchBeanDefinitionException exception) {
-			fail("Bean of type " + beanClass + " should not have been created.");
+			fail("Bean of type " + beanClass + " should have been created.");
 		}
 	}
 
