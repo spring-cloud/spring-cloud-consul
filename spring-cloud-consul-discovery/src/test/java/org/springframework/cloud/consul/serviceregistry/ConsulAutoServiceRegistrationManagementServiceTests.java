@@ -35,7 +35,7 @@ import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -68,7 +68,7 @@ public class ConsulAutoServiceRegistrationManagementServiceTests {
 		assertThat(service.getPort().intValue()).as("service port was 0").isNotEqualTo(0);
 		assertThat(service.getId()).as("service id was wrong").isEqualTo("myTestService-EE-0");
 		assertThat(service.getService()).as("service name was wrong").isEqualTo("myTestService-EE");
-		assertThat(StringUtils.isEmpty(service.getAddress())).as("service address must not be empty").isFalse();
+		assertThat(ObjectUtils.isEmpty(service.getAddress())).as("service address must not be empty").isFalse();
 		assertThat(service.getAddress()).as("service address must equals hostname from discovery properties")
 				.isEqualTo(this.discoveryProperties.getHostname());
 
@@ -79,7 +79,7 @@ public class ConsulAutoServiceRegistrationManagementServiceTests {
 				.isEqualTo("myTestService-EE-0-management");
 		assertThat(managementService.getService()).as("management service name was wrong")
 				.isEqualTo("myTestService-EE-management");
-		assertThat(StringUtils.isEmpty(managementService.getAddress()))
+		assertThat(ObjectUtils.isEmpty(managementService.getAddress()))
 				.as("management service address must not be empty").isFalse();
 		assertThat(managementService.getAddress())
 				.as("management service address must equals hostname from discovery properties")

@@ -34,7 +34,7 @@ import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -64,7 +64,7 @@ public class ConsulAutoServiceRegistrationCustomizedAgentAddressTests {
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
 		assertThat(service.getId()).as("service id was wrong").isEqualTo("myTestService1-AA");
 		assertThat(service.getService()).as("service name was wrong").isEqualTo("myprefix-myTestService-AA");
-		assertThat(StringUtils.isEmpty(service.getAddress())).as("service address must be empty").isTrue();
+		assertThat(ObjectUtils.isEmpty(service.getAddress())).as("service address must be empty").isTrue();
 	}
 
 	@Configuration(proxyBeanMethods = false)
