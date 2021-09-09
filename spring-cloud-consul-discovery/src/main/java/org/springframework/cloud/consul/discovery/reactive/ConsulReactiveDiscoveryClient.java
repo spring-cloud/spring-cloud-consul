@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -42,6 +43,7 @@ import org.springframework.cloud.consul.discovery.ConsulServiceInstance;
  *
  * @author Tim Ysewyn
  * @author Chris Bono
+ * @author Chen Zhiguo
  */
 public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 
@@ -50,6 +52,8 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 	private final ConsulClient client;
 
 	private final ConsulDiscoveryProperties properties;
+
+	private final Map<String, List<ServiceInstance>> serviceInstanceBackup = new ConcurrentHashMap<>();
 
 	public ConsulReactiveDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties) {
 		this.client = client;
@@ -68,10 +72,17 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 			for (HealthService healthService : getHealthServices(serviceId)) {
 				instances.add(new ConsulServiceInstance(healthService, serviceId));
 			}
+			if (properties.isBackup()) {
+				serviceInstanceBackup.put(serviceId, instances);
+			}
 			return Flux.fromIterable(instances);
 		}).onErrorResume(exception -> {
 			logger.error("Error getting instances from Consul.", exception);
-			return Flux.empty();
+			if (properties.isBackup() && serviceInstanceBackup.containsKey(serviceId)) {
+				return Flux.fromIterable(serviceInstanceBackup.get(serviceId));
+			} else {
+				return Flux.empty();
+			}
 		}).subscribeOn(Schedulers.boundedElastic());
 	}
 

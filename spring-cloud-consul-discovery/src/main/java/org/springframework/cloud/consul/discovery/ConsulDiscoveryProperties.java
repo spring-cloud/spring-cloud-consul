@@ -40,6 +40,7 @@ import org.springframework.util.StringUtils;
  * @author Donnabell Dmello
  * @author Venil Noronha
  * @author Richard Kettelerij
+ * @author Chen Zhiguo
  */
 @ConfigurationProperties(ConsulDiscoveryProperties.PREFIX)
 public class ConsulDiscoveryProperties {
@@ -211,6 +212,11 @@ public class ConsulDiscoveryProperties {
 	 * available clients.
 	 */
 	private int order = 0;
+
+	/**
+	 * Turn on the service list backup, use backup data when consul is not available.
+	 */
+	private boolean backup = false;
 
 	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {
@@ -617,6 +623,14 @@ public class ConsulDiscoveryProperties {
 		this.managementEnableTagOverride = managementEnableTagOverride;
 	}
 
+	public boolean isBackup() {
+		return backup;
+	}
+
+	public void setBackup(boolean backup) {
+		this.backup = backup;
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("aclToken", this.aclToken)
@@ -645,7 +659,8 @@ public class ConsulDiscoveryProperties {
 				.append("queryPassing", this.queryPassing).append("register", this.register)
 				.append("registerHealthCheck", this.registerHealthCheck).append("scheme", this.scheme)
 				.append("serviceName", this.serviceName).append("serverListQueryTags", this.serverListQueryTags)
-				.append("tags", this.tags).toString();
+				.append("tags", this.tags)
+			    .append("backup", this.backup).toString();
 	}
 
 	/**
