@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Unit tests for {@link ConsulDiscoveryProperties}.
  *
  * @author Chris Bono
+ * @author Chen Zhiguo
  */
 class ConsulDiscoveryPropertiesTests {
 
@@ -140,6 +141,12 @@ class ConsulDiscoveryPropertiesTests {
 	void addManagementTag() {
 		properties.getManagementTags().add("newTag");
 		assertThat(properties.getManagementTags()).containsOnly(ConsulDiscoveryProperties.MANAGEMENT, "newTag");
+	}
+
+	@Test
+	void setBackup() {
+		properties.setBackup(true);
+		assertThat(properties.isBackup()).isEqualTo(true);
 	}
 
 }

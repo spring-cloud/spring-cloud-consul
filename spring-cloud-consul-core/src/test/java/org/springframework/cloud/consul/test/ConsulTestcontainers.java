@@ -60,6 +60,10 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 		consul.start();
 	}
 
+	public static void stop() {
+		consul.stop();
+	}
+
 	public static Integer getPort() {
 		if (!consul.isRunning()) {
 			throw new IllegalStateException("consul Testcontainer is not running");

@@ -40,6 +40,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * @author Spencer Gibb
  * @author Joe Athman
+ * @author Chen Zhiguo
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(properties = { "spring.application.name=testConsulDiscovery",
@@ -53,6 +54,9 @@ public class ConsulDiscoveryClientTests {
 
 	@Autowired
 	private ConsulClient consulClient;
+
+	@Autowired
+	private ConsulDiscoveryProperties properties;
 
 	@Test
 	public void getInstancesForServiceWorks() {
@@ -78,6 +82,19 @@ public class ConsulDiscoveryClientTests {
 
 		ServiceInstance instance = instances.get(0);
 		assertIpAddress(instance);
+	}
+
+	@Test
+	public void getInstancesFromBackup() {
+		properties.setBackup(true);
+		List<ServiceInstance> instances = this.discoveryClient.getInstances("testConsulDiscovery");
+		assertThat(instances.isEmpty()).as("instances was empty").isFalse();
+		// Close consul container
+		ConsulTestcontainers.stop();
+		List<ServiceInstance> backupInstances = this.discoveryClient.getInstances("testConsulDiscovery");
+		assertThat(backupInstances.isEmpty()).as("instances was empty").isFalse();
+		// Resume consul container
+		ConsulTestcontainers.start();
 	}
 
 	@Test

@@ -29,6 +29,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cloud.commons.util.InetUtils;
+import org.springframework.cloud.commons.util.InetUtilsProperties;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -50,6 +52,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * @author Tim Ysewyn
+ * @author Chen Zhiguo
  */
 @ExtendWith(MockitoExtension.class)
 class ConsulReactiveDiscoveryClientTests {
@@ -146,6 +149,23 @@ class ConsulReactiveDiscoveryClientTests {
 		verify(properties).getQueryTagsForService("existing-service");
 		verify(properties).isQueryPassing();
 		verify(consulClient).getHealthServices(eq("existing-service"), any());
+	}
+
+	@Test
+	public void shouldReturnFluxOfServiceInstancesWhenConsulFailsAndBackupOpened() {
+		Response<List<HealthService>> response = consulInstancesResponse();
+		when(consulClient.getHealthServices(eq("existing-service"), any(HealthServicesRequest.class)))
+			.thenReturn(response);
+		ConsulDiscoveryProperties newProperties = new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties()));
+		newProperties.setBackup(true);
+		ConsulReactiveDiscoveryClient newClient = new ConsulReactiveDiscoveryClient(consulClient, newProperties);
+		Flux<ServiceInstance> instances = newClient.getInstances("existing-service");
+		StepVerifier.create(instances).expectNextCount(1).expectComplete().verify();
+
+		when(consulClient.getHealthServices(eq("existing-service"), any(HealthServicesRequest.class)))
+			.thenThrow(new RuntimeException("Mock timeout exception"));
+		Flux<ServiceInstance> backupInstances = newClient.getInstances("existing-service");
+		StepVerifier.create(backupInstances).expectNextCount(1).expectComplete().verify();
 	}
 
 	private Response<Map<String, List<String>>> consulServicesResponse() {

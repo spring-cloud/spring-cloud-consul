@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.discovery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -27,6 +28,8 @@ import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
 import com.ecwid.consul.v1.health.HealthServicesRequest;
 import com.ecwid.consul.v1.health.model.HealthService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 
@@ -35,12 +38,17 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
  * @author Joe Athman
  * @author Tim Ysewyn
  * @author Chris Bono
+ * @author Chen Zhiguo
  */
 public class ConsulDiscoveryClient implements DiscoveryClient {
+
+	private static final Logger logger = LoggerFactory.getLogger(ConsulDiscoveryClient.class);
 
 	private final ConsulClient client;
 
 	private final ConsulDiscoveryProperties properties;
+
+	private final Map<String, List<ServiceInstance>> serviceInstanceBackup = new ConcurrentHashMap<>();
 
 	public ConsulDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties) {
 		this.client = client;
@@ -73,11 +81,20 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 			requestBuilder.setTags(queryTags);
 		}
 		HealthServicesRequest request = requestBuilder.build();
+		try {
+			Response<List<HealthService>> services = this.client.getHealthServices(serviceId, request);
 
-		Response<List<HealthService>> services = this.client.getHealthServices(serviceId, request);
-
-		for (HealthService service : services.getValue()) {
-			instances.add(new ConsulServiceInstance(service, serviceId));
+			for (HealthService service : services.getValue()) {
+				instances.add(new ConsulServiceInstance(service, serviceId));
+			}
+			if (properties.isBackup()) {
+				serviceInstanceBackup.put(serviceId, instances);
+			}
+		} catch (Exception exception) {
+			logger.error("Error getting instances from Consul.", exception);
+			if (properties.isBackup() && serviceInstanceBackup.containsKey(serviceId)) {
+				instances.addAll(serviceInstanceBackup.get(serviceId));
+			}
 		}
 	}
 
