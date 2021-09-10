@@ -63,6 +63,9 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		if (!this.context.endsWith("/")) {
 			this.context = this.context + "/";
 		}
+		if (this.context.startsWith("/")) {
+			this.context = this.context.substring(1);
+		}
 
 		Response<List<GetValue>> response = this.source.getKVValues(this.context, this.configProperties.getAclToken(),
 				QueryParams.DEFAULT);
