@@ -21,10 +21,10 @@
 
 	<properties>
 		<spring-cloud-bus.version>3.0.3</spring-cloud-bus.version>
-		<spring-cloud-commons.version>3.0.5-SNAPSHOT</spring-cloud-commons.version>
-		<spring-cloud-config.version>3.0.6-SNAPSHOT</spring-cloud-config.version>
+		<spring-cloud-commons.version>3.0.4</spring-cloud-commons.version>
+		<spring-cloud-config.version>3.0.5</spring-cloud-config.version>
 		<spring-cloud-deployer.version>1.0.3.RELEASE</spring-cloud-deployer.version>
-		<spring-cloud-openfeign.version>3.0.5-SNAPSHOT</spring-cloud-openfeign.version>
+		<spring-cloud-openfeign.version>3.0.4</spring-cloud-openfeign.version>
 		<spring-cloud-stream.version>3.1.4</spring-cloud-stream.version>
 		<testcontainers.version>1.15.1</testcontainers.version>
 	</properties>
