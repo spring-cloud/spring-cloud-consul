@@ -120,7 +120,7 @@ public class ConsulPropertySourceTests {
 	@Test
 	public void testExtraSlashInContext() {
 		ConsulPropertySource source = new ConsulPropertySource("/my/very/custom/context", this.client,
-				new ConsulConfigProperties());
+			new ConsulConfigProperties());
 		source.init();
 		assertThat(source.getContext()).as("context was wrong").isEqualTo("my/very/custom/context/");
 	}
