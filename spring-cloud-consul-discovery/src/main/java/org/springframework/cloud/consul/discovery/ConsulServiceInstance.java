@@ -34,7 +34,7 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 
 	public ConsulServiceInstance(HealthService healthService, String serviceId) {
 		this(healthService.getService().getId(), serviceId, findHost(healthService),
-				healthService.getService().getPort(), getSecure(healthService), getMetadata(healthService),
+				getPort(healthService.getService()), getSecure(healthService), getMetadata(healthService),
 				healthService.getService().getTags());
 		this.healthService = healthService;
 	}
@@ -57,6 +57,16 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 			metadata = new LinkedHashMap<>();
 		}
 		return metadata;
+	}
+
+	private static int getPort(HealthService.Service service) {
+		Integer port = service.getPort();
+		// Services without registered port receive '0' from consul 1.9 and null from
+		// consul 1.10
+		if (port == null) {
+			return 0;
+		}
+		return port;
 	}
 
 	private static boolean getSecure(HealthService healthService) {
