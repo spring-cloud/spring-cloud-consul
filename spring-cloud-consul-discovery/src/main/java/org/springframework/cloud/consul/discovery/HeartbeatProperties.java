@@ -19,9 +19,8 @@ package org.springframework.cloud.consul.discovery;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
-
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
 import org.apache.commons.logging.Log;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
