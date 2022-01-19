@@ -55,8 +55,6 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER
 /**
  * @author Spencer Gibb
  */
-// FIXME: 4.0.0 https://github.com/wiremock/wiremock/issues/1760
-@Ignore("wiremock missing jakartax.servlet")
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulBinderApplicationTests.Application.class)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
