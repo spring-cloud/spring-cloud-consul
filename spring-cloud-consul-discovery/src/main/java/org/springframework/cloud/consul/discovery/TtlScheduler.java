@@ -34,6 +34,7 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
  * Created by nicu on 11.03.2015.
  *
  * @author Stéphane LEROY
+ * @author jinkai.chen
  */
 public class TtlScheduler {
 
