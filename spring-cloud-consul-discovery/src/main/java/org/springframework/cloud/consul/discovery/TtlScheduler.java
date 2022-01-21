@@ -54,7 +54,7 @@ public class TtlScheduler {
 	private final Map<String, NewService> registeredServices = new ConcurrentHashMap<>();
 
 	public TtlScheduler(HeartbeatProperties heartbeatProperties, ConsulDiscoveryProperties discoveryProperties,
-		ConsulClient client, ReregistrationPredicate reregistrationPredicate) {
+			ConsulClient client, ReregistrationPredicate reregistrationPredicate) {
 		this.heartbeatProperties = heartbeatProperties;
 		this.discoveryProperties = discoveryProperties;
 		this.client = client;
@@ -72,7 +72,7 @@ public class TtlScheduler {
 	 */
 	public void add(String instanceId) {
 		ScheduledFuture task = this.scheduler.scheduleAtFixedRate(new ConsulHeartbeatTask(instanceId, this),
-			this.heartbeatProperties.computeHeartbeatInterval().toMillis());
+				this.heartbeatProperties.computeHeartbeatInterval().toMillis());
 		ScheduledFuture previousTask = this.serviceHeartbeats.put(instanceId, task);
 		if (previousTask != null) {
 			previousTask.cancel(true);
@@ -110,14 +110,14 @@ public class TtlScheduler {
 		@Override
 		public void run() {
 			try {
-				this.ttlScheduler.client.agentCheckPass(this.checkId, null, this.ttlScheduler.discoveryProperties.getAclToken());
+				this.ttlScheduler.client.agentCheckPass(this.checkId);
 				if (log.isDebugEnabled()) {
 					log.debug("Sending consul heartbeat for: " + this.checkId);
 				}
 			}
 			catch (OperationException e) {
 				if (this.ttlScheduler.heartbeatProperties.isReregisterServiceOnFailure()
-					&& this.ttlScheduler.reregistrationPredicate.isEligible(e)) {
+						&& this.ttlScheduler.reregistrationPredicate.isEligible(e)) {
 					log.warn(e.getMessage());
 					NewService registeredService = this.ttlScheduler.registeredServices.get(this.serviceId);
 					if (registeredService != null) {
@@ -125,7 +125,7 @@ public class TtlScheduler {
 							log.info("Re-register " + registeredService);
 						}
 						this.ttlScheduler.client.agentServiceRegister(registeredService,
-							this.ttlScheduler.discoveryProperties.getAclToken());
+								this.ttlScheduler.discoveryProperties.getAclToken());
 					}
 					else {
 						log.warn("The service to re-register is not found.");
