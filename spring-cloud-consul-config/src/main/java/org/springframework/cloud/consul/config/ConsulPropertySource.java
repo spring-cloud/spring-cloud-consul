@@ -166,9 +166,9 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 	}
 
 	/**
-	 * @deprecated As of 1.1.0 use {@link GetValue#getDecodedValue()}.
 	 * @param value encoded value
 	 * @return the decoded string
+	 * @deprecated As of 1.1.0 use {@link GetValue#getDecodedValue()}.
 	 */
 	@Deprecated
 	public String getDecoded(String value) {
