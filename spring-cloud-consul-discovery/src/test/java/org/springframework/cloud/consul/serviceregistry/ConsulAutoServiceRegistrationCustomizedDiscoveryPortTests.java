@@ -30,10 +30,10 @@ import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationC
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
+import org.springframework.cloud.test.TestSocketUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.SocketUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
@@ -55,7 +55,7 @@ public class ConsulAutoServiceRegistrationCustomizedDiscoveryPortTests {
 
 	@BeforeClass
 	public static void initClass() {
-		Integer port = SocketUtils.findAvailableTcpPort();
+		Integer port = TestSocketUtils.findAvailableTcpPort();
 		System.setProperty("spring.cloud.consul.discovery.port", port.toString());
 		System.setProperty("server.port", port.toString());
 	}
