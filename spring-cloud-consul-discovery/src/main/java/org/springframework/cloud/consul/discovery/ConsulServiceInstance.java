@@ -34,6 +34,13 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 
 	private HealthService healthService;
 
+	public ConsulServiceInstance(HealthService healthService, String serviceId) {
+		this(healthService.getService().getId(), serviceId, findHost(healthService),
+			healthService.getService().getPort(), getSecure(healthService, false), getMetadata(healthService),
+			healthService.getService().getTags());
+		this.healthService = healthService;
+	}
+
 	public ConsulServiceInstance(String instanceId, String serviceId, String host, int port, boolean secure,
 			Map<String, String> metadata, List<String> tags) {
 		this(instanceId, serviceId, host, port, secure, metadata, tags, false);
@@ -41,7 +48,7 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 
 	public ConsulServiceInstance(HealthService healthService, String serviceId, boolean mergeTags) {
 		this(healthService.getService().getId(), serviceId, findHost(healthService),
-			healthService.getService().getPort(), getSecure(healthService), getMetadata(healthService),
+			healthService.getService().getPort(), getSecure(healthService, mergeTags), getMetadata(healthService),
 			healthService.getService().getTags(), mergeTags);
 		this.healthService = healthService;
 	}
@@ -99,10 +106,12 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 		return metadata;
 	}
 
-	private static boolean getSecure(HealthService healthService) {
+	private static boolean getSecure(HealthService healthService, boolean mergeTags) {
 		boolean secure = false;
 		Map<String, String> metadata = getMetadata(healthService);
-		// getMetadata() above returns an empty Map if meta is null
+		if (mergeTags) {
+			metadata = mergeTags(metadata, healthService.getService().getTags());
+		}
 		if (metadata.containsKey("secure")) {
 			secure = Boolean.parseBoolean(metadata.get("secure"));
 		}
