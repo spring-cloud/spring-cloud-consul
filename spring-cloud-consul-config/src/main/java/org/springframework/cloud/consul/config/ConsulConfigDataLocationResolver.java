@@ -37,6 +37,7 @@ import org.springframework.boot.context.config.Profiles;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.logging.DeferredLogFactory;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.config.ConsulPropertySources.Context;
@@ -63,8 +64,8 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 
 	private final Log log;
 
-	public ConsulConfigDataLocationResolver(Log log) {
-		this.log = log;
+	public ConsulConfigDataLocationResolver(DeferredLogFactory logFactory) {
+		this.log = logFactory.getLog(ConsulConfigDataLocationResolver.class);
 	}
 
 	@Override

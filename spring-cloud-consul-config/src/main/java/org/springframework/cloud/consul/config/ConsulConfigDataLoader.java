@@ -31,6 +31,7 @@ import org.springframework.boot.context.config.ConfigDataLoader;
 import org.springframework.boot.context.config.ConfigDataLoaderContext;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.logging.DeferredLogFactory;
 import org.springframework.cloud.consul.config.ConsulBootstrapper.LoadContext;
 import org.springframework.cloud.consul.config.ConsulBootstrapper.LoaderInterceptor;
 import org.springframework.util.StringUtils;
@@ -41,8 +42,8 @@ public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigData
 
 	private final Log log;
 
-	public ConsulConfigDataLoader(Log log) {
-		this.log = log;
+	public ConsulConfigDataLoader(DeferredLogFactory logFactory) {
+		this.log = logFactory.getLog(ConsulConfigDataLoader.class);
 	}
 
 	@Override

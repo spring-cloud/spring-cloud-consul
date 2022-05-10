@@ -42,7 +42,8 @@ public class ConsulConfigDataLocationResolverTests {
 
 	@Test
 	public void testParseLocation() {
-		ConsulConfigDataLocationResolver resolver = new ConsulConfigDataLocationResolver(LogFactory.getLog(getClass()));
+		ConsulConfigDataLocationResolver resolver = new ConsulConfigDataLocationResolver(
+				destination -> LogFactory.getLog(ConsulConfigDataLocationResolver.class));
 		UriComponents uriComponents = resolver.parseLocation(null,
 				ConfigDataLocation.of("consul:myhost:8501/mypath1;/mypath2;/mypath3"));
 		assertThat(uriComponents.toUri()).hasScheme("consul").hasHost("myhost").hasPort(8501)
@@ -98,7 +99,8 @@ public class ConsulConfigDataLocationResolverTests {
 	}
 
 	private ConsulConfigDataLocationResolver createResolver() {
-		return new ConsulConfigDataLocationResolver(LogFactory.getLog(getClass())) {
+		return new ConsulConfigDataLocationResolver(
+				destination -> LogFactory.getLog(ConsulConfigDataLocationResolver.class)) {
 			@Override
 			public <T> void registerBean(ConfigDataLocationResolverContext context, Class<T> type, T instance) {
 				// do nothing
