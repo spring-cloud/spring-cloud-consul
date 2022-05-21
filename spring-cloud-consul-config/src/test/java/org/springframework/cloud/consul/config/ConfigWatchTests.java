@@ -75,12 +75,12 @@ public class ConfigWatchTests {
 	}
 
 	@Test
-	public void watchWithNullValueDoesNotPublishEvent() {
+	public void watchForDeletedKeyPublishesEvent() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
 		setupWatch(eventPublisher, null, "/app/");
 
-		verify(eventPublisher, never()).publishEvent(any(RefreshEvent.class));
+		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
 	}
 
 	@Test
