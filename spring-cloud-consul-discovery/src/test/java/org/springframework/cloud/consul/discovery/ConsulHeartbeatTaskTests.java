@@ -35,7 +35,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 /**
- * Test for ConsulHeartbeatTask
+ * Test for ConsulHeartbeatTask.
  *
  * @author Toshiaki Maki
  */

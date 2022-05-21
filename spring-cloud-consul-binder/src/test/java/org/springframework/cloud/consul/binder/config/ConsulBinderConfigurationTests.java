@@ -34,6 +34,9 @@ import static org.hamcrest.Matchers.containsString;
  */
 public class ConsulBinderConfigurationTests {
 
+	/**
+	 * exception
+	 */
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
@@ -55,6 +58,9 @@ public class ConsulBinderConfigurationTests {
 
 	interface Events {
 
+		/**
+		 * @return the channel
+		 */
 		// @Output
 		MessageChannel purchases();
 

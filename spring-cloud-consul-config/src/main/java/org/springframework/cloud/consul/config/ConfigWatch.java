@@ -158,25 +158,25 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 						new QueryParams(this.properties.getWatch().getWaitTime(), currentIndex));
 
 				// if response.value == null, response was a 404, a key is deleted
-				 Long newIndex = response.getConsulIndex();
-				 if (newIndex != null && !newIndex.equals(currentIndex)) {
-					  // don't publish the same index again, don't publish the first
-					  // time (-1) so index can be primed
-					  if (!this.consulIndexes.containsValue(newIndex) && !currentIndex.equals(-1L)) {
-						  if (log.isTraceEnabled()) {
-							  log.trace("Context " + context + " has new index " + newIndex);
-						  }
-						  RefreshEventData data = new RefreshEventData(context, currentIndex, newIndex);
-						  this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
-					  }
-					  else if (log.isTraceEnabled()) {
-						  log.trace("Event for index already published for context " + context);
-					  }
-					  this.consulIndexes.put(context, newIndex);
-				 }
-				 else if (log.isTraceEnabled()) {
-					  log.trace("Same index for context " + context);
-				 }
+				Long newIndex = response.getConsulIndex();
+				if (newIndex != null && !newIndex.equals(currentIndex)) {
+					// don't publish the same index again, don't publish the first
+					// time (-1) so index can be primed
+					if (!this.consulIndexes.containsValue(newIndex) && !currentIndex.equals(-1L)) {
+						if (log.isTraceEnabled()) {
+							log.trace("Context " + context + " has new index " + newIndex);
+						}
+						RefreshEventData data = new RefreshEventData(context, currentIndex, newIndex);
+						this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
+					}
+					else if (log.isTraceEnabled()) {
+						log.trace("Event for index already published for context " + context);
+					}
+					this.consulIndexes.put(context, newIndex);
+				}
+				else if (log.isTraceEnabled()) {
+					log.trace("Same index for context " + context);
+				}
 			}
 			catch (Exception e) {
 				// only fail fast on the initial query, otherwise just log the error
