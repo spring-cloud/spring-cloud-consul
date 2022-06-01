@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.consul.discovery.configclient;
 
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
@@ -44,8 +45,23 @@ public class ConsulConfigServerBootstrapperTests {
 				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
 							.get(ConfigServerInstanceProvider.Function.class);
-					assertThat(providerFn).as("ConfigServerInstanceProvider.Function was created when it shouldn't")
-							.isNull();
+					assertThat(providerFn.apply("id"))
+							.as("ConfigServerInstanceProvider.Function should return empty list")
+							.isEqualTo(Collections.EMPTY_LIST);
+				})).run().close();
+	}
+
+	@Test
+	public void discoveryClientNotEnabledProvidesEmptyList() {
+		new SpringApplicationBuilder(TestConfig.class)
+				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false",
+						"spring.cloud.config.discovery.enabled=true", "spring.cloud.consul.discovery.enabled=false")
+				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
+					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
+							.get(ConfigServerInstanceProvider.Function.class);
+					assertThat(providerFn.apply("id"))
+							.as("ConfigServerInstanceProvider.Function should return empty list")
+							.isEqualTo(Collections.EMPTY_LIST);
 				})).run().close();
 	}
 
