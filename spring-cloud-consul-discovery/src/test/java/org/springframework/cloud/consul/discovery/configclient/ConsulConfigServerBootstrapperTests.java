@@ -70,15 +70,15 @@ public class ConsulConfigServerBootstrapperTests {
 	@Test
 	public void springCloudDiscoveryClientNotEnabledProvidesEmptyList() {
 		new SpringApplicationBuilder(TestConfig.class)
-			.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false",
-				"spring.cloud.config.discovery.enabled=true", "spring.cloud.discovery.enabled=false")
-			.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
-				ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
-					.get(ConfigServerInstanceProvider.Function.class);
-				assertThat(providerFn.apply("id"))
-					.as("ConfigServerInstanceProvider.Function should return empty list")
-					.isEqualTo(Collections.EMPTY_LIST);
-			})).run().close();
+				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false",
+						"spring.cloud.config.discovery.enabled=true", "spring.cloud.discovery.enabled=false")
+				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
+					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
+							.get(ConfigServerInstanceProvider.Function.class);
+					assertThat(providerFn.apply("id"))
+							.as("ConfigServerInstanceProvider.Function should return empty list")
+							.isEqualTo(Collections.EMPTY_LIST);
+				})).run().close();
 	}
 
 	@Test
@@ -96,9 +96,9 @@ public class ConsulConfigServerBootstrapperTests {
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
 							.get(ConfigServerInstanceProvider.Function.class);
 					assertThatThrownBy(() -> providerFn.apply("id")).isInstanceOf(TransportException.class)
-						.hasMessageContaining("org.apache.http.conn.HttpHostConnectException: Connect to localhost:8500")
-						.as("Should have tried to reach out to Consul to get config server instance")
-							.isNotNull();
+							.hasMessageContaining(
+									"org.apache.http.conn.HttpHostConnectException: Connect to localhost:8500")
+							.as("Should have tried to reach out to Consul to get config server instance").isNotNull();
 				})).run();
 		ConsulDiscoveryClient discoveryClient = context.getBean(ConsulDiscoveryClient.class);
 		assertThat(discoveryClient == bootstrapDiscoveryClient.get()).isTrue();
