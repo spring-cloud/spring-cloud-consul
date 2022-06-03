@@ -36,7 +36,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@ConditionalOnProperty(value = "spring.cloud.consul.discovery.enabled", matchIfMissing = true)
+@ConditionalOnProperty(value = ConditionalOnConsulDiscoveryEnabled.PROPERTY, matchIfMissing = true)
 public @interface ConditionalOnConsulDiscoveryEnabled {
+
+	/**
+	 * Property key.
+	 */
+	String PROPERTY = "spring.cloud.consul.discovery.enabled";
 
 }
