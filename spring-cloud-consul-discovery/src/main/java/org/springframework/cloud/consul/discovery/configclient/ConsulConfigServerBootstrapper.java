@@ -100,7 +100,8 @@ public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitiali
 
 	private boolean isDiscoveryEnabled(Binder binder) {
 		return binder.bind(ConfigClientProperties.CONFIG_DISCOVERY_ENABLED, Boolean.class).orElse(false)
-				&& binder.bind(ConditionalOnConsulDiscoveryEnabled.PROPERTY, Boolean.class).orElse(true);
+				&& binder.bind(ConditionalOnConsulDiscoveryEnabled.PROPERTY, Boolean.class).orElse(true)
+			&& binder.bind("spring.cloud.discovery.enabled", Boolean.class).orElse(true);
 	}
 
 }
