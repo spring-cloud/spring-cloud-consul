@@ -57,7 +57,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 	private final AtomicBoolean running = new AtomicBoolean(false);
 
-	private LinkedHashMap<String, Long> consulIndexes;
+	private final LinkedHashMap<String, Long> consulIndexes;
 
 	private ApplicationEventPublisher publisher;
 
@@ -150,13 +150,12 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 				// use the consul ACL token if found
 				String aclToken = this.properties.getAclToken();
-				if (StringUtils.isEmpty(aclToken)) {
+				if (!StringUtils.hasLength(aclToken)) {
 					aclToken = null;
 				}
 
 				Response<List<GetValue>> response = this.consul.getKVValues(context, aclToken,
 						new QueryParams(this.properties.getWatch().getWaitTime(), currentIndex));
-
 				// if response.value == null, response was a 404, a key is deleted
 				Long newIndex = response.getConsulIndex();
 				if (newIndex != null && !newIndex.equals(currentIndex)) {

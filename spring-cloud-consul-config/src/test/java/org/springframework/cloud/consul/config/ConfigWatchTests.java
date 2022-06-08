@@ -38,7 +38,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
@@ -51,7 +51,7 @@ public class ConfigWatchTests {
 	private ConsulConfigProperties configProperties;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		this.configProperties = new ConsulConfigProperties();
 	}
 
@@ -61,6 +61,11 @@ public class ConfigWatchTests {
 
 		setupWatch(eventPublisher, new GetValue(), "/app/", "2ee647bd-bd69-4118-9f34-b9a6e9e60746");
 
+		// there are two threads to publish events here in this UT, the unit test main
+		// thread and the thread started by
+		// config.start(). If you set a breakpoint or have a slow machine, you will see
+		// the test cases fail if we
+		// times(1) here. To work around this problem we use atLeastOnce() here.
 		verify(eventPublisher, atLeastOnce()).publishEvent(any(RefreshEvent.class));
 	}
 
@@ -70,7 +75,7 @@ public class ConfigWatchTests {
 
 		setupWatch(eventPublisher, new GetValue(), "/app/");
 
-		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
+		verify(eventPublisher, atLeastOnce()).publishEvent(any(RefreshEvent.class));
 	}
 
 	@Test
@@ -79,7 +84,7 @@ public class ConfigWatchTests {
 
 		setupWatch(eventPublisher, null, "/app/");
 
-		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
+		verify(eventPublisher, atLeastOnce()).publishEvent(any(RefreshEvent.class));
 	}
 
 	@Test
@@ -134,11 +139,11 @@ public class ConfigWatchTests {
 		Response<List<GetValue>> response = new Response<>(getValues, 1L, false, 1L);
 		when(consul.getKVValues(eq(context), anyString(), any(QueryParams.class))).thenReturn(response);
 
-		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, new LinkedHashMap<String, Long>());
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, new LinkedHashMap<>());
 		watch.setApplicationEventPublisher(eventPublisher);
 
 		watch.watchConfigKeyValues();
-		verify(eventPublisher, times(0)).publishEvent(any(RefreshEvent.class));
+		verify(eventPublisher, never()).publishEvent(any(RefreshEvent.class));
 	}
 
 }
