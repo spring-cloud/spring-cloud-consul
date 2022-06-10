@@ -36,7 +36,7 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 	static final Logger logger = LoggerFactory.getLogger(ConsulTestcontainers.class);
 
 	/**
-	 * the consul server
+	 * the consul server.
 	 */
 	public static GenericContainer<?> consul = new GenericContainer<>("consul:1.7.2")
 			.withLogConsumer(new Slf4jLogConsumer(logger).withSeparateOutputStreams())

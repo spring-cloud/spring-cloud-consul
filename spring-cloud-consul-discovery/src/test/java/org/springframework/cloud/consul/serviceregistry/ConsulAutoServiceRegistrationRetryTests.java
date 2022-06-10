@@ -48,13 +48,13 @@ import static org.hamcrest.Matchers.isA;
 public class ConsulAutoServiceRegistrationRetryTests {
 
 	/**
-	 * the exception
+	 * the exception.
 	 */
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
 	/**
-	 * the output
+	 * the output.
 	 */
 	@Rule
 	public OutputCaptureRule output = new OutputCaptureRule();

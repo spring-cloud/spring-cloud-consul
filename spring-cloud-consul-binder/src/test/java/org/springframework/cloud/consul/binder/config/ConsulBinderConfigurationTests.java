@@ -35,7 +35,7 @@ import static org.hamcrest.Matchers.containsString;
 public class ConsulBinderConfigurationTests {
 
 	/**
-	 * exception
+	 * exception.
 	 */
 	@Rule
 	public ExpectedException exception = ExpectedException.none();

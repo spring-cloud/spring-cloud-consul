@@ -94,7 +94,7 @@ public class TestProducer implements ApplicationRunner {
 	public static class StubPartitionSelectorStrategy implements PartitionSelectorStrategy {
 
 		/**
-		 * invoked
+		 * invoked.
 		 */
 		public volatile boolean invoked = false;
 
