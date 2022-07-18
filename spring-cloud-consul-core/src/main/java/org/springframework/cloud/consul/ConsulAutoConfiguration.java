@@ -54,16 +54,21 @@ public class ConsulAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulClient consulClient(ConsulProperties consulProperties) {
-		return createConsulClient(consulProperties);
+	public ConsulRawClient.Builder consulRawClientBuilder() {
+		return ConsulRawClient.Builder.builder();
 	}
 
-	public static ConsulClient createConsulClient(ConsulProperties consulProperties) {
+	@Bean
+	@ConditionalOnMissingBean
+	public ConsulClient consulClient(ConsulProperties consulProperties, ConsulRawClient.Builder builder) {
+		return createConsulClient(consulProperties, builder);
+	}
+
+	public static ConsulClient createConsulClient(ConsulProperties consulProperties, ConsulRawClient.Builder builder) {
 		final String agentPath = consulProperties.getPath();
 		final String agentHost = StringUtils.hasLength(consulProperties.getScheme())
 				? consulProperties.getScheme() + "://" + consulProperties.getHost() : consulProperties.getHost();
-		final ConsulRawClient.Builder builder = ConsulRawClient.Builder.builder().setHost(agentHost)
-				.setPort(consulProperties.getPort());
+		builder.setHost(agentHost).setPort(consulProperties.getPort());
 
 		if (consulProperties.getTls() != null) {
 			ConsulProperties.TLSConfig tls = consulProperties.getTls();
