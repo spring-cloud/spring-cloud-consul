@@ -55,18 +55,18 @@ public class ConsulAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public Supplier<ConsulRawClient.Builder> consulRawClientBuilder() {
+	public Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier() {
 		return () -> ConsulRawClient.Builder.builder();
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulClient consulClient(ConsulProperties consulProperties, Supplier<ConsulRawClient.Builder> builderSupplier) {
-		return createConsulClient(consulProperties, builderSupplier);
+	public ConsulClient consulClient(ConsulProperties consulProperties, Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
+		return createConsulClient(consulProperties, consulRawClientBuilderSupplier);
 	}
 
-	public static ConsulClient createConsulClient(ConsulProperties consulProperties, Supplier<ConsulRawClient.Builder> builderSupplier) {
-		ConsulRawClient.Builder builder = builderSupplier.get();
+	public static ConsulClient createConsulClient(ConsulProperties consulProperties, Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
+		ConsulRawClient.Builder builder = consulRawClientBuilderSupplier.get();
 		final String agentPath = consulProperties.getPath();
 		final String agentHost = StringUtils.hasLength(consulProperties.getScheme())
 				? consulProperties.getScheme() + "://" + consulProperties.getHost() : consulProperties.getHost();
