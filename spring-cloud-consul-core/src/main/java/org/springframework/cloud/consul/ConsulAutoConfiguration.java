@@ -19,6 +19,7 @@ package org.springframework.cloud.consul;
 import com.ecwid.consul.transport.TLSConfig;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.ConsulRawClient;
+import java.util.function.Supplier;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
@@ -54,17 +55,18 @@ public class ConsulAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulRawClient.Builder consulRawClientBuilder() {
-		return ConsulRawClient.Builder.builder();
+	public Supplier<ConsulRawClient.Builder> consulRawClientBuilder() {
+		return () -> ConsulRawClient.Builder.builder();
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulClient consulClient(ConsulProperties consulProperties, ConsulRawClient.Builder builder) {
-		return createConsulClient(consulProperties, builder);
+	public ConsulClient consulClient(ConsulProperties consulProperties, Supplier<ConsulRawClient.Builder> builderSupplier) {
+		return createConsulClient(consulProperties, builderSupplier);
 	}
 
-	public static ConsulClient createConsulClient(ConsulProperties consulProperties, ConsulRawClient.Builder builder) {
+	public static ConsulClient createConsulClient(ConsulProperties consulProperties, Supplier<ConsulRawClient.Builder> builderSupplier) {
+		ConsulRawClient.Builder builder = builderSupplier.get();
 		final String agentPath = consulProperties.getPath();
 		final String agentHost = StringUtils.hasLength(consulProperties.getScheme())
 				? consulProperties.getScheme() + "://" + consulProperties.getHost() : consulProperties.getHost();
