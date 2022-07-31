@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 import com.ecwid.consul.transport.TLSConfig;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.ConsulRawClient;
+import com.ecwid.consul.v1.ConsulRawClient.Builder;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
@@ -57,7 +58,7 @@ public class ConsulAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier() {
-		return () -> ConsulRawClient.Builder.builder();
+		return createConsulRawClientBuilder();
 	}
 
 	@Bean
@@ -65,6 +66,10 @@ public class ConsulAutoConfiguration {
 	public ConsulClient consulClient(ConsulProperties consulProperties,
 			Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
 		return createConsulClient(consulProperties, consulRawClientBuilderSupplier);
+	}
+
+	public static Supplier<Builder> createConsulRawClientBuilder() {
+		return Builder::builder;
 	}
 
 	public static ConsulClient createConsulClient(ConsulProperties consulProperties,
