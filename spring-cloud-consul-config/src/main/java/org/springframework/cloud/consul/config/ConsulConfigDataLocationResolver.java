@@ -184,7 +184,8 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 	protected ConsulClient createConsulClient(BootstrapContext context) {
 		ConsulProperties properties = context.get(ConsulProperties.class);
 
-		return ConsulAutoConfiguration.createConsulClient(properties);
+		return ConsulAutoConfiguration.createConsulClient(properties,
+				ConsulAutoConfiguration.createConsulRawClientBuilder());
 	}
 
 	protected ConsulProperties loadProperties(ConfigDataLocationResolverContext resolverContext,

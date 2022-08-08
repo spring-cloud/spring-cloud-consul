@@ -16,11 +16,14 @@
 
 package org.springframework.cloud.consul;
 
+import java.util.function.Supplier;
+
 import com.ecwid.consul.transport.AbstractHttpTransport;
 import com.ecwid.consul.transport.HttpResponse;
 import com.ecwid.consul.transport.TLSConfig;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.ConsulRawClient;
+import com.ecwid.consul.v1.ConsulRawClient.Builder;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
 import com.ecwid.consul.v1.acl.AclClient;
@@ -94,16 +97,28 @@ public class ConsulAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulClient consulClient(ConsulProperties consulProperties) {
-		return createConsulClient(consulProperties);
+	public Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier() {
+		return createConsulRawClientBuilder();
 	}
 
-	public static ConsulClient createConsulClient(ConsulProperties consulProperties) {
+	@Bean
+	@ConditionalOnMissingBean
+	public ConsulClient consulClient(ConsulProperties consulProperties,
+			Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
+		return createConsulClient(consulProperties, consulRawClientBuilderSupplier);
+	}
+
+	public static Supplier<Builder> createConsulRawClientBuilder() {
+		return Builder::builder;
+	}
+
+	public static ConsulClient createConsulClient(ConsulProperties consulProperties,
+			Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
+		ConsulRawClient.Builder builder = consulRawClientBuilderSupplier.get();
 		final String agentPath = consulProperties.getPath();
 		final String agentHost = StringUtils.hasLength(consulProperties.getScheme())
 				? consulProperties.getScheme() + "://" + consulProperties.getHost() : consulProperties.getHost();
-		final ConsulRawClient.Builder builder = ConsulRawClient.Builder.builder().setHost(agentHost)
-				.setPort(consulProperties.getPort());
+		builder.setHost(agentHost).setPort(consulProperties.getPort());
 
 		if (consulProperties.getTls() != null) {
 			ConsulProperties.TLSConfig tls = consulProperties.getTls();
@@ -163,6 +178,7 @@ public class ConsulAutoConfiguration {
 	}
 
 }
+
 class ConsulHints implements RuntimeHintsRegistrar {
 
 	@Override
@@ -170,121 +186,90 @@ class ConsulHints implements RuntimeHintsRegistrar {
 		if (!ClassUtils.isPresent("com.ecwid.consul.v1.ConsulClient", classLoader)) {
 			return;
 		}
-		hints.reflection()
-			.registerType(TypeReference.of(NewService.class),
+		hints.reflection().registerType(TypeReference.of(NewService.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(NewAcl.class),
+		hints.reflection().registerType(TypeReference.of(NewAcl.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(UpdateAcl.class),
+		hints.reflection().registerType(TypeReference.of(UpdateAcl.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(NewCheck.class),
+		hints.reflection().registerType(TypeReference.of(NewCheck.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(CatalogDeregistration.class),
+		hints.reflection().registerType(TypeReference.of(CatalogDeregistration.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(CatalogRegistration.class),
+		hints.reflection().registerType(TypeReference.of(CatalogRegistration.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection().registerType(
-			TypeReference.of(CatalogRegistration.Service.class),
-			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(QueryParams.class),
+		hints.reflection().registerType(TypeReference.of(CatalogRegistration.Service.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(EventParams.class),
+		hints.reflection().registerType(TypeReference.of(QueryParams.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(EventListRequest.class),
+		hints.reflection().registerType(TypeReference.of(EventParams.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(CatalogNodesRequest.class),
+		hints.reflection().registerType(TypeReference.of(EventListRequest.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(CatalogServiceRequest.class),
+		hints.reflection().registerType(TypeReference.of(CatalogNodesRequest.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(HealthChecksForServiceRequest.class),
+		hints.reflection().registerType(TypeReference.of(CatalogServiceRequest.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(HealthServicesRequest.class),
+		hints.reflection().registerType(TypeReference.of(HealthChecksForServiceRequest.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(PutParams.class),
+		hints.reflection().registerType(TypeReference.of(HealthServicesRequest.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(AbstractHttpTransport.class),
+		hints.reflection().registerType(TypeReference.of(PutParams.class),
+				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
+		hints.reflection().registerType(TypeReference.of(AbstractHttpTransport.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(ConsulClient.class),
+		hints.reflection().registerType(TypeReference.of(ConsulClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(ConsulRawClient.class),
+		hints.reflection().registerType(TypeReference.of(ConsulRawClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(AgentConsulClient.class),
+		hints.reflection().registerType(TypeReference.of(AgentConsulClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(CatalogConsulClient.class),
+		hints.reflection().registerType(TypeReference.of(CatalogConsulClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(AclClient.class),
+		hints.reflection().registerType(TypeReference.of(AclClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(AgentClient.class),
+		hints.reflection().registerType(TypeReference.of(AgentClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(CatalogClient.class),
+		hints.reflection().registerType(TypeReference.of(CatalogClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(CoordinateClient.class),
+		hints.reflection().registerType(TypeReference.of(CoordinateClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(EventClient.class),
+		hints.reflection().registerType(TypeReference.of(EventClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(HealthClient.class),
+		hints.reflection().registerType(TypeReference.of(HealthClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(KeyValueClient.class),
+		hints.reflection().registerType(TypeReference.of(KeyValueClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(QueryClient.class),
+		hints.reflection().registerType(TypeReference.of(QueryClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(SessionClient.class),
+		hints.reflection().registerType(TypeReference.of(SessionClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
-		hints.reflection()
-			.registerType(TypeReference.of(StatusClient.class),
+		hints.reflection().registerType(TypeReference.of(StatusClient.class),
 				hint -> hint.withMembers(MemberCategory.INTROSPECT_DECLARED_METHODS));
 		hints.reflection().registerType(TypeReference.of(HttpResponse.class),
-			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
+				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
 		hints.reflection().registerType(TypeReference.of(HealthService.class),
-			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
+				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
 		hints.reflection().registerType(TypeReference.of(HealthService.Node.class),
-			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
+				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
 		hints.reflection().registerType(TypeReference.of(HealthService.Service.class),
-			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
+				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
 		hints.reflection().registerType(TypeReference.of(Response.class),
-			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
+				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
 		hints.reflection().registerType(TypeReference.of(Session.class),
-			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
+				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
 		hints.reflection().registerType(TypeReference.of(GetBinaryValue.class),
-			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
+				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
 		hints.reflection().registerType(TypeReference.of(GetValue.class),
-			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
+				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
 		hints.reflection().registerType(TypeReference.of(Check.class),
-			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
+				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
 		hints.reflection().registerType(TypeReference.of(Check.CheckStatus.class),
-			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
-		hints.reflection()
-			.registerType(TypeReference.of(com.ecwid.consul.v1.health.model.Check.class),
+				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
+		hints.reflection().registerType(TypeReference.of(com.ecwid.consul.v1.health.model.Check.class),
 				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
 		hints.reflection().registerType(TypeReference.of(Event.class),
-			hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
+				hint -> hint.withMembers(MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.DECLARED_FIELDS));
 	}
 
 }

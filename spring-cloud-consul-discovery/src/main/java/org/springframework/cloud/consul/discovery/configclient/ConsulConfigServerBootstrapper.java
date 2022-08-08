@@ -59,7 +59,8 @@ public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitiali
 				return null;
 			}
 			ConsulProperties consulProperties = context.get(ConsulProperties.class);
-			return ConsulAutoConfiguration.createConsulClient(consulProperties);
+			return ConsulAutoConfiguration.createConsulClient(consulProperties,
+					ConsulAutoConfiguration.createConsulRawClientBuilder());
 		});
 		registry.registerIfAbsent(ConsulDiscoveryClient.class, context -> {
 			Binder binder = context.get(Binder.class);
