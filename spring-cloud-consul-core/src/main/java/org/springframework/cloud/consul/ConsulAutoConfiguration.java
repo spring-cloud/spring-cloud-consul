@@ -179,6 +179,7 @@ public class ConsulAutoConfiguration {
 
 }
 
+// TODO: remove hints after merging GraalVM metadata PR
 class ConsulHints implements RuntimeHintsRegistrar {
 
 	@Override
