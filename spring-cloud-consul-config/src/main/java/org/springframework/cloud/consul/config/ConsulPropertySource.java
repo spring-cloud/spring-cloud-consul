@@ -75,12 +75,12 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		final List<GetValue> values = response.getValue();
 		ConsulConfigProperties.Format format = this.configProperties.getFormat();
 		switch (format) {
-		case KEY_VALUE:
-			parsePropertiesInKeyValueFormat(values);
-			break;
-		case PROPERTIES:
-		case YAML:
-			parsePropertiesWithNonKeyValueFormat(values, format);
+			case KEY_VALUE:
+				parsePropertiesInKeyValueFormat(values);
+				break;
+			case PROPERTIES:
+			case YAML:
+				parsePropertiesWithNonKeyValueFormat(values, format);
 		}
 	}
 
