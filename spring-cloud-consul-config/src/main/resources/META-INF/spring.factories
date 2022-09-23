@@ -1,6 +1,3 @@
-# Auto Configuration
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-org.springframework.cloud.consul.config.ConsulConfigAutoConfiguration
 # Bootstrap Configuration
 org.springframework.cloud.bootstrap.BootstrapConfiguration=\
 org.springframework.cloud.consul.config.ConsulConfigBootstrapConfiguration
@@ -21,5 +18,5 @@ org.springframework.boot.context.config.ConfigDataLoader=\
 org.springframework.cloud.consul.config.ConsulConfigDataLoader
 
 # Spring Boot Bootstrappers
-org.springframework.boot.Bootstrapper=\
+org.springframework.boot.BootstrapRegistryInitializer=\
 org.springframework.cloud.consul.config.ConsulRetryBootstrapper

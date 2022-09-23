@@ -62,6 +62,7 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 	private static boolean getSecure(HealthService healthService) {
 		boolean secure = false;
 		Map<String, String> metadata = getMetadata(healthService);
+		// getMetadata() above returns an empty Map if meta is null
 		if (metadata.containsKey("secure")) {
 			secure = Boolean.parseBoolean(metadata.get("secure"));
 		}

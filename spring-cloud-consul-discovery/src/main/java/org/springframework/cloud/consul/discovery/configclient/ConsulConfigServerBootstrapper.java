@@ -16,10 +16,12 @@
 
 package org.springframework.cloud.consul.discovery.configclient;
 
+import java.util.Collections;
+
 import com.ecwid.consul.v1.ConsulClient;
 
 import org.springframework.boot.BootstrapRegistry;
-import org.springframework.boot.Bootstrapper;
+import org.springframework.boot.BootstrapRegistryInitializer;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -29,14 +31,15 @@ import org.springframework.cloud.config.client.ConfigClientProperties;
 import org.springframework.cloud.config.client.ConfigServerInstanceProvider;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.discovery.ConditionalOnConsulDiscoveryEnabled;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.util.ClassUtils;
 
-public class ConsulConfigServerBootstrapper implements Bootstrapper {
+public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitializer {
 
 	@Override
-	public void intitialize(BootstrapRegistry registry) {
+	public void initialize(BootstrapRegistry registry) {
 		if (!ClassUtils.isPresent("org.springframework.cloud.config.client.ConfigServerInstanceProvider", null) ||
 		// don't run if bootstrap enabled, how to check the property?
 				ClassUtils.isPresent("org.springframework.cloud.bootstrap.marker.Marker", null)) {
@@ -45,12 +48,19 @@ public class ConsulConfigServerBootstrapper implements Bootstrapper {
 		// create consul client
 		registry.registerIfAbsent(ConsulProperties.class, context -> {
 			Binder binder = context.get(Binder.class);
+			if (!isDiscoveryEnabled(binder)) {
+				return null;
+			}
 			return binder.bind(ConsulProperties.PREFIX, Bindable.of(ConsulProperties.class), getBindHandler(context))
 					.orElseGet(ConsulProperties::new);
 		});
 		registry.registerIfAbsent(ConsulClient.class, context -> {
+			if (!isDiscoveryEnabled(context.get(Binder.class))) {
+				return null;
+			}
 			ConsulProperties consulProperties = context.get(ConsulProperties.class);
-			return ConsulAutoConfiguration.createConsulClient(consulProperties);
+			return ConsulAutoConfiguration.createConsulClient(consulProperties,
+					ConsulAutoConfiguration.createConsulRawClientBuilder());
 		});
 		registry.registerIfAbsent(ConsulDiscoveryClient.class, context -> {
 			Binder binder = context.get(Binder.class);
@@ -66,6 +76,9 @@ public class ConsulConfigServerBootstrapper implements Bootstrapper {
 		});
 		// promote discovery client if created
 		registry.addCloseListener(event -> {
+			if (!isDiscoveryEnabled(event.getBootstrapContext().get(Binder.class))) {
+				return;
+			}
 			ConsulDiscoveryClient discoveryClient = event.getBootstrapContext().get(ConsulDiscoveryClient.class);
 			if (discoveryClient != null) {
 				event.getApplicationContext().getBeanFactory().registerSingleton("consulDiscoveryClient",
@@ -74,7 +87,7 @@ public class ConsulConfigServerBootstrapper implements Bootstrapper {
 		});
 		registry.registerIfAbsent(ConfigServerInstanceProvider.Function.class, context -> {
 			if (!isDiscoveryEnabled(context.get(Binder.class))) {
-				return null;
+				return (id) -> Collections.emptyList();
 			}
 			ConsulDiscoveryClient discoveryClient = context.get(ConsulDiscoveryClient.class);
 			return discoveryClient::getInstances;
@@ -87,7 +100,9 @@ public class ConsulConfigServerBootstrapper implements Bootstrapper {
 	}
 
 	private boolean isDiscoveryEnabled(Binder binder) {
-		return binder.bind(ConfigClientProperties.CONFIG_DISCOVERY_ENABLED, Boolean.class).orElse(false);
+		return binder.bind(ConfigClientProperties.CONFIG_DISCOVERY_ENABLED, Boolean.class).orElse(false)
+				&& binder.bind(ConditionalOnConsulDiscoveryEnabled.PROPERTY, Boolean.class).orElse(true)
+				&& binder.bind("spring.cloud.discovery.enabled", Boolean.class).orElse(true);
 	}
 
 }

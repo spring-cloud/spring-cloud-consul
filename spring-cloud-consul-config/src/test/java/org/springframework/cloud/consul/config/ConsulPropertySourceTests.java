@@ -43,7 +43,7 @@ public class ConsulPropertySourceTests {
 	@Before
 	public void setup() {
 		ConsulTestcontainers.start();
-		this.prefix = "consulPropertySourceTests" + new Random().nextInt(Integer.MAX_VALUE);
+		this.prefix = "/consulPropertySourceTests" + new Random().nextInt(Integer.MAX_VALUE);
 		this.client = ConsulTestcontainers.client();
 	}
 
@@ -115,6 +115,14 @@ public class ConsulPropertySourceTests {
 		assertThat(names).as("names was null").isNotNull();
 		assertThat(names.length).as("names was wrong size").isEqualTo(2);
 		return source;
+	}
+
+	@Test
+	public void testExtraSlashInContext() {
+		ConsulPropertySource source = new ConsulPropertySource("/my/very/custom/context", this.client,
+				new ConsulConfigProperties());
+		source.init();
+		assertThat(source.getContext()).as("context was wrong").isEqualTo("my/very/custom/context/");
 	}
 
 }

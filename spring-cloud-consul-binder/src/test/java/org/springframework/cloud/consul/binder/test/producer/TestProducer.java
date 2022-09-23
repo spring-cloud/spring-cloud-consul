@@ -37,7 +37,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.SubscribableChannel;
 import org.springframework.messaging.support.ExecutorSubscribableChannel;
 import org.springframework.messaging.support.GenericMessage;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -86,7 +86,7 @@ public class TestProducer implements ApplicationRunner {
 		return new StubPartitionSelectorStrategy();
 	}
 
-	@RequestMapping("/partition-strategy-invoked")
+	@GetMapping("/partition-strategy-invoked")
 	public boolean partitionStrategyInvoked() {
 		return stubPartitionSelectorStrategy().invoked;
 	}

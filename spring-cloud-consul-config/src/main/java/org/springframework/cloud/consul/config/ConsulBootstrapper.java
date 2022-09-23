@@ -23,27 +23,27 @@ import com.ecwid.consul.v1.ConsulClient;
 
 import org.springframework.boot.BootstrapContext;
 import org.springframework.boot.BootstrapRegistry;
-import org.springframework.boot.Bootstrapper;
+import org.springframework.boot.BootstrapRegistryInitializer;
 import org.springframework.boot.context.config.ConfigData;
 import org.springframework.boot.context.config.ConfigDataLoaderContext;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.util.Assert;
 
-public class ConsulBootstrapper implements Bootstrapper {
+public class ConsulBootstrapper implements BootstrapRegistryInitializer {
 
 	private Function<BootstrapContext, ConsulClient> consulClientFactory;
 
 	private LoaderInterceptor loaderInterceptor;
 
-	static Bootstrapper fromConsulProperties(Function<ConsulProperties, ConsulClient> factory) {
+	static BootstrapRegistryInitializer fromConsulProperties(Function<ConsulProperties, ConsulClient> factory) {
 		return registry -> registry.register(ConsulClient.class, context -> {
 			ConsulProperties properties = context.get(ConsulProperties.class);
 			return factory.apply(properties);
 		});
 	}
 
-	static Bootstrapper fromBootstrapContext(Function<BootstrapContext, ConsulClient> factory) {
+	static BootstrapRegistryInitializer fromBootstrapContext(Function<BootstrapContext, ConsulClient> factory) {
 		return registry -> registry.register(ConsulClient.class, factory::apply);
 	}
 
@@ -63,7 +63,7 @@ public class ConsulBootstrapper implements Bootstrapper {
 	}
 
 	@Override
-	public void intitialize(BootstrapRegistry registry) {
+	public void initialize(BootstrapRegistry registry) {
 		if (consulClientFactory != null) {
 			registry.register(ConsulClient.class, consulClientFactory::apply);
 		}

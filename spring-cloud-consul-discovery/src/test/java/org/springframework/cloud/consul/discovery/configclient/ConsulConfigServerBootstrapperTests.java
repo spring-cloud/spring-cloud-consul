@@ -16,12 +16,14 @@
 
 package org.springframework.cloud.consul.discovery.configclient;
 
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.ecwid.consul.transport.TransportException;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.BootstrapRegistry;
-import org.springframework.boot.Bootstrapper;
+import org.springframework.boot.BootstrapRegistryInitializer;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -34,6 +36,7 @@ import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ConsulConfigServerBootstrapperTests {
 
@@ -41,11 +44,40 @@ public class ConsulConfigServerBootstrapperTests {
 	public void notEnabledDoesNotAddInstanceProviderFn() {
 		new SpringApplicationBuilder(TestConfig.class)
 				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false")
-				.addBootstrapper(registry -> registry.addCloseListener(event -> {
+				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
 							.get(ConfigServerInstanceProvider.Function.class);
-					assertThat(providerFn).as("ConfigServerInstanceProvider.Function was created when it shouldn't")
-							.isNull();
+					assertThat(providerFn.apply("id"))
+							.as("ConfigServerInstanceProvider.Function should return empty list")
+							.isEqualTo(Collections.EMPTY_LIST);
+				})).run().close();
+	}
+
+	@Test
+	public void consulDiscoveryClientNotEnabledProvidesEmptyList() {
+		new SpringApplicationBuilder(TestConfig.class)
+				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false",
+						"spring.cloud.config.discovery.enabled=true", "spring.cloud.consul.discovery.enabled=false")
+				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
+					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
+							.get(ConfigServerInstanceProvider.Function.class);
+					assertThat(providerFn.apply("id"))
+							.as("ConfigServerInstanceProvider.Function should return empty list")
+							.isEqualTo(Collections.EMPTY_LIST);
+				})).run().close();
+	}
+
+	@Test
+	public void springCloudDiscoveryClientNotEnabledProvidesEmptyList() {
+		new SpringApplicationBuilder(TestConfig.class)
+				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false",
+						"spring.cloud.config.discovery.enabled=true", "spring.cloud.discovery.enabled=false")
+				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
+					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
+							.get(ConfigServerInstanceProvider.Function.class);
+					assertThat(providerFn.apply("id"))
+							.as("ConfigServerInstanceProvider.Function should return empty list")
+							.isEqualTo(Collections.EMPTY_LIST);
 				})).run().close();
 	}
 
@@ -58,13 +90,15 @@ public class ConsulConfigServerBootstrapperTests {
 						"spring.cloud.consul.discovery.hostname=myhost",
 						"spring.cloud.service-registry.auto-registration.enabled=false",
 						"spring.cloud.consul.host=localhost")
-				.addBootstrapper(bindHandlerBootstrapper)
-				.addBootstrapper(registry -> registry.addCloseListener(event -> {
+				.addBootstrapRegistryInitializer(bindHandlerBootstrapper)
+				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
 					bootstrapDiscoveryClient.set(event.getBootstrapContext().get(ConsulDiscoveryClient.class));
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
 							.get(ConfigServerInstanceProvider.Function.class);
-					assertThat(providerFn).as("ConfigServerInstanceProvider.Function was not created when it should.")
-							.isNotNull();
+					assertThatThrownBy(() -> providerFn.apply("id")).isInstanceOf(TransportException.class)
+							.hasMessageContaining(
+									"org.apache.http.conn.HttpHostConnectException: Connect to localhost:8500")
+							.as("Should have tried to reach out to Consul to get config server instance").isNotNull();
 				})).run();
 		ConsulDiscoveryClient discoveryClient = context.getBean(ConsulDiscoveryClient.class);
 		assertThat(discoveryClient == bootstrapDiscoveryClient.get()).isTrue();
@@ -78,12 +112,12 @@ public class ConsulConfigServerBootstrapperTests {
 
 	}
 
-	static class BindHandlerBootstrapper implements Bootstrapper {
+	static class BindHandlerBootstrapper implements BootstrapRegistryInitializer {
 
 		private int onSuccessCount = 0;
 
 		@Override
-		public void intitialize(BootstrapRegistry registry) {
+		public void initialize(BootstrapRegistry registry) {
 			registry.register(BindHandler.class, context -> new BindHandler() {
 				@Override
 				public Object onSuccess(ConfigurationPropertyName name, Bindable<?> target, BindContext context,

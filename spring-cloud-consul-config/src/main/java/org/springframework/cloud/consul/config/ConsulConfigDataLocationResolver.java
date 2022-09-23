@@ -37,8 +37,10 @@ import org.springframework.boot.context.config.Profiles;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.logging.DeferredLogFactory;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.config.ConsulPropertySources.Context;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
@@ -62,8 +64,8 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 
 	private final Log log;
 
-	public ConsulConfigDataLocationResolver(Log log) {
-		this.log = log;
+	public ConsulConfigDataLocationResolver(DeferredLogFactory logFactory) {
+		this.log = logFactory.getLog(ConsulConfigDataLocationResolver.class);
 	}
 
 	@Override
@@ -99,8 +101,8 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 
 		ConsulPropertySources consulPropertySources = new ConsulPropertySources(properties, log);
 
-		List<String> contexts = (locationUri == null || CollectionUtils.isEmpty(locationUri.getPathSegments()))
-				? consulPropertySources.getAutomaticContexts(profiles.getAccepted(), false)
+		List<Context> contexts = (locationUri == null || CollectionUtils.isEmpty(locationUri.getPathSegments()))
+				? consulPropertySources.generateAutomaticContexts(profiles.getAccepted(), false)
 				: getCustomContexts(locationUri, properties);
 
 		registerAndPromoteBean(resolverContext, ConsulConfigProperties.class, InstanceSupplier.of(properties));
@@ -108,23 +110,25 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		registerAndPromoteBean(resolverContext, ConsulConfigIndexes.class,
 				InstanceSupplier.from(ConsulConfigDataIndexes::new));
 
-		return contexts.stream().map(propertySourceContext -> new ConsulConfigDataResource(propertySourceContext,
-				properties, consulPropertySources)).collect(Collectors.toList());
+		return contexts
+				.stream().map(propertySourceContext -> new ConsulConfigDataResource(propertySourceContext.getPath(),
+						properties, consulPropertySources, propertySourceContext.getProfile()))
+				.collect(Collectors.toList());
 	}
 
 	private BindHandler getBindHandler(ConfigDataLocationResolverContext context) {
 		return context.getBootstrapContext().getOrElse(BindHandler.class, null);
 	}
 
-	private List<String> getCustomContexts(UriComponents uriComponents, ConsulConfigProperties properties) {
+	private List<Context> getCustomContexts(UriComponents uriComponents, ConsulConfigProperties properties) {
 		if (!StringUtils.hasText(uriComponents.getPath())) {
 			return Collections.emptyList();
 		}
 
-		List<String> contexts = new ArrayList<>();
+		List<Context> contexts = new ArrayList<>();
 		for (String path : uriComponents.getPath().split(";")) {
 			for (String suffix : getSuffixes(properties)) {
-				contexts.add(path + suffix);
+				contexts.add(new Context(path + suffix));
 			}
 		}
 
@@ -180,7 +184,8 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 	protected ConsulClient createConsulClient(BootstrapContext context) {
 		ConsulProperties properties = context.get(ConsulProperties.class);
 
-		return ConsulAutoConfiguration.createConsulClient(properties);
+		return ConsulAutoConfiguration.createConsulClient(properties,
+				ConsulAutoConfiguration.createConsulRawClientBuilder());
 	}
 
 	protected ConsulProperties loadProperties(ConfigDataLocationResolverContext resolverContext,

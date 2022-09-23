@@ -16,9 +16,8 @@
 
 package org.springframework.cloud.consul.discovery.configclient;
 
-import javax.annotation.PostConstruct;
-
 import com.ecwid.consul.v1.ConsulClient;
+import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;

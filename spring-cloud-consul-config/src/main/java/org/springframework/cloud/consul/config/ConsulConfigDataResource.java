@@ -31,6 +31,18 @@ public class ConsulConfigDataResource extends ConfigDataResource {
 
 	private final ConsulPropertySources consulPropertySources;
 
+	private final String profile;
+
+	public ConsulConfigDataResource(String context, ConsulConfigProperties properties,
+			ConsulPropertySources consulPropertySources, String profile) {
+		this.properties = properties;
+		this.context = context;
+		this.optional = true;
+		this.consulPropertySources = consulPropertySources;
+		this.profile = profile;
+	}
+
+	@Deprecated
 	public ConsulConfigDataResource(String context, ConsulConfigProperties properties,
 			ConsulPropertySources consulPropertySources) {
 		this(context, true, properties, consulPropertySources);
@@ -43,6 +55,7 @@ public class ConsulConfigDataResource extends ConfigDataResource {
 		this.context = context;
 		this.optional = optional;
 		this.consulPropertySources = consulPropertySources;
+		this.profile = null;
 	}
 
 	public String getContext() {
@@ -62,6 +75,10 @@ public class ConsulConfigDataResource extends ConfigDataResource {
 		return this.consulPropertySources;
 	}
 
+	String getProfile() {
+		return this.profile;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -71,18 +88,19 @@ public class ConsulConfigDataResource extends ConfigDataResource {
 			return false;
 		}
 		ConsulConfigDataResource that = (ConsulConfigDataResource) o;
-		return this.optional == that.optional && this.context.equals(that.context);
+		return this.optional == that.optional && this.context.equals(that.context)
+				&& Objects.equals(this.profile, that.profile);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(this.context, this.optional);
+		return Objects.hash(this.context, this.optional, this.profile);
 	}
 
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("context", context).append("optional", optional)
-				.append("properties", properties).toString();
+				.append("properties", properties).append("profile", profile).toString();
 
 	}
 

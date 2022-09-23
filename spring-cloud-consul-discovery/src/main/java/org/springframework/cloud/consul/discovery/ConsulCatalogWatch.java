@@ -108,7 +108,7 @@ public class ConsulCatalogWatch implements ApplicationEventPublisherAware, Smart
 
 	@Override
 	public boolean isRunning() {
-		return false;
+		return this.running.get();
 	}
 
 	@Override
