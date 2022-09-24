@@ -127,20 +127,20 @@ public class TtlScheduler {
 			ConsulClient client = this.ttlScheduler.client;
 			CheckStatus status = statusSupplier.get();
 			switch (status) {
-			case PASSING:
-				possiblyReregisterIfFails(() -> client.agentCheckPass(checkId));
-				logHeartbeatSent(status);
-				break;
-			case WARNING:
-				possiblyReregisterIfFails(() -> client.agentCheckWarn(checkId));
-				logHeartbeatSent(status);
-				break;
-			case CRITICAL:
-				possiblyReregisterIfFails(() -> client.agentCheckFail(checkId));
-				logHeartbeatSent(status);
-				break;
-			default:
-				log.debug(String.format("Not sending consul heartbeat for %s (%s)", checkId, status));
+				case PASSING:
+					possiblyReregisterIfFails(() -> client.agentCheckPass(checkId));
+					logHeartbeatSent(status);
+					break;
+				case WARNING:
+					possiblyReregisterIfFails(() -> client.agentCheckWarn(checkId));
+					logHeartbeatSent(status);
+					break;
+				case CRITICAL:
+					possiblyReregisterIfFails(() -> client.agentCheckFail(checkId));
+					logHeartbeatSent(status);
+					break;
+				default:
+					log.debug(String.format("Not sending consul heartbeat for %s (%s)", checkId, status));
 			}
 		}
 
