@@ -96,7 +96,7 @@ public class ConsulAutoConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
+	@ConditionalOnMissingBean(value = ConsulRawClient.Builder.class, parameterizedContainer = Supplier.class)
 	public Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier() {
 		return createConsulRawClientBuilder();
 	}
