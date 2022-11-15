@@ -123,7 +123,7 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 	}
 
 	@Override
-	public void bind(WebServerInitializedEvent event) {
+	public void onApplicationEvent(WebServerInitializedEvent event) {
 		// do nothing so we can listen for this event in a different class
 		// this ensures start() can be retried if spring-retry is available
 	}
