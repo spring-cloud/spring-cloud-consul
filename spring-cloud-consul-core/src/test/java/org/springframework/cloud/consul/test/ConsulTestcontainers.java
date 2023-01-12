@@ -50,7 +50,7 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 			Integer mappedPort = consul.getMappedPort(8500);
 			HashMap<String, Object> map = new HashMap<>();
 			map.put(ConsulProperties.PREFIX + ".port", String.valueOf(mappedPort));
-			map.put(ConsulProperties.PREFIX + ".host", consul.getContainerIpAddress());
+			map.put(ConsulProperties.PREFIX + ".host", consul.getHost());
 
 			sources.addFirst(new MapPropertySource("consulTestcontainer", map));
 		}
@@ -71,7 +71,7 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 		if (!consul.isRunning()) {
 			throw new IllegalStateException("consul Testcontainer is not running");
 		}
-		return consul.getContainerIpAddress();
+		return consul.getHost();
 	}
 
 	public static ConsulClient client() {
