@@ -62,7 +62,7 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 		if (!consul.isRunning()) {
 			throw new IllegalStateException("consul Testcontainer is not running");
 		}
-		return consul.getContainerIpAddress();
+		return consul.getHost();
 	}
 
 	public static ConsulClient client() {
