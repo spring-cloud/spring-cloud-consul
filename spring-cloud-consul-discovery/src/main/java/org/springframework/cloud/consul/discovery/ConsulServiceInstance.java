@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,6 +26,7 @@ import com.ecwid.consul.v1.health.model.HealthService;
 
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.core.style.ToStringCreator;
+import org.springframework.util.StringUtils;
 
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;
 
@@ -34,14 +36,26 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 
 	public ConsulServiceInstance(HealthService healthService, String serviceId) {
 		this(healthService.getService().getId(), serviceId, findHost(healthService),
-				healthService.getService().getPort(), getSecure(healthService), getMetadata(healthService),
-				healthService.getService().getTags());
+			healthService.getService().getPort(), getSecure(healthService, false), getMetadata(healthService),
+			healthService.getService().getTags());
 		this.healthService = healthService;
 	}
 
 	public ConsulServiceInstance(String instanceId, String serviceId, String host, int port, boolean secure,
 			Map<String, String> metadata, List<String> tags) {
-		super(instanceId, serviceId, host, port, secure, metadata);
+		this(instanceId, serviceId, host, port, secure, metadata, tags, false);
+	}
+
+	public ConsulServiceInstance(HealthService healthService, String serviceId, boolean mergeTags) {
+		this(healthService.getService().getId(), serviceId, findHost(healthService),
+			healthService.getService().getPort(), getSecure(healthService, mergeTags), getMetadata(healthService),
+			healthService.getService().getTags(), mergeTags);
+		this.healthService = healthService;
+	}
+
+	public ConsulServiceInstance(String instanceId, String serviceId, String host, int port, boolean secure,
+			Map<String, String> metadata, List<String> tags, boolean mergeTags) {
+		super(instanceId, serviceId, host, port, secure, mergeTags ? mergeTags(metadata, tags) : metadata);
 	}
 
 	public ConsulServiceInstance(String instanceId, String serviceId, String host, int port, boolean secure) {
@@ -49,6 +63,39 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 	}
 
 	public ConsulServiceInstance() {
+	}
+
+	private static Map<String, String> mergeTags(Map<String, String> metadata, List<String> tags) {
+		Map<String, String> result = new LinkedHashMap<>();
+
+		if (metadata != null) {
+			result.putAll(metadata);
+		}
+
+		if (tags == null || tags.isEmpty()) {
+			return result;
+		}
+
+		for (String tag : tags) {
+			String[] parts = StringUtils.delimitedListToStringArray(tag, "=");
+
+			switch (parts.length) {
+				case 0:
+					break;
+				case 1:
+					result.put(parts[0], parts[0]);
+					break;
+				case 2:
+					result.put(parts[0], parts[1]);
+					break;
+				default:
+					String[] end = Arrays.copyOfRange(parts, 1, parts.length);
+					result.put(parts[0], StringUtils.arrayToDelimitedString(end, "="));
+					break;
+			}
+		}
+
+		return result;
 	}
 
 	private static Map<String, String> getMetadata(HealthService healthService) {
@@ -59,10 +106,12 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 		return metadata;
 	}
 
-	private static boolean getSecure(HealthService healthService) {
+	private static boolean getSecure(HealthService healthService, boolean mergeTags) {
 		boolean secure = false;
 		Map<String, String> metadata = getMetadata(healthService);
-		// getMetadata() above returns an empty Map if meta is null
+		if (mergeTags) {
+			metadata = mergeTags(metadata, healthService.getService().getTags());
+		}
 		if (metadata.containsKey("secure")) {
 			secure = Boolean.parseBoolean(metadata.get("secure"));
 		}
@@ -78,8 +127,8 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 	}
 
 	public List<String> getTags() {
-		if (healthService != null) {
-			return healthService.getService().getTags();
+		if (this.healthService != null) {
+			return this.healthService.getService().getTags();
 		}
 		return Collections.emptyList();
 	}

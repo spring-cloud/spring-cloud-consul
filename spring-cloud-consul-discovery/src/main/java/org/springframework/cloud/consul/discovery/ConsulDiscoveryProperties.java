@@ -212,6 +212,12 @@ public class ConsulDiscoveryProperties {
 	 */
 	private int order = 0;
 
+	/**
+	 * Enable merge consul tag data with metadata to create service instance (defaults
+	 * to false).
+	 */
+	private boolean mergeTagsEnabled = false;
+
 	@SuppressWarnings("unused")
 	private ConsulDiscoveryProperties() {
 		this(new InetUtils(new InetUtilsProperties()));
@@ -617,6 +623,14 @@ public class ConsulDiscoveryProperties {
 		this.managementEnableTagOverride = managementEnableTagOverride;
 	}
 
+	public boolean isMergeTagsEnabled() {
+		return this.mergeTagsEnabled;
+	}
+
+	public void setMergeTagsEnabled(boolean mergeTagsEnabled) {
+		this.mergeTagsEnabled = mergeTagsEnabled;
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("aclToken", this.aclToken)
@@ -628,6 +642,7 @@ public class ConsulDiscoveryProperties {
 				.append("enabled", this.enabled).append("enableTagOverride", this.enableTagOverride)
 				.append("failFast", this.failFast).append("hostInfo", this.hostInfo)
 				.append("healthCheckCriticalTimeout", this.healthCheckCriticalTimeout)
+				.append("mergeTagsEnabled", this.mergeTagsEnabled)
 				.append("healthCheckHeaders", this.healthCheckHeaders)
 				.append("healthCheckInterval", this.healthCheckInterval).append("healthCheckPath", this.healthCheckPath)
 				.append("healthCheckTimeout", this.healthCheckTimeout)
