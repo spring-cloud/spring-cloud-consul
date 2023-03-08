@@ -3,14 +3,14 @@
 
 |spring.cloud.consul.config.acl-token |  | 
 |spring.cloud.consul.config.data-key | `+++data+++` | If format is Format.PROPERTIES or Format.YAML then the following field is used as key to look up consul for configuration.
-|spring.cloud.consul.config.default-context | `+++application+++` | 
-|spring.cloud.consul.config.enabled | `+++true+++` | 
+|spring.cloud.consul.config.default-context | `+++application+++` |
+|spring.cloud.consul.config.enabled | `+++true+++` |
 |spring.cloud.consul.config.fail-fast | `+++true+++` | Throw exceptions during config lookup if true, otherwise, log warnings.
 |spring.cloud.consul.config.format |  | 
 |spring.cloud.consul.config.name |  | Alternative to spring.application.name to use in looking up values in consul KV.
 |spring.cloud.consul.config.prefix |  | 
 |spring.cloud.consul.config.prefixes |  | 
-|spring.cloud.consul.config.profile-separator | `+++,+++` | 
+|spring.cloud.consul.config.profile-separator | `+++,+++` |
 |spring.cloud.consul.config.watch.delay | `+++1000+++` | The value of the fixed delay for the watch in millis. Defaults to 1000.
 |spring.cloud.consul.config.watch.enabled | `+++true+++` | If the watch is enabled. Defaults to true.
 |spring.cloud.consul.config.watch.wait-time | `+++55+++` | The number of seconds to wait (or block) for watch query, defaults to 55. Needs to be less than default ConsulClient (defaults to 60). To increase ConsulClient timeout create a ConsulClient bean with a custom ConsulRawClient with a custom HttpClient.
@@ -33,10 +33,10 @@
 |spring.cloud.consul.discovery.health-check-tls-skip-verify |  | Skips certificate verification during service checks if true, otherwise runs certificate verification.
 |spring.cloud.consul.discovery.health-check-url |  | Custom health check url to override default.
 |spring.cloud.consul.discovery.heartbeat.actuator-health-group |  | The actuator health group to use (null for the root group) when determining system health via Actuator.
-|spring.cloud.consul.discovery.heartbeat.enabled | `+++false+++` | 
+|spring.cloud.consul.discovery.heartbeat.enabled | `+++false+++` |
 |spring.cloud.consul.discovery.heartbeat.interval-ratio |  | 
-|spring.cloud.consul.discovery.heartbeat.reregister-service-on-failure | `+++false+++` | 
-|spring.cloud.consul.discovery.heartbeat.ttl | `+++30s+++` | 
+|spring.cloud.consul.discovery.heartbeat.reregister-service-on-failure | `+++false+++` |
+|spring.cloud.consul.discovery.heartbeat.ttl | `+++30s+++` |
 |spring.cloud.consul.discovery.heartbeat.use-actuator-health | `+++true+++` | Whether or not to take the current system health (as reported via the Actuator Health endpoint) into account when reporting the application status to the Consul TTL check. Actuator Health endpoint also has to be available to the application.
 |spring.cloud.consul.discovery.hostname |  | Hostname to use when accessing server.
 |spring.cloud.consul.discovery.include-hostname-in-instance-id | `+++false+++` | Whether hostname is included into the default instance id when registering service.
@@ -44,7 +44,7 @@
 |spring.cloud.consul.discovery.instance-id |  | Unique service instance id.
 |spring.cloud.consul.discovery.instance-zone |  | Service instance zone.
 |spring.cloud.consul.discovery.ip-address |  | IP address to use when accessing service (must also set preferIpAddress to use).
-|spring.cloud.consul.discovery.lifecycle.enabled | `+++true+++` | 
+|spring.cloud.consul.discovery.lifecycle.enabled | `+++true+++` |
 |spring.cloud.consul.discovery.management-enable-tag-override |  | Enable tag override for the registered management service.
 |spring.cloud.consul.discovery.management-metadata |  | Metadata to use when registering management service.
 |spring.cloud.consul.discovery.management-port |  | Port to register the management service under (defaults to management port).

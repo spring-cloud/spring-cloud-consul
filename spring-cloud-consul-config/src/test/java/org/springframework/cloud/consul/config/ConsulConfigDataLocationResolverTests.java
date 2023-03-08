@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import org.springframework.boot.BootstrapRegistry.InstanceSupplier;
 import org.springframework.boot.DefaultBootstrapContext;
@@ -30,6 +32,7 @@ import org.springframework.boot.context.config.ConfigDataLocationResolverContext
 import org.springframework.boot.context.config.Profiles;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.springframework.mock.env.MockEnvironment;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -80,6 +83,28 @@ public class ConsulConfigDataLocationResolverTests {
 				UriComponentsBuilder.fromUriString("consul://myhost:8502").build());
 		assertThat(properties.getHost()).isEqualTo("myhost");
 		assertThat(properties.getPort()).isEqualTo(8502);
+	}
+
+	@ParameterizedTest
+	@ValueSource(strings = { "consul.token", "CONSUL_TOKEN", "spring.cloud.consul.token", "SPRING_CLOUD_CONSUL_TOKEN",
+			"spring.cloud.consul.config.acl-token" })
+	public void testLoadConfigProperties(String property) {
+		MockEnvironment mockEnvironment = new MockEnvironment();
+		String tokenValue = "mytoken";
+		if (property.contains("_")) {
+			SystemEnvironmentPropertySource envPS = new SystemEnvironmentPropertySource("mocksysenv",
+					Collections.singletonMap(property, tokenValue));
+			mockEnvironment.getPropertySources().addLast(envPS);
+		}
+		else {
+			mockEnvironment.setProperty(property, tokenValue);
+		}
+		Binder binder = Binder.get(mockEnvironment);
+		ConfigDataLocationResolverContext resolverContext = mock(ConfigDataLocationResolverContext.class);
+		when(resolverContext.getBinder()).thenReturn(binder);
+		when(resolverContext.getBootstrapContext()).thenReturn(new DefaultBootstrapContext());
+		ConsulConfigProperties properties = createResolver().loadConfigProperties(resolverContext);
+		assertThat(properties.getAclToken()).isEqualTo(tokenValue);
 	}
 
 	private List<String> toContexts(List<ConsulConfigDataResource> locations) {
