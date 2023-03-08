@@ -212,8 +212,13 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 				.bind(ConsulConfigProperties.PREFIX, Bindable.of(ConsulConfigProperties.class), bindHandler)
 				.orElseGet(ConsulConfigProperties::new);
 
-		if (StringUtils.isEmpty(properties.getName())) {
+		if (!StringUtils.hasText(properties.getName())) {
 			properties.setName(binder.bind("spring.application.name", String.class).orElse("application"));
+		}
+
+		if (!StringUtils.hasText(properties.getAclToken())) {
+			properties.setAclToken(binder.bind("spring.cloud.consul.token", String.class)
+					.orElse(binder.bind("consul.token", String.class).orElse(null)));
 		}
 		return properties;
 	}
