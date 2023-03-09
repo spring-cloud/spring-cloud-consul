@@ -43,7 +43,7 @@ import static com.ecwid.consul.v1.health.model.Check.CheckStatus;
  */
 public class TtlScheduler {
 
-	private static final Log log = LogFactory.getLog(ConsulDiscoveryClient.class);
+	private static final Log log = LogFactory.getLog(TtlScheduler.class);
 
 	private final Map<String, ScheduledFuture> serviceHeartbeats = new ConcurrentHashMap<>();
 

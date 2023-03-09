@@ -43,7 +43,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
  */
 public class ConsulCatalogWatch implements ApplicationEventPublisherAware, SmartLifecycle {
 
-	private static final Log log = LogFactory.getLog(ConsulDiscoveryClient.class);
+	private static final Log log = LogFactory.getLog(ConsulCatalogWatch.class);
 
 	private final ConsulDiscoveryProperties properties;
 
