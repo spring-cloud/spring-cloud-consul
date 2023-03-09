@@ -35,9 +35,9 @@ import org.springframework.cloud.deployer.spi.core.AppDefinition;
 import org.springframework.cloud.deployer.spi.core.AppDeploymentRequest;
 import org.springframework.cloud.deployer.spi.local.LocalAppDeployer;
 import org.springframework.cloud.deployer.spi.local.LocalDeployerProperties;
+import org.springframework.cloud.test.TestSocketUtils;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.util.SocketUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
@@ -153,7 +153,7 @@ public class ConsulBinderTests {
 		Map<String, String> appProperties = new HashMap<>();
 		int consumerCount = groups == null ? 1 : groups.length;
 		for (int i = 0; i < consumerCount; i++) {
-			int consumerPort = SocketUtils.findAvailableTcpPort();
+			int consumerPort = TestSocketUtils.findAvailableTcpPort();
 			appProperties.put("server.port", String.valueOf(consumerPort));
 			List<String> args = new ArrayList<>();
 			args.add(String.format("--server.port=%d", consumerPort));
@@ -178,7 +178,7 @@ public class ConsulBinderTests {
 	 * @return {@link AppId} for producer
 	 */
 	private AppId launchProducer() {
-		int producerPort = SocketUtils.findAvailableTcpPort();
+		int producerPort = TestSocketUtils.findAvailableTcpPort();
 		Map<String, String> appProperties = new HashMap<>();
 		appProperties.put("server.port", String.valueOf(producerPort));
 		List<String> args = new ArrayList<>();

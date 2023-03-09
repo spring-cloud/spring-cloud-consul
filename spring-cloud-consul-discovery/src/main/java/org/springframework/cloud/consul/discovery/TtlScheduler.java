@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
+import java.util.function.Supplier;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.OperationException;
@@ -27,13 +28,18 @@ import com.ecwid.consul.v1.agent.model.NewService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.cloud.consul.serviceregistry.ApplicationStatusProvider;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+
+import static com.ecwid.consul.v1.health.model.Check.CheckStatus;
 
 /**
  * Created by nicu on 11.03.2015.
  *
  * @author Stéphane LEROY
+ * @author Chris Bono
  */
 public class TtlScheduler {
 
@@ -53,12 +59,17 @@ public class TtlScheduler {
 
 	private final Map<String, NewService> registeredServices = new ConcurrentHashMap<>();
 
+	private ApplicationStatusProvider applicationStatusProvider;
+
 	public TtlScheduler(HeartbeatProperties heartbeatProperties, ConsulDiscoveryProperties discoveryProperties,
-			ConsulClient client, ReregistrationPredicate reregistrationPredicate) {
+			ConsulClient client, ReregistrationPredicate reregistrationPredicate,
+			ObjectProvider<ApplicationStatusProvider> applicationStatusProviderFactory) {
 		this.heartbeatProperties = heartbeatProperties;
 		this.discoveryProperties = discoveryProperties;
 		this.client = client;
 		this.reregistrationPredicate = reregistrationPredicate;
+		this.applicationStatusProvider = applicationStatusProviderFactory
+				.getIfAvailable(() -> () -> CheckStatus.PASSING);
 	}
 
 	public void add(final NewService service) {
@@ -71,7 +82,8 @@ public class TtlScheduler {
 	 * @param instanceId instance id
 	 */
 	public void add(String instanceId) {
-		ScheduledFuture task = this.scheduler.scheduleAtFixedRate(new ConsulHeartbeatTask(instanceId, this),
+		ScheduledFuture task = this.scheduler.scheduleAtFixedRate(
+				new ConsulHeartbeatTask(instanceId, this, () -> applicationStatusProvider.currentStatus()),
 				this.heartbeatProperties.computeHeartbeatInterval().toMillis());
 		ScheduledFuture previousTask = this.serviceHeartbeats.put(instanceId, task);
 		if (previousTask != null) {
@@ -96,7 +108,9 @@ public class TtlScheduler {
 
 		private final TtlScheduler ttlScheduler;
 
-		ConsulHeartbeatTask(String serviceId, TtlScheduler ttlScheduler) {
+		private final Supplier<CheckStatus> statusSupplier;
+
+		ConsulHeartbeatTask(String serviceId, TtlScheduler ttlScheduler, Supplier<CheckStatus> statusSupplier) {
 			this.serviceId = serviceId;
 			if (!this.serviceId.startsWith("service:")) {
 				this.checkId = "service:" + this.serviceId;
@@ -104,16 +118,39 @@ public class TtlScheduler {
 			else {
 				this.checkId = this.serviceId;
 			}
+			this.statusSupplier = statusSupplier;
 			this.ttlScheduler = ttlScheduler;
 		}
 
 		@Override
 		public void run() {
+			ConsulClient client = this.ttlScheduler.client;
+			CheckStatus status = statusSupplier.get();
+			switch (status) {
+				case PASSING:
+					possiblyReregisterIfFails(() -> client.agentCheckPass(checkId));
+					logHeartbeatSent(status);
+					break;
+				case WARNING:
+					possiblyReregisterIfFails(() -> client.agentCheckWarn(checkId));
+					logHeartbeatSent(status);
+					break;
+				case CRITICAL:
+					possiblyReregisterIfFails(() -> client.agentCheckFail(checkId));
+					logHeartbeatSent(status);
+					break;
+				default:
+					log.debug(String.format("Not sending consul heartbeat for %s (%s)", checkId, status));
+			}
+		}
+
+		private void logHeartbeatSent(CheckStatus status) {
+			log.debug(String.format("Sent consul heartbeat for %s (%s)", checkId, status));
+		}
+
+		private void possiblyReregisterIfFails(Runnable consulClientCall) {
 			try {
-				this.ttlScheduler.client.agentCheckPass(this.checkId);
-				if (log.isDebugEnabled()) {
-					log.debug("Sending consul heartbeat for: " + this.checkId);
-				}
+				consulClientCall.run();
 			}
 			catch (OperationException e) {
 				if (this.ttlScheduler.heartbeatProperties.isReregisterServiceOnFailure()

@@ -21,9 +21,8 @@ import java.util.HashMap;
 import com.ecwid.consul.v1.ConsulClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.consul.ConsulContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.testcontainers.containers.wait.strategy.Wait;
 
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.context.ApplicationContextInitializer;
@@ -35,10 +34,25 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 
 	static final Logger logger = LoggerFactory.getLogger(ConsulTestcontainers.class);
 
-	public static GenericContainer<?> consul = new GenericContainer<>("consul:1.7.2")
-			.withLogConsumer(new Slf4jLogConsumer(logger).withSeparateOutputStreams())
-			.waitingFor(Wait.forHttp("/v1/status/leader")).withExposedPorts(8500)
-			.withCommand("agent", "-dev", "-server", "-bootstrap", "-client", "0.0.0.0", "-log-level", "trace");
+	/**
+	 * Default consul port.
+	 */
+	public static final int DEFAULT_PORT = 8500;
+
+	/**
+	 * Shared consul container.
+	 */
+	public static ConsulContainer consul = createConsulContainer();
+
+	public static ConsulContainer createConsulContainer() {
+		return createConsulContainer("1.7");
+	}
+
+	public static ConsulContainer createConsulContainer(String consulVersion) {
+		String dockerImageName = "consul:" + consulVersion;
+		return new ConsulContainer(dockerImageName)
+				.withLogConsumer(new Slf4jLogConsumer(logger).withSeparateOutputStreams());
+	}
 
 	@Override
 	public void initialize(ConfigurableApplicationContext context) {
@@ -47,10 +61,10 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 		MutablePropertySources sources = context.getEnvironment().getPropertySources();
 
 		if (!sources.contains("consulTestcontainer")) {
-			Integer mappedPort = consul.getMappedPort(8500);
+			Integer mappedPort = consul.getMappedPort(DEFAULT_PORT);
 			HashMap<String, Object> map = new HashMap<>();
 			map.put(ConsulProperties.PREFIX + ".port", String.valueOf(mappedPort));
-			map.put(ConsulProperties.PREFIX + ".host", consul.getContainerIpAddress());
+			map.put(ConsulProperties.PREFIX + ".host", consul.getHost());
 
 			sources.addFirst(new MapPropertySource("consulTestcontainer", map));
 		}
@@ -71,7 +85,7 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 		if (!consul.isRunning()) {
 			throw new IllegalStateException("consul Testcontainer is not running");
 		}
-		return consul.getContainerIpAddress();
+		return consul.getHost();
 	}
 
 	public static ConsulClient client() {

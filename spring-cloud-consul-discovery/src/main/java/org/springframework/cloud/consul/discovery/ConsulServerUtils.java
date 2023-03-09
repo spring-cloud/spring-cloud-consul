@@ -55,7 +55,7 @@ public final class ConsulServerUtils {
 		try {
 			InetAddress inetAdr = InetAddress.getByName(address);
 			if (inetAdr instanceof Inet6Address) {
-				return "[" + inetAdr.getHostName() + "]";
+				return "[" + inetAdr.getHostAddress() + "]";
 			}
 			return address;
 		}

@@ -19,8 +19,6 @@ package org.springframework.cloud.consul.binder;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.annotation.PostConstruct;
-
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
@@ -28,6 +26,7 @@ import com.ecwid.consul.v1.event.EventListRequest;
 import com.ecwid.consul.v1.event.model.Event;
 import com.ecwid.consul.v1.event.model.EventParams;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 
 import org.springframework.cloud.consul.binder.config.ConsulBinderProperties;
 

@@ -18,8 +18,12 @@ package org.springframework.cloud.consul.support;
 
 import com.ecwid.consul.v1.ConsulClient;
 
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
@@ -29,6 +33,8 @@ import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.discovery.ReregistrationPredicate;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
+import org.springframework.cloud.consul.serviceregistry.ActuatorHealthApplicationStatusProvider;
+import org.springframework.cloud.consul.serviceregistry.ApplicationStatusProvider;
 import org.springframework.cloud.consul.serviceregistry.ConsulServiceRegistryAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,6 +43,7 @@ import org.springframework.context.annotation.Configuration;
  * Auto configuration for the heartbeat.
  *
  * @author Tim Ysewyn
+ * @author Chris Bono
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnConsulEnabled
@@ -56,14 +63,32 @@ public class ConsulHeartbeatAutoConfiguration {
 	@ConditionalOnMissingBean
 	public TtlScheduler ttlScheduler(HeartbeatProperties heartbeatProperties,
 			ConsulDiscoveryProperties discoveryProperties, ConsulClient consulClient,
-			ReregistrationPredicate reRegistrationPredicate) {
-		return new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient, reRegistrationPredicate);
+			ReregistrationPredicate reRegistrationPredicate,
+			ObjectProvider<ApplicationStatusProvider> applicationStatusProvider) {
+		return new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient, reRegistrationPredicate,
+				applicationStatusProvider);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
 	public ReregistrationPredicate reRegistrationPredicate() {
 		return ReregistrationPredicate.DEFAULT;
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnClass(HealthEndpoint.class)
+	@ConditionalOnProperty(value = "spring.cloud.consul.discovery.heartbeat.use-actuator-health", havingValue = "true",
+			matchIfMissing = true)
+	static class ActuatorBasedApplicationStatusProviderConfig {
+
+		@Bean
+		@ConditionalOnBean(HealthEndpoint.class)
+		@ConditionalOnMissingBean
+		public ApplicationStatusProvider actuatorHealthStatusProvider(HealthEndpoint healthEndpoint,
+				HeartbeatProperties heartbeatProperties) {
+			return new ActuatorHealthApplicationStatusProvider(healthEndpoint, heartbeatProperties);
+		}
+
 	}
 
 }

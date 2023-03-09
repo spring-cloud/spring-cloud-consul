@@ -6,7 +6,7 @@
 
 	<groupId>org.springframework.cloud</groupId>
 	<artifactId>spring-cloud-consul</artifactId>
-	<version>3.1.0-SNAPSHOT</version>
+	<version>4.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Spring Cloud Consul</name>
 	<description>Spring Cloud Consul</description>
@@ -14,19 +14,19 @@
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
 		<artifactId>spring-cloud-build</artifactId>
-		<version>3.1.0-SNAPSHOT</version>
+		<version>4.0.2-SNAPSHOT</version>
 		<relativePath/>
 		<!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
-		<spring-cloud-bus.version>3.1.0-SNAPSHOT</spring-cloud-bus.version>
-		<spring-cloud-commons.version>3.1.0-SNAPSHOT</spring-cloud-commons.version>
-		<spring-cloud-config.version>3.1.0-SNAPSHOT</spring-cloud-config.version>
+		<spring-cloud-bus.version>4.0.2-SNAPSHOT</spring-cloud-bus.version>
+		<spring-cloud-commons.version>4.0.2-SNAPSHOT</spring-cloud-commons.version>
+		<spring-cloud-config.version>4.0.2-SNAPSHOT</spring-cloud-config.version>
 		<spring-cloud-deployer.version>1.0.3.RELEASE</spring-cloud-deployer.version>
-		<spring-cloud-openfeign.version>3.1.0-SNAPSHOT</spring-cloud-openfeign.version>
-		<spring-cloud-stream.version>3.2.0-SNAPSHOT</spring-cloud-stream.version>
-		<testcontainers.version>1.15.1</testcontainers.version>
+		<spring-cloud-openfeign.version>4.0.2-SNAPSHOT</spring-cloud-openfeign.version>
+		<spring-cloud-stream.version>4.0.2-SNAPSHOT</spring-cloud-stream.version>
+		<testcontainers.version>1.17.6</testcontainers.version>
 	</properties>
 
 	<scm>
@@ -153,8 +153,23 @@
 			</dependency>
 			<dependency>
 				<groupId>org.testcontainers</groupId>
-				<artifactId>testcontainers</artifactId>
+				<artifactId>consul</artifactId>
 				<version>${testcontainers.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>${testcontainers.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>4.5.14</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<version>4.4.16</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

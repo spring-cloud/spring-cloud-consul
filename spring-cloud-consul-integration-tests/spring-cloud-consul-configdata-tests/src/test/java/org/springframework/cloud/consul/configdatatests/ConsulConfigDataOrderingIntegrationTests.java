@@ -41,7 +41,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @SpringBootTest(classes = ConsulConfigDataApplication.class,
 		properties = { "spring.application.name=" + ConsulConfigDataOrderingIntegrationTests.APP_NAME,
 				"spring.config.name=orderingtest", "spring.profiles.active=dev",
-				"management.endpoints.web.exposure.include=*" },
+				"management.endpoints.web.exposure.include=*", "management.endpoint.env.show-values=ALWAYS" },
 		webEnvironment = RANDOM_PORT)
 public class ConsulConfigDataOrderingIntegrationTests {
 

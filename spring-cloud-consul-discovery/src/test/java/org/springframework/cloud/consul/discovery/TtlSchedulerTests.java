@@ -16,76 +16,99 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import java.util.List;
+import java.time.Duration;
+import java.util.Collections;
 
 import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.health.HealthChecksForServiceRequest;
-import com.ecwid.consul.v1.health.model.Check;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.cloud.consul.support.ConsulHeartbeatAutoConfiguration;
-import org.springframework.cloud.consul.test.ConsulTestcontainers;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.beans.factory.support.StaticListableBeanFactory;
+import org.springframework.cloud.consul.serviceregistry.ApplicationStatusProvider;
 
+import static com.ecwid.consul.v1.health.model.Check.CheckStatus;
+import static com.ecwid.consul.v1.health.model.Check.CheckStatus.CRITICAL;
 import static com.ecwid.consul.v1.health.model.Check.CheckStatus.PASSING;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static com.ecwid.consul.v1.health.model.Check.CheckStatus.WARNING;
+import static org.awaitility.Awaitility.await;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
+ * Unit tests for {@link TtlScheduler}.
+ *
  * @author Stéphane Leroy
+ * @author Chris Bono
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = TtlSchedulerTests.TtlSchedulerTestConfig.class,
-		properties = { "spring.application.name=ttlScheduler",
-				"spring.cloud.consul.discovery.instance-id=ttlScheduler-id",
-				"spring.cloud.consul.discovery.heartbeat.enabled=true",
-				"spring.cloud.consul.discovery.heartbeat.ttlValue=2", "management.server.port=0" },
-		webEnvironment = RANDOM_PORT)
-@ContextConfiguration(initializers = ConsulTestcontainers.class)
-public class TtlSchedulerTests {
+@ExtendWith(MockitoExtension.class)
+class TtlSchedulerTests {
 
-	@Autowired
-	private ConsulClient consul;
+	@Mock
+	private HeartbeatProperties heartbeatProperties;
+
+	@Mock
+	private ConsulDiscoveryProperties discoveryProperties;
+
+	@Mock
+	private ConsulClient client;
+
+	@Mock
+	private ApplicationStatusProvider applicationStatusProvider;
+
+	private TtlScheduler ttlScheduler;
+
+	@BeforeEach
+	void setup() {
+		StaticListableBeanFactory beanFactory = new StaticListableBeanFactory(
+				Collections.singletonMap("applicationStatusProvider", applicationStatusProvider));
+		ttlScheduler = new TtlScheduler(heartbeatProperties, discoveryProperties, client,
+				ReregistrationPredicate.DEFAULT, beanFactory.getBeanProvider(ApplicationStatusProvider.class));
+		when(heartbeatProperties.computeHeartbeatInterval()).thenReturn(Duration.ofMillis(2000));
+	}
 
 	@Test
-	public void should_send_a_check_before_ttl_for_all_services() throws InterruptedException {
-		Thread.sleep(2100); // Wait for TTL to expired (TTL is set to 2 seconds)
-
-		Check serviceCheck = getCheckForService("ttlScheduler");
-		assertThat(serviceCheck).isNotNull();
-		assertThat(serviceCheck.getStatus()).isEqualTo(PASSING).as("Service check is in wrong state");
-		Check serviceManagementCheck = getCheckForService("ttlScheduler-management");
-		assertThat(serviceManagementCheck).isNotNull();
-		assertThat(serviceManagementCheck.getStatus()).isEqualTo(PASSING)
-				.as("Service management check is in wrong state");
+	void agentCheckIsReportedProperAmountOfTimes() {
+		String serviceId = addServiceToSchedulerWhenApplicationStatusIs(PASSING);
+		// Wait for 5s and it should have run 3 times as the interval is 2s and it runs
+		// immediately when added
+		awaitFor(Duration.ofSeconds(5));
+		verify(client, times(3)).agentCheckPass("service:" + serviceId);
 	}
 
-	private Check getCheckForService(String serviceId) {
-		Response<List<Check>> checkResponse = this.consul.getHealthChecksForService(serviceId,
-				HealthChecksForServiceRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
-		if (checkResponse.getValue().size() > 0) {
-			return checkResponse.getValue().get(0);
-		}
-		return null;
+	@Test
+	void agentCheckPassGetsCalledWhenApplicationStatusIsPassing() {
+		String serviceId = addServiceToSchedulerWhenApplicationStatusIs(PASSING);
+		verify(client).agentCheckPass("service:" + serviceId);
 	}
 
-	@Configuration(proxyBeanMethods = false)
-	@EnableAutoConfiguration
-	@Import({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
-			ConsulDiscoveryClientConfiguration.class, ConsulHeartbeatAutoConfiguration.class })
-	public static class TtlSchedulerTestConfig {
+	@Test
+	void agentCheckWarnGetsCalledWhenApplicationStatusIsWarning() {
+		String serviceId = addServiceToSchedulerWhenApplicationStatusIs(WARNING);
+		verify(client).agentCheckWarn("service:" + serviceId);
+	}
 
+	@Test
+	void agentCheckFailGetsCalledWhenApplicationStatusIsCritical() {
+		String serviceId = addServiceToSchedulerWhenApplicationStatusIs(CRITICAL);
+		verify(client).agentCheckFail("service:" + serviceId);
+	}
+
+	private String addServiceToSchedulerWhenApplicationStatusIs(CheckStatus checkStatus) {
+		String serviceId = "svc-" + checkStatus.name();
+		when(applicationStatusProvider.currentStatus()).thenReturn(checkStatus);
+		ttlScheduler.add(serviceId);
+		// The scheduler runs immediately after the add(serviceId) - pause for 500ms
+		awaitFor(Duration.ofMillis(500));
+		verify(applicationStatusProvider).currentStatus();
+		return serviceId;
+	}
+
+	private void awaitFor(Duration duration) {
+		await().pollDelay(duration).until(() -> true);
 	}
 
 }

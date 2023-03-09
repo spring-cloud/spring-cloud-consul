@@ -37,6 +37,7 @@ import org.springframework.boot.context.config.Profiles;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.boot.logging.DeferredLogFactory;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.config.ConsulPropertySources.Context;
@@ -64,8 +65,8 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 
 	private final Log log;
 
-	public ConsulConfigDataLocationResolver(Log log) {
-		this.log = log;
+	public ConsulConfigDataLocationResolver(DeferredLogFactory logFactory) {
+		this.log = logFactory.getLog(ConsulConfigDataLocationResolver.class);
 	}
 
 	@Override
@@ -184,7 +185,8 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 	protected ConsulClient createConsulClient(BootstrapContext context) {
 		ConsulProperties properties = context.get(ConsulProperties.class);
 
-		return ConsulAutoConfiguration.createConsulClient(properties);
+		return ConsulAutoConfiguration.createConsulClient(properties,
+				ConsulAutoConfiguration.createConsulRawClientBuilder());
 	}
 
 	protected ConsulProperties loadProperties(ConfigDataLocationResolverContext resolverContext,
@@ -213,8 +215,14 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 				.bind(ConsulConfigProperties.PREFIX, Bindable.of(ConsulConfigProperties.class), bindHandler)
 				.orElseGet(ConsulConfigProperties::new);
 
-		if (ObjectUtils.isEmpty(properties.getName())) {
+
+		if (!StringUtils.hasText(properties.getName())) {
 			properties.setName(binder.bind("spring.application.name", String.class).orElse("application"));
+		}
+
+		if (!StringUtils.hasText(properties.getAclToken())) {
+			properties.setAclToken(binder.bind("spring.cloud.consul.token", String.class)
+					.orElse(binder.bind("consul.token", String.class).orElse(null)));
 		}
 		return properties;
 	}

@@ -24,8 +24,6 @@ import org.junit.rules.ExpectedException;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
-import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.MessageChannel;
 
@@ -57,14 +55,14 @@ public class ConsulBinderConfigurationTests {
 
 	interface Events {
 
-		@Output
+		// @Output
 		MessageChannel purchases();
 
 	}
 
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
-	@EnableBinding(Events.class)
+	// @EnableBinding(Events.class)
 	public static class Application {
 
 	}

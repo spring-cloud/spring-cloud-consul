@@ -12,7 +12,7 @@
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
 		<artifactId>spring-cloud-consul-integration-tests</artifactId>
-		<version>3.1.0-SNAPSHOT</version>
+		<version>4.0.2-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
@@ -69,7 +69,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>testcontainers</artifactId>
+			<artifactId>consul</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

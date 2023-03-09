@@ -16,9 +16,8 @@
 
 package org.springframework.cloud.consul;
 
-import javax.validation.constraints.NotNull;
-
 import com.ecwid.consul.transport.TLSConfig.KeyStoreInstanceType;
+import jakarta.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.style.ToStringCreator;

@@ -19,7 +19,7 @@ package org.springframework.cloud.consul.serviceregistry;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.util.StringUtils;

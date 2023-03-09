@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.discovery.configclient;
 
+import java.util.Collections;
+
 import com.ecwid.consul.v1.ConsulClient;
 
 import org.springframework.boot.BootstrapRegistry;
@@ -29,6 +31,7 @@ import org.springframework.cloud.config.client.ConfigClientProperties;
 import org.springframework.cloud.config.client.ConfigServerInstanceProvider;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.discovery.ConditionalOnConsulDiscoveryEnabled;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.util.ClassUtils;
@@ -56,7 +59,8 @@ public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitiali
 				return null;
 			}
 			ConsulProperties consulProperties = context.get(ConsulProperties.class);
-			return ConsulAutoConfiguration.createConsulClient(consulProperties);
+			return ConsulAutoConfiguration.createConsulClient(consulProperties,
+					ConsulAutoConfiguration.createConsulRawClientBuilder());
 		});
 		registry.registerIfAbsent(ConsulDiscoveryClient.class, context -> {
 			Binder binder = context.get(Binder.class);
@@ -83,7 +87,7 @@ public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitiali
 		});
 		registry.registerIfAbsent(ConfigServerInstanceProvider.Function.class, context -> {
 			if (!isDiscoveryEnabled(context.get(Binder.class))) {
-				return null;
+				return (id) -> Collections.emptyList();
 			}
 			ConsulDiscoveryClient discoveryClient = context.get(ConsulDiscoveryClient.class);
 			return discoveryClient::getInstances;
@@ -96,7 +100,9 @@ public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitiali
 	}
 
 	private boolean isDiscoveryEnabled(Binder binder) {
-		return binder.bind(ConfigClientProperties.CONFIG_DISCOVERY_ENABLED, Boolean.class).orElse(false);
+		return binder.bind(ConfigClientProperties.CONFIG_DISCOVERY_ENABLED, Boolean.class).orElse(false)
+				&& binder.bind(ConditionalOnConsulDiscoveryEnabled.PROPERTY, Boolean.class).orElse(true)
+				&& binder.bind("spring.cloud.discovery.enabled", Boolean.class).orElse(true);
 	}
 
 }

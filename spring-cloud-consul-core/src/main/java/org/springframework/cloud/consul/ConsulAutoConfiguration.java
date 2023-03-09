@@ -16,9 +16,12 @@
 
 package org.springframework.cloud.consul;
 
+import java.util.function.Supplier;
+
 import com.ecwid.consul.transport.TLSConfig;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.ConsulRawClient;
+import com.ecwid.consul.v1.ConsulRawClient.Builder;
 import org.aspectj.lang.annotation.Aspect;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
@@ -53,17 +56,29 @@ public class ConsulAutoConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnMissingBean
-	public ConsulClient consulClient(ConsulProperties consulProperties) {
-		return createConsulClient(consulProperties);
+	@ConditionalOnMissingBean(value = ConsulRawClient.Builder.class, parameterizedContainer = Supplier.class)
+	public Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier() {
+		return createConsulRawClientBuilder();
 	}
 
-	public static ConsulClient createConsulClient(ConsulProperties consulProperties) {
+	@Bean
+	@ConditionalOnMissingBean
+	public ConsulClient consulClient(ConsulProperties consulProperties,
+			Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
+		return createConsulClient(consulProperties, consulRawClientBuilderSupplier);
+	}
+
+	public static Supplier<Builder> createConsulRawClientBuilder() {
+		return Builder::builder;
+	}
+
+	public static ConsulClient createConsulClient(ConsulProperties consulProperties,
+			Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
+		ConsulRawClient.Builder builder = consulRawClientBuilderSupplier.get();
 		final String agentPath = consulProperties.getPath();
 		final String agentHost = StringUtils.hasLength(consulProperties.getScheme())
 				? consulProperties.getScheme() + "://" + consulProperties.getHost() : consulProperties.getHost();
-		final ConsulRawClient.Builder builder = ConsulRawClient.Builder.builder().setHost(agentHost)
-				.setPort(consulProperties.getPort());
+		builder.setHost(agentHost).setPort(consulProperties.getPort());
 
 		if (consulProperties.getTls() != null) {
 			ConsulProperties.TLSConfig tls = consulProperties.getTls();
