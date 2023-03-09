@@ -35,10 +35,27 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 
 	static final Logger logger = LoggerFactory.getLogger(ConsulTestcontainers.class);
 
-	public static GenericContainer<?> consul = new GenericContainer<>("consul:1.7.2")
-			.withLogConsumer(new Slf4jLogConsumer(logger).withSeparateOutputStreams())
-			.waitingFor(Wait.forHttp("/v1/status/leader")).withExposedPorts(8500)
-			.withCommand("agent", "-dev", "-server", "-bootstrap", "-client", "0.0.0.0", "-log-level", "trace");
+	/**
+	 * Default consul port.
+	 */
+	public static final int DEFAULT_PORT = 8500;
+
+	/**
+	 * Shared consul container.
+	 */
+	public static GenericContainer<?> consul = createConsulContainer();
+
+	public static GenericContainer<?> createConsulContainer() {
+		return createConsulContainer("1.7");
+	}
+
+	public static GenericContainer<?> createConsulContainer(String consulVersion) {
+		String dockerImageName = "consul:" + consulVersion;
+		return new GenericContainer<>(dockerImageName)
+				.withLogConsumer(new Slf4jLogConsumer(logger).withSeparateOutputStreams())
+				.waitingFor(Wait.forHttp("/v1/status/leader")).withExposedPorts(DEFAULT_PORT)
+				.withCommand("agent", "-dev", "-server", "-bootstrap", "-client", "0.0.0.0", "-log-level", "trace");
+	}
 
 	@Override
 	public void initialize(ConfigurableApplicationContext context) {
@@ -47,7 +64,7 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 		MutablePropertySources sources = context.getEnvironment().getPropertySources();
 
 		if (!sources.contains("consulTestcontainer")) {
-			Integer mappedPort = consul.getMappedPort(8500);
+			Integer mappedPort = consul.getMappedPort(DEFAULT_PORT);
 			HashMap<String, Object> map = new HashMap<>();
 			map.put(ConsulProperties.PREFIX + ".port", String.valueOf(mappedPort));
 			map.put(ConsulProperties.PREFIX + ".host", consul.getHost());
