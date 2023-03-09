@@ -137,8 +137,9 @@ public class ConsulHeartbeatTaskTests {
 	@Test
 	public void eligibleForReRegistrationWith404() {
 		TtlScheduler ttlScheduler = new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient,
-				ReregistrationPredicate.DEFAULT);
-		ConsulHeartbeatTask consulHeartbeatTask = new ConsulHeartbeatTask(serviceId, ttlScheduler);
+				ReregistrationPredicate.DEFAULT, applicationStatusProviders);
+		ConsulHeartbeatTask consulHeartbeatTask = new ConsulHeartbeatTask(serviceId, ttlScheduler,
+				() -> Check.CheckStatus.PASSING);
 		heartbeatProperties.setReregisterServiceOnFailure(true);
 		NewService service = new NewService();
 		service.setId(serviceId);
