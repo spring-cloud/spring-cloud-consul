@@ -33,7 +33,8 @@ public interface ReregistrationPredicate {
 	boolean isEligible(OperationException e);
 
 	/**
-	 * Default implementation that performs re-registration when the status code is either 404 or 500.
+	 * Default implementation that performs re-registration when the status code is either
+	 * 404 or 500.
 	 */
 	ReregistrationPredicate DEFAULT = e -> (e.getStatusCode() == 404 || e.getStatusCode() == 500);
 

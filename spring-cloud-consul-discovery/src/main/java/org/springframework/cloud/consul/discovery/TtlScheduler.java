@@ -128,15 +128,18 @@ public class TtlScheduler {
 			CheckStatus status = statusSupplier.get();
 			switch (status) {
 				case PASSING:
-					possiblyReregisterIfFails(() -> client.agentCheckPass(checkId));
+					possiblyReregisterIfFails(() -> client.agentCheckPass(checkId, null,
+							this.ttlScheduler.discoveryProperties.getAclToken()));
 					logHeartbeatSent(status);
 					break;
 				case WARNING:
-					possiblyReregisterIfFails(() -> client.agentCheckWarn(checkId));
+					possiblyReregisterIfFails(() -> client.agentCheckWarn(checkId, null,
+							this.ttlScheduler.discoveryProperties.getAclToken()));
 					logHeartbeatSent(status);
 					break;
 				case CRITICAL:
-					possiblyReregisterIfFails(() -> client.agentCheckFail(checkId));
+					possiblyReregisterIfFails(() -> client.agentCheckFail(checkId, null,
+							this.ttlScheduler.discoveryProperties.getAclToken()));
 					logHeartbeatSent(status);
 					break;
 				default:
