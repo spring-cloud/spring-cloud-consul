@@ -35,7 +35,6 @@ import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.support.ConsulHeartbeatAutoConfiguration;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
-import org.springframework.cloud.consul.test.TestConsulClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -61,10 +60,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 public class TtlSchedulerTests {
 
 	@Autowired
-	private ConsulClient consul;
-
-	@Autowired
-	private AtomicBoolean agentCheckPassWithTokenCalled;
+	private TestConsulClient consul;
 
 	@Test
 	public void should_send_a_check_before_ttl_for_all_services() throws InterruptedException {
@@ -77,7 +73,7 @@ public class TtlSchedulerTests {
 		assertThat(serviceManagementCheck).isNotNull();
 		assertThat(serviceManagementCheck.getStatus()).isEqualTo(PASSING)
 				.as("Service management check is in wrong state");
-		assertThat(agentCheckPassWithTokenCalled).isTrue();
+		assertThat(consul.agentCheckPassWithTokenCalled).isTrue();
 	}
 
 	private Check getCheckForService(String serviceId) {
@@ -96,23 +92,24 @@ public class TtlSchedulerTests {
 	public static class TtlSchedulerTestConfig {
 
 		@Bean
-		AtomicBoolean agentCheckPassWithTokenCalled() {
-			return new AtomicBoolean();
-		}
-
-		@Bean
 		@Primary
-		ConsulClient testConsulClient(ConsulProperties consulProperties, AtomicBoolean agentCheckPassWithTokenCalled) {
-			ConsulClient consulClient = ConsulAutoConfiguration.createConsulClient(consulProperties);
-			return new TestConsulClient(consulClient) {
-				@Override
-				public Response<Void> agentCheckPass(String checkId, String note, String token) {
-					agentCheckPassWithTokenCalled.compareAndSet(false, true);
-					return super.agentCheckPass(checkId, note, token);
-				}
-			};
+		TestConsulClient testConsulClient(ConsulProperties consulProperties) {
+			return new TestConsulClient(consulProperties);
 		}
 
 	}
 
+	static class TestConsulClient extends ConsulClient {
+		boolean agentCheckPassWithTokenCalled;
+
+		TestConsulClient(ConsulProperties properties) {
+			super(properties.getHost(), properties.getPort());
+		}
+
+		@Override
+		public Response<Void> agentCheckPass(String checkId, String note, String token) {
+			agentCheckPassWithTokenCalled = true;
+			return super.agentCheckPass(checkId, note, token);
+		}
+	}
 }
