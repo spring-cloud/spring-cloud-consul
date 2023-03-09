@@ -135,6 +135,21 @@ public class ConsulHeartbeatTaskTests {
 	}
 
 	@Test
+	public void eligibleForReRegistrationWith404() {
+		TtlScheduler ttlScheduler = new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient,
+				ReregistrationPredicate.DEFAULT);
+		ConsulHeartbeatTask consulHeartbeatTask = new ConsulHeartbeatTask(serviceId, ttlScheduler);
+		heartbeatProperties.setReregisterServiceOnFailure(true);
+		NewService service = new NewService();
+		service.setId(serviceId);
+		ttlScheduler.add(service);
+		OperationException operationException = new OperationException(404, "Internal Server Error",
+				"CheckID \"service:service-A\" does not have associated TTL");
+		given(consulClient.agentCheckPass("service:" + serviceId)).willThrow(operationException);
+		consulHeartbeatTask.run();
+	}
+
+	@Test
 	public void notEligibleForReRegistration() {
 		TtlScheduler ttlScheduler = new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient,
 				ReregistrationPredicate.DEFAULT, applicationStatusProviders);
