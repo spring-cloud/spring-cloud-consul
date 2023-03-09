@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.cloud.consul.discovery;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -31,10 +32,14 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.support.ConsulHeartbeatAutoConfiguration;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
+import org.springframework.cloud.consul.test.TestConsulClient;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -58,6 +63,9 @@ public class TtlSchedulerTests {
 	@Autowired
 	private ConsulClient consul;
 
+	@Autowired
+	private AtomicBoolean agentCheckPassWithTokenCalled;
+
 	@Test
 	public void should_send_a_check_before_ttl_for_all_services() throws InterruptedException {
 		Thread.sleep(2100); // Wait for TTL to expired (TTL is set to 2 seconds)
@@ -69,6 +77,7 @@ public class TtlSchedulerTests {
 		assertThat(serviceManagementCheck).isNotNull();
 		assertThat(serviceManagementCheck.getStatus()).isEqualTo(PASSING)
 				.as("Service management check is in wrong state");
+		assertThat(agentCheckPassWithTokenCalled).isTrue();
 	}
 
 	private Check getCheckForService(String serviceId) {
@@ -85,6 +94,24 @@ public class TtlSchedulerTests {
 	@Import({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulDiscoveryClientConfiguration.class, ConsulHeartbeatAutoConfiguration.class })
 	public static class TtlSchedulerTestConfig {
+
+		@Bean
+		AtomicBoolean agentCheckPassWithTokenCalled() {
+			return new AtomicBoolean();
+		}
+
+		@Bean
+		@Primary
+		ConsulClient testConsulClient(ConsulProperties consulProperties, AtomicBoolean agentCheckPassWithTokenCalled) {
+			ConsulClient consulClient = ConsulAutoConfiguration.createConsulClient(consulProperties);
+			return new TestConsulClient(consulClient) {
+				@Override
+				public Response<Void> agentCheckPass(String checkId, String note, String token) {
+					agentCheckPassWithTokenCalled.compareAndSet(false, true);
+					return super.agentCheckPass(checkId, note, token);
+				}
+			};
+		}
 
 	}
 

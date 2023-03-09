@@ -110,7 +110,8 @@ public class TtlScheduler {
 		@Override
 		public void run() {
 			try {
-				this.ttlScheduler.client.agentCheckPass(this.checkId, null, this.ttlScheduler.discoveryProperties.getAclToken());
+				this.ttlScheduler.client.agentCheckPass(this.checkId, null,
+						this.ttlScheduler.discoveryProperties.getAclToken());
 				if (log.isDebugEnabled()) {
 					log.debug("Sending consul heartbeat for: " + this.checkId);
 				}
