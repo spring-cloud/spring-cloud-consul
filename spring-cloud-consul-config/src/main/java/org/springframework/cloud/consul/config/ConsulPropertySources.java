@@ -65,8 +65,10 @@ public class ConsulPropertySources {
 			for (String suffix : suffixes) {
 				contexts.add(new Context(defaultContext + suffix));
 			}
-			for (String suffix : suffixes) {
-				addProfiles(contexts, defaultContext, profiles, suffix);
+			if (properties.isProfileEnabled()) {
+				for (String suffix : suffixes) {
+					addProfiles(contexts, defaultContext, profiles, suffix);
+				}
 			}
 
 			// getName() defaults to ${spring.application.name} or application
@@ -75,8 +77,10 @@ public class ConsulPropertySources {
 			for (String suffix : suffixes) {
 				contexts.add(new Context(baseContext + suffix));
 			}
-			for (String suffix : suffixes) {
-				addProfiles(contexts, baseContext, profiles, suffix);
+			if (properties.isProfileEnabled()) {
+				for (String suffix : suffixes) {
+					addProfiles(contexts, baseContext, profiles, suffix);
+				}
 			}
 		}
 		if (reverse) {

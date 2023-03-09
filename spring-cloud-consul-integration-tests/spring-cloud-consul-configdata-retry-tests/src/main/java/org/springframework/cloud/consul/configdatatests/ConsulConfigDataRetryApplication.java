@@ -22,6 +22,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * @author Spencer Gibb
  */
+@SuppressWarnings({ "checkstyle:hideutilityclassconstructor" })
 @SpringBootApplication
 public class ConsulConfigDataRetryApplication {
 

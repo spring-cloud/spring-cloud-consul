@@ -47,9 +47,15 @@ import static org.hamcrest.Matchers.isA;
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoServiceRegistrationRetryTests {
 
+	/**
+	 * the exception.
+	 */
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
+	/**
+	 * the output.
+	 */
 	@Rule
 	public OutputCaptureRule output = new OutputCaptureRule();
 

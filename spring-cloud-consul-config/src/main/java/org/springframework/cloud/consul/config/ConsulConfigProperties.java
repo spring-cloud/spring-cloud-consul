@@ -80,6 +80,8 @@ public class ConsulConfigProperties {
 	 */
 	private String name;
 
+	private boolean profileEnabled = true;
+
 	public ConsulConfigProperties() {
 	}
 
@@ -189,12 +191,21 @@ public class ConsulConfigProperties {
 		this.name = name;
 	}
 
+	public boolean isProfileEnabled() {
+		return profileEnabled;
+	}
+
+	public void setProfileEnabled(boolean profileEnabled) {
+		this.profileEnabled = profileEnabled;
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("enabled", this.enabled).append("prefixes", this.prefixes)
 				.append("defaultContext", this.defaultContext).append("profileSeparator", this.profileSeparator)
 				.append("format", this.format).append("dataKey", this.dataKey).append("aclToken", this.aclToken)
-				.append("watch", this.watch).append("failFast", this.failFast).append("name", this.name).toString();
+				.append("watch", this.watch).append("failFast", this.failFast).append("name", this.name)
+				.append("profileEnabled", this.profileEnabled).toString();
 	}
 
 	/**

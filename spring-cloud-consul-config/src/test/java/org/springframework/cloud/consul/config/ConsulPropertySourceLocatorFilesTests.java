@@ -41,24 +41,54 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 public class ConsulPropertySourceLocatorFilesTests {
 
+	/**
+	 * the prefix.
+	 */
 	public static final String PREFIX = "_propertySourceLocatorFilesTests_config__";
 
+	/**
+	 * the ROOT.
+	 */
 	public static final String ROOT = PREFIX + UUID.randomUUID();
 
+	/**
+	 * the spring app name.
+	 */
 	public static final String APP_NAME = "testFilesFormat";
 
+	/**
+	 * the config file for the application in YAML.
+	 */
 	public static final String APPLICATION_YML = "/application.yml";
 
+	/**
+	 * the dev profile config for the application in YAML.
+	 */
 	public static final String APPLICATION_DEV_YML = "/application-dev.yaml";
 
+	/**
+	 * the config file in properties.
+	 */
 	public static final String APP_NAME_PROPS = "/" + APP_NAME + ".properties";
 
+	/**
+	 * the dev profile config file in properties.
+	 */
 	public static final String APP_NAME_DEV_PROPS = "/" + APP_NAME + "-dev.properties";
 
+	/**
+	 * the spring app context.
+	 */
 	private ConfigurableApplicationContext context;
 
+	/**
+	 * the env.
+	 */
 	private ConfigurableEnvironment environment;
 
+	/**
+	 * the consul client for test.
+	 */
 	private ConsulClient client;
 
 	@Before

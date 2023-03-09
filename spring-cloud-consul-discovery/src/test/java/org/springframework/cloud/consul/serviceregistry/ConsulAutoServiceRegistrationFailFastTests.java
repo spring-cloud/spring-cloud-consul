@@ -44,6 +44,9 @@ import static org.hamcrest.Matchers.isA;
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoServiceRegistrationFailFastTests {
 
+	/**
+	 * the exception.
+	 */
 	@Rule
 	public ExpectedException exception = ExpectedException.none();
 
