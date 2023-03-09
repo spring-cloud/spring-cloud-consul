@@ -37,8 +37,8 @@ import org.springframework.context.SmartLifecycle;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
 
@@ -150,7 +150,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 				// use the consul ACL token if found
 				String aclToken = this.properties.getAclToken();
-				if (StringUtils.isEmpty(aclToken)) {
+				if (ObjectUtils.isEmpty(aclToken)) {
 					aclToken = null;
 				}
 

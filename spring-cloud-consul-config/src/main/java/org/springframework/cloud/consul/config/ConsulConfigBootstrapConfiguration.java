@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.env.Environment;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author Spencer Gibb
@@ -51,7 +51,7 @@ public class ConsulConfigBootstrapConfiguration {
 		@ConditionalOnMissingBean
 		public ConsulConfigProperties consulConfigProperties(Environment env) {
 			ConsulConfigProperties properties = new ConsulConfigProperties();
-			if (StringUtils.isEmpty(properties.getName())) {
+			if (ObjectUtils.isEmpty(properties.getName())) {
 				properties.setName(env.getProperty("spring.application.name", "application"));
 			}
 			return properties;

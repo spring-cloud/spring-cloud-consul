@@ -25,7 +25,7 @@ import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationP
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
+import org.springframework.util.ObjectUtils;
 
 /**
  * @author Spencer Gibb
@@ -119,7 +119,7 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 	@SuppressWarnings("deprecation")
 	protected String getAppName() {
 		String appName = this.properties.getServiceName();
-		return StringUtils.isEmpty(appName) ? super.getAppName() : appName;
+		return ObjectUtils.isEmpty(appName) ? super.getAppName() : appName;
 	}
 
 	@Override

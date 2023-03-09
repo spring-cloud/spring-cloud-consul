@@ -34,6 +34,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -197,10 +198,10 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		}
 
 		// add metadata from other properties. See createTags above.
-		if (!StringUtils.isEmpty(properties.getInstanceZone())) {
+		if (!ObjectUtils.isEmpty(properties.getInstanceZone())) {
 			metadata.put(properties.getDefaultZoneMetadataName(), properties.getInstanceZone());
 		}
-		if (!StringUtils.isEmpty(properties.getInstanceGroup())) {
+		if (!ObjectUtils.isEmpty(properties.getInstanceGroup())) {
 			metadata.put("group", properties.getInstanceGroup());
 		}
 

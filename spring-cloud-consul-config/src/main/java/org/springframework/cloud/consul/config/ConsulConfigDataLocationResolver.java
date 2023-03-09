@@ -44,6 +44,7 @@ import org.springframework.cloud.consul.config.ConsulPropertySources.Context;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -213,6 +214,7 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		ConsulConfigProperties properties = binder
 				.bind(ConsulConfigProperties.PREFIX, Bindable.of(ConsulConfigProperties.class), bindHandler)
 				.orElseGet(ConsulConfigProperties::new);
+
 
 		if (!StringUtils.hasText(properties.getName())) {
 			properties.setName(binder.bind("spring.application.name", String.class).orElse("application"));
