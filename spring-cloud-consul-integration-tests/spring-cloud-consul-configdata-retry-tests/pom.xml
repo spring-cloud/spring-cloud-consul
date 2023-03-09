@@ -69,7 +69,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>testcontainers</artifactId>
+			<artifactId>consul</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

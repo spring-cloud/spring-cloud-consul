@@ -21,7 +21,7 @@ import java.util.List;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.agent.model.NewService;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.consul.ConsulContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -54,11 +54,11 @@ public class ConsulDiscoveryClientNoPortTests {
 
 	// 1.10 introduces different data for port
 	@Container
-	static GenericContainer<?> consul = ConsulTestcontainers.createConsulContainer("1.10");
+	static ConsulContainer consul = ConsulTestcontainers.createConsulContainer("1.10");
 
 	@DynamicPropertySource
 	static void consulProperties(DynamicPropertyRegistry registry) {
-		registry.add(ConsulProperties.PREFIX + ".host", consul::getContainerIpAddress);
+		registry.add(ConsulProperties.PREFIX + ".host", consul::getHost);
 		registry.add(ConsulProperties.PREFIX + ".port", () -> consul.getMappedPort(ConsulTestcontainers.DEFAULT_PORT));
 	}
 
