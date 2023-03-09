@@ -76,25 +76,25 @@ class TtlSchedulerTests {
 		// Wait for 5s and it should have run 3 times as the interval is 2s and it runs
 		// immediately when added
 		awaitFor(Duration.ofSeconds(5));
-		verify(client, times(3)).agentCheckPass("service:" + serviceId);
+		verify(client, times(3)).agentCheckPass("service:" + serviceId, null, null);
 	}
 
 	@Test
 	void agentCheckPassGetsCalledWhenApplicationStatusIsPassing() {
 		String serviceId = addServiceToSchedulerWhenApplicationStatusIs(PASSING);
-		verify(client).agentCheckPass("service:" + serviceId);
+		verify(client).agentCheckPass("service:" + serviceId, null, null);
 	}
 
 	@Test
 	void agentCheckWarnGetsCalledWhenApplicationStatusIsWarning() {
 		String serviceId = addServiceToSchedulerWhenApplicationStatusIs(WARNING);
-		verify(client).agentCheckWarn("service:" + serviceId);
+		verify(client).agentCheckWarn("service:" + serviceId, null, null);
 	}
 
 	@Test
 	void agentCheckFailGetsCalledWhenApplicationStatusIsCritical() {
 		String serviceId = addServiceToSchedulerWhenApplicationStatusIs(CRITICAL);
-		verify(client).agentCheckFail("service:" + serviceId);
+		verify(client).agentCheckFail("service:" + serviceId, null, null);
 	}
 
 	private String addServiceToSchedulerWhenApplicationStatusIs(CheckStatus checkStatus) {
