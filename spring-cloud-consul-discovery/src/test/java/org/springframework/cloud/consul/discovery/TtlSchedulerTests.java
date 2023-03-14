@@ -17,7 +17,6 @@
 package org.springframework.cloud.consul.discovery;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
@@ -100,6 +99,7 @@ public class TtlSchedulerTests {
 	}
 
 	static class TestConsulClient extends ConsulClient {
+
 		boolean agentCheckPassWithTokenCalled;
 
 		TestConsulClient(ConsulProperties properties) {
@@ -111,5 +111,7 @@ public class TtlSchedulerTests {
 			agentCheckPassWithTokenCalled = true;
 			return super.agentCheckPass(checkId, note, token);
 		}
+
 	}
+
 }
