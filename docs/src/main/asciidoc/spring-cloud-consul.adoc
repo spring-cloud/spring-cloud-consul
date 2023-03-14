@@ -146,10 +146,10 @@ Further customization is possible via following properties:
 /** Port to register the management service under (defaults to management port) */
 spring.cloud.consul.discovery.management-port
 
-/** Suffix to use when registering management service (defaults to "management" */
+/** Suffix to use when registering management service (defaults to "management") */
 spring.cloud.consul.discovery.management-suffix
 
-/** Tags to use when registering management service (defaults to "management" */
+/** Tags to use when registering management service (defaults to "management") */
 spring.cloud.consul.discovery.management-tags
 ----
 
