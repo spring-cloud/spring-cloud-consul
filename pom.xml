@@ -20,7 +20,7 @@
 	</parent>
 
 	<properties>
-		<spring-cloud-bus.version>4.0.1</spring-cloud-bus.version>
+		<spring-cloud-bus.version>4.0.2-SNAPSHOT</spring-cloud-bus.version>
 		<spring-cloud-commons.version>4.0.3-SNAPSHOT</spring-cloud-commons.version>
 		<spring-cloud-config.version>4.0.3-SNAPSHOT</spring-cloud-config.version>
 		<spring-cloud-deployer.version>1.0.3.RELEASE</spring-cloud-deployer.version>
