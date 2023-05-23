@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.ecwid.consul.transport.TransportException;
+import org.apache.commons.logging.Log;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.BootstrapRegistry;
@@ -30,6 +31,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.bind.BindContext;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.cloud.config.client.ConfigServerInstanceProvider;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
@@ -37,6 +39,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 public class ConsulConfigServerBootstrapperTests {
 
@@ -47,37 +50,41 @@ public class ConsulConfigServerBootstrapperTests {
 				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
 							.get(ConfigServerInstanceProvider.Function.class);
-					assertThat(providerFn.apply("id"))
-							.as("ConfigServerInstanceProvider.Function should return empty list")
-							.isEqualTo(Collections.EMPTY_LIST);
+					Log log = mock(Log.class);
+					assertThat(providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
+							event.getBootstrapContext().get(BindHandler.class), log))
+									.as("ConfigServerInstanceProvider.Function should return empty list")
+									.isEqualTo(Collections.EMPTY_LIST);
 				})).run().close();
 	}
 
 	@Test
 	public void consulDiscoveryClientNotEnabledProvidesEmptyList() {
 		new SpringApplicationBuilder(TestConfig.class)
-				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false",
-						"spring.cloud.config.discovery.enabled=true", "spring.cloud.consul.discovery.enabled=false")
+				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false")
 				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
 							.get(ConfigServerInstanceProvider.Function.class);
-					assertThat(providerFn.apply("id"))
-							.as("ConfigServerInstanceProvider.Function should return empty list")
-							.isEqualTo(Collections.EMPTY_LIST);
+					Log log = mock(Log.class);
+					assertThat(providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
+							event.getBootstrapContext().get(BindHandler.class), log))
+									.as("ConfigServerInstanceProvider.Function should return empty list")
+									.isEqualTo(Collections.EMPTY_LIST);
 				})).run().close();
 	}
 
 	@Test
 	public void springCloudDiscoveryClientNotEnabledProvidesEmptyList() {
 		new SpringApplicationBuilder(TestConfig.class)
-				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false",
-						"spring.cloud.config.discovery.enabled=true", "spring.cloud.discovery.enabled=false")
+				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false")
 				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
 							.get(ConfigServerInstanceProvider.Function.class);
-					assertThat(providerFn.apply("id"))
-							.as("ConfigServerInstanceProvider.Function should return empty list")
-							.isEqualTo(Collections.EMPTY_LIST);
+					Log log = mock(Log.class);
+					assertThat(providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
+							event.getBootstrapContext().get(BindHandler.class), log))
+									.as("ConfigServerInstanceProvider.Function should return empty list")
+									.isEqualTo(Collections.EMPTY_LIST);
 				})).run().close();
 	}
 
@@ -88,17 +95,19 @@ public class ConsulConfigServerBootstrapperTests {
 		ConfigurableApplicationContext context = new SpringApplicationBuilder(TestConfig.class)
 				.properties("--server.port=0", "spring.cloud.config.discovery.enabled=true",
 						"spring.cloud.consul.discovery.hostname=myhost",
-						"spring.cloud.service-registry.auto-registration.enabled=false",
-						"spring.cloud.consul.host=localhost")
+						"spring.cloud.service-registry.auto-registration.enabled=false")
 				.addBootstrapRegistryInitializer(bindHandlerBootstrapper)
 				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
 					bootstrapDiscoveryClient.set(event.getBootstrapContext().get(ConsulDiscoveryClient.class));
 					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
 							.get(ConfigServerInstanceProvider.Function.class);
-					assertThatThrownBy(() -> providerFn.apply("id")).isInstanceOf(TransportException.class)
-							.hasMessageContaining(
-									"org.apache.http.conn.HttpHostConnectException: Connect to localhost:8500")
-							.as("Should have tried to reach out to Consul to get config server instance").isNotNull();
+					assertThatThrownBy(() -> providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
+							event.getBootstrapContext().get(BindHandler.class), mock(Log.class)))
+									.isInstanceOf(TransportException.class)
+									.hasMessageContaining(
+											"org.apache.http.conn.HttpHostConnectException: Connect to localhost:8500")
+									.as("Should have tried to reach out to Consul to get config server instance")
+									.isNotNull();
 				})).run();
 		ConsulDiscoveryClient discoveryClient = context.getBean(ConsulDiscoveryClient.class);
 		assertThat(discoveryClient == bootstrapDiscoveryClient.get()).isTrue();
