@@ -27,6 +27,7 @@
 		<spring-cloud-openfeign.version>4.0.4-SNAPSHOT</spring-cloud-openfeign.version>
 		<spring-cloud-stream.version>4.0.4-SNAPSHOT</spring-cloud-stream.version>
 		<testcontainers.version>1.17.6</testcontainers.version>
+		<mockserverclient.version>5.15.0</mockserverclient.version>
 	</properties>
 
 	<scm>
@@ -158,6 +159,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.testcontainers</groupId>
+				<artifactId>mockserver</artifactId>
+				<version>${testcontainers.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
 				<artifactId>junit-jupiter</artifactId>
 				<version>${testcontainers.version}</version>
 			</dependency>
@@ -170,6 +176,11 @@
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpcore</artifactId>
 				<version>4.4.16</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mock-server</groupId>
+				<artifactId>mockserver-client-java</artifactId>
+				<version>${mockserverclient.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

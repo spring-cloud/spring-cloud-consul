@@ -17,14 +17,18 @@
 package org.springframework.cloud.consul.discovery.configclient;
 
 import java.util.Collections;
+import java.util.List;
 
 import com.ecwid.consul.v1.ConsulClient;
+import org.apache.commons.logging.Log;
 
+import org.springframework.boot.BootstrapContext;
 import org.springframework.boot.BootstrapRegistry;
 import org.springframework.boot.BootstrapRegistryInitializer;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtilsProperties;
 import org.springframework.cloud.config.client.ConfigClientProperties;
@@ -85,24 +89,67 @@ public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitiali
 						discoveryClient);
 			}
 		});
-		registry.registerIfAbsent(ConfigServerInstanceProvider.Function.class, context -> {
-			if (!isDiscoveryEnabled(context.get(Binder.class))) {
-				return (id) -> Collections.emptyList();
-			}
-			ConsulDiscoveryClient discoveryClient = context.get(ConsulDiscoveryClient.class);
-			return discoveryClient::getInstances;
-		});
 
+		// We need to pass the lambda here so we do not create a new instance of
+		// ConfigServerInstanceProvider.Function
+		// which would result in a ClassNotFoundException when Spring Cloud Config is not
+		// on the classpath
+		registry.registerIfAbsent(ConfigServerInstanceProvider.Function.class, ConsulFunction::new);
 	}
 
 	private BindHandler getBindHandler(org.springframework.boot.BootstrapContext context) {
 		return context.getOrElse(BindHandler.class, null);
 	}
 
-	private boolean isDiscoveryEnabled(Binder binder) {
+	private static boolean isDiscoveryEnabled(Binder binder) {
 		return binder.bind(ConfigClientProperties.CONFIG_DISCOVERY_ENABLED, Boolean.class).orElse(false)
 				&& binder.bind(ConditionalOnConsulDiscoveryEnabled.PROPERTY, Boolean.class).orElse(true)
 				&& binder.bind("spring.cloud.discovery.enabled", Boolean.class).orElse(true);
+	}
+
+	/*
+	 * This Function is executed when loading config data. Because of this we cannot rely
+	 * on the BootstrapContext because Boot has not finished loading all the configuration
+	 * data so if we ask the BootstrapContext for configuration data it will not have it.
+	 * The apply method in this function is passed the Binder and BindHandler from the
+	 * config data context which has the configuration properties that have been loaded so
+	 * far in the config data process.
+	 *
+	 * We will create many of the same beans in this function as we do above in the
+	 * initializer above. We do both to maintain compatibility since we are promoting
+	 * those beans to the main application context.
+	 */
+	static final class ConsulFunction implements ConfigServerInstanceProvider.Function {
+
+		private final BootstrapContext context;
+
+		private ConsulFunction(BootstrapContext context) {
+			this.context = context;
+		}
+
+		@Override
+		public List<ServiceInstance> apply(String serviceId) {
+			return apply(serviceId, null, null, null);
+		}
+
+		@Override
+		public List<ServiceInstance> apply(String serviceId, Binder binder, BindHandler bindHandler, Log log) {
+			if (binder == null || !isDiscoveryEnabled(binder)) {
+				return Collections.emptyList();
+			}
+
+			ConsulProperties consulProperties = binder
+					.bind(ConsulProperties.PREFIX, Bindable.of(ConsulProperties.class), bindHandler)
+					.orElseGet(ConsulProperties::new);
+			ConsulClient consulClient = ConsulAutoConfiguration.createConsulClient(consulProperties);
+			ConsulDiscoveryProperties properties = binder
+					.bind(ConsulDiscoveryProperties.PREFIX, Bindable.of(ConsulDiscoveryProperties.class), bindHandler)
+					.orElseGet(() -> new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties())));
+			ConsulDiscoveryClient discoveryClient = new ConsulDiscoveryClient(consulClient, properties);
+
+			return discoveryClient.getInstances(serviceId);
+		}
+
 	}
 
 }
