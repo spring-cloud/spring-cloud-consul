@@ -141,7 +141,8 @@ public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitiali
 			ConsulProperties consulProperties = binder
 					.bind(ConsulProperties.PREFIX, Bindable.of(ConsulProperties.class), bindHandler)
 					.orElseGet(ConsulProperties::new);
-			ConsulClient consulClient = ConsulAutoConfiguration.createConsulClient(consulProperties);
+			ConsulClient consulClient = ConsulAutoConfiguration.createConsulClient(consulProperties,
+					ConsulAutoConfiguration.createConsulRawClientBuilder());
 			ConsulDiscoveryProperties properties = binder
 					.bind(ConsulDiscoveryProperties.PREFIX, Bindable.of(ConsulDiscoveryProperties.class), bindHandler)
 					.orElseGet(() -> new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties())));

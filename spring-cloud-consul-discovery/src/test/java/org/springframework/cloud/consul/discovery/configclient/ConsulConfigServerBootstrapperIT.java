@@ -73,7 +73,8 @@ public class ConsulConfigServerBootstrapperIT {
 		ConsulProperties consulProperties = new ConsulProperties();
 		consulProperties.setHost(consul.getHost());
 		consulProperties.setPort(consul.getMappedPort(ConsulTestcontainers.DEFAULT_PORT));
-		ConsulClient client = ConsulAutoConfiguration.createConsulClient(consulProperties);
+		ConsulClient client = ConsulAutoConfiguration.createConsulClient(consulProperties,
+				ConsulAutoConfiguration.createConsulRawClientBuilder());
 		NewService newService = new NewService();
 		newService.setId("consul-configserver");
 		newService.setName("consul-configserver");
