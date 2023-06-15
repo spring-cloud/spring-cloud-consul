@@ -93,7 +93,7 @@ public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitiali
 		// ConfigServerInstanceProvider.Function
 		// which would result in a ClassNotFoundException when Spring Cloud Config is not
 		// on the classpath
-		registry.registerIfAbsent(ConfigServerInstanceProvider.Function.class, ConsulFunction::new);
+		registry.registerIfAbsent(ConfigServerInstanceProvider.Function.class, ConsulFunction::create);
 	}
 
 	private BindHandler getBindHandler(org.springframework.boot.BootstrapContext context) {
@@ -124,6 +124,10 @@ public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitiali
 
 		private ConsulFunction(BootstrapContext context) {
 			this.context = context;
+		}
+
+		public static ConsulFunction create(BootstrapContext context) {
+			return new ConsulFunction(context);
 		}
 
 		@Override
