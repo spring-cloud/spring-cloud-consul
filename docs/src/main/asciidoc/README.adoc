@@ -1,13 +1,13 @@
-image::https://circleci.com/gh/spring-cloud/spring-cloud-consul/tree/master.svg?style=svg["CircleCI", link="https://circleci.com/gh/spring-cloud/spring-cloud-consul/tree/master"]
-image::https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/master/graph/badge.svg["Codecov", link="https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/master"]
+image::https://github.com/spring-cloud/spring-cloud-consul/workflows/Build/badge.svg?style=svg["Actions Status", link="https://github.com/spring-cloud/spring-cloud-consul/actions"]
+image::https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/main/graph/badge.svg["Codecov", link="https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/main"]
 
-include::intro.adoc[]
 
-== Quick Start
+[[quick-start]]
+= Quick Start
 
-include::quickstart.adoc[]
 
-== Consul overview
+[[consul-overview]]
+= Consul overview
 
 Features of Consul
 
@@ -20,7 +20,8 @@ Features of Consul
 
 See the https://consul.io/intro/index.html[intro] for more information.
 
-== Spring Cloud Consul Features
+[[spring-cloud-consul-features]]
+= Spring Cloud Consul Features
 
 * Spring Cloud `DiscoveryClient` implementation
 ** supports Spring Cloud Gateway
@@ -28,7 +29,8 @@ See the https://consul.io/intro/index.html[intro] for more information.
 * Consul based `PropertySource` loaded during the 'bootstrap' phase.
 * Spring Cloud Bus implementation based on Consul https://www.consul.io/docs/agent/http/event.html[events]
 
-== Running the sample
+[[running-the-sample]]
+= Running the sample
 
 1. Run `docker-compose up`
 2. Verify consul is running by visiting http://localhost:8500
@@ -38,10 +40,12 @@ See the https://consul.io/intro/index.html[intro] for more information.
 6. run `java -jar spring-cloud-consul-sample/target/spring-cloud-consul-sample-${VERSION}.jar --server.port=8081`
 7. visit http://localhost:8080 again, verify that `{"serviceId":"<yourhost>:8081","host":"<yourhost>","port":8081}` eventually shows up in the results in a round robbin fashion (may take a minute or so).
 
-== Building
+[[building]]
+= Building
 
-include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/building-jdk8.adoc[]
+include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/main/docs/modules/ROOT/pages/building.adoc[]
 
-== Contributing
+[[contributing]]
+= Contributing
 
-include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/contributing.adoc[]
+include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/main/docs/modules/ROOT/pages/contributing.adoc[]

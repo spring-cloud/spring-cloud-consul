@@ -1,8 +1,12 @@
+[[quickstart]]
+= Quick Start
+
 This quick start walks through using Spring Cloud Consul for Service Discovery and Distributed Configuration.
 
 First, run Consul Agent on your machine. Then you can access it and use it as a Service Registry and Configuration source with Spring Cloud Consul.
 
-=== Discovery Client Usage
+[[discovery-client-usage]]
+== Discovery Client Usage
 
 To use these features in an application, you can build it as a Spring Boot application that depends on `spring-cloud-consul-core`.
 The most convenient way to add the dependency is with a Spring Boot starter: `org.springframework.cloud:spring-cloud-starter-consul-discovery`.
@@ -125,7 +129,8 @@ public String serviceUrl() {
 }
 ----
 
-=== Distributed Configuration Usage
+[[distributed-configuration-usage]]
+== Distributed Configuration Usage
 
 To use these features in an application, you can build it as a Spring Boot application that depends on `spring-cloud-consul-core` and `spring-cloud-consul-config`.
 The most convenient way to add the dependency is with a Spring Boot starter: `org.springframework.cloud:spring-cloud-starter-consul-config`.
@@ -224,4 +229,4 @@ public class Application {
 The application retrieves configuration data from Consul.
 
 WARNING: If you use Spring Cloud Consul Config, you need to set the `spring.config.import` property in order to bind to Consul.
-You can read more about it in the <<config-data-import,Spring Boot Config Data Import section>>.
+You can read more about it in the xref:config.adoc#config-data-import[Spring Boot Config Data Import section].
