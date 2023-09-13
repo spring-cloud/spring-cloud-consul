@@ -1,6 +1,5 @@
 [[spring-cloud-consul-retry]]
 = Consul Retry
-:page-section-summary-toc: 1
 
 If you expect that the consul agent may occasionally be unavailable when
 your app starts, you can ask it to keep trying after a failure. You need to add

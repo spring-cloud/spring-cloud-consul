@@ -1,6 +1,6 @@
-name: PROJECT_WITHOUT_SPRING
+name: cloud-consul
 version: true
-title: PROJECT_NAME
+title: spring-cloud-consul
 nav:
   - modules/ROOT/nav.adoc
 ext:

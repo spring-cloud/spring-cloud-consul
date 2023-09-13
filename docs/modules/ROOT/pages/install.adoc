@@ -1,0 +1,14 @@
+[[spring-cloud-consul-install]]
+= Install Consul
+
+// TODO: document using Testcontainers and SpringApplication.from()
+
+Please see the https://www.consul.io/intro/getting-started/install.html[installation documentation] for instructions on how to install Consul.
+
+[[spring-cloud-consul-agent]]
+== Consul Agent
+
+A Consul Agent client must be available to all Spring Cloud Consul applications.  By default, the Agent client is expected to be at `localhost:8500`.  See the https://consul.io/docs/agent/basics.html[Agent documentation] for specifics on how to start an Agent client and how to connect to a cluster of Consul Agent Servers.  Start a development agent according to the documentation above.
+
+This will start an agent in server mode on port 8500, with the ui available at http://localhost:8500
+

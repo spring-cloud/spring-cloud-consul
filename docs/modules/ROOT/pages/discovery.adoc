@@ -44,7 +44,7 @@ spring:
       port: 8500
 ----
 
-CAUTION: If you use xref:spring-cloud-consul/config.adoc[Spring Cloud Consul Config], and you have set `spring.cloud.bootstrap.enabled=true` or `spring.config.use-legacy-processing=true` or use `spring-cloud-starter-bootstrap`, then the above values will need to be placed in `bootstrap.yml` instead of `application.yml`.
+CAUTION: If you use xref:config.adoc[Spring Cloud Consul Config], and you have set `spring.cloud.bootstrap.enabled=true` or `spring.config.use-legacy-processing=true` or use `spring-cloud-starter-bootstrap`, then the above values will need to be placed in `bootstrap.yml` instead of `application.yml`.
 
 The default service name, instance id and port, taken from the `Environment`, are `${spring.application.name}`, the Spring Context ID and `${server.port}` respectively.
 
@@ -153,7 +153,7 @@ You can disable the HTTP health check entirely by setting `spring.cloud.consul.d
 
 [[applying-headers]]
 ==== Applying Headers
-Headers can be applied to health check requests. For example, if you're trying to register a https://cloud.spring.io/spring-cloud-config/[Spring Cloud Config] server that uses https://github.com/spring-cloud/spring-cloud-config/blob/master/docs/src/main/asciidoc/spring-cloud-config.adoc#vault-backend[Vault Backend]:
+Headers can be applied to health check requests. For example, if you're trying to register a https://cloud.spring.io/spring-cloud-config/[Spring Cloud Config] server that uses https://github.com/spring-cloud/spring-cloud-config/blob/main/docs/src/main/asciidoc/spring-cloud-config.adoc#vault-backend[Vault Backend]:
 
 .application.yml
 ----
@@ -338,7 +338,7 @@ With this metadata, and multiple service instances deployed on localhost, the ra
 [[using-load-balancer]]
 === Using Load-balancer
 
-Spring Cloud has support for https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign[Feign] (a REST client builder) and also https://docs.spring.io/spring-cloud-commons/docs/current/reference/html/#rest-template-loadbalancer-client[Spring `RestTemplate`]
+Spring Cloud has support for https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/[Feign] (a REST client builder) and also https://docs.spring.io/spring-cloud-commons/docs/current/reference/html/#rest-template-loadbalancer-client[Spring `RestTemplate`]
 for looking up services using the logical service names/ids instead of physical URLs. Both Feign and the discovery-aware RestTemplate utilize https://docs.spring.io/spring-cloud-commons/docs/current/reference/html/#spring-cloud-loadbalancer[Spring Cloud LoadBalancer] for client-side load balancing.
 
 If you want to access service STORES using the RestTemplate simply declare:
