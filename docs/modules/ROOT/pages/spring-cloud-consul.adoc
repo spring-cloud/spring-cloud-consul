@@ -1,5 +1,6 @@
 [[spring-cloud-consul]]
 = Spring Cloud Consul
+:page-section-summary-toc: 1
 
 *{spring-cloud-version}*
 

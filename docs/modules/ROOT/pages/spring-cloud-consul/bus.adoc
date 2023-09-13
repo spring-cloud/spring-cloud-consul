@@ -1,5 +1,6 @@
 [[spring-cloud-consul-bus]]
 = Spring Cloud Bus with Consul
+:page-section-summary-toc: 1
 
 [[how-to-activate]]
 == How to activate

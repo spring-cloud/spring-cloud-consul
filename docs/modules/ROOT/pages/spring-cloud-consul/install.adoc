@@ -1,5 +1,6 @@
 [[spring-cloud-consul-install]]
 = Install Consul
+:page-section-summary-toc: 1
 
 Please see the https://www.consul.io/intro/getting-started/install.html[installation documentation] for instructions on how to install Consul.
 
