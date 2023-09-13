@@ -3,7 +3,7 @@ This quick start walks through using Spring Cloud Consul for Service Discovery a
 First, run Consul Agent on your machine. Then you can access it and use it as a Service Registry and Configuration source with Spring Cloud Consul.
 
 [[discovery-client-usage]]
-=== Discovery Client Usage
+= Discovery Client Usage
 
 To use these features in an application, you can build it as a Spring Boot application that depends on `spring-cloud-consul-core`.
 The most convenient way to add the dependency is with a Spring Boot starter: `org.springframework.cloud:spring-cloud-starter-consul-discovery`.
@@ -127,7 +127,7 @@ public String serviceUrl() {
 ----
 
 [[distributed-configuration-usage]]
-=== Distributed Configuration Usage
+= Distributed Configuration Usage
 
 To use these features in an application, you can build it as a Spring Boot application that depends on `spring-cloud-consul-core` and `spring-cloud-consul-config`.
 The most convenient way to add the dependency is with a Spring Boot starter: `org.springframework.cloud:spring-cloud-starter-consul-config`.

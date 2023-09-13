@@ -4,12 +4,12 @@ image::https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/master/grap
 include::intro.adoc[]
 
 [[quick-start]]
-== Quick Start
+= Quick Start
 
 include::quickstart.adoc[]
 
 [[consul-overview]]
-== Consul overview
+= Consul overview
 
 Features of Consul
 
@@ -23,7 +23,7 @@ Features of Consul
 See the https://consul.io/intro/index.html[intro] for more information.
 
 [[spring-cloud-consul-features]]
-== Spring Cloud Consul Features
+= Spring Cloud Consul Features
 
 * Spring Cloud `DiscoveryClient` implementation
 ** supports Spring Cloud Gateway
@@ -32,7 +32,7 @@ See the https://consul.io/intro/index.html[intro] for more information.
 * Spring Cloud Bus implementation based on Consul https://www.consul.io/docs/agent/http/event.html[events]
 
 [[running-the-sample]]
-== Running the sample
+= Running the sample
 
 1. Run `docker-compose up`
 2. Verify consul is running by visiting http://localhost:8500
@@ -43,11 +43,11 @@ See the https://consul.io/intro/index.html[intro] for more information.
 7. visit http://localhost:8080 again, verify that `{"serviceId":"<yourhost>:8081","host":"<yourhost>","port":8081}` eventually shows up in the results in a round robbin fashion (may take a minute or so).
 
 [[building]]
-== Building
+= Building
 
 include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/building-jdk8.adoc[]
 
 [[contributing]]
-== Contributing
+= Contributing
 
 include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/contributing.adoc[]
