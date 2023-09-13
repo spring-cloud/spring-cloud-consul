@@ -1,3 +1,4 @@
+[[spring-cloud-consul]]
 = Spring Cloud Consul
 include::_attributes.adoc[]
 
@@ -5,6 +6,7 @@ include::_attributes.adoc[]
 
 include::intro.adoc[]
 
+[[quick-start]]
 == Quick Start
 
 include::quickstart.adoc[]
@@ -29,10 +31,12 @@ This will start an agent in server mode on port 8500, with the ui available at h
 
 Service Discovery is one of the key tenets of a microservice based architecture. Trying to hand configure each client or some form of convention can be very difficult to do and can be very brittle.  Consul provides Service Discovery services via an https://www.consul.io/docs/agent/http.html[HTTP API] and https://www.consul.io/docs/agent/dns.html[DNS].  Spring Cloud Consul leverages the HTTP API for service registration and discovery.  This does not prevent non-Spring Cloud applications from leveraging the DNS interface.  Consul Agents servers are run in a https://www.consul.io/docs/internals/architecture.html[cluster] that communicates via a https://www.consul.io/docs/internals/gossip.html[gossip protocol] and uses the https://www.consul.io/docs/internals/consensus.html[Raft consensus protocol].
 
+[[how-to-activate]]
 === How to activate
 
 To activate Consul Service Discovery use the starter with group `org.springframework.cloud` and artifact id `spring-cloud-starter-consul-discovery`. See the https://projects.spring.io/spring-cloud/[Spring Cloud Project page] for details on setting up your build system with the current Spring Cloud Release Train.
 
+[[registering-with-consul]]
 === Registering with Consul
 
 When a client registers with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An https://www.consul.io/docs/discovery/checks#http-interval[HTTP Check] is created by default that Consul hits the `/actuator/health` endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.
@@ -76,6 +80,7 @@ To disable the Consul Discovery Client you can set `spring.cloud.consul.discover
 
 To disable the service registration you can set `spring.cloud.consul.discovery.register` to `false`.
 
+[[registering-management-as-a-separate-service]]
 ==== Registering Management as a Separate Service
 
 When management server port is set to something different than the application port, by setting `management.server.port` property, management service will be registered as a separate service than the application service. For example:
@@ -153,6 +158,7 @@ spring.cloud.consul.discovery.management-suffix
 spring.cloud.consul.discovery.management-tags
 ----
 
+[[http-health-check]]
 ==== HTTP Health Check
 
 The health check for a Consul instance defaults to "/actuator/health", which is the default location of the health endpoint in a Spring Boot Actuator application. You need to change this, even for an Actuator application, if you use a non-default context path or servlet path (e.g. `server.servletPath=/foo`) or management endpoint path (e.g. `management.server.servlet.context-path=/admin`).
@@ -173,6 +179,7 @@ spring:
 
 You can disable the HTTP health check entirely by setting `spring.cloud.consul.discovery.register-health-check=false`.
 
+[[applying-headers]]
 ===== Applying Headers
 Headers can be applied to health check requests. For example, if you're trying to register a https://cloud.spring.io/spring-cloud-config/[Spring Cloud Config] server that uses https://github.com/spring-cloud/spring-cloud-config/blob/master/docs/src/main/asciidoc/spring-cloud-config.adoc#vault-backend[Vault Backend]:
 
@@ -200,6 +207,7 @@ spring:
             - "Some other value"
 ----
 
+[[ttl-health-check]]
 ==== TTL Health Check
 
 A Consul https://www.consul.io/docs/discovery/checks#ttl[TTL Check] can be used instead of the default configured HTTP check.
@@ -221,6 +229,7 @@ spring:
           ttl: 10s
 ----
 
+[[ttl-application-status]]
 ===== TTL Application Status
 
 For a Spring Boot Actuator application the status is determined from its available health endpoint.
@@ -251,6 +260,7 @@ spring:
           use-actuator-health: false
 ----
 
+[[custom-ttl-application-status]]
 ====== Custom TTL Application Status
 
 If you want to configure your own application status mechanism, simply implement the `ApplicationStatusProvider` interface
@@ -272,13 +282,16 @@ public CustomApplicationStatusProvider customAppStatusProvider() {
 }
 ----
 
+[[actuator-health-indicators]]
 ==== Actuator Health Indicator(s)
 If the service instance is a Spring Boot Actuator application, it may be provided the following Actuator health indicators.
 
+[[discoveryclienthealthindicator]]
 ===== DiscoveryClientHealthIndicator
 When Consul Service Discovery is active, a https://cloud.spring.io/spring-cloud-commons/2.2.x/reference/html/#health-indicator[DiscoverClientHealthIndicator] is configured and made available to the Actuator health endpoint.
 See https://cloud.spring.io/spring-cloud-commons/2.2.x/reference/html/#health-indicator[here] for configuration options.
 
+[[consulhealthindicator]]
 ===== ConsulHealthIndicator
 An indicator is configured that verifies the health of the `ConsulClient`.
 
@@ -291,6 +304,7 @@ To disable the indicator set `management.health.consul.enabled=false`.
 WARNING: When the application runs in https://cloud.spring.io/spring-cloud-commons/2.2.x/reference/html/#the-bootstrap-application-context[bootstrap context mode] (the default),
 this indicator is loaded into the bootstrap context and is not made available to the Actuator health endpoint.
 
+[[metadata]]
 ==== Metadata
 
 Consul supports metadata on services. Spring Cloud's `ServiceInstance` has a `Map<String, String> metadata` field which is populated from a services `meta` field. To populate the `meta` field set values on `spring.cloud.consul.discovery.metadata` or `spring.cloud.consul.discovery.management-metadata` properties.
@@ -308,6 +322,7 @@ spring:
 
 The above configuration will result in a service who's meta field contains `myfield->myvalue` and `anotherfield->anothervalue`.
 
+[[generated-metadata]]
 ===== Generated Metadata
 
 The Consul Auto Registration will generate a few entries automatically.
@@ -329,6 +344,7 @@ The Consul Auto Registration will generate a few entries automatically.
 
 WARNING: Older versions of Spring Cloud Consul populated the `ServiceInstance.getMetadata()` method from Spring Cloud Commons by parsing the `spring.cloud.consul.discovery.tags` property. This is no longer supported, please migrate to using  the `spring.cloud.consul.discovery.metadata` map.
 
+[[making-the-consul-instance-id-unique]]
 ==== Making the Consul Instance ID Unique
 
 By default a consul instance is registered with an ID that is equal to its Spring Application Context ID. By default, the Spring Application Context ID is `${spring.application.name}:comma,separated,profiles:${server.port}`. For most cases, this will allow multiple instances of one service to run on one machine.  If further uniqueness is required, Using Spring Cloud you can override this by providing a unique identifier in `spring.cloud.consul.discovery.instanceId`. For example:
@@ -344,8 +360,10 @@ spring:
 
 With this metadata, and multiple service instances deployed on localhost, the random value will kick in there to make the instance unique. In Cloudfoundry the `vcap.application.instance_id` will be populated automatically in a Spring Boot application, so the random value will not be needed.
 
+[[looking-up-services]]
 === Looking up services
 
+[[using-load-balancer]]
 ==== Using Load-balancer
 
 Spring Cloud has support for https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign[Feign] (a REST client builder) and also https://docs.spring.io/spring-cloud-commons/docs/current/reference/html/#rest-template-loadbalancer-client[Spring `RestTemplate`]
@@ -380,6 +398,7 @@ TIP: Spring Cloud now also offers support for
 https://cloud.spring.io/spring-cloud-commons/reference/html/#_spring_resttemplate_as_a_load_balancer_client[Spring Cloud LoadBalancer].
 
 
+[[using-the-discoveryclient]]
 ==== Using the DiscoveryClient
 
 You can also use the `org.springframework.cloud.client.discovery.DiscoveryClient` which provides a simple API for discovery clients that is not specific to Netflix, e.g.
@@ -397,6 +416,7 @@ public String serviceUrl() {
 }
 ----
 
+[[consul-catalog-watch]]
 === Consul Catalog Watch
 
 The Consul Catalog Watch takes advantage of the ability of consul to https://www.consul.io/docs/agent/watches.html#services[watch services]. The Catalog Watch makes a blocking Consul HTTP API call to determine if any services have changed. If there is new service data a Heartbeat Event is published.
@@ -424,6 +444,7 @@ The most specific property source is at the top, with the least specific at the 
 
 Configuration is currently read on startup of the application.  Sending a HTTP POST to `/refresh` will cause the configuration to be reloaded. <<spring-cloud-consul-config-watch>> will also automatically detect changes and reload the application context.
 
+[[how-to-activate]]
 === How to activate
 
 To get started with Consul Configuration use the starter with group `org.springframework.cloud` and artifact id `spring-cloud-starter-consul-config`. See the https://projects.spring.io/spring-cloud/[Spring Cloud Project page] for details on setting up your build system with the current Spring Cloud Release Train.
@@ -456,6 +477,7 @@ This will optionally load configuration only from `/contextone` and `/context/tw
 
 NOTE: A `bootstrap` file (properties or yaml) is *not* needed for the Spring Boot Config Data method of import via `spring.config.import`.
 
+[[customizing]]
 === Customizing
 
 Consul Config may be customized using the following properties:
@@ -580,6 +602,7 @@ Retry has a `RetryInterceptorBuilder` that makes it easy to create one.
 [[spring-cloud-consul-bus]]
 == Spring Cloud Bus with Consul
 
+[[how-to-activate]]
 === How to activate
 
 To get started with the Consul Bus use the starter with group `org.springframework.cloud` and artifact id `spring-cloud-starter-consul-bus`. See the https://projects.spring.io/spring-cloud/[Spring Cloud Project page] for details on setting up your build system with the current Spring Cloud Release Train.
@@ -634,6 +657,7 @@ public class Turbine {
 }
 ----
 
+[[configuration-properties]]
 == Configuration Properties
 
 To see the list of all Consul related configuration properties please check link:appendix.html[the Appendix page].
