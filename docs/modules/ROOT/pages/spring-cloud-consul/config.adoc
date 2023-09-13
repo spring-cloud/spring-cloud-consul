@@ -12,7 +12,7 @@ config/application/
 
 The most specific property source is at the top, with the least specific at the bottom.  Properties in the `config/application` folder are applicable to all applications using consul for configuration.  Properties in the `config/testApp` folder are only available to the instances of the service named "testApp".
 
-Configuration is currently read on startup of the application.  Sending a HTTP POST to `/refresh` will cause the configuration to be reloaded. <<spring-cloud-consul-config-watch>> will also automatically detect changes and reload the application context.
+Configuration is currently read on startup of the application.  Sending a HTTP POST to `/refresh` will cause the configuration to be reloaded. xref:spring-cloud-consul/config.adoc#spring-cloud-consul-config-watch[Config Watch] will also automatically detect changes and reload the application context.
 
 [[how-to-activate]]
 == How to activate

@@ -44,7 +44,7 @@ spring:
       port: 8500
 ----
 
-CAUTION: If you use <<spring-cloud-consul-config,Spring Cloud Consul Config>>, and you have set `spring.cloud.bootstrap.enabled=true` or `spring.config.use-legacy-processing=true` or use `spring-cloud-starter-bootstrap`, then the above values will need to be placed in `bootstrap.yml` instead of `application.yml`.
+CAUTION: If you use xref:spring-cloud-consul/config.adoc[Spring Cloud Consul Config], and you have set `spring.cloud.bootstrap.enabled=true` or `spring.config.use-legacy-processing=true` or use `spring-cloud-starter-bootstrap`, then the above values will need to be placed in `bootstrap.yml` instead of `application.yml`.
 
 The default service name, instance id and port, taken from the `Environment`, are `${spring.application.name}`, the Spring Context ID and `${server.port}` respectively.
 

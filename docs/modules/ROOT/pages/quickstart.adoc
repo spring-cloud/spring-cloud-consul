@@ -226,4 +226,4 @@ public class Application {
 The application retrieves configuration data from Consul.
 
 WARNING: If you use Spring Cloud Consul Config, you need to set the `spring.config.import` property in order to bind to Consul.
-You can read more about it in the <<config-data-import,Spring Boot Config Data Import section>>.
+You can read more about it in the xref:spring-cloud-consul/config.adoc#config-data-import[Spring Boot Config Data Import section].
