@@ -1,2 +1,0 @@
-consul:\
-org.springframework.cloud.consul.binder.config.ConsulBinderConfiguration

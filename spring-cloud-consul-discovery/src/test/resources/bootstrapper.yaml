@@ -1,8 +1,0 @@
-spring:
-  config:
-    import: "optional:configserver:"
-  cloud:
-    config:
-      discovery:
-        service-id: consul-configserver
-        enabled: true

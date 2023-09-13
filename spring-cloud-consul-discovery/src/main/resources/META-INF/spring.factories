@@ -1,5 +1,0 @@
-org.springframework.cloud.bootstrap.BootstrapConfiguration=\
-org.springframework.cloud.consul.discovery.configclient.ConsulDiscoveryClientConfigServiceBootstrapConfiguration
-
-org.springframework.boot.BootstrapRegistryInitializer=\
-org.springframework.cloud.consul.discovery.configclient.ConsulConfigServerBootstrapper
