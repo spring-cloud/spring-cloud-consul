@@ -1,4 +1,4 @@
-* xref:index.adoc[]
+* xref:index.adoc[Introduction]
 * xref:quickstart.adoc[]
 * xref:install.adoc[]
 * xref:discovery.adoc[]

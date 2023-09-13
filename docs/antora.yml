@@ -1,6 +1,6 @@
 name: cloud-consul
 version: true
-title: spring-cloud-consul
+title: Spring Cloud Consul
 nav:
   - modules/ROOT/nav.adoc
 ext:
