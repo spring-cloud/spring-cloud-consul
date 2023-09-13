@@ -1,0 +1,402 @@
+[[spring-cloud-consul-discovery]]
+= Service Discovery with Consul
+
+Service Discovery is one of the key tenets of a microservice based architecture. Trying to hand configure each client or some form of convention can be very difficult to do and can be very brittle.  Consul provides Service Discovery services via an https://www.consul.io/docs/agent/http.html[HTTP API] and https://www.consul.io/docs/agent/dns.html[DNS].  Spring Cloud Consul leverages the HTTP API for service registration and discovery.  This does not prevent non-Spring Cloud applications from leveraging the DNS interface.  Consul Agents servers are run in a https://www.consul.io/docs/internals/architecture.html[cluster] that communicates via a https://www.consul.io/docs/internals/gossip.html[gossip protocol] and uses the https://www.consul.io/docs/internals/consensus.html[Raft consensus protocol].
+
+[[how-to-activate]]
+== How to activate
+
+To activate Consul Service Discovery use the starter with group `org.springframework.cloud` and artifact id `spring-cloud-starter-consul-discovery`. See the https://projects.spring.io/spring-cloud/[Spring Cloud Project page] for details on setting up your build system with the current Spring Cloud Release Train.
+
+[[registering-with-consul]]
+== Registering with Consul
+
+When a client registers with Consul, it provides meta-data about itself such as host and port, id, name and tags.  An https://www.consul.io/docs/discovery/checks#http-interval[HTTP Check] is created by default that Consul hits the `/actuator/health` endpoint every 10 seconds.  If the health check fails, the service instance is marked as critical.
+
+Example Consul client:
+
+[source,java,indent=0]
+----
+@SpringBootApplication
+@RestController
+public class Application {
+
+    @RequestMapping("/")
+    public String home() {
+        return "Hello world";
+    }
+
+    public static void main(String[] args) {
+        new SpringApplicationBuilder(Application.class).web(true).run(args);
+    }
+
+}
+----
+
+(i.e. utterly normal Spring Boot app).  If the Consul client is located somewhere other than `localhost:8500`, the configuration is required to locate the client. Example:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+----
+
+CAUTION: If you use <<spring-cloud-consul-config,Spring Cloud Consul Config>>, and you have set `spring.cloud.bootstrap.enabled=true` or `spring.config.use-legacy-processing=true` or use `spring-cloud-starter-bootstrap`, then the above values will need to be placed in `bootstrap.yml` instead of `application.yml`.
+
+The default service name, instance id and port, taken from the `Environment`, are `${spring.application.name}`, the Spring Context ID and `${server.port}` respectively.
+
+To disable the Consul Discovery Client you can set `spring.cloud.consul.discovery.enabled` to `false`. Consul Discovery Client will also be disabled when `spring.cloud.discovery.enabled` is set to `false`.
+
+To disable the service registration you can set `spring.cloud.consul.discovery.register` to `false`.
+
+[[registering-management-as-a-separate-service]]
+=== Registering Management as a Separate Service
+
+When management server port is set to something different than the application port, by setting `management.server.port` property, management service will be registered as a separate service than the application service. For example:
+
+.application.yml
+----
+spring:
+  application:
+    name: myApp
+management:
+  server:
+    port: 4452
+----
+
+Above configuration will register following 2 services:
+
+* Application Service:
+
+----
+ID: myApp
+Name: myApp
+----
+
+* Management Service:
+
+----
+ID: myApp-management
+Name: myApp-management
+----
+
+Management service will inherit its `instanceId` and `serviceName` from the application service. For example:
+
+.application.yml
+----
+spring:
+  application:
+    name: myApp
+management:
+  server:
+    port: 4452
+spring:
+  cloud:
+    consul:
+      discovery:
+        instance-id: custom-service-id
+        serviceName: myprefix-${spring.application.name}
+----
+
+Above configuration will register following 2 services:
+
+* Application Service:
+
+----
+ID: custom-service-id
+Name: myprefix-myApp
+----
+
+* Management Service:
+
+----
+ID: custom-service-id-management
+Name: myprefix-myApp-management
+----
+
+Further customization is possible via following properties:
+
+----
+/** Port to register the management service under (defaults to management port) */
+spring.cloud.consul.discovery.management-port
+
+/** Suffix to use when registering management service (defaults to "management") */
+spring.cloud.consul.discovery.management-suffix
+
+/** Tags to use when registering management service (defaults to "management") */
+spring.cloud.consul.discovery.management-tags
+----
+
+[[http-health-check]]
+=== HTTP Health Check
+
+The health check for a Consul instance defaults to "/actuator/health", which is the default location of the health endpoint in a Spring Boot Actuator application. You need to change this, even for an Actuator application, if you use a non-default context path or servlet path (e.g. `server.servletPath=/foo`) or management endpoint path (e.g. `management.server.servlet.context-path=/admin`).
+
+The interval that Consul uses to check the health endpoint may also be configured. "10s" and "1m" represent 10 seconds and 1 minute respectively.
+
+This example illustrates the above (see the `spring.cloud.consul.discovery.health-check-*` properties in link:appendix.html[the appendix page] for more options).
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        healthCheckPath: ${management.server.servlet.context-path}/actuator/health
+        healthCheckInterval: 15s
+----
+
+You can disable the HTTP health check entirely by setting `spring.cloud.consul.discovery.register-health-check=false`.
+
+[[applying-headers]]
+==== Applying Headers
+Headers can be applied to health check requests. For example, if you're trying to register a https://cloud.spring.io/spring-cloud-config/[Spring Cloud Config] server that uses https://github.com/spring-cloud/spring-cloud-config/blob/master/docs/src/main/asciidoc/spring-cloud-config.adoc#vault-backend[Vault Backend]:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        health-check-headers:
+          X-Config-Token: 6442e58b-d1ea-182e-cfa5-cf9cddef0722
+----
+
+According to the HTTP standard, each header can have more than one values, in which case, an array can be supplied:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        health-check-headers:
+          X-Config-Token:
+            - "6442e58b-d1ea-182e-cfa5-cf9cddef0722"
+            - "Some other value"
+----
+
+[[ttl-health-check]]
+=== TTL Health Check
+
+A Consul https://www.consul.io/docs/discovery/checks#ttl[TTL Check] can be used instead of the default configured HTTP check.
+The main difference is that the application sends a heartbeat signal to the Consul agent rather than the Consul agent sending a request to the application.
+
+The interval the application uses to send the ping may also be configured. "10s" and "1m" represent 10 seconds and 1 minute respectively.
+The default is 30 seconds.
+
+This example illustrates the above (see the `spring.cloud.consul.discovery.heartbeat.*` properties in link:appendix.html[the appendix page] for more options).
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        heartbeat:
+          enabled: true
+          ttl: 10s
+----
+
+[[ttl-application-status]]
+==== TTL Application Status
+
+For a Spring Boot Actuator application the status is determined from its available health endpoint.
+When the health endpoint is not available (either disabled or not a Spring Boot Actuator application) it assumes the application is in good health.
+
+When querying the health endpoint, the root https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#production-ready-health-groups[health group] is used by default.
+A different health group can be used by setting the following property:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        heartbeat:
+          actuator-health-group: <your-custom-group-goes-here>
+----
+
+You can disable the use of the health endpoint entirely by setting the following property:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        heartbeat:
+          use-actuator-health: false
+----
+
+[[custom-ttl-application-status]]
+===== Custom TTL Application Status
+
+If you want to configure your own application status mechanism, simply implement the `ApplicationStatusProvider` interface
+
+.MyCustomApplicationStatusProvider.java
+----
+@Bean
+public class MyCustomApplicationStatusProvider implements ApplicationStatusProvider {
+	public CheckStatus currentStatus() {
+        return yourMethodToDetermineAppStatusGoesHere();
+    }
+}
+----
+and make it available to the application context:
+----
+@Bean
+public CustomApplicationStatusProvider customAppStatusProvider() {
+     return new MyCustomApplicationStatusProvider();
+}
+----
+
+[[actuator-health-indicators]]
+=== Actuator Health Indicator(s)
+If the service instance is a Spring Boot Actuator application, it may be provided the following Actuator health indicators.
+
+[[discoveryclienthealthindicator]]
+==== DiscoveryClientHealthIndicator
+When Consul Service Discovery is active, a https://cloud.spring.io/spring-cloud-commons/2.2.x/reference/html/#health-indicator[DiscoverClientHealthIndicator] is configured and made available to the Actuator health endpoint.
+See https://cloud.spring.io/spring-cloud-commons/2.2.x/reference/html/#health-indicator[here] for configuration options.
+
+[[consulhealthindicator]]
+==== ConsulHealthIndicator
+An indicator is configured that verifies the health of the `ConsulClient`.
+
+By default, it retrieves the Consul leader node status and all registered services.
+In deployments that have many registered services it may be costly to retrieve all services on every health check.
+To skip the service retrieval and only check the leader node status set `spring.cloud.consul.health-indicator.include-services-query=false`.
+
+To disable the indicator set `management.health.consul.enabled=false`.
+
+WARNING: When the application runs in https://cloud.spring.io/spring-cloud-commons/2.2.x/reference/html/#the-bootstrap-application-context[bootstrap context mode] (the default),
+this indicator is loaded into the bootstrap context and is not made available to the Actuator health endpoint.
+
+[[metadata]]
+=== Metadata
+
+Consul supports metadata on services. Spring Cloud's `ServiceInstance` has a `Map<String, String> metadata` field which is populated from a services `meta` field. To populate the `meta` field set values on `spring.cloud.consul.discovery.metadata` or `spring.cloud.consul.discovery.management-metadata` properties.
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        metadata:
+          myfield: myvalue
+          anotherfield: anothervalue
+----
+
+The above configuration will result in a service who's meta field contains `myfield->myvalue` and `anotherfield->anothervalue`.
+
+[[generated-metadata]]
+==== Generated Metadata
+
+The Consul Auto Registration will generate a few entries automatically.
+
+.Auto Generated Metadata
+|===
+| Key | Value
+
+| 'group'
+| Property `spring.cloud.consul.discovery.instance-group`. This values is only generated if `instance-group` is not empty.'
+
+| 'secure'
+| True if property `spring.cloud.consul.discovery.scheme` equals 'https', otherwise false.
+
+| Property `spring.cloud.consul.discovery.default-zone-metadata-name`, defaults to 'zone'
+| Property `spring.cloud.consul.discovery.instance-zone`. This values is only generated if `instance-zone` is not empty.'
+
+|===
+
+WARNING: Older versions of Spring Cloud Consul populated the `ServiceInstance.getMetadata()` method from Spring Cloud Commons by parsing the `spring.cloud.consul.discovery.tags` property. This is no longer supported, please migrate to using  the `spring.cloud.consul.discovery.metadata` map.
+
+[[making-the-consul-instance-id-unique]]
+=== Making the Consul Instance ID Unique
+
+By default a consul instance is registered with an ID that is equal to its Spring Application Context ID. By default, the Spring Application Context ID is `${spring.application.name}:comma,separated,profiles:${server.port}`. For most cases, this will allow multiple instances of one service to run on one machine.  If further uniqueness is required, Using Spring Cloud you can override this by providing a unique identifier in `spring.cloud.consul.discovery.instanceId`. For example:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+----
+
+With this metadata, and multiple service instances deployed on localhost, the random value will kick in there to make the instance unique. In Cloudfoundry the `vcap.application.instance_id` will be populated automatically in a Spring Boot application, so the random value will not be needed.
+
+[[looking-up-services]]
+== Looking up services
+
+[[using-load-balancer]]
+=== Using Load-balancer
+
+Spring Cloud has support for https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign[Feign] (a REST client builder) and also https://docs.spring.io/spring-cloud-commons/docs/current/reference/html/#rest-template-loadbalancer-client[Spring `RestTemplate`]
+for looking up services using the logical service names/ids instead of physical URLs. Both Feign and the discovery-aware RestTemplate utilize https://docs.spring.io/spring-cloud-commons/docs/current/reference/html/#spring-cloud-loadbalancer[Spring Cloud LoadBalancer] for client-side load balancing.
+
+If you want to access service STORES using the RestTemplate simply declare:
+
+----
+@LoadBalanced
+@Bean
+public RestTemplate loadbalancedRestTemplate() {
+     return new RestTemplate();
+}
+----
+
+and use it like this (notice how we use the STORES service name/id from Consul instead of a fully qualified domainname):
+
+----
+@Autowired
+RestTemplate restTemplate;
+
+public String getFirstProduct() {
+   return this.restTemplate.getForObject("https://STORES/products/1", String.class);
+}
+----
+
+If you have Consul clusters in multiple datacenters and you want to access a service in another datacenter a service name/id alone is not enough. In that case
+you use property `spring.cloud.consul.discovery.datacenters.STORES=dc-west` where `STORES` is the service name/id and `dc-west` is the datacenter
+where the STORES service lives.
+
+TIP: Spring Cloud now also offers support for
+https://cloud.spring.io/spring-cloud-commons/reference/html/#_spring_resttemplate_as_a_load_balancer_client[Spring Cloud LoadBalancer].
+
+
+[[using-the-discoveryclient]]
+=== Using the DiscoveryClient
+
+You can also use the `org.springframework.cloud.client.discovery.DiscoveryClient` which provides a simple API for discovery clients that is not specific to Netflix, e.g.
+
+----
+@Autowired
+private DiscoveryClient discoveryClient;
+
+public String serviceUrl() {
+    List<ServiceInstance> list = discoveryClient.getInstances("STORES");
+    if (list != null && list.size() > 0 ) {
+        return list.get(0).getUri();
+    }
+    return null;
+}
+----
+
+[[consul-catalog-watch]]
+== Consul Catalog Watch
+
+The Consul Catalog Watch takes advantage of the ability of consul to https://www.consul.io/docs/agent/watches.html#services[watch services]. The Catalog Watch makes a blocking Consul HTTP API call to determine if any services have changed. If there is new service data a Heartbeat Event is published.
+
+To change the frequency of when the Config Watch is called change `spring.cloud.consul.config.discovery.catalog-services-watch-delay`. The default value is 1000, which is in milliseconds. The delay is the amount of time after the end of the previous invocation and the start of the next.
+
+To disable the Catalog Watch set `spring.cloud.consul.discovery.catalogServicesWatch.enabled=false`.
+
+
+The watch uses a Spring `TaskScheduler` to schedule the call to consul. By default it is a `ThreadPoolTaskScheduler` with a `poolSize` of 1. To change the `TaskScheduler`, create a bean of type `TaskScheduler` named with the `ConsulDiscoveryClientConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME` constant.
+

@@ -1,0 +1,4 @@
+[[configuration-properties]]
+= Configuration Properties
+
+To see the list of all Consul related configuration properties please check link:appendix.html[the Appendix page].

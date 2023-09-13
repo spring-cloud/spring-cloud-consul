@@ -1,0 +1,156 @@
+[[spring-cloud-consul-config]]
+= Distributed Configuration with Consul
+
+Consul provides a https://consul.io/docs/agent/http/kv.html[Key/Value Store] for storing configuration and other metadata.  Spring Cloud Consul Config is an alternative to the https://github.com/spring-cloud/spring-cloud-config[Config Server and Client].  Configuration is loaded into the Spring Environment during the special "bootstrap" phase.  Configuration is stored in the `/config` folder by default.  Multiple `PropertySource` instances are created based on the application's name and the active profiles that mimics the Spring Cloud Config order of resolving properties.  For example, an application with the name "testApp" and with the "dev" profile will have the following property sources created:
+
+----
+config/testApp,dev/
+config/testApp/
+config/application,dev/
+config/application/
+----
+
+The most specific property source is at the top, with the least specific at the bottom.  Properties in the `config/application` folder are applicable to all applications using consul for configuration.  Properties in the `config/testApp` folder are only available to the instances of the service named "testApp".
+
+Configuration is currently read on startup of the application.  Sending a HTTP POST to `/refresh` will cause the configuration to be reloaded. <<spring-cloud-consul-config-watch>> will also automatically detect changes and reload the application context.
+
+[[how-to-activate]]
+== How to activate
+
+To get started with Consul Configuration use the starter with group `org.springframework.cloud` and artifact id `spring-cloud-starter-consul-config`. See the https://projects.spring.io/spring-cloud/[Spring Cloud Project page] for details on setting up your build system with the current Spring Cloud Release Train.
+
+
+[[config-data-import]]
+== Spring Boot Config Data Import
+
+Spring Boot 2.4 introduced a new way to import configuration data via the `spring.config.import` property. This is now the default way to get configuration from Consul.
+
+To optionally connect to Consul set the following in application.properties:
+
+.application.properties
+[source,properties]
+----
+spring.config.import=optional:consul:
+----
+
+This will connect to the Consul Agent at the default location of "http://localhost:8500". Removing the `optional:` prefix will cause Consul Config to fail if it is unable to connect to Consul. To change the connection properties of Consul Config either set `spring.cloud.consul.host` and `spring.cloud.consul.port` or add the host/port pair to the `spring.config.import` statement such as, `spring.config.import=optional:consul:myhost:8500`. The location in the import property has precedence over the host and port propertie.
+
+Consul Config will try to load values from four automatic contexts based on `spring.cloud.consul.config.name` (which defaults to the value of the `spring.application.name` property) and `spring.cloud.consul.config.default-context` (which defaults to `application`). If you want to specify the contexts rather than using the computed ones, you can add that information to the `spring.config.import` statement.
+
+.application.properties
+[source,properties]
+----
+spring.config.import=optional:consul:myhost:8500/contextone;/context/two
+----
+
+This will optionally load configuration only from `/contextone` and `/context/two`.
+
+NOTE: A `bootstrap` file (properties or yaml) is *not* needed for the Spring Boot Config Data method of import via `spring.config.import`.
+
+[[customizing]]
+== Customizing
+
+Consul Config may be customized using the following properties:
+
+[source,yaml]
+----
+spring:
+  cloud:
+    consul:
+      config:
+        enabled: true
+        prefix: configuration
+        defaultContext: apps
+        profileSeparator: '::'
+----
+
+CAUTION: If you have set `spring.cloud.bootstrap.enabled=true` or `spring.config.use-legacy-processing=true`, or included `spring-cloud-starter-bootstrap`, then the above values will need to be placed in `bootstrap.yml` instead of `application.yml`.
+
+* `enabled` setting this value to "false" disables Consul Config
+* `prefix` sets the base folder for configuration values
+* `defaultContext` sets the folder name used by all applications
+* `profileSeparator` sets the value of the separator used to separate the profile name in property sources with profiles
+
+[[spring-cloud-consul-config-watch]]
+== Config Watch
+
+The Consul Config Watch takes advantage of the ability of consul to https://www.consul.io/docs/agent/watches.html#keyprefix[watch a key prefix]. The Config Watch makes a blocking Consul HTTP API call to determine if any relevant configuration data has changed for the current application. If there is new configuration data a Refresh Event is published. This is equivalent to calling the `/refresh` actuator endpoint.
+
+To change the frequency of when the Config Watch is called change `spring.cloud.consul.config.watch.delay`. The default value is 1000, which is in milliseconds. The delay is the amount of time after the end of the previous invocation and the start of the next.
+
+To disable the Config Watch set `spring.cloud.consul.config.watch.enabled=false`.
+
+The watch uses a Spring `TaskScheduler` to schedule the call to consul. By default it is a `ThreadPoolTaskScheduler` with a `poolSize` of 1. To change the `TaskScheduler`, create a bean of type `TaskScheduler` named with the `ConsulConfigAutoConfiguration.CONFIG_WATCH_TASK_SCHEDULER_NAME` constant.
+
+[[spring-cloud-consul-config-format]]
+== YAML or Properties with Config
+
+It may be more convenient to store a blob of properties in YAML or Properties format as opposed to individual key/value pairs.  Set the `spring.cloud.consul.config.format` property to `YAML` or `PROPERTIES`. For example to use YAML:
+
+[source,yaml]
+----
+spring:
+  cloud:
+    consul:
+      config:
+        format: YAML
+----
+
+CAUTION: If you have set `spring.cloud.bootstrap.enabled=true` or `spring.config.use-legacy-processing=true`, or included `spring-cloud-starter-bootstrap`, then the above values will need to be placed in `bootstrap.yml` instead of `application.yml`.
+
+YAML must be set in the appropriate `data` key in consul. Using the defaults above the keys would look like:
+
+----
+config/testApp,dev/data
+config/testApp/data
+config/application,dev/data
+config/application/data
+----
+
+You could store a YAML document in any of the keys listed above.
+
+You can change the data key using `spring.cloud.consul.config.data-key`.
+
+[[spring-cloud-consul-config-git2consul]]
+== git2consul with Config
+git2consul is a Consul community project that loads files from a git repository to individual keys into Consul. By default the names of the keys are names of the files. YAML and Properties files are supported with file extensions of `.yml` and `.properties` respectively.  Set the `spring.cloud.consul.config.format` property to `FILES`. For example:
+
+.bootstrap.yml
+----
+spring:
+  cloud:
+    consul:
+      config:
+        format: FILES
+----
+
+Given the following keys in `/config`, the `development` profile and an application name of `foo`:
+
+----
+.gitignore
+application.yml
+bar.properties
+foo-development.properties
+foo-production.yml
+foo.properties
+master.ref
+----
+
+the following property sources would be created:
+
+----
+config/foo-development.properties
+config/foo.properties
+config/application.yml
+----
+
+The value of each key needs to be a properly formatted YAML or Properties file.
+
+
+[[spring-cloud-consul-failfast]]
+== Fail Fast
+
+It may be convenient in certain circumstances (like local development or certain test scenarios) to not fail if consul isn't available for configuration. Setting `spring.cloud.consul.config.fail-fast=false` will cause the configuration module to log a warning rather than throw an exception. This will allow the application to continue startup normally.
+
+CAUTION: If you have set `spring.cloud.bootstrap.enabled=true` or `spring.config.use-legacy-processing=true`, or included `spring-cloud-starter-bootstrap`, then the above values will need to be placed in `bootstrap.yml` instead of `application.yml`.
+
