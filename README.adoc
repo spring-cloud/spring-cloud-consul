@@ -364,7 +364,7 @@ from the `file` menu.
 
 == Contributing
 
-:spring-cloud-build-branch: 4.0.x
+:spring-cloud-build-branch: master
 
 Spring Cloud is released under the non-restrictive Apache 2.0 license,
 and follows a very standard Github development process, using Github
