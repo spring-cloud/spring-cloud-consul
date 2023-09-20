@@ -174,7 +174,7 @@ spring:
 You can disable the HTTP health check entirely by setting `spring.cloud.consul.discovery.register-health-check=false`.
 
 ===== Applying Headers
-Headers can be applied to health check requests. For example, if you're trying to register a https://cloud.spring.io/spring-cloud-config/[Spring Cloud Config] server that uses https://github.com/spring-cloud/spring-cloud-config/blob/master/docs/src/main/asciidoc/spring-cloud-config.adoc#vault-backend[Vault Backend]:
+Headers can be applied to health check requests. For example, if you're trying to register a https://cloud.spring.io/spring-cloud-config/[Spring Cloud Config] server that uses https://github.com/spring-cloud/spring-cloud-config/blob/4.0.x/docs/src/main/asciidoc/spring-cloud-config.adoc#vault-backend[Vault Backend]:
 
 .application.yml
 ----
@@ -348,7 +348,7 @@ With this metadata, and multiple service instances deployed on localhost, the ra
 
 ==== Using Load-balancer
 
-Spring Cloud has support for https://github.com/spring-cloud/spring-cloud-netflix/blob/master/docs/src/main/asciidoc/spring-cloud-netflix.adoc#spring-cloud-feign[Feign] (a REST client builder) and also https://docs.spring.io/spring-cloud-commons/docs/current/reference/html/#rest-template-loadbalancer-client[Spring `RestTemplate`]
+Spring Cloud has support for https://docs.spring.io/spring-cloud-openfeign/docs/current/reference/html/[OpenFeign] (a REST client builder) and also https://docs.spring.io/spring-cloud-commons/docs/current/reference/html/#rest-template-loadbalancer-client[Spring `RestTemplate`]
 for looking up services using the logical service names/ids instead of physical URLs. Both Feign and the discovery-aware RestTemplate utilize https://docs.spring.io/spring-cloud-commons/docs/current/reference/html/#spring-cloud-loadbalancer[Spring Cloud LoadBalancer] for client-side load balancing.
 
 If you want to access service STORES using the RestTemplate simply declare:
@@ -541,7 +541,7 @@ bar.properties
 foo-development.properties
 foo-production.yml
 foo.properties
-master.ref
+main.ref
 ----
 
 the following property sources would be created:

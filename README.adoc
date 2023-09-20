@@ -5,8 +5,8 @@ Edit the files in the src/main/asciidoc/ directory instead.
 ////
 
 
-image::https://circleci.com/gh/spring-cloud/spring-cloud-consul/tree/master.svg?style=svg["CircleCI", link="https://circleci.com/gh/spring-cloud/spring-cloud-consul/tree/master"]
-image::https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/master/graph/badge.svg["Codecov", link="https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/master"]
+image::https://github.com/spring-cloud/spring-cloud-consul/workflows/Build/badge.svg?style=svg["Actions Status", link="https://github.com/spring-cloud/spring-cloud-consul/actions"]
+image::https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/4.0.x/graph/badge.svg["Codecov", link="https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/4.0.x"]
 
 This project provides Consul integrations for Spring Boot apps through autoconfiguration
 and binding to the Spring Environment and other Spring programming model idioms. With a few
@@ -364,7 +364,7 @@ from the `file` menu.
 
 == Contributing
 
-:spring-cloud-build-branch: master
+:spring-cloud-build-branch: 4.0.x
 
 Spring Cloud is released under the non-restrictive Apache 2.0 license,
 and follows a very standard Github development process, using Github
@@ -381,7 +381,7 @@ author credit if we do.  Active contributors might be asked to join the core tea
 given the ability to merge pull requests.
 
 === Code of Conduct
-This project adheres to the Contributor Covenant https://github.com/spring-cloud/spring-cloud-build/blob/master/docs/src/main/asciidoc/code-of-conduct.adoc[code of
+This project adheres to the Contributor Covenant https://github.com/spring-cloud/spring-cloud-build/blob/{spring-cloud-build-branch}/docs/src/main/asciidoc/code-of-conduct.adoc[code of
 conduct]. By participating, you  are expected to uphold this code. Please report
 unacceptable behavior to spring-code-of-conduct@pivotal.io.
 
@@ -392,7 +392,7 @@ added after the original pull request but before a merge.
 * Use the Spring Framework code format conventions. If you use Eclipse
   you can import formatter settings using the
   `eclipse-code-formatter.xml` file from the
-  https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/spring-cloud-dependencies-parent/eclipse-code-formatter.xml[Spring
+  https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/{spring-cloud-build-branch}/spring-cloud-dependencies-parent/eclipse-code-formatter.xml[Spring
   Cloud Build] project. If using IntelliJ, you can use the
   https://plugins.jetbrains.com/plugin/6546[Eclipse Code Formatter
   Plugin] to import the same file.

@@ -1,5 +1,5 @@
-image::https://circleci.com/gh/spring-cloud/spring-cloud-consul/tree/master.svg?style=svg["CircleCI", link="https://circleci.com/gh/spring-cloud/spring-cloud-consul/tree/master"]
-image::https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/master/graph/badge.svg["Codecov", link="https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/master"]
+image::https://github.com/spring-cloud/spring-cloud-consul/workflows/Build/badge.svg?style=svg["Actions Status", link="https://github.com/spring-cloud/spring-cloud-consul/actions"]
+image::https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/4.0.x/graph/badge.svg["Codecov", link="https://codecov.io/gh/spring-cloud/spring-cloud-consul/branch/4.0.x"]
 
 include::intro.adoc[]
 
@@ -40,8 +40,8 @@ See the https://consul.io/intro/index.html[intro] for more information.
 
 == Building
 
-include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/building-jdk8.adoc[]
+include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/4.0.x/docs/src/main/asciidoc/building-jdk8.adoc[]
 
 == Contributing
 
-include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/master/docs/src/main/asciidoc/contributing.adoc[]
+include::https://raw.githubusercontent.com/spring-cloud/spring-cloud-build/4.0.x/docs/src/main/asciidoc/contributing.adoc[]
