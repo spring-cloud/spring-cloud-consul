@@ -280,8 +280,7 @@ See the https://consul.io/intro/index.html[intro] for more information.
 
 == Building
 
-
-:jdkversion: 17
+:jdkversion: 1.8
 
 === Basic Compile and Test
 
