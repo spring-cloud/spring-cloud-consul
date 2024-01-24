@@ -14,6 +14,7 @@
 	<parent>
 		<groupId>org.springframework.cloud</groupId>
 		<artifactId>spring-cloud-build</artifactId>
+
 		<version>4.1.1-SNAPSHOT</version>
 		<relativePath/>
 		<!-- lookup parent from repository -->
