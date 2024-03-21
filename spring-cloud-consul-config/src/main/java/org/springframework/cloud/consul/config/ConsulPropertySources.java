@@ -60,6 +60,14 @@ public class ConsulPropertySources {
 	public List<Context> generateAutomaticContexts(List<String> profiles, boolean reverse) {
 		List<Context> contexts = new ArrayList<>();
 		for (String prefix : this.properties.getPrefixes()) {
+			// contexts which shared with each other
+			final String[] sharedContexts = properties.getSharedContexts();
+			if (sharedContexts != null) {
+				for (String sharedContext : sharedContexts) {
+					contexts.add(new Context(getContext(prefix, sharedContext)));
+				}
+			}
+
 			String defaultContext = getContext(prefix, properties.getDefaultContext());
 			List<String> suffixes = getSuffixes();
 			for (String suffix : suffixes) {

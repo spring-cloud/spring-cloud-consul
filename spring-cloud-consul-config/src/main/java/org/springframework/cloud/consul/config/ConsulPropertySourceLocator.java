@@ -50,9 +50,18 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 
 	private final LinkedHashMap<String, Long> contextIndex = new LinkedHashMap<>();
 
+	private final ConsulPropertySources sources;
+
 	public ConsulPropertySourceLocator(ConsulClient consul, ConsulConfigProperties properties) {
 		this.consul = consul;
 		this.properties = properties;
+		sources = new ConsulPropertySources(properties, log);
+	}
+
+	public ConsulPropertySourceLocator(ConsulClient consul, ConsulConfigProperties properties, ConsulPropertySources sources) {
+		this.consul = consul;
+		this.properties = properties;
+		this.sources = sources;
 	}
 
 	@Deprecated
@@ -76,8 +85,6 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 	public PropertySource<?> locate(Environment environment) {
 		if (environment instanceof ConfigurableEnvironment) {
 			ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
-
-			ConsulPropertySources sources = new ConsulPropertySources(properties, log);
 
 			List<String> profiles = Arrays.asList(env.getActiveProfiles());
 			this.contexts.addAll(sources.getAutomaticContexts(profiles));
