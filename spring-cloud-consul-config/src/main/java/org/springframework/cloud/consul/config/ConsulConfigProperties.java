@@ -80,6 +80,11 @@ public class ConsulConfigProperties {
 	 */
 	private String name;
 
+	/**
+	 * contexts which shared with each other, lowest priority.
+	 */
+	private String[] sharedContexts;
+
 	public ConsulConfigProperties() {
 	}
 
@@ -189,12 +194,21 @@ public class ConsulConfigProperties {
 		this.name = name;
 	}
 
+	public String[] getSharedContexts() {
+		return sharedContexts;
+	}
+
+	public void setSharedContexts(String[] sharedContexts) {
+		this.sharedContexts = sharedContexts;
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringCreator(this).append("enabled", this.enabled).append("prefixes", this.prefixes)
 				.append("defaultContext", this.defaultContext).append("profileSeparator", this.profileSeparator)
 				.append("format", this.format).append("dataKey", this.dataKey).append("aclToken", this.aclToken)
-				.append("watch", this.watch).append("failFast", this.failFast).append("name", this.name).toString();
+				.append("watch", this.watch).append("failFast", this.failFast).append("name", this.name)
+				.append("sharedContexts", this.sharedContexts).toString();
 	}
 
 	/**
