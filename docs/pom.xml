@@ -67,7 +67,7 @@
 						<artifactId>antora-component-version-maven-plugin</artifactId>
 					</plugin>
 					<plugin>
-						<groupId>io.spring.maven.antora</groupId>
+						<groupId>org.antora</groupId>
 						<artifactId>antora-maven-plugin</artifactId>
 					</plugin>
 					<plugin>
@@ -75,6 +75,7 @@
 						<artifactId>maven-antrun-plugin</artifactId>
 					</plugin>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-deploy-plugin</artifactId>
 					</plugin>
 				</plugins>
