@@ -96,8 +96,10 @@ class ConsulAutoServiceRegistrationTtlCheckTests {
 	}
 
 	private void assertThatConsulTtlCheckIsInStatus(String serviceName, CheckStatus expectedStatus) {
-		await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> assertThat(getCheckForService(serviceName)).isNotNull()
-				.extracting(Check::getStatus).isEqualTo(expectedStatus));
+		await().atMost(10, TimeUnit.SECONDS)
+			.untilAsserted(() -> assertThat(getCheckForService(serviceName)).isNotNull()
+				.extracting(Check::getStatus)
+				.isEqualTo(expectedStatus));
 	}
 
 	private Check getCheckForService(String serviceName) {

@@ -81,8 +81,9 @@ public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitiali
 			}
 			ConsulDiscoveryClient discoveryClient = event.getBootstrapContext().get(ConsulDiscoveryClient.class);
 			if (discoveryClient != null) {
-				event.getApplicationContext().getBeanFactory().registerSingleton("consulDiscoveryClient",
-						discoveryClient);
+				event.getApplicationContext()
+					.getBeanFactory()
+					.registerSingleton("consulDiscoveryClient", discoveryClient);
 			}
 		});
 

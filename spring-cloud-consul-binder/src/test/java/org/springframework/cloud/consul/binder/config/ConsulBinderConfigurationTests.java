@@ -42,7 +42,8 @@ public class ConsulBinderConfigurationTests {
 	public void consulBinderDisabledWorks() {
 		this.exception.expectMessage(containsString("no proper implementation found"));
 		new SpringApplicationBuilder(Application.class).initializers(new ConsulTestcontainers())
-				.properties("spring.cloud.consul.binder.enabled=false").run();
+			.properties("spring.cloud.consul.binder.enabled=false")
+			.run();
 	}
 
 	@Test
@@ -50,7 +51,8 @@ public class ConsulBinderConfigurationTests {
 	public void consulDisabledDisablesBinder() {
 		this.exception.expectMessage(containsString("no proper implementation found"));
 		new SpringApplicationBuilder(Application.class).initializers(new ConsulTestcontainers())
-				.properties("spring.cloud.consul.enabled=false").run();
+			.properties("spring.cloud.consul.enabled=false")
+			.run();
 	}
 
 	interface Events {

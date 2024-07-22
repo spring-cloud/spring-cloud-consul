@@ -36,7 +36,7 @@ class ConsulConfigDataMissingEnvironmentPostProcessorTests {
 		SpringApplication app = mock(SpringApplication.class);
 		ConsulConfigDataMissingEnvironmentPostProcessor processor = new ConsulConfigDataMissingEnvironmentPostProcessor();
 		assertThatThrownBy(() -> processor.postProcessEnvironment(environment, app))
-				.isInstanceOf(ConsulConfigDataMissingEnvironmentPostProcessor.ImportException.class);
+			.isInstanceOf(ConsulConfigDataMissingEnvironmentPostProcessor.ImportException.class);
 	}
 
 	@Test

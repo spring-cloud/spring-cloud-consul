@@ -69,7 +69,7 @@ public class TtlScheduler {
 		this.client = client;
 		this.reregistrationPredicate = reregistrationPredicate;
 		this.applicationStatusProvider = applicationStatusProviderFactory
-				.getIfAvailable(() -> () -> CheckStatus.PASSING);
+			.getIfAvailable(() -> () -> CheckStatus.PASSING);
 	}
 
 	public void add(final NewService service) {

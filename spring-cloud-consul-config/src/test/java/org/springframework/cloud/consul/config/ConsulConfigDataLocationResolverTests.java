@@ -49,8 +49,10 @@ public class ConsulConfigDataLocationResolverTests {
 				destination -> LogFactory.getLog(ConsulConfigDataLocationResolver.class));
 		UriComponents uriComponents = resolver.parseLocation(null,
 				ConfigDataLocation.of("consul:myhost:8501/mypath1;/mypath2;/mypath3"));
-		assertThat(uriComponents.toUri()).hasScheme("consul").hasHost("myhost").hasPort(8501)
-				.hasPath("/mypath1;/mypath2;/mypath3");
+		assertThat(uriComponents.toUri()).hasScheme("consul")
+			.hasHost("myhost")
+			.hasPort(8501)
+			.hasPath("/mypath1;/mypath2;/mypath3");
 
 		uriComponents = resolver.parseLocation(null, ConfigDataLocation.of("consul:myhost:8501"));
 		assertThat(uriComponents.toUri()).hasScheme("consul").hasHost("myhost").hasPort(8501).hasPath("");

@@ -90,9 +90,12 @@ public class RetryProperties {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this).append("enabled", this.enabled).append("initialInterval", this.initialInterval)
-				.append("multiplier", this.multiplier).append("maxInterval", this.maxInterval)
-				.append("maxAttempts", this.maxAttempts).toString();
+		return new ToStringCreator(this).append("enabled", this.enabled)
+			.append("initialInterval", this.initialInterval)
+			.append("multiplier", this.multiplier)
+			.append("maxInterval", this.maxInterval)
+			.append("maxAttempts", this.maxAttempts)
+			.toString();
 	}
 
 }

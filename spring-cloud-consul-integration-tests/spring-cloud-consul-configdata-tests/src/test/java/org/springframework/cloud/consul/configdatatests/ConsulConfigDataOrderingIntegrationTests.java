@@ -88,7 +88,7 @@ public class ConsulConfigDataOrderingIntegrationTests {
 	public void contextLoads() {
 		Integer port = env.getProperty("local.server.port", Integer.class);
 		ResponseEntity<Map> response = new TestRestTemplate()
-				.getForEntity("http://localhost:" + port + BASE_PATH + "/env/my.prop", Map.class);
+			.getForEntity("http://localhost:" + port + BASE_PATH + "/env/my.prop", Map.class);
 		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 		Map res = response.getBody();
 		assertThat(res).containsKey("propertySources");

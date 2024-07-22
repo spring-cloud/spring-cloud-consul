@@ -67,12 +67,12 @@ public class ConsulAutoServiceRegistrationTests {
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
 		assertThat(service.getId().contains(":")).as("service id contained invalid character: " + service.getId())
-				.isFalse();
+			.isFalse();
 		assertThat(service.getId()).as("service id was wrong").isEqualTo(this.registration.getInstanceId());
 		assertThat(service.getService()).as("service name was wrong").isEqualTo("myTestService1-FF-something");
 		assertThat(ObjectUtils.isEmpty(service.getAddress())).as("service address must not be empty").isFalse();
 		assertThat(service.getAddress()).as("service address must equals hostname from discovery properties")
-				.isEqualTo(this.discoveryProperties.getHostname());
+			.isEqualTo(this.discoveryProperties.getHostname());
 	}
 
 	@Test

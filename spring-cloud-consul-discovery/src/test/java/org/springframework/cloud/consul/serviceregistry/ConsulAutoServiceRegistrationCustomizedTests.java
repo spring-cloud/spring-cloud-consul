@@ -57,9 +57,9 @@ public class ConsulAutoServiceRegistrationCustomizedTests {
 	@Test
 	public void usesCustomConsulLifecycle() {
 		assertThat(this.registration1.getConfiguration()).as("configuration is not customized")
-				.isEqualTo("customconfiguration");
+			.isEqualTo("customconfiguration");
 		assertThat(this.registration2.getConfiguration()).as("configuration is not customized")
-				.isEqualTo("customconfiguration");
+			.isEqualTo("customconfiguration");
 	}
 
 	@SpringBootConfiguration

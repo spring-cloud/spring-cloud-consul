@@ -92,13 +92,13 @@ public class ConsulConfigDataIntegrationTests {
 		client.setKVValue(KEY2, VALUE2_DEFAULT);
 		client.setKVValue(KEY2_APP_NAME, VALUE2);
 
-		context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE).run(
-				"--logging.level.org.springframework.cloud.consul.config.ConfigWatch=TRACE",
-				"--spring.application.name=" + APP_NAME,
-				"--spring.config.import=consul:" + ConsulTestcontainers.getHost() + ":"
-						+ ConsulTestcontainers.getPort(),
-				"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.watch.delay=10",
-				"--spring.cloud.consul.config.watch.wait-time=1");
+		context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
+			.run("--logging.level.org.springframework.cloud.consul.config.ConfigWatch=TRACE",
+					"--spring.application.name=" + APP_NAME,
+					"--spring.config.import=consul:" + ConsulTestcontainers.getHost() + ":"
+							+ ConsulTestcontainers.getPort(),
+					"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.watch.delay=10",
+					"--spring.cloud.consul.config.watch.wait-time=1");
 
 		client = context.getBean(ConsulClient.class);
 		environment = context.getEnvironment();

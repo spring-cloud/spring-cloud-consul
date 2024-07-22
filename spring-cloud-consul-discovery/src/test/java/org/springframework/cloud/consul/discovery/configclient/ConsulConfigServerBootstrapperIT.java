@@ -58,7 +58,7 @@ import static org.mockserver.model.HttpResponse.response;
 public class ConsulConfigServerBootstrapperIT {
 
 	public static final DockerImageName MOCKSERVER_IMAGE = DockerImageName.parse("mockserver/mockserver")
-			.withTag("mockserver-" + MockServerClient.class.getPackage().getImplementationVersion());
+		.withTag("mockserver-" + MockServerClient.class.getPackage().getImplementationVersion());
 
 	@Container
 	static ConsulContainer consul = ConsulTestcontainers.createConsulContainer("1.10");
@@ -100,8 +100,8 @@ public class ConsulConfigServerBootstrapperIT {
 		try (MockServerClient mockServerClient = new MockServerClient(mockServer.getHost(),
 				mockServer.getMappedPort(MockServerContainer.PORT))) {
 			mockServerClient.when(request().withPath("/application/default"))
-					.respond(response().withBody(objectMapper.writeValueAsString(environment))
-							.withHeader("content-type", "application/json"));
+				.respond(response().withBody(objectMapper.writeValueAsString(environment))
+					.withHeader("content-type", "application/json"));
 			this.context = setup().run();
 			assertThat(this.context.getEnvironment().getProperty("hello")).isEqualTo("world");
 		}
@@ -110,7 +110,7 @@ public class ConsulConfigServerBootstrapperIT {
 
 	SpringApplicationBuilder setup(String... env) {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder(TestConfig.class)
-				.properties(addDefaultEnv(env));
+			.properties(addDefaultEnv(env));
 		return builder;
 	}
 

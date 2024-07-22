@@ -84,11 +84,11 @@ public class ConsulConfigDataFileIntegrationTests {
 		client.deleteKVValues(PREFIX);
 		client.setKVValue(KEY1, TEST_PROP + "=" + VALUE1 + "\n" + TEST_PROP2 + "=" + VALUE2);
 
-		context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE).run(
-				"--spring.application.name=" + APP_NAME, "--spring.cloud.consul.config.format=files",
-				"--spring.config.import=optional:consul:" + ConsulTestcontainers.getHost() + ":"
-						+ ConsulTestcontainers.getPort(),
-				"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.watch.delay=10");
+		context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
+			.run("--spring.application.name=" + APP_NAME, "--spring.cloud.consul.config.format=files",
+					"--spring.config.import=optional:consul:" + ConsulTestcontainers.getHost() + ":"
+							+ ConsulTestcontainers.getPort(),
+					"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.watch.delay=10");
 
 		client = context.getBean(ConsulClient.class);
 		environment = context.getEnvironment();

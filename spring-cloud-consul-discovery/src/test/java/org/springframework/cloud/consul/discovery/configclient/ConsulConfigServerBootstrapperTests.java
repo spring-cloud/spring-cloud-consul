@@ -46,46 +46,52 @@ public class ConsulConfigServerBootstrapperTests {
 	@Test
 	public void notEnabledDoesNotAddInstanceProviderFn() {
 		new SpringApplicationBuilder(TestConfig.class)
-				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false")
-				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
-					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
-							.get(ConfigServerInstanceProvider.Function.class);
-					Log log = mock(Log.class);
-					assertThat(providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
-							event.getBootstrapContext().get(BindHandler.class), log))
-									.as("ConfigServerInstanceProvider.Function should return empty list")
-									.isEqualTo(Collections.EMPTY_LIST);
-				})).run().close();
+			.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false")
+			.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
+				ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
+					.get(ConfigServerInstanceProvider.Function.class);
+				Log log = mock(Log.class);
+				assertThat(providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
+						event.getBootstrapContext().get(BindHandler.class), log))
+					.as("ConfigServerInstanceProvider.Function should return empty list")
+					.isEqualTo(Collections.EMPTY_LIST);
+			}))
+			.run()
+			.close();
 	}
 
 	@Test
 	public void consulDiscoveryClientNotEnabledProvidesEmptyList() {
 		new SpringApplicationBuilder(TestConfig.class)
-				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false")
-				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
-					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
-							.get(ConfigServerInstanceProvider.Function.class);
-					Log log = mock(Log.class);
-					assertThat(providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
-							event.getBootstrapContext().get(BindHandler.class), log))
-									.as("ConfigServerInstanceProvider.Function should return empty list")
-									.isEqualTo(Collections.EMPTY_LIST);
-				})).run().close();
+			.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false")
+			.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
+				ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
+					.get(ConfigServerInstanceProvider.Function.class);
+				Log log = mock(Log.class);
+				assertThat(providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
+						event.getBootstrapContext().get(BindHandler.class), log))
+					.as("ConfigServerInstanceProvider.Function should return empty list")
+					.isEqualTo(Collections.EMPTY_LIST);
+			}))
+			.run()
+			.close();
 	}
 
 	@Test
 	public void springCloudDiscoveryClientNotEnabledProvidesEmptyList() {
 		new SpringApplicationBuilder(TestConfig.class)
-				.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false")
-				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
-					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
-							.get(ConfigServerInstanceProvider.Function.class);
-					Log log = mock(Log.class);
-					assertThat(providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
-							event.getBootstrapContext().get(BindHandler.class), log))
-									.as("ConfigServerInstanceProvider.Function should return empty list")
-									.isEqualTo(Collections.EMPTY_LIST);
-				})).run().close();
+			.properties("--server.port=0", "spring.cloud.service-registry.auto-registration.enabled=false")
+			.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
+				ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
+					.get(ConfigServerInstanceProvider.Function.class);
+				Log log = mock(Log.class);
+				assertThat(providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
+						event.getBootstrapContext().get(BindHandler.class), log))
+					.as("ConfigServerInstanceProvider.Function should return empty list")
+					.isEqualTo(Collections.EMPTY_LIST);
+			}))
+			.run()
+			.close();
 	}
 
 	@Test
@@ -93,22 +99,22 @@ public class ConsulConfigServerBootstrapperTests {
 		AtomicReference<ConsulDiscoveryClient> bootstrapDiscoveryClient = new AtomicReference<>();
 		BindHandlerBootstrapper bindHandlerBootstrapper = new BindHandlerBootstrapper();
 		ConfigurableApplicationContext context = new SpringApplicationBuilder(TestConfig.class)
-				.properties("--server.port=0", "spring.cloud.config.discovery.enabled=true",
-						"spring.cloud.consul.discovery.hostname=myhost",
-						"spring.cloud.service-registry.auto-registration.enabled=false")
-				.addBootstrapRegistryInitializer(bindHandlerBootstrapper)
-				.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
-					bootstrapDiscoveryClient.set(event.getBootstrapContext().get(ConsulDiscoveryClient.class));
-					ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
-							.get(ConfigServerInstanceProvider.Function.class);
-					assertThatThrownBy(() -> providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
-							event.getBootstrapContext().get(BindHandler.class), mock(Log.class)))
-									.isInstanceOf(TransportException.class)
-									.hasMessageContaining(
-											"org.apache.http.conn.HttpHostConnectException: Connect to localhost:8500")
-									.as("Should have tried to reach out to Consul to get config server instance")
-									.isNotNull();
-				})).run();
+			.properties("--server.port=0", "spring.cloud.config.discovery.enabled=true",
+					"spring.cloud.consul.discovery.hostname=myhost",
+					"spring.cloud.service-registry.auto-registration.enabled=false")
+			.addBootstrapRegistryInitializer(bindHandlerBootstrapper)
+			.addBootstrapRegistryInitializer(registry -> registry.addCloseListener(event -> {
+				bootstrapDiscoveryClient.set(event.getBootstrapContext().get(ConsulDiscoveryClient.class));
+				ConfigServerInstanceProvider.Function providerFn = event.getBootstrapContext()
+					.get(ConfigServerInstanceProvider.Function.class);
+				assertThatThrownBy(() -> providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
+						event.getBootstrapContext().get(BindHandler.class), mock(Log.class)))
+					.isInstanceOf(TransportException.class)
+					.hasMessageContaining("org.apache.http.conn.HttpHostConnectException: Connect to localhost:8500")
+					.as("Should have tried to reach out to Consul to get config server instance")
+					.isNotNull();
+			}))
+			.run();
 		ConsulDiscoveryClient discoveryClient = context.getBean(ConsulDiscoveryClient.class);
 		assertThat(discoveryClient == bootstrapDiscoveryClient.get()).isTrue();
 		assertThat(bindHandlerBootstrapper.onSuccessCount).isGreaterThan(0);

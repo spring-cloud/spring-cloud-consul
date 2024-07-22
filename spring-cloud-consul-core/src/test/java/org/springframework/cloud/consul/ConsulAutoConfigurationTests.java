@@ -42,22 +42,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ConsulAutoConfigurationTests {
 
 	private final ApplicationContextRunner appContextRunner = new ApplicationContextRunner()
-			.withInitializer(new ConsulTestcontainers())
-			.withConfiguration(AutoConfigurations.of(ConsulAutoConfiguration.class));
+		.withInitializer(new ConsulTestcontainers())
+		.withConfiguration(AutoConfigurations.of(ConsulAutoConfiguration.class));
 
 	@Test
 	public void defaultConfiguration() {
-		appContextRunner.run(context -> assertThat(context).hasNotFailed().hasSingleBean(ConsulProperties.class)
-				.hasSingleBean(ConsulClient.class).hasSingleBean(ConsulHealthIndicator.class)
-				.doesNotHaveBean(ConsulEndpoint.class));
+		appContextRunner.run(context -> assertThat(context).hasNotFailed()
+			.hasSingleBean(ConsulProperties.class)
+			.hasSingleBean(ConsulClient.class)
+			.hasSingleBean(ConsulHealthIndicator.class)
+			.doesNotHaveBean(ConsulEndpoint.class));
 	}
 
 	@Test
 	public void consulDisabled() {
 		appContextRunner.withPropertyValues("spring.cloud.consul.enabled=false")
-				.run(context -> assertThat(context).hasNotFailed().doesNotHaveBean(ConsulProperties.class)
-						.doesNotHaveBean(ConsulClient.class).doesNotHaveBean(ConsulHealthIndicator.class)
-						.doesNotHaveBean(ConsulEndpoint.class));
+			.run(context -> assertThat(context).hasNotFailed()
+				.doesNotHaveBean(ConsulProperties.class)
+				.doesNotHaveBean(ConsulClient.class)
+				.doesNotHaveBean(ConsulHealthIndicator.class)
+				.doesNotHaveBean(ConsulEndpoint.class));
 	}
 
 	@Test
@@ -78,57 +82,61 @@ public class ConsulAutoConfigurationTests {
 
 	@Test
 	public void tlsConfigured() {
-		appContextRunner.withPropertyValues("spring.cloud.consul.tls.key-store-instance-type=JKS",
-				"spring.cloud.consul.tls.key-store-path=src/test/resources/server.jks",
-				"spring.cloud.consul.tls.key-store-password=letmein",
-				"spring.cloud.consul.tls.certificate-path=src/test/resources/trustStore.jks",
-				"spring.cloud.consul.tls.certificate-password=change_me").run(context -> {
-					assertThat(context).hasNotFailed().hasSingleBean(ConsulClient.class);
+		appContextRunner
+			.withPropertyValues("spring.cloud.consul.tls.key-store-instance-type=JKS",
+					"spring.cloud.consul.tls.key-store-path=src/test/resources/server.jks",
+					"spring.cloud.consul.tls.key-store-password=letmein",
+					"spring.cloud.consul.tls.certificate-path=src/test/resources/trustStore.jks",
+					"spring.cloud.consul.tls.certificate-password=change_me")
+			.run(context -> {
+				assertThat(context).hasNotFailed().hasSingleBean(ConsulClient.class);
 
-					ConsulClient consulClient = context.getBean(ConsulClient.class);
-					CatalogConsulClient client = (CatalogConsulClient) ReflectionTestUtils.getField(consulClient,
-							"catalogClient");
-					ConsulRawClient rawClient = (ConsulRawClient) ReflectionTestUtils.getField(client, "rawClient");
-					HttpTransport httpTransport = (HttpTransport) ReflectionTestUtils.getField(rawClient,
-							"httpTransport");
-					assertThat(httpTransport).isInstanceOf(DefaultHttpsTransport.class);
-				});
+				ConsulClient consulClient = context.getBean(ConsulClient.class);
+				CatalogConsulClient client = (CatalogConsulClient) ReflectionTestUtils.getField(consulClient,
+						"catalogClient");
+				ConsulRawClient rawClient = (ConsulRawClient) ReflectionTestUtils.getField(client, "rawClient");
+				HttpTransport httpTransport = (HttpTransport) ReflectionTestUtils.getField(rawClient, "httpTransport");
+				assertThat(httpTransport).isInstanceOf(DefaultHttpsTransport.class);
+			});
 	}
 
 	@Test
 	public void nonActuatorAppGetsNoEndpointOrHealthIndicator() {
 		appContextRunner.withClassLoader(new FilteredClassLoader(Endpoint.class))
-				.withPropertyValues("management.endpoints.web.exposure.include=consul")
-				.run(context -> assertThat(context).hasNotFailed().doesNotHaveBean(ConsulHealthIndicator.class)
-						.doesNotHaveBean(ConsulEndpoint.class));
+			.withPropertyValues("management.endpoints.web.exposure.include=consul")
+			.run(context -> assertThat(context).hasNotFailed()
+				.doesNotHaveBean(ConsulHealthIndicator.class)
+				.doesNotHaveBean(ConsulEndpoint.class));
 	}
 
 	@Test
 	public void consulEndpointAvailable() {
 		appContextRunner.withPropertyValues("management.endpoints.web.exposure.include=consul")
-				.run(context -> assertThat(context).hasNotFailed().hasSingleBean(ConsulEndpoint.class));
+			.run(context -> assertThat(context).hasNotFailed().hasSingleBean(ConsulEndpoint.class));
 	}
 
 	@Test
 	public void consulEndpointAvailableButDisabled() {
 		appContextRunner
-				.withPropertyValues("management.endpoints.web.exposure.include=consul",
-						"management.endpoint.consul.enabled=false")
-				.run(context -> assertThat(context).hasNotFailed().doesNotHaveBean(ConsulEndpoint.class));
+			.withPropertyValues("management.endpoints.web.exposure.include=consul",
+					"management.endpoint.consul.enabled=false")
+			.run(context -> assertThat(context).hasNotFailed().doesNotHaveBean(ConsulEndpoint.class));
 	}
 
 	@Test
 	public void consulEndpointDisabled() {
 		appContextRunner.withPropertyValues("spring.cloud.consul.enabled=false")
-				.run(context -> assertThat(context).hasNotFailed().doesNotHaveBean(ConsulProperties.class)
-						.doesNotHaveBean(ConsulClient.class).doesNotHaveBean(ConsulHealthIndicator.class)
-						.doesNotHaveBean(ConsulEndpoint.class));
+			.run(context -> assertThat(context).hasNotFailed()
+				.doesNotHaveBean(ConsulProperties.class)
+				.doesNotHaveBean(ConsulClient.class)
+				.doesNotHaveBean(ConsulHealthIndicator.class)
+				.doesNotHaveBean(ConsulEndpoint.class));
 	}
 
 	@Test
 	public void consulHealthIndicatorDisabled() {
 		appContextRunner.withPropertyValues("management.health.consul.enabled=false")
-				.run(context -> assertThat(context).hasNotFailed().doesNotHaveBean(ConsulHealthIndicator.class));
+			.run(context -> assertThat(context).hasNotFailed().doesNotHaveBean(ConsulHealthIndicator.class));
 	}
 
 }

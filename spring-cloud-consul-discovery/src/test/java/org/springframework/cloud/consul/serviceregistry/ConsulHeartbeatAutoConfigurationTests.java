@@ -38,11 +38,11 @@ import static org.mockito.Mockito.mock;
 class ConsulHeartbeatAutoConfigurationTests {
 
 	private ApplicationContextRunner appContextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations.of(ConsulHeartbeatAutoConfiguration.class))
-			.withBean(ConsulClient.class, () -> mock(ConsulClient.class))
-			.withBean(HealthEndpoint.class, () -> mock(HealthEndpoint.class))
-			.withBean(ConsulDiscoveryProperties.class, () -> mock(ConsulDiscoveryProperties.class))
-			.withPropertyValues("spring.cloud.consul.discovery.heartbeat.enabled=true");
+		.withConfiguration(AutoConfigurations.of(ConsulHeartbeatAutoConfiguration.class))
+		.withBean(ConsulClient.class, () -> mock(ConsulClient.class))
+		.withBean(HealthEndpoint.class, () -> mock(HealthEndpoint.class))
+		.withBean(ConsulDiscoveryProperties.class, () -> mock(ConsulDiscoveryProperties.class))
+		.withPropertyValues("spring.cloud.consul.discovery.heartbeat.enabled=true");
 
 	@Test
 	void heartbeatEnabled() {
@@ -52,83 +52,93 @@ class ConsulHeartbeatAutoConfigurationTests {
 	@Test
 	void heartbeatDisabled() {
 		appContextRunner.withPropertyValues("spring.cloud.consul.discovery.heartbeat.enabled=false")
-				.run(this::assertThatHeartbeatNotConfigured);
+			.run(this::assertThatHeartbeatNotConfigured);
 	}
 
 	@Test
 	void heartbeatEnabledPropertyNotSpecified() {
 		new ApplicationContextRunner().withConfiguration(AutoConfigurations.of(ConsulHeartbeatAutoConfiguration.class))
-				.withBean(ConsulClient.class, () -> mock(ConsulClient.class))
-				.withBean(HealthEndpoint.class, () -> mock(HealthEndpoint.class))
-				.run(this::assertThatHeartbeatNotConfigured);
+			.withBean(ConsulClient.class, () -> mock(ConsulClient.class))
+			.withBean(HealthEndpoint.class, () -> mock(HealthEndpoint.class))
+			.run(this::assertThatHeartbeatNotConfigured);
 	}
 
 	@Test
 	void heartbeatEnabledButConsulDisabled() {
 		appContextRunner.withPropertyValues("spring.cloud.consul.enabled=false")
-				.run(this::assertThatHeartbeatNotConfigured);
+			.run(this::assertThatHeartbeatNotConfigured);
 	}
 
 	@Test
 	void heartbeatEnabledButDiscoveryDisabled() {
 		appContextRunner.withPropertyValues("spring.cloud.discovery.enabled=false")
-				.run(this::assertThatHeartbeatNotConfigured);
+			.run(this::assertThatHeartbeatNotConfigured);
 	}
 
 	private void assertThatHeartbeatNotConfigured(AssertableApplicationContext context) {
-		assertThat(context).hasNotFailed().doesNotHaveBean(HeartbeatProperties.class)
-				.doesNotHaveBean(TtlScheduler.class).doesNotHaveBean(ApplicationStatusProvider.class);
+		assertThat(context).hasNotFailed()
+			.doesNotHaveBean(HeartbeatProperties.class)
+			.doesNotHaveBean(TtlScheduler.class)
+			.doesNotHaveBean(ApplicationStatusProvider.class);
 	}
 
 	private void assertThatHeartbeatConfigured(AssertableApplicationContext context) {
-		assertThat(context).hasNotFailed().hasSingleBean(HeartbeatProperties.class).hasSingleBean(TtlScheduler.class)
-				.hasSingleBean(ApplicationStatusProvider.class);
+		assertThat(context).hasNotFailed()
+			.hasSingleBean(HeartbeatProperties.class)
+			.hasSingleBean(TtlScheduler.class)
+			.hasSingleBean(ApplicationStatusProvider.class);
 	}
 
 	@Test
 	void heartbeatEnabledAndActuatorNotOnClasspath() {
 		new ApplicationContextRunner().withConfiguration(AutoConfigurations.of(ConsulHeartbeatAutoConfiguration.class))
-				.withBean(ConsulClient.class, () -> mock(ConsulClient.class))
-				.withBean(ConsulDiscoveryProperties.class, () -> mock(ConsulDiscoveryProperties.class))
-				.withPropertyValues("spring.cloud.consul.discovery.heartbeat.enabled=true")
-				.withClassLoader(new FilteredClassLoader(HealthEndpoint.class))
-				.run(this::assertThatHeartbeatConfiguredWithoutAppStatusProvider);
+			.withBean(ConsulClient.class, () -> mock(ConsulClient.class))
+			.withBean(ConsulDiscoveryProperties.class, () -> mock(ConsulDiscoveryProperties.class))
+			.withPropertyValues("spring.cloud.consul.discovery.heartbeat.enabled=true")
+			.withClassLoader(new FilteredClassLoader(HealthEndpoint.class))
+			.run(this::assertThatHeartbeatConfiguredWithoutAppStatusProvider);
 	}
 
 	@Test
 	void heartbeatEnabledAndActuatorOnClasspathButNoHealthEndpointBeanRegistered() {
 		new ApplicationContextRunner().withConfiguration(AutoConfigurations.of(ConsulHeartbeatAutoConfiguration.class))
-				.withBean(ConsulClient.class, () -> mock(ConsulClient.class))
-				.withBean(ConsulDiscoveryProperties.class, () -> mock(ConsulDiscoveryProperties.class))
-				.withPropertyValues("spring.cloud.consul.discovery.heartbeat.enabled=true")
-				.run(this::assertThatHeartbeatConfiguredWithoutAppStatusProvider);
+			.withBean(ConsulClient.class, () -> mock(ConsulClient.class))
+			.withBean(ConsulDiscoveryProperties.class, () -> mock(ConsulDiscoveryProperties.class))
+			.withPropertyValues("spring.cloud.consul.discovery.heartbeat.enabled=true")
+			.run(this::assertThatHeartbeatConfiguredWithoutAppStatusProvider);
 	}
 
 	@Test
 	void heartbeatEnabledButUseActuatorHealthPropertySetToFalse() {
 		appContextRunner.withPropertyValues("spring.cloud.consul.discovery.heartbeat.use-actuator-health=false")
-				.run(this::assertThatHeartbeatConfiguredWithoutAppStatusProvider);
+			.run(this::assertThatHeartbeatConfiguredWithoutAppStatusProvider);
 	}
 
 	private void assertThatHeartbeatConfiguredWithoutAppStatusProvider(AssertableApplicationContext context) {
-		assertThat(context).hasNotFailed().hasSingleBean(HeartbeatProperties.class).hasSingleBean(TtlScheduler.class)
-				.doesNotHaveBean(ApplicationStatusProvider.class);
+		assertThat(context).hasNotFailed()
+			.hasSingleBean(HeartbeatProperties.class)
+			.hasSingleBean(TtlScheduler.class)
+			.doesNotHaveBean(ApplicationStatusProvider.class);
 	}
 
 	@Test
 	void customHeartbeatPropertiesRespected() {
 		HeartbeatProperties customHeartbeatProps = mock(HeartbeatProperties.class);
 		appContextRunner.withBean(HeartbeatProperties.class, () -> customHeartbeatProps)
-				.run(context -> assertThat(context).hasNotFailed().hasSingleBean(HeartbeatProperties.class)
-						.getBean(HeartbeatProperties.class).isSameAs(customHeartbeatProps));
+			.run(context -> assertThat(context).hasNotFailed()
+				.hasSingleBean(HeartbeatProperties.class)
+				.getBean(HeartbeatProperties.class)
+				.isSameAs(customHeartbeatProps));
 	}
 
 	@Test
 	void customTtlSchedulerRespected() {
 		TtlScheduler customTtlScheduler = mock(TtlScheduler.class);
 		appContextRunner.withBean(TtlScheduler.class, () -> customTtlScheduler)
-				.run(context -> assertThat(context).hasNotFailed().hasSingleBean(TtlScheduler.class)
-						.getBean(TtlScheduler.class).isSameAs(customTtlScheduler));
+			.run(context -> assertThat(context).hasNotFailed()
+				.hasSingleBean(TtlScheduler.class)
+				.getBean(TtlScheduler.class)
+				.isSameAs(customTtlScheduler));
 
 	}
 
@@ -136,8 +146,10 @@ class ConsulHeartbeatAutoConfigurationTests {
 	void customApplicationStatusProviderRespected() {
 		ApplicationStatusProvider customAppStatusProvider = mock(ApplicationStatusProvider.class);
 		appContextRunner.withBean(ApplicationStatusProvider.class, () -> customAppStatusProvider)
-				.run(context -> assertThat(context).hasNotFailed().hasSingleBean(ApplicationStatusProvider.class)
-						.getBean(ApplicationStatusProvider.class).isSameAs(customAppStatusProvider));
+			.run(context -> assertThat(context).hasNotFailed()
+				.hasSingleBean(ApplicationStatusProvider.class)
+				.getBean(ApplicationStatusProvider.class)
+				.isSameAs(customAppStatusProvider));
 
 	}
 

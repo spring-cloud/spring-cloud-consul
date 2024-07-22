@@ -63,7 +63,7 @@ public class ConsulHealthIndicatorDownTest {
 		Response<String> leaderStatus = new Response<>("OK", 5150L, true, System.currentTimeMillis());
 		when(consulClient.getStatusLeader()).thenReturn(leaderStatus);
 		when(consulClient.getCatalogServices(any(CatalogServicesRequest.class)))
-				.thenThrow(new RuntimeException("no services"));
+			.thenThrow(new RuntimeException("no services"));
 		assertThat(this.healthEndpoint.health().getStatus()).as("health status was not DOWN").isEqualTo(Status.DOWN);
 		verify(consulClient).getCatalogServices(any(CatalogServicesRequest.class));
 	}

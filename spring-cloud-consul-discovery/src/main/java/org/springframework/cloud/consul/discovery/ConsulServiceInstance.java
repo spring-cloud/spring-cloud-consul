@@ -96,10 +96,15 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this).append("instanceId", getInstanceId()).append("serviceId", getServiceId())
-				.append("host", getHost()).append("port", getPort()).append("secure", isSecure())
-				.append("metadata", getMetadata()).append("uri", getUri()).append("healthService", healthService)
-				.toString();
+		return new ToStringCreator(this).append("instanceId", getInstanceId())
+			.append("serviceId", getServiceId())
+			.append("host", getHost())
+			.append("port", getPort())
+			.append("secure", isSecure())
+			.append("metadata", getMetadata())
+			.append("uri", getUri())
+			.append("healthService", healthService)
+			.toString();
 
 	}
 

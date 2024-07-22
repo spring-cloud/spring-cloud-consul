@@ -87,11 +87,11 @@ public class ConsulPropertySourceLocatorTests {
 		client.setKVValue(KEY1, VALUE1);
 		client.setKVValue(KEY2, VALUE2);
 
-		context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE).run(
-				"--spring.application.name=" + APP_NAME, "--spring.config.use-legacy-processing=true",
-				"--spring.cloud.consul.host=" + ConsulTestcontainers.getHost(),
-				"--spring.cloud.consul.port=" + ConsulTestcontainers.getPort(),
-				"--spring.cloud.consul.config.prefixes=" + ROOT, "--spring.cloud.consul.config.watch.delay=10");
+		context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
+			.run("--spring.application.name=" + APP_NAME, "--spring.config.use-legacy-processing=true",
+					"--spring.cloud.consul.host=" + ConsulTestcontainers.getHost(),
+					"--spring.cloud.consul.port=" + ConsulTestcontainers.getPort(),
+					"--spring.cloud.consul.config.prefixes=" + ROOT, "--spring.cloud.consul.config.watch.delay=10");
 
 		client = context.getBean(ConsulClient.class);
 		environment = context.getEnvironment();

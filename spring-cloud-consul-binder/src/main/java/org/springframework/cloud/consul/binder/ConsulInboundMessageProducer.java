@@ -100,8 +100,8 @@ public class ConsulInboundMessageProducer extends MessageProducerSupport {
 				// headers.put(MessageHeaders.REPLY_CHANNEL, outputChannel.)
 				String decoded = new String(decodeFromString(event.getPayload()));
 				sendMessage(getMessageBuilderFactory().withPayload(decoded)
-						// TODO: support headers
-						.build());
+					// TODO: support headers
+					.build());
 			}
 		}
 		catch (OperationException e) {

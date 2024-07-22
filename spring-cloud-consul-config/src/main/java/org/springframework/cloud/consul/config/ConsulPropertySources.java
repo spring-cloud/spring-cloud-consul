@@ -38,7 +38,7 @@ public class ConsulPropertySources {
 	protected static final List<String> DIR_SUFFIXES = Collections.singletonList("/");
 
 	protected static final List<String> FILES_SUFFIXES = Collections
-			.unmodifiableList(Arrays.asList(".yml", ".yaml", ".properties"));
+		.unmodifiableList(Arrays.asList(".yml", ".yaml", ".properties"));
 
 	private final ConsulConfigProperties properties;
 

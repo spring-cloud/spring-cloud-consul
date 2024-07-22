@@ -80,7 +80,7 @@ public class ConsulDiscoveryClientConfigurationTests {
 	@Test
 	public void consulConfigNotLoadedWhenCloudDiscoveryDisabled_ConsulDiscoveryClientDisabled() {
 		TestPropertyValues.of("spring.cloud.discovery.enabled=false", "spring.cloud.consul.discovery.enabled=false")
-				.applyTo(this.context);
+			.applyTo(this.context);
 		setupContext();
 		assertBeanNotPresent(ConsulDiscoveryProperties.class);
 		assertBeanNotPresent(ConsulDiscoveryClient.class);
@@ -90,7 +90,7 @@ public class ConsulDiscoveryClientConfigurationTests {
 	@Test
 	public void consulConfigIsLoadedWhenCloudDiscoveryEnabled_ConsulDiscoveryClientEnabled() {
 		TestPropertyValues.of("spring.cloud.discovery.enabled=true", "spring.cloud.consul.discovery.enabled=true")
-				.applyTo(this.context);
+			.applyTo(this.context);
 		setupContext();
 		assertBeanIsPresent(ConsulDiscoveryProperties.class);
 		assertBeanIsPresent(ConsulDiscoveryClient.class);
@@ -99,7 +99,7 @@ public class ConsulDiscoveryClientConfigurationTests {
 	@Test
 	public void consulConfigNotLoadedWhenCloudDiscoveryEnabled_ConsulDiscoveryClientDisabled() {
 		TestPropertyValues.of("spring.cloud.discovery.enabled=true", "spring.cloud.consul.discovery.enabled=false")
-				.applyTo(this.context);
+			.applyTo(this.context);
 		setupContext();
 		assertBeanNotPresent(ConsulDiscoveryProperties.class);
 		assertBeanNotPresent(ConsulDiscoveryClient.class);
@@ -109,7 +109,7 @@ public class ConsulDiscoveryClientConfigurationTests {
 	@Test
 	public void consulConfigNotLoadedWhenCloudDiscoveryDisabled_ConsulDiscoveryClientEnabled() {
 		TestPropertyValues.of("spring.cloud.discovery.enabled=false", "spring.cloud.consul.discovery.enabled=true")
-				.applyTo(this.context);
+			.applyTo(this.context);
 		setupContext();
 		assertBeanNotPresent(ConsulDiscoveryProperties.class);
 		assertBeanNotPresent(ConsulDiscoveryClient.class);

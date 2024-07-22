@@ -60,7 +60,7 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 	protected static final List<String> DIR_SUFFIXES = Collections.singletonList("/");
 
 	protected static final List<String> FILES_SUFFIXES = Collections
-			.unmodifiableList(Arrays.asList(".yml", ".yaml", ".properties"));
+		.unmodifiableList(Arrays.asList(".yml", ".yaml", ".properties"));
 
 	private final Log log;
 
@@ -75,8 +75,9 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		}
 		// only bind if correct prefix
 		boolean enabled = context.getBinder().bind(ConsulProperties.PREFIX + ".enabled", Boolean.class).orElse(true);
-		boolean configEnabled = context.getBinder().bind(ConsulConfigProperties.PREFIX + ".enabled", Boolean.class)
-				.orElse(true);
+		boolean configEnabled = context.getBinder()
+			.bind(ConsulConfigProperties.PREFIX + ".enabled", Boolean.class)
+			.orElse(true);
 		return configEnabled && enabled;
 	}
 
@@ -110,10 +111,10 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		registerAndPromoteBean(resolverContext, ConsulConfigIndexes.class,
 				InstanceSupplier.from(ConsulConfigDataIndexes::new));
 
-		return contexts
-				.stream().map(propertySourceContext -> new ConsulConfigDataResource(propertySourceContext.getPath(),
-						properties, consulPropertySources, propertySourceContext.getProfile()))
-				.collect(Collectors.toList());
+		return contexts.stream()
+			.map(propertySourceContext -> new ConsulConfigDataResource(propertySourceContext.getPath(), properties,
+					consulPropertySources, propertySourceContext.getProfile()))
+			.collect(Collectors.toList());
 	}
 
 	private BindHandler getBindHandler(ConfigDataLocationResolverContext context) {
@@ -192,8 +193,8 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 			UriComponents location) {
 		Binder binder = resolverContext.getBinder();
 		ConsulProperties consulProperties = binder
-				.bind(ConsulProperties.PREFIX, Bindable.of(ConsulProperties.class), getBindHandler(resolverContext))
-				.orElseGet(ConsulProperties::new);
+			.bind(ConsulProperties.PREFIX, Bindable.of(ConsulProperties.class), getBindHandler(resolverContext))
+			.orElseGet(ConsulProperties::new);
 
 		if (location != null) {
 			if (StringUtils.hasText(location.getHost())) {
@@ -211,8 +212,8 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		Binder binder = resolverContext.getBinder();
 		BindHandler bindHandler = getBindHandler(resolverContext);
 		ConsulConfigProperties properties = binder
-				.bind(ConsulConfigProperties.PREFIX, Bindable.of(ConsulConfigProperties.class), bindHandler)
-				.orElseGet(ConsulConfigProperties::new);
+			.bind(ConsulConfigProperties.PREFIX, Bindable.of(ConsulConfigProperties.class), bindHandler)
+			.orElseGet(ConsulConfigProperties::new);
 
 		if (!StringUtils.hasText(properties.getName())) {
 			properties.setName(binder.bind("spring.application.name", String.class).orElse("application"));
@@ -220,7 +221,7 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 
 		if (!StringUtils.hasText(properties.getAclToken())) {
 			properties.setAclToken(binder.bind("spring.cloud.consul.token", String.class)
-					.orElse(binder.bind("consul.token", String.class).orElse(null)));
+				.orElse(binder.bind("consul.token", String.class).orElse(null)));
 		}
 		return properties;
 	}

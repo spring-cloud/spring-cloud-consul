@@ -74,7 +74,7 @@ public class ConsulAutoServiceRegistrationManagementDisabledServiceTests {
 		assertThat(service.getService()).as("service name was wrong").isEqualTo("myTestService-NM");
 		assertThat(ObjectUtils.isEmpty(service.getAddress())).as("service address must not be empty").isFalse();
 		assertThat(service.getAddress()).as("service address must equals hostname from discovery properties")
-				.isEqualTo(this.discoveryProperties.getHostname());
+			.isEqualTo(this.discoveryProperties.getHostname());
 
 	}
 

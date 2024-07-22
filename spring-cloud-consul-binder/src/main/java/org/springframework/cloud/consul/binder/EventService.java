@@ -101,7 +101,7 @@ public class EventService {
 			eventTimeout = this.properties.getEventTimeout();
 		}
 		Response<List<Event>> watch = this.consul
-				.eventList(EventListRequest.newBuilder().setQueryParams(new QueryParams(eventTimeout, index)).build());
+			.eventList(EventListRequest.newBuilder().setQueryParams(new QueryParams(eventTimeout, index)).build());
 		return filterEvents(readEvents(watch), lastIndex);
 	}
 

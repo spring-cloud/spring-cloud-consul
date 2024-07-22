@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Conditional;
 
 /**
  * When both property and consul classes are on the classpath.
+ *
  * @author Spencer Gibb
  */
 @Retention(RetentionPolicy.RUNTIME)

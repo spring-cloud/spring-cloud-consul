@@ -89,7 +89,7 @@ public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 		entries.put("group", "mygroup");
 		entries.put("secure", "false");
 		assertThat(service.getMeta()).as("property metadata contains the wrong entries")
-				.containsExactlyInAnyOrderEntriesOf(entries);
+			.containsExactlyInAnyOrderEntriesOf(entries);
 
 		Response<List<Check>> checkResponse = this.consul.getHealthChecksForService("myTestService-B",
 				HealthChecksForServiceRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());

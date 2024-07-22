@@ -130,9 +130,11 @@ public class ConsulAutoConfiguration {
 		@Bean(name = "consulRetryInterceptor")
 		@ConditionalOnMissingBean(name = "consulRetryInterceptor")
 		public RetryOperationsInterceptor consulRetryInterceptor(RetryProperties properties) {
-			return RetryInterceptorBuilder.stateless().backOffOptions(properties.getInitialInterval(),
-					properties.getMultiplier(), properties.getMaxInterval()).maxAttempts(properties.getMaxAttempts())
-					.build();
+			return RetryInterceptorBuilder.stateless()
+				.backOffOptions(properties.getInitialInterval(), properties.getMultiplier(),
+						properties.getMaxInterval())
+				.maxAttempts(properties.getMaxAttempts())
+				.build();
 		}
 
 	}

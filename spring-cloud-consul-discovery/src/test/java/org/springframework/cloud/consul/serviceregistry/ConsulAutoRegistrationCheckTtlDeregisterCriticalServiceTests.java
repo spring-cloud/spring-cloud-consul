@@ -53,7 +53,8 @@ public class ConsulAutoRegistrationCheckTtlDeregisterCriticalServiceTests {
 	public void contextLoads() {
 		NewService service = registration.getService();
 		assertThat("1m".equals(service.getCheck().getDeregisterCriticalServiceAfter()))
-				.as("Service with heartbeat check and deregister critical timeout registered").isTrue();
+			.as("Service with heartbeat check and deregister critical timeout registered")
+			.isTrue();
 	}
 
 	@Configuration(proxyBeanMethods = false)

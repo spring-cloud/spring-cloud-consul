@@ -58,10 +58,10 @@ public class ConsulAutoServiceRegistrationRetryTests {
 	public void testRetry() {
 		this.exception.expectCause(isA(ConsulException.class));
 		try (ConfigurableApplicationContext context = new SpringApplicationBuilder(TestConfig.class)
-				.properties("spring.application.name=testregistrationretry",
-						"spring.jmx.default-domain=testautoregretry", "spring.cloud.consul.retry.max-attempts=2",
-						"logging.level.org.springframework.retry=DEBUG", "server.port=0")
-				.run()) {
+			.properties("spring.application.name=testregistrationretry", "spring.jmx.default-domain=testautoregretry",
+					"spring.cloud.consul.retry.max-attempts=2", "logging.level.org.springframework.retry=DEBUG",
+					"server.port=0")
+			.run()) {
 			this.output.expect(Matchers.containsString("Retry: count="));
 		}
 	}

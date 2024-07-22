@@ -53,9 +53,10 @@ class ConsulDiscoveryClientQueryTagsTests {
 	static NewService PROD_EAST_SERVICE = serviceForEnvironmentAndRegion("prod", "us-east", 9082);
 
 	private ApplicationContextRunner appContextRunner = new ApplicationContextRunner()
-			.withInitializer(new ConsulTestcontainers()).withConfiguration(AutoConfigurations.of(TestConfig.class))
-			.withPropertyValues("spring.application.name=consulServiceQueryTags",
-					"spring.cloud.consul.discovery.catalogServicesWatch.enabled=false");
+		.withInitializer(new ConsulTestcontainers())
+		.withConfiguration(AutoConfigurations.of(TestConfig.class))
+		.withPropertyValues("spring.application.name=consulServiceQueryTags",
+				"spring.cloud.consul.discovery.catalogServicesWatch.enabled=false");
 
 	private static NewService serviceForEnvironmentAndRegion(String env, String region, int port) {
 		NewService service = new NewService();
@@ -69,89 +70,89 @@ class ConsulDiscoveryClientQueryTagsTests {
 
 	@Test
 	void singleMatchingTagSpecifiedOnDefaultQueryTagProperty() {
-		appContextRunner.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa").run(
-				context -> assertThatGetInstancesReturnsExpectedServices(context, QA_WEST_SERVICE, QA_EAST_SERVICE));
+		appContextRunner.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa")
+			.run(context -> assertThatGetInstancesReturnsExpectedServices(context, QA_WEST_SERVICE, QA_EAST_SERVICE));
 	}
 
 	@Test
 	void singleNonMatchingTagSpecifiedOnDefaultQueryTagProperty() {
 		appContextRunner.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=foo")
-				.run(context -> assertThatGetInstancesReturnsExpectedServices(context, new NewService[0]));
+			.run(context -> assertThatGetInstancesReturnsExpectedServices(context, new NewService[0]));
 	}
 
 	@Test
 	void multipleMatchingTagsSpecifiedOnDefaultQueryTagProperty() {
 		appContextRunner.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=prod,us-west")
-				.run(context -> assertThatGetInstancesReturnsExpectedServices(context, PROD_WEST_SERVICE));
+			.run(context -> assertThatGetInstancesReturnsExpectedServices(context, PROD_WEST_SERVICE));
 	}
 
 	@Test
 	void multipleNonMatchingTagsSpecifiedOnDefaultQueryTagProperty() {
 		appContextRunner.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=prod,foo")
-				.run(context -> assertThatGetInstancesReturnsExpectedServices(context, new NewService[0]));
+			.run(context -> assertThatGetInstancesReturnsExpectedServices(context, new NewService[0]));
 	}
 
 	@Test
 	void multipleConflictingMatchingTagsSpecifiedOnDefaultQueryTagsProperty() {
 		appContextRunner.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=prod,qa")
-				.run(context -> assertThatGetInstancesReturnsExpectedServices(context));
+			.run(context -> assertThatGetInstancesReturnsExpectedServices(context));
 	}
 
 	@Test
 	void emptyTagSpecifiedOnDefaultQueryTagProperty() {
 		appContextRunner.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=")
-				.run(context -> assertThatGetInstancesReturnsExpectedServices(context, QA_WEST_SERVICE, QA_EAST_SERVICE,
-						PROD_WEST_SERVICE, PROD_EAST_SERVICE));
+			.run(context -> assertThatGetInstancesReturnsExpectedServices(context, QA_WEST_SERVICE, QA_EAST_SERVICE,
+					PROD_WEST_SERVICE, PROD_EAST_SERVICE));
 	}
 
 	@Test
 	void singleTagSpecifiedOnServerListQueryTagsProperty() {
 		appContextRunner
-				.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa",
-						"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=prod")
-				.run(context -> assertThatGetInstancesReturnsExpectedServices(context, PROD_WEST_SERVICE,
-						PROD_EAST_SERVICE));
+			.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa",
+					"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=prod")
+			.run(context -> assertThatGetInstancesReturnsExpectedServices(context, PROD_WEST_SERVICE,
+					PROD_EAST_SERVICE));
 	}
 
 	@Test
 	void singleNonMatchingTagSpecifiedOnServerListQueryTagsProperty() {
 		appContextRunner
-				.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa",
-						"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=foo")
-				.run(context -> assertThatGetInstancesReturnsExpectedServices(context, new NewService[0]));
+			.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa",
+					"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=foo")
+			.run(context -> assertThatGetInstancesReturnsExpectedServices(context, new NewService[0]));
 	}
 
 	@Test
 	void multipleMatchingTagsSpecifiedOnServerListQueryTagsProperty() {
 		appContextRunner
-				.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa",
-						"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=prod,us-west")
-				.run(context -> assertThatGetInstancesReturnsExpectedServices(context, PROD_WEST_SERVICE));
+			.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa",
+					"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=prod,us-west")
+			.run(context -> assertThatGetInstancesReturnsExpectedServices(context, PROD_WEST_SERVICE));
 	}
 
 	@Test
 	void multipleNotAllMatchingTagsSpecifiedOnServerListQueryTagsProperty() {
 		appContextRunner
-				.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa",
-						"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=prod,foo")
-				.run(context -> assertThatGetInstancesReturnsExpectedServices(context, new NewService[0]));
+			.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa",
+					"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=prod,foo")
+			.run(context -> assertThatGetInstancesReturnsExpectedServices(context, new NewService[0]));
 	}
 
 	@Test
 	void multipleConflictingMatchingTagsSpecifiedOnServerListQueryTagsProperty() {
 		appContextRunner
-				.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa",
-						"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=prod,qa")
-				.run(context -> assertThatGetInstancesReturnsExpectedServices(context, new NewService[0]));
+			.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa",
+					"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=prod,qa")
+			.run(context -> assertThatGetInstancesReturnsExpectedServices(context, new NewService[0]));
 	}
 
 	@Test
 	void emptyTagSpecifiedOnServerListQueryTagsProperty() {
 		appContextRunner
-				.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa",
-						"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=")
-				.run(context -> assertThatGetInstancesReturnsExpectedServices(context, QA_WEST_SERVICE, QA_EAST_SERVICE,
-						PROD_WEST_SERVICE, PROD_EAST_SERVICE));
+			.withPropertyValues("spring.cloud.consul.discovery.default-query-tag=qa",
+					"spring.cloud.consul.discovery.server-list-query-tags[" + NAME + "]=")
+			.run(context -> assertThatGetInstancesReturnsExpectedServices(context, QA_WEST_SERVICE, QA_EAST_SERVICE,
+					PROD_WEST_SERVICE, PROD_EAST_SERVICE));
 	}
 
 	@Test
@@ -169,11 +170,11 @@ class ConsulDiscoveryClientQueryTagsTests {
 		ConsulDiscoveryClient consulDiscoveryClient = context.getBean(ConsulDiscoveryClient.class);
 		List<ServiceInstance> serviceInstances = consulDiscoveryClient.getInstances(NAME);
 		assertThat(serviceInstances).hasSize(expectedServices.length)
-				.hasOnlyElementsOfType(ConsulServiceInstance.class);
+			.hasOnlyElementsOfType(ConsulServiceInstance.class);
 		for (NewService expectedService : expectedServices) {
 			assertThat(serviceInstances)
-					.anySatisfy(serviceInstance -> assertThatServicesMatch((ConsulServiceInstance) serviceInstance,
-							expectedService));
+				.anySatisfy(serviceInstance -> assertThatServicesMatch((ConsulServiceInstance) serviceInstance,
+						expectedService));
 		}
 	}
 

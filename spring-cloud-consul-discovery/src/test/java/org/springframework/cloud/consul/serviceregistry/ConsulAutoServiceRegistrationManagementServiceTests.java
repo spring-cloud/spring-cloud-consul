@@ -70,20 +70,21 @@ public class ConsulAutoServiceRegistrationManagementServiceTests {
 		assertThat(service.getService()).as("service name was wrong").isEqualTo("myTestService-EE");
 		assertThat(ObjectUtils.isEmpty(service.getAddress())).as("service address must not be empty").isFalse();
 		assertThat(service.getAddress()).as("service address must equals hostname from discovery properties")
-				.isEqualTo(this.discoveryProperties.getHostname());
+			.isEqualTo(this.discoveryProperties.getHostname());
 
 		final Service managementService = services.get("myTestService-EE-0-management");
 		assertThat(managementService).as("management service was null").isNotNull();
 		assertThat(managementService.getPort().intValue()).as("management service port was wrong").isEqualTo(4452);
 		assertThat(managementService.getId()).as("management service id was wrong")
-				.isEqualTo("myTestService-EE-0-management");
+			.isEqualTo("myTestService-EE-0-management");
 		assertThat(managementService.getService()).as("management service name was wrong")
-				.isEqualTo("myTestService-EE-management");
+			.isEqualTo("myTestService-EE-management");
 		assertThat(ObjectUtils.isEmpty(managementService.getAddress()))
-				.as("management service address must not be empty").isFalse();
+			.as("management service address must not be empty")
+			.isFalse();
 		assertThat(managementService.getAddress())
-				.as("management service address must equals hostname from discovery properties")
-				.isEqualTo(this.discoveryProperties.getHostname());
+			.as("management service address must equals hostname from discovery properties")
+			.isEqualTo(this.discoveryProperties.getHostname());
 	}
 
 	@Configuration(proxyBeanMethods = false)

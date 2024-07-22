@@ -51,7 +51,7 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 	public static ConsulContainer createConsulContainer(String consulVersion) {
 		String dockerImageName = "consul:" + consulVersion;
 		return new ConsulContainer(dockerImageName)
-				.withLogConsumer(new Slf4jLogConsumer(logger).withSeparateOutputStreams());
+			.withLogConsumer(new Slf4jLogConsumer(logger).withSeparateOutputStreams());
 	}
 
 	@Override

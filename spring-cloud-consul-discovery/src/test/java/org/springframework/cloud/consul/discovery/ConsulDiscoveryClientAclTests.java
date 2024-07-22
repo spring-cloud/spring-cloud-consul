@@ -60,10 +60,10 @@ public class ConsulDiscoveryClientAclTests {
 	@Test
 	public void getInstancesForSecondServiceWorks() throws Exception {
 
-		new SpringApplicationBuilder(MyTestConfig.class).initializers(new ConsulTestcontainers()).run(
-				"--spring.application.name=testSecondServiceAcl", "--server.port=0",
-				"--spring.cloud.consul.discovery.preferIpAddress=true",
-				"--consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304");
+		new SpringApplicationBuilder(MyTestConfig.class).initializers(new ConsulTestcontainers())
+			.run("--spring.application.name=testSecondServiceAcl", "--server.port=0",
+					"--spring.cloud.consul.discovery.preferIpAddress=true",
+					"--consul.token=2d2e6b3b-1c82-40ab-8171-54609d8ad304");
 
 		List<ServiceInstance> instances = this.discoveryClient.getInstances("testSecondServiceAcl");
 		assertThat(instances).as("second service instances was null").isNotNull();

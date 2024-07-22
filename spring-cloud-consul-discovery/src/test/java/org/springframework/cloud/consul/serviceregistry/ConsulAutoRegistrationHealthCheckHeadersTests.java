@@ -62,7 +62,7 @@ public class ConsulAutoRegistrationHealthCheckHeadersTests {
 		assertThat(check.getHeader()).as("header is null").isNotNull();
 		assertThat(check.getHeader()).as("header is empty").isNotEmpty();
 		assertThat(check.getHeader().get("X-Config-Token").get(0)).as("expected header value not found")
-				.isEqualTo("ACCESSTOKEN");
+			.isEqualTo("ACCESSTOKEN");
 
 		// unable to call consul api to get health check details
 	}

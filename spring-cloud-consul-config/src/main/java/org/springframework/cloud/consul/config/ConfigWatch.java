@@ -252,8 +252,10 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 		@Override
 		public String toString() {
-			return new ToStringCreator(this).append("context", this.context).append("prevIndex", this.prevIndex)
-					.append("newIndex", this.newIndex).toString();
+			return new ToStringCreator(this).append("context", this.context)
+				.append("prevIndex", this.prevIndex)
+				.append("newIndex", this.newIndex)
+				.toString();
 		}
 
 	}

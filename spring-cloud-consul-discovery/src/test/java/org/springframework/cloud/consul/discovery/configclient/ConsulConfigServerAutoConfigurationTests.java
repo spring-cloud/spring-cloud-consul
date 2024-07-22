@@ -60,7 +60,10 @@ public class ConsulConfigServerAutoConfigurationTests {
 	private void setup(String... env) {
 		this.context = new SpringApplicationBuilder(PropertyPlaceholderAutoConfiguration.class,
 				ConsulConfigServerAutoConfiguration.class, ConfigServerProperties.class,
-				ConsulDiscoveryProperties.class).web(WebApplicationType.NONE).properties(env).run();
+				ConsulDiscoveryProperties.class)
+			.web(WebApplicationType.NONE)
+			.properties(env)
+			.run();
 	}
 
 }

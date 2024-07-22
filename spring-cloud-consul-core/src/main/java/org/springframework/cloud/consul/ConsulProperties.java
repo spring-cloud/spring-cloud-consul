@@ -189,9 +189,11 @@ public class ConsulProperties {
 		@Override
 		public String toString() {
 			return new ToStringCreator(this).append("keyStoreInstanceType", this.keyStoreInstanceType)
-					.append("keyStorePath", this.keyStorePath).append("keyStorePassword", this.keyStorePassword)
-					.append("certificatePath", this.certificatePath)
-					.append("certificatePassword", this.certificatePassword).toString();
+				.append("keyStorePath", this.keyStorePath)
+				.append("keyStorePassword", this.keyStorePassword)
+				.append("certificatePath", this.certificatePath)
+				.append("certificatePassword", this.certificatePassword)
+				.toString();
 		}
 
 	}

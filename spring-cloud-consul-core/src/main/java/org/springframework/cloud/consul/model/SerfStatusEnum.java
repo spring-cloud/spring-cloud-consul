@@ -18,6 +18,7 @@ package org.springframework.cloud.consul.model;
 
 /**
  * Gossip pool (serf) statuses. Created by nicu on 10.03.2015.
+ *
  * @author Nicu Marasoiu
  */
 public enum SerfStatusEnum {

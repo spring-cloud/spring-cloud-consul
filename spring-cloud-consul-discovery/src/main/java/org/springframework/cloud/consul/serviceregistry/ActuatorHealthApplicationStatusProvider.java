@@ -64,8 +64,10 @@ public class ActuatorHealthApplicationStatusProvider implements ApplicationStatu
 	public CheckStatus currentStatus() {
 		String healthGroup = heartbeatProperties.getActuatorHealthGroup();
 		String[] path = healthGroup == null ? new String[0] : new String[] { healthGroup };
-		return Optional.ofNullable(healthEndpoint.healthForPath(path)).map(HealthComponent::getStatus)
-				.map(this::healthStatusToCheckStatus).orElse(CheckStatus.UNKNOWN);
+		return Optional.ofNullable(healthEndpoint.healthForPath(path))
+			.map(HealthComponent::getStatus)
+			.map(this::healthStatusToCheckStatus)
+			.orElse(CheckStatus.UNKNOWN);
 	}
 
 	private CheckStatus healthStatusToCheckStatus(Status healthStatus) {

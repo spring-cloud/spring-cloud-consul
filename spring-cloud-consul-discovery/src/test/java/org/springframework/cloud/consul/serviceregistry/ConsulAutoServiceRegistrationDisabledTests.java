@@ -59,22 +59,23 @@ public class ConsulAutoServiceRegistrationDisabledTests {
 
 	private void testAutoRegistrationDisabled(String testName, String disableProperty) {
 		new WebApplicationContextRunner().withUserConfiguration(TestConfig.class)
-				.withPropertyValues("spring.application.name=" + testName, disableProperty + "=false", "server.port=0")
-				.withInitializer(new ConsulTestcontainers()).run(context -> {
+			.withPropertyValues("spring.application.name=" + testName, disableProperty + "=false", "server.port=0")
+			.withInitializer(new ConsulTestcontainers())
+			.run(context -> {
 
-					assertThat(context).doesNotHaveBean(ConsulAutoServiceRegistration.class);
-					assertThat(context).doesNotHaveBean(ConsulAutoServiceRegistrationListener.class);
-					assertThat(context).doesNotHaveBean(ConsulAutoRegistration.class);
-					assertThat(context).doesNotHaveBean(ConsulRegistrationCustomizer.class);
+				assertThat(context).doesNotHaveBean(ConsulAutoServiceRegistration.class);
+				assertThat(context).doesNotHaveBean(ConsulAutoServiceRegistrationListener.class);
+				assertThat(context).doesNotHaveBean(ConsulAutoRegistration.class);
+				assertThat(context).doesNotHaveBean(ConsulRegistrationCustomizer.class);
 
-					ConsulClient consul = context.getBean(ConsulClient.class);
+				ConsulClient consul = context.getBean(ConsulClient.class);
 
-					Response<Map<String, Service>> response = consul.getAgentServices();
-					Map<String, Service> services = response.getValue();
-					Service service = services.get(testName);
-					assertThat(service).as("service was registered").isNull();
+				Response<Map<String, Service>> response = consul.getAgentServices();
+				Map<String, Service> services = response.getValue();
+				Service service = services.get(testName);
+				assertThat(service).as("service was registered").isNull();
 
-				});
+			});
 	}
 
 	@Configuration(proxyBeanMethods = false)

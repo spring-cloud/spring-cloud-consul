@@ -77,8 +77,9 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 
 	private List<HealthService> getHealthServices(String serviceId) {
 		HealthServicesRequest.Builder requestBuilder = HealthServicesRequest.newBuilder()
-				.setPassing(properties.isQueryPassing()).setQueryParams(QueryParams.DEFAULT)
-				.setToken(properties.getAclToken());
+			.setPassing(properties.isQueryPassing())
+			.setQueryParams(QueryParams.DEFAULT)
+			.setToken(properties.getAclToken());
 		String[] queryTags = properties.getQueryTagsForService(serviceId);
 		if (queryTags != null) {
 			requestBuilder.setTags(queryTags);
@@ -93,8 +94,10 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 	@Override
 	public Flux<String> getServices() {
 		return Flux.defer(() -> {
-			CatalogServicesRequest request = CatalogServicesRequest.newBuilder().setToken(properties.getAclToken())
-					.setQueryParams(QueryParams.DEFAULT).build();
+			CatalogServicesRequest request = CatalogServicesRequest.newBuilder()
+				.setToken(properties.getAclToken())
+				.setQueryParams(QueryParams.DEFAULT)
+				.build();
 			Response<Map<String, List<String>>> services = client.getCatalogServices(request);
 			return services == null ? Flux.empty() : Flux.fromIterable(services.getValue().keySet());
 		}).onErrorResume(exception -> {

@@ -67,7 +67,9 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	private void addInstancesToList(List<ServiceInstance> instances, String serviceId, QueryParams queryParams) {
 		HealthServicesRequest.Builder requestBuilder = HealthServicesRequest.newBuilder()
-				.setPassing(properties.isQueryPassing()).setQueryParams(queryParams).setToken(properties.getAclToken());
+			.setPassing(properties.isQueryPassing())
+			.setQueryParams(queryParams)
+			.setToken(properties.getAclToken());
 		String[] queryTags = properties.getQueryTagsForService(serviceId);
 		if (queryTags != null) {
 			requestBuilder.setTags(queryTags);
@@ -85,7 +87,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		List<ServiceInstance> instances = new ArrayList<>();
 
 		Response<Map<String, List<String>>> services = this.client
-				.getCatalogServices(CatalogServicesRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
+			.getCatalogServices(CatalogServicesRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
 		for (String serviceId : services.getValue().keySet()) {
 			addInstancesToList(instances, serviceId, QueryParams.DEFAULT);
 		}
@@ -94,8 +96,10 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<String> getServices() {
-		CatalogServicesRequest request = CatalogServicesRequest.newBuilder().setQueryParams(QueryParams.DEFAULT)
-				.setToken(this.properties.getAclToken()).build();
+		CatalogServicesRequest request = CatalogServicesRequest.newBuilder()
+			.setQueryParams(QueryParams.DEFAULT)
+			.setToken(this.properties.getAclToken())
+			.build();
 		return new ArrayList<>(this.client.getCatalogServices(request).getValue().keySet());
 	}
 

@@ -99,8 +99,11 @@ public class ConsulConfigDataResource extends ConfigDataResource {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this).append("context", context).append("optional", optional)
-				.append("properties", properties).append("profile", profile).toString();
+		return new ToStringCreator(this).append("context", context)
+			.append("optional", optional)
+			.append("properties", properties)
+			.append("profile", profile)
+			.toString();
 
 	}
 

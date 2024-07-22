@@ -74,7 +74,7 @@ class ConsulReactiveDiscoveryClientTests {
 	public void shouldReturnEmptyFluxOfServicesWhenConsulFails() {
 		Flux<String> services = client.getServices();
 		when(consulClient.getCatalogServices(any(CatalogServicesRequest.class)))
-				.thenThrow(new RuntimeException("Possible runtime exception"));
+			.thenThrow(new RuntimeException("Possible runtime exception"));
 		StepVerifier.create(services).expectNextCount(0).expectComplete().verify();
 		verify(consulClient).getCatalogServices(any(CatalogServicesRequest.class));
 	}
@@ -102,7 +102,7 @@ class ConsulReactiveDiscoveryClientTests {
 	public void shouldReturnEmptyFluxForNonExistingService() {
 		configureCommonProperties();
 		when(consulClient.getHealthServices(eq("nonexistent-service"), any(HealthServicesRequest.class)))
-				.thenReturn(emptyConsulInstancesResponse());
+			.thenReturn(emptyConsulInstancesResponse());
 		Flux<ServiceInstance> instances = client.getInstances("nonexistent-service");
 		StepVerifier.create(instances).expectNextCount(0).expectComplete().verify();
 		verify(properties).getAclToken();
@@ -113,7 +113,7 @@ class ConsulReactiveDiscoveryClientTests {
 	public void shouldReturnEmptyFluxWhenConsulFails() {
 		configureCommonProperties();
 		when(consulClient.getHealthServices(eq("existing-service"), any(HealthServicesRequest.class)))
-				.thenThrow(new RuntimeException("Possible runtime exception"));
+			.thenThrow(new RuntimeException("Possible runtime exception"));
 		Flux<ServiceInstance> instances = client.getInstances("existing-service");
 		StepVerifier.create(instances).expectNextCount(0).expectComplete().verify();
 		verify(consulClient).getHealthServices(eq("existing-service"), any());
@@ -124,7 +124,7 @@ class ConsulReactiveDiscoveryClientTests {
 		configureCommonProperties();
 		Response<List<HealthService>> response = consulInstancesResponse();
 		when(consulClient.getHealthServices(eq("existing-service"), any(HealthServicesRequest.class)))
-				.thenReturn(response);
+			.thenReturn(response);
 		Flux<ServiceInstance> instances = client.getInstances("existing-service");
 		StepVerifier.create(instances).expectNextCount(1).expectComplete().verify();
 		verify(properties).getAclToken();
@@ -139,7 +139,7 @@ class ConsulReactiveDiscoveryClientTests {
 		when(properties.getAclToken()).thenReturn("aclToken");
 		Response<List<HealthService>> response = consulInstancesResponse();
 		when(consulClient.getHealthServices(eq("existing-service"), any(HealthServicesRequest.class)))
-				.thenReturn(response);
+			.thenReturn(response);
 		Flux<ServiceInstance> instances = client.getInstances("existing-service");
 		StepVerifier.create(instances).expectNextCount(1).expectComplete().verify();
 		verify(properties, times(1)).getAclToken();
