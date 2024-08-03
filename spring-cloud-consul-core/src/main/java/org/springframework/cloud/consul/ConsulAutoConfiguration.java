@@ -40,6 +40,11 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.interceptor.RetryInterceptorBuilder;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriBuilder;
 
 /**
  * @author Spencer Gibb
@@ -66,6 +71,44 @@ public class ConsulAutoConfiguration {
 	public ConsulClient consulClient(ConsulProperties consulProperties,
 			Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
 		return createConsulClient(consulProperties, consulRawClientBuilderSupplier);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public IConsulClient newConsulClient(ConsulProperties consulProperties) {
+		RestClient.Builder builder = RestClient.builder();
+
+		UriBuilder uriBuilder = new DefaultUriBuilderFactory().builder();
+
+		if (StringUtils.hasLength(consulProperties.getScheme())) {
+			uriBuilder.scheme(consulProperties.getScheme());
+		}
+		else {
+			uriBuilder.scheme("http");
+		}
+
+		uriBuilder.host(consulProperties.getHost()).port(consulProperties.getPort());
+
+		if (consulProperties.getTls() != null) {
+			ConsulProperties.TLSConfig tls = consulProperties.getTls();
+			// TODO: Set the TLS config
+		}
+
+		final String agentPath = consulProperties.getPath();
+		if (StringUtils.hasLength(agentPath)) {
+			String normalizedAgentPath = StringUtils.trimTrailingCharacter(agentPath, '/');
+			normalizedAgentPath = StringUtils.trimLeadingCharacter(normalizedAgentPath, '/');
+
+			uriBuilder.path(normalizedAgentPath);
+		}
+
+		String baseUrl = uriBuilder.build().toString();
+
+		RestClient restClient = builder.baseUrl(baseUrl).build();
+		RestClientAdapter adapter = RestClientAdapter.create(restClient);
+		HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+
+		return factory.createClient(IConsulClient.class);
 	}
 
 	public static Supplier<Builder> createConsulRawClientBuilder() {
@@ -112,7 +155,7 @@ public class ConsulAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean
 		@ConditionalOnEnabledHealthIndicator("consul")
-		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient,
+		public ConsulHealthIndicator consulHealthIndicator(IConsulClient consulClient,
 				ConsulHealthIndicatorProperties properties) {
 			return new ConsulHealthIndicator(consulClient, properties);
 		}

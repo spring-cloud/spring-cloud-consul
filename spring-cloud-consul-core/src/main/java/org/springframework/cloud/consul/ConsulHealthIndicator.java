@@ -19,11 +19,6 @@ package org.springframework.cloud.consul;
 import java.util.List;
 import java.util.Map;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
-
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 
@@ -32,23 +27,22 @@ import org.springframework.boot.actuate.health.Health;
  */
 public class ConsulHealthIndicator extends AbstractHealthIndicator {
 
-	private ConsulClient consul;
+	private IConsulClient consul;
 
 	private ConsulHealthIndicatorProperties properties;
 
-	public ConsulHealthIndicator(ConsulClient consul, ConsulHealthIndicatorProperties properties) {
+	public ConsulHealthIndicator(IConsulClient consul, ConsulHealthIndicatorProperties properties) {
 		this.consul = consul;
 		this.properties = properties;
 	}
 
 	@Override
 	protected void doHealthCheck(Health.Builder builder) {
-		final Response<String> leaderStatus = this.consul.getStatusLeader();
-		builder.up().withDetail("leader", leaderStatus.getValue());
+		final String leaderStatus = this.consul.getStatusLeader();
+		builder.up().withDetail("leader", leaderStatus);
 		if (properties.isIncludeServicesQuery()) {
-			final Response<Map<String, List<String>>> services = this.consul
-				.getCatalogServices(CatalogServicesRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
-			builder.withDetail("services", services.getValue());
+			final Map<String, List<String>> services = this.consul.getCatalogServices();
+			builder.withDetail("services", services);
 		}
 	}
 

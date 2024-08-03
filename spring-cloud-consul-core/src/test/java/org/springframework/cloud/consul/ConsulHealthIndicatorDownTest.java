@@ -16,9 +16,6 @@
 
 package org.springframework.cloud.consul;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -32,12 +29,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Integration test for {@link ConsulHealthIndicator} when its in the DOWN status.
+ * Integration test for {@link ConsulHealthIndicator} when it's in the DOWN status.
  *
  * @author Lomesh Patel (lomeshpatel)
  */
@@ -46,7 +42,7 @@ import static org.mockito.Mockito.when;
 public class ConsulHealthIndicatorDownTest {
 
 	@MockBean
-	private ConsulClient consulClient;
+	private IConsulClient consulClient;
 
 	@Autowired
 	private HealthEndpoint healthEndpoint;
@@ -60,12 +56,11 @@ public class ConsulHealthIndicatorDownTest {
 
 	@Test
 	public void statusIsDownWhenConsulClientFailsToGetServices() {
-		Response<String> leaderStatus = new Response<>("OK", 5150L, true, System.currentTimeMillis());
+		String leaderStatus = "OK";
 		when(consulClient.getStatusLeader()).thenReturn(leaderStatus);
-		when(consulClient.getCatalogServices(any(CatalogServicesRequest.class)))
-			.thenThrow(new RuntimeException("no services"));
+		when(consulClient.getCatalogServices()).thenThrow(new RuntimeException("no services"));
 		assertThat(this.healthEndpoint.health().getStatus()).as("health status was not DOWN").isEqualTo(Status.DOWN);
-		verify(consulClient).getCatalogServices(any(CatalogServicesRequest.class));
+		verify(consulClient).getCatalogServices();
 	}
 
 	@EnableAutoConfiguration
