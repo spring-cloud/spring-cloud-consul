@@ -59,17 +59,17 @@ public class ConsulPropertySourceLocatorFilesTests {
 
 	private ConfigurableEnvironment environment;
 
-	private ConsulClient client;
+	private ConsulClient testClient;
 
 	@Before
 	public void setup() {
 		ConsulTestcontainers.start();
-		this.client = ConsulTestcontainers.client();
-		this.client.setKVValue(ROOT + APPLICATION_YML, "foo: bar\nmy.baz: ${foo}");
-		this.client.setKVValue(ROOT + APPLICATION_DEV_YML, "foo: bar-dev\nmy.baz: ${foo}");
-		this.client.setKVValue(ROOT + "/master.ref", UUID.randomUUID().toString());
-		this.client.setKVValue(ROOT + APP_NAME_PROPS, "foo: bar-app\nmy.baz: ${foo}");
-		this.client.setKVValue(ROOT + APP_NAME_DEV_PROPS, "foo: bar-app-dev\nmy.baz: ${foo}");
+		this.testClient = ConsulTestcontainers.client();
+		this.testClient.setKVValue(ROOT + APPLICATION_YML, "foo: bar\nmy.baz: ${foo}");
+		this.testClient.setKVValue(ROOT + APPLICATION_DEV_YML, "foo: bar-dev\nmy.baz: ${foo}");
+		this.testClient.setKVValue(ROOT + "/master.ref", UUID.randomUUID().toString());
+		this.testClient.setKVValue(ROOT + APP_NAME_PROPS, "foo: bar-app\nmy.baz: ${foo}");
+		this.testClient.setKVValue(ROOT + APP_NAME_DEV_PROPS, "foo: bar-app-dev\nmy.baz: ${foo}");
 
 		this.context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
 			.run("--spring.application.name=" + APP_NAME, "--spring.config.use-legacy-processing=true",
@@ -77,14 +77,12 @@ public class ConsulPropertySourceLocatorFilesTests {
 					"--spring.cloud.consul.port=" + ConsulTestcontainers.getPort(),
 					"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.format=FILES",
 					"--spring.profiles.active=dev", "spring.cloud.consul.config.watch.delay=1");
-
-		this.client = this.context.getBean(ConsulClient.class);
 		this.environment = this.context.getEnvironment();
 	}
 
 	@After
 	public void teardown() {
-		this.client.deleteKVValues(PREFIX);
+		this.testClient.deleteKVValues(PREFIX);
 		if (this.context != null) {
 			this.context.close();
 		}

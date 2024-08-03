@@ -16,6 +16,10 @@
 
 package org.springframework.cloud.consul.config;
 
+import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.Random;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -23,6 +27,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.IConsulClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +39,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ConsulPropertySourceTests {
 
-	private ConsulClient client;
+	private ConsulClient testClient;
+
+	private IConsulClient consulClient;
 
 	private String prefix;
 
@@ -41,23 +50,27 @@ public class ConsulPropertySourceTests {
 	private String propertiesContext;
 
 	@Before
-	public void setup() {
+	public void setup() throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 		ConsulTestcontainers.start();
 		this.prefix = "/consulPropertySourceTests" + new Random().nextInt(Integer.MAX_VALUE);
-		this.client = ConsulTestcontainers.client();
+		ConsulProperties consulProperties = new ConsulProperties();
+		consulProperties.setHost(ConsulTestcontainers.getHost());
+		consulProperties.setPort(ConsulTestcontainers.getPort());
+		this.testClient = ConsulTestcontainers.client();
+		this.consulClient = ConsulAutoConfiguration.createNewConsulClient(consulProperties);
 	}
 
 	@After
 	public void teardown() {
-		this.client.deleteKVValues(this.prefix);
+		this.testClient.deleteKVValues(this.prefix);
 	}
 
 	@Test
 	public void testKv() {
 		// key value properties
 		this.kvContext = this.prefix + "/kv";
-		this.client.setKVValue(this.kvContext + "/fooprop", "fookvval");
-		this.client.setKVValue(this.prefix + "/kv" + "/bar/prop", "8080");
+		this.testClient.setKVValue(this.kvContext + "/fooprop", "fookvval");
+		this.testClient.setKVValue(this.prefix + "/kv" + "/bar/prop", "8080");
 
 		ConsulPropertySource source = getConsulPropertySource(new ConsulConfigProperties(), this.kvContext);
 
@@ -73,7 +86,7 @@ public class ConsulPropertySourceTests {
 	public void testProperties() {
 		// properties file property
 		this.propertiesContext = this.prefix + "/properties";
-		this.client.setKVValue(this.propertiesContext + "/data", "fooprop=foopropval\nbar.prop=8080");
+		this.testClient.setKVValue(this.propertiesContext + "/data", "fooprop=foopropval\nbar.prop=8080");
 
 		ConsulConfigProperties configProperties = new ConsulConfigProperties();
 		configProperties.setFormat(ConsulConfigProperties.Format.PROPERTIES);
@@ -86,7 +99,7 @@ public class ConsulPropertySourceTests {
 	public void testYaml() {
 		// yaml file property
 		String yamlContext = this.prefix + "/yaml";
-		this.client.setKVValue(yamlContext + "/data", "fooprop: fooymlval\nbar:\n  prop: 8080");
+		this.testClient.setKVValue(yamlContext + "/data", "fooprop: fooymlval\nbar:\n  prop: 8080");
 
 		ConsulConfigProperties configProperties = new ConsulConfigProperties();
 		configProperties.setFormat(ConsulConfigProperties.Format.YAML);
@@ -99,17 +112,17 @@ public class ConsulPropertySourceTests {
 	public void testEmptyYaml() {
 		// yaml file property
 		String yamlContext = this.prefix + "/yaml";
-		this.client.setKVValue(yamlContext + "/data", "");
+		this.testClient.setKVValue(yamlContext + "/data", "");
 
 		ConsulConfigProperties configProperties = new ConsulConfigProperties();
 		configProperties.setFormat(ConsulConfigProperties.Format.YAML);
-		ConsulPropertySource source = new ConsulPropertySource(yamlContext, this.client, configProperties);
+		ConsulPropertySource source = new ConsulPropertySource(yamlContext, this.consulClient, configProperties);
 		// Should NOT throw a NPE
 		source.init();
 	}
 
 	private ConsulPropertySource getConsulPropertySource(ConsulConfigProperties configProperties, String context) {
-		ConsulPropertySource source = new ConsulPropertySource(context, this.client, configProperties);
+		ConsulPropertySource source = new ConsulPropertySource(context, this.consulClient, configProperties);
 		source.init();
 		String[] names = source.getPropertyNames();
 		assertThat(names).as("names was null").isNotNull();
@@ -119,7 +132,7 @@ public class ConsulPropertySourceTests {
 
 	@Test
 	public void testExtraSlashInContext() {
-		ConsulPropertySource source = new ConsulPropertySource("/my/very/custom/context", this.client,
+		ConsulPropertySource source = new ConsulPropertySource("/my/very/custom/context", this.consulClient,
 				new ConsulConfigProperties());
 		source.init();
 		assertThat(source.getContext()).as("context was wrong").isEqualTo("my/very/custom/context/");

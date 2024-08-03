@@ -16,8 +16,6 @@
 
 package org.springframework.cloud.consul;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -33,7 +31,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -47,7 +44,7 @@ import static org.mockito.Mockito.verify;
 public class ConsulHealthIndicatorUpTest {
 
 	@MockitoSpyBean
-	private ConsulClient consulClient;
+	private IConsulClient consulClient;
 
 	@Autowired
 	private HealthEndpoint healthEndpoint;
@@ -56,7 +53,7 @@ public class ConsulHealthIndicatorUpTest {
 	public void statusIsUp() {
 		assertThat(this.healthEndpoint.health().getStatus()).as("health status was not UP").isEqualTo(Status.UP);
 		verify(consulClient).getStatusLeader();
-		verify(consulClient).getCatalogServices(any(CatalogServicesRequest.class));
+		verify(consulClient).getCatalogServices();
 	}
 
 	@EnableAutoConfiguration

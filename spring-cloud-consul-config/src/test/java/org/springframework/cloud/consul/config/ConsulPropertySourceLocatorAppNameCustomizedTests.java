@@ -62,15 +62,15 @@ public class ConsulPropertySourceLocatorAppNameCustomizedTests {
 
 	private ConfigurableEnvironment environment;
 
-	private ConsulClient client;
+	private ConsulClient testClient;
 
 	@Before
 	public void setup() {
 		ConsulTestcontainers.start();
-		this.client = ConsulTestcontainers.client();
-		this.client.deleteKVValues(PREFIX);
-		this.client.setKVValue(KEY1, VALUE1);
-		this.client.setKVValue(KEY2, VALUE2);
+		this.testClient = ConsulTestcontainers.client();
+		this.testClient.deleteKVValues(PREFIX);
+		this.testClient.setKVValue(KEY1, VALUE1);
+		this.testClient.setKVValue(KEY2, VALUE2);
 
 		this.context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
 			.run("--spring.application.name=testConsulPropertySourceLocatorAppNameCustomized",
@@ -78,14 +78,12 @@ public class ConsulPropertySourceLocatorAppNameCustomizedTests {
 					"--spring.cloud.consul.host=" + ConsulTestcontainers.getHost(),
 					"--spring.cloud.consul.port=" + ConsulTestcontainers.getPort(),
 					"--spring.cloud.consul.config.name=" + CONFIG_NAME, "--spring.cloud.consul.config.prefix=" + ROOT);
-
-		this.client = this.context.getBean(ConsulClient.class);
 		this.environment = this.context.getEnvironment();
 	}
 
 	@After
 	public void teardown() {
-		this.client.deleteKVValues(PREFIX);
+		this.testClient.deleteKVValues(PREFIX);
 		if (context != null) {
 			this.context.close();
 		}

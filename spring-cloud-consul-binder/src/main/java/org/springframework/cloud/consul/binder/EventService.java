@@ -19,16 +19,14 @@ package org.springframework.cloud.consul.binder;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.event.EventListRequest;
-import com.ecwid.consul.v1.event.model.Event;
-import com.ecwid.consul.v1.event.model.EventParams;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 
+import org.springframework.cloud.consul.IConsulClient;
 import org.springframework.cloud.consul.binder.config.ConsulBinderProperties;
+import org.springframework.cloud.consul.model.http.ConsulHeaders;
+import org.springframework.cloud.consul.model.http.event.Event;
+import org.springframework.http.ResponseEntity;
 
 /**
  * @author Spencer Gibb
@@ -37,19 +35,19 @@ public class EventService {
 
 	protected ConsulBinderProperties properties;
 
-	protected ConsulClient consul;
+	protected IConsulClient consul;
 
 	protected ObjectMapper objectMapper = new ObjectMapper();
 
 	private AtomicReference<Long> lastIndex = new AtomicReference<>();
 
-	public EventService(ConsulBinderProperties properties, ConsulClient consul, ObjectMapper objectMapper) {
+	public EventService(ConsulBinderProperties properties, IConsulClient consul, ObjectMapper objectMapper) {
 		this.properties = properties;
 		this.consul = consul;
 		this.objectMapper = objectMapper;
 	}
 
-	public ConsulClient getConsulClient() {
+	public IConsulClient getConsulClient() {
 		return this.consul;
 	}
 
@@ -62,24 +60,25 @@ public class EventService {
 		return this.lastIndex.get();
 	}
 
-	private void setLastIndex(Response<?> response) {
-		Long consulIndex = response.getConsulIndex();
+	private void setLastIndex(ResponseEntity<?> response) {
+		String indexHeader = response.getHeaders().getFirst(ConsulHeaders.ConsulIndex.getHeaderName());
+		Long consulIndex = indexHeader == null ? null : Long.parseLong(indexHeader);
 		if (consulIndex != null) {
-			this.lastIndex.set(response.getConsulIndex());
+			this.lastIndex.set(consulIndex);
 		}
 	}
 
 	public Event fire(String name, String payload) {
-		Response<Event> response = this.consul.eventFire(name, payload, new EventParams(), QueryParams.DEFAULT);
-		return response.getValue();
+		ResponseEntity<Event> response = this.consul.eventFire(name, payload);
+		return response.getBody();
 	}
 
-	public Response<List<Event>> getEventsResponse() {
-		return this.consul.eventList(EventListRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
+	public ResponseEntity<List<Event>> getEventsResponse() {
+		return this.consul.eventList();
 	}
 
 	public List<Event> getEvents() {
-		return getEventsResponse().getValue();
+		return getEventsResponse().getBody();
 	}
 
 	public List<Event> getEvents(Long lastIndex) {
@@ -100,14 +99,13 @@ public class EventService {
 		if (this.properties != null) {
 			eventTimeout = this.properties.getEventTimeout();
 		}
-		Response<List<Event>> watch = this.consul
-			.eventList(EventListRequest.newBuilder().setQueryParams(new QueryParams(eventTimeout, index)).build());
+		ResponseEntity<List<Event>> watch = this.consul.eventList(eventTimeout, index);
 		return filterEvents(readEvents(watch), lastIndex);
 	}
 
-	protected List<Event> readEvents(Response<List<Event>> response) {
+	protected List<Event> readEvents(ResponseEntity<List<Event>> response) {
 		setLastIndex(response);
-		return response.getValue();
+		return response.getBody();
 	}
 
 	/**

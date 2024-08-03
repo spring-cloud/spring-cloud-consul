@@ -20,18 +20,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-import com.ecwid.consul.v1.catalog.CatalogNodesRequest;
-import com.ecwid.consul.v1.catalog.CatalogServiceRequest;
-import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
-import com.ecwid.consul.v1.catalog.model.CatalogService;
-import com.ecwid.consul.v1.catalog.model.Node;
-
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+import org.springframework.cloud.consul.model.http.agent.Service;
+import org.springframework.cloud.consul.model.http.catalog.CatalogService;
+import org.springframework.cloud.consul.model.http.catalog.Node;
 import org.springframework.core.style.ToStringCreator;
 
 /**
@@ -40,9 +33,9 @@ import org.springframework.core.style.ToStringCreator;
 @Endpoint(id = "consul")
 public class ConsulEndpoint {
 
-	private ConsulClient consul;
+	private final IConsulClient consul;
 
-	public ConsulEndpoint(ConsulClient consul) {
+	public ConsulEndpoint(IConsulClient consul) {
 		this.consul = consul;
 	}
 
@@ -50,21 +43,18 @@ public class ConsulEndpoint {
 	public ConsulData invoke() {
 		ConsulData data = new ConsulData();
 		// data.setKeyValues(kvClient.getKeyValueRecurse());
-		Response<Map<String, Service>> agentServices = this.consul.getAgentServices();
-		data.setAgentServices(agentServices.getValue());
+		Map<String, Service> agentServices = this.consul.getAgentServices();
+		data.setAgentServices(agentServices);
 
-		Response<Map<String, List<String>>> catalogServices = this.consul
-			.getCatalogServices(CatalogServicesRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
+		Map<String, List<String>> catalogServices = this.consul.getCatalogServices();
 
-		for (String serviceId : catalogServices.getValue().keySet()) {
-			Response<List<CatalogService>> response = this.consul.getCatalogService(serviceId,
-					CatalogServiceRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
-			data.getCatalogServices().put(serviceId, response.getValue());
+		for (String serviceId : catalogServices.keySet()) {
+			List<CatalogService> response = this.consul.getCatalogService(serviceId);
+			data.getCatalogServices().put(serviceId, response);
 		}
 
-		Response<List<Node>> catalogNodes = this.consul
-			.getCatalogNodes(CatalogNodesRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
-		data.setCatalogNodes(catalogNodes.getValue());
+		List<Node> catalogNodes = this.consul.getCatalogNodes();
+		data.setCatalogNodes(catalogNodes);
 
 		return data;
 	}

@@ -18,12 +18,9 @@ package org.springframework.cloud.consul.binder;
 
 import java.util.Arrays;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.event.model.Event;
-import com.ecwid.consul.v1.event.model.EventParams;
-
+import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.model.http.event.Event;
+import org.springframework.http.ResponseEntity;
 import org.springframework.integration.handler.AbstractMessageHandler;
 import org.springframework.messaging.Message;
 
@@ -34,11 +31,11 @@ import org.springframework.messaging.Message;
  */
 public class ConsulSendingHandler extends AbstractMessageHandler {
 
-	private final ConsulClient consul;
+	private final IConsulClient consul;
 
 	private final String eventName;
 
-	public ConsulSendingHandler(ConsulClient consul, String eventName) {
+	public ConsulSendingHandler(IConsulClient consul, String eventName) {
 		this.consul = consul;
 		this.eventName = eventName;
 	}
@@ -56,8 +53,7 @@ public class ConsulSendingHandler extends AbstractMessageHandler {
 
 		// TODO: support headers
 		// TODO: support consul event filters: NodeFilter, ServiceFilter, TagFilter
-		Response<Event> event = this.consul.eventFire(this.eventName, (String) payload, new EventParams(),
-				QueryParams.DEFAULT);
+		ResponseEntity<Event> event = this.consul.eventFire(this.eventName, (String) payload);
 		// TODO: return event?
 	}
 

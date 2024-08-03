@@ -16,6 +16,13 @@
 
 package org.springframework.cloud.consul;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.function.Supplier;
 
 import com.ecwid.consul.transport.TLSConfig;
@@ -23,6 +30,8 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.ConsulRawClient;
 import com.ecwid.consul.v1.ConsulRawClient.Builder;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
@@ -33,14 +42,30 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.health.autoconfigure.contributor.ConditionalOnEnabledHealthIndicator;
 import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.ssl.SslBundle;
+import org.springframework.boot.ssl.SslStoreBundle;
+import org.springframework.boot.web.client.ClientHttpRequestFactories;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
+import org.springframework.cloud.consul.model.http.KeyStoreInstanceType;
+import org.springframework.cloud.consul.model.http.format.WaitTimeAnnotationFormatterFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.format.support.DefaultFormattingConversionService;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.interceptor.RetryInterceptorBuilder;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.invoker.HttpExchangeAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
+import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.UriBuilder;
 
 /**
  * @author Spencer Gibb
@@ -49,6 +74,8 @@ import org.springframework.util.StringUtils;
 @EnableConfigurationProperties
 @ConditionalOnConsulEnabled
 public class ConsulAutoConfiguration {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConsulAutoConfiguration.class);
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -69,6 +96,80 @@ public class ConsulAutoConfiguration {
 		return createConsulClient(consulProperties, consulRawClientBuilderSupplier);
 	}
 
+	@Bean
+	@ConditionalOnMissingBean
+	public IConsulClient newConsulClient(ConsulProperties consulProperties)
+			throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
+		return createNewConsulClient(consulProperties);
+	}
+
+	public static IConsulClient createNewConsulClient(ConsulProperties consulProperties)
+			throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
+		UriBuilder uriBuilder = new DefaultUriBuilderFactory().builder();
+
+		if (StringUtils.hasLength(consulProperties.getScheme())) {
+			uriBuilder.scheme(consulProperties.getScheme());
+		}
+		else {
+			uriBuilder.scheme("http");
+		}
+
+		uriBuilder.host(consulProperties.getHost()).port(consulProperties.getPort());
+
+		final String agentPath = consulProperties.getPath();
+		if (StringUtils.hasLength(agentPath)) {
+			String normalizedAgentPath = StringUtils.trimTrailingCharacter(agentPath, '/');
+			normalizedAgentPath = StringUtils.trimLeadingCharacter(normalizedAgentPath, '/');
+
+			uriBuilder.path(normalizedAgentPath);
+		}
+
+		String baseUrl = uriBuilder.build().toString();
+
+		HttpExchangeAdapter adapter = createConsulRestClientAdapter(baseUrl, consulProperties.getTls());
+		HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter)
+			.conversionService(createConsulClientConversionService())
+			.build();
+
+		return factory.createClient(IConsulClient.class);
+	}
+
+	public static RestClientAdapter createConsulRestClientAdapter(String baseUrl, ConsulProperties.TLSConfig tlsConfig)
+			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+		RestClient.Builder builder = RestClient.builder()
+			.defaultStatusHandler(HttpStatusCode::is4xxClientError, (request, response) -> {
+			})
+			.defaultStatusHandler(HttpStatusCode::is5xxServerError,
+					(request, response) -> LOGGER
+						.error(new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8)))
+			.baseUrl(baseUrl);
+
+		if (tlsConfig != null) {
+			KeyStore clientStore = KeyStore.getInstance(tlsConfig.getKeyStoreInstanceType().name());
+			clientStore.load(new FileInputStream(tlsConfig.getCertificatePath()),
+					tlsConfig.getCertificatePassword().toCharArray());
+
+			KeyStore trustStore = KeyStore.getInstance(KeyStoreInstanceType.JKS.name());
+			trustStore.load(new FileInputStream(tlsConfig.getKeyStorePath()),
+					tlsConfig.getKeyStorePassword().toCharArray());
+
+			SslStoreBundle sslStoreBundle = SslStoreBundle.of(clientStore, tlsConfig.getKeyStorePassword(), trustStore);
+			SslBundle sslBundle = SslBundle.of(sslStoreBundle);
+			ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+				.withSslBundle(sslBundle);
+			ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
+			builder.requestFactory(requestFactory);
+		}
+
+		return RestClientAdapter.create(builder.build());
+	}
+
+	public static ConversionService createConsulClientConversionService() {
+		DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService();
+		conversionService.addFormatterForFieldAnnotation(new WaitTimeAnnotationFormatterFactory());
+		return conversionService;
+	}
+
 	public static Supplier<Builder> createConsulRawClientBuilder() {
 		return Builder::builder;
 	}
@@ -83,7 +184,9 @@ public class ConsulAutoConfiguration {
 
 		if (consulProperties.getTls() != null) {
 			ConsulProperties.TLSConfig tls = consulProperties.getTls();
-			TLSConfig tlsConfig = new TLSConfig(tls.getKeyStoreInstanceType(), tls.getCertificatePath(),
+			TLSConfig.KeyStoreInstanceType keyStoreInstanceType = TLSConfig.KeyStoreInstanceType
+				.valueOf(tls.getKeyStoreInstanceType().toString());
+			TLSConfig tlsConfig = new TLSConfig(keyStoreInstanceType, tls.getCertificatePath(),
 					tls.getCertificatePassword(), tls.getKeyStorePath(), tls.getKeyStorePassword());
 			builder.setTlsConfig(tlsConfig);
 		}
@@ -106,14 +209,14 @@ public class ConsulAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean
 		@ConditionalOnAvailableEndpoint
-		public ConsulEndpoint consulEndpoint(ConsulClient consulClient) {
+		public ConsulEndpoint consulEndpoint(IConsulClient consulClient) {
 			return new ConsulEndpoint(consulClient);
 		}
 
 		@Bean
 		@ConditionalOnMissingBean
 		@ConditionalOnEnabledHealthIndicator("consul")
-		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient,
+		public ConsulHealthIndicator consulHealthIndicator(IConsulClient consulClient,
 				ConsulHealthIndicatorProperties properties) {
 			return new ConsulHealthIndicator(consulClient, properties);
 		}
