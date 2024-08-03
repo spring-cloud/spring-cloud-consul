@@ -19,6 +19,9 @@ package org.springframework.cloud.consul;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.cloud.consul.model.http.agent.Service;
+import org.springframework.cloud.consul.model.http.catalog.CatalogService;
+import org.springframework.cloud.consul.model.http.catalog.Node;
 import org.springframework.web.service.annotation.GetExchange;
 
 public interface IConsulClient {
@@ -31,5 +34,14 @@ public interface IConsulClient {
 
 	@GetExchange("/v1/catalog/services")
 	Map<String, List<String>> getCatalogServices();
+
+	@GetExchange("/v1/agent/services")
+	Map<String, Service> getAgentServices();
+
+	@GetExchange("/v1/catalog/services")
+	List<CatalogService> getCatalogService(String serviceId);
+
+	@GetExchange("/v1/catalog/nodes")
+	List<Node> getCatalogNodes();
 
 }

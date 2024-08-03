@@ -125,7 +125,9 @@ public class ConsulAutoConfiguration {
 
 		if (consulProperties.getTls() != null) {
 			ConsulProperties.TLSConfig tls = consulProperties.getTls();
-			TLSConfig tlsConfig = new TLSConfig(tls.getKeyStoreInstanceType(), tls.getCertificatePath(),
+			TLSConfig.KeyStoreInstanceType keyStoreInstanceType = TLSConfig.KeyStoreInstanceType
+				.valueOf(tls.getKeyStoreInstanceType().toString());
+			TLSConfig tlsConfig = new TLSConfig(keyStoreInstanceType, tls.getCertificatePath(),
 					tls.getCertificatePassword(), tls.getKeyStorePath(), tls.getKeyStorePassword());
 			builder.setTlsConfig(tlsConfig);
 		}
@@ -148,7 +150,7 @@ public class ConsulAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean
 		@ConditionalOnAvailableEndpoint
-		public ConsulEndpoint consulEndpoint(ConsulClient consulClient) {
+		public ConsulEndpoint consulEndpoint(IConsulClient consulClient) {
 			return new ConsulEndpoint(consulClient);
 		}
 
