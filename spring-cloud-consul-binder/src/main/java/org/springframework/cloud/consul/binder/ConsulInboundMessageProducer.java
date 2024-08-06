@@ -22,7 +22,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import com.ecwid.consul.v1.OperationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -102,11 +101,6 @@ public class ConsulInboundMessageProducer extends MessageProducerSupport {
 				sendMessage(getMessageBuilderFactory().withPayload(decoded)
 					// TODO: support headers
 					.build());
-			}
-		}
-		catch (OperationException e) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Error getting consul events: " + e);
 			}
 		}
 		catch (Exception e) {

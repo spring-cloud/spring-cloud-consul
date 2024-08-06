@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.consul.binder;
 
-import com.ecwid.consul.v1.OperationException;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.fail;
@@ -31,7 +30,7 @@ public class ConsulInboundMessageProducerTests {
 	@Test
 	public void getEventsShouldNotThrowException() {
 		EventService eventService = mock(EventService.class);
-		when(eventService.watch()).thenThrow(new OperationException(500, "error", ""));
+		when(eventService.watch()).thenThrow(new RuntimeException("error"));
 
 		ConsulInboundMessageProducer producer = new ConsulInboundMessageProducer(eventService);
 

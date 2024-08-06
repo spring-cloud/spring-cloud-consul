@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import com.ecwid.consul.ConsulException;
 import org.apache.commons.logging.Log;
 
+import org.springframework.cloud.consul.ConsulException;
 import org.springframework.cloud.consul.IConsulClient;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
