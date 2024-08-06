@@ -20,7 +20,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.BootstrapRegistry;
@@ -33,6 +32,7 @@ import org.springframework.boot.context.properties.bind.BindContext;
 import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
+import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.IConsulClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -46,7 +46,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Spencer Gibb
  */
-@Disabled
 @DirtiesContext
 public class ConsulConfigDataCustomizationIntegrationTests {
 
@@ -68,8 +67,8 @@ public class ConsulConfigDataCustomizationIntegrationTests {
 		application.setWebApplicationType(WebApplicationType.NONE);
 		bindHandlerBootstrapper = new BindHandlerBootstrapper();
 		application.addBootstrapRegistryInitializer(bindHandlerBootstrapper);
-		// TODO: Fix
-		application.addBootstrapRegistryInitializer(ConsulBootstrapper.fromConsulProperties(consulProperties -> null));
+		application.addBootstrapRegistryInitializer(ConsulBootstrapper.fromConsulProperties(
+			ConsulAutoConfiguration::createNewConsulClient));
 		application.addBootstrapRegistryInitializer(
 				registry -> registry.register(ConsulBootstrapper.LoaderInterceptor.class, context1 -> loadContext -> {
 					ConfigData configData = loadContext.getInvocation()
