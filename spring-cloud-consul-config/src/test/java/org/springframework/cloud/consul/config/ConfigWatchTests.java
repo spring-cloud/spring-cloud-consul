@@ -21,18 +21,22 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.kv.model.GetValue;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.model.http.ConsulHeaders;
+import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.util.StringUtils;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -99,15 +103,24 @@ public class ConfigWatchTests {
 
 	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue, String context,
 			String aclToken) {
-		ConsulClient consul = mock(ConsulClient.class);
+		IConsulClient consul = mock(IConsulClient.class);
 		List<GetValue> getValues = null;
 
+		BodyBuilder response;
 		if (getValue != null) {
 			getValues = Arrays.asList(getValue);
+			response = ResponseEntity.status(HttpStatus.OK);
+		}
+		else {
+			response = ResponseEntity.status(HttpStatus.NOT_FOUND);
 		}
 
-		Response<List<GetValue>> response = new Response<>(getValues, 1L, false, 1L);
-		when(consul.getKVValues(eq(context), nullable(String.class), any(QueryParams.class))).thenReturn(response);
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(ConsulHeaders.ConsulIndex.getHeaderName(), "1");
+		headers.add(ConsulHeaders.ConsulLastContact.getHeaderName(), "1");
+		response.headers(headers);
+		when(consul.getKVValues(eq(context), nullable(String.class), anyString(), anyLong()))
+			.thenReturn(response.body(getValues));
 
 		if (StringUtils.hasText(aclToken)) {
 			this.configProperties.setAclToken(aclToken);
@@ -129,13 +142,13 @@ public class ConfigWatchTests {
 
 		GetValue getValue = new GetValue();
 		String context = "/config/app.yml";
-		ConsulClient consul = mock(ConsulClient.class);
+		IConsulClient consul = mock(IConsulClient.class);
 		List<GetValue> getValues = Collections.singletonList(getValue);
 
-		Response<List<GetValue>> response = new Response<>(getValues, 1L, false, 1L);
-		when(consul.getKVValues(eq(context), anyString(), any(QueryParams.class))).thenReturn(response);
+		ResponseEntity<List<GetValue>> response = ResponseEntity.ok(getValues);
+		when(consul.getKVValues(eq(context), anyString(), anyString(), anyLong())).thenReturn(response);
 
-		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, new LinkedHashMap<String, Long>());
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, new LinkedHashMap<>());
 		watch.setApplicationEventPublisher(eventPublisher);
 
 		watch.watchConfigKeyValues();

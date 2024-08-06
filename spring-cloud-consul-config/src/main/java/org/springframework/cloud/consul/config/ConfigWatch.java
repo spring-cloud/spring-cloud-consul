@@ -22,19 +22,20 @@ import java.util.Objects;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.kv.model.GetValue;
 import io.micrometer.core.annotation.Timed;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.model.http.ConsulHeaders;
+import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.core.style.ToStringCreator;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.util.ObjectUtils;
@@ -51,7 +52,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 	private final ConsulConfigProperties properties;
 
-	private final ConsulClient consul;
+	private final IConsulClient consul;
 
 	private final TaskScheduler taskScheduler;
 
@@ -65,12 +66,12 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 	private ScheduledFuture<?> watchFuture;
 
-	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul,
+	public ConfigWatch(ConsulConfigProperties properties, IConsulClient consul,
 			LinkedHashMap<String, Long> initialIndexes) {
 		this(properties, consul, initialIndexes, getTaskScheduler());
 	}
 
-	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul,
+	public ConfigWatch(ConsulConfigProperties properties, IConsulClient consul,
 			LinkedHashMap<String, Long> initialIndexes, TaskScheduler taskScheduler) {
 		this.properties = properties;
 		this.consul = consul;
@@ -154,13 +155,15 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 					aclToken = null;
 				}
 
-				Response<List<GetValue>> response = this.consul.getKVValues(context, aclToken,
-						new QueryParams(this.properties.getWatch().getWaitTime(), currentIndex));
+				ResponseEntity<List<GetValue>> response = this.consul.getKVValues(context, aclToken,
+						this.properties.getWatch().getWaitTime() + "s", currentIndex);
 
 				// if response.value == null, response was a 404, otherwise it was a
 				// 200, reducing churn if there wasn't anything
-				if (response.getValue() != null && !response.getValue().isEmpty()) {
-					Long newIndex = response.getConsulIndex();
+				if (HttpStatus.OK.isSameCodeAs(response.getStatusCode()) && response.hasBody()
+						&& !response.getBody().isEmpty()) {
+					String indexHeader = response.getHeaders().getFirst(ConsulHeaders.ConsulIndex.getHeaderName());
+					Long newIndex = indexHeader == null ? null : Long.parseLong(indexHeader);
 
 					if (newIndex != null && !newIndex.equals(currentIndex)) {
 						// don't publish the same index again, don't publish the first

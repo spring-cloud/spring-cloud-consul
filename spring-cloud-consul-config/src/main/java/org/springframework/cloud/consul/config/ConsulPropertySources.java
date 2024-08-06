@@ -23,12 +23,14 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.kv.model.GetValue;
+import com.ecwid.consul.ConsulException;
 import org.apache.commons.logging.Log;
 
+import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.model.http.ConsulHeaders;
+import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.core.style.ToStringCreator;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.FILES;
@@ -111,22 +113,40 @@ public class ConsulPropertySources {
 
 	@Deprecated
 	public ConsulPropertySource createPropertySource(String propertySourceContext, boolean optional,
-			ConsulClient consul, BiConsumer<String, Long> indexConsumer) {
+			IConsulClient consul, BiConsumer<String, Long> indexConsumer) {
 		return createPropertySource(propertySourceContext, consul, indexConsumer);
 	}
 
-	public ConsulPropertySource createPropertySource(String propertySourceContext, ConsulClient consul,
+	public ConsulPropertySource createPropertySource(String propertySourceContext, IConsulClient consul,
 			BiConsumer<String, Long> indexConsumer) {
 		try {
 			ConsulPropertySource propertySource = null;
 
 			if (properties.getFormat() == FILES) {
-				Response<GetValue> response = consul.getKVValue(propertySourceContext, properties.getAclToken());
-				indexConsumer.accept(propertySourceContext, response.getConsulIndex());
-				if (response.getValue() != null) {
+				ResponseEntity<List<GetValue>> response = consul.getKVValue(propertySourceContext,
+						properties.getAclToken());
+
+				GetValue value = null;
+				if (response.getStatusCode().is2xxSuccessful()) {
+					List<GetValue> values = response.getBody();
+					if (values.size() == 0) {
+						value = new GetValue();
+					}
+					else if (values.size() == 1) {
+						value = values.get(0);
+					}
+					else {
+						throw new ConsulException("Strange response (list size=" + values.size() + ")");
+					}
+				}
+
+				String indexHeader = response.getHeaders().getFirst(ConsulHeaders.ConsulIndex.getHeaderName());
+				Long consulIndex = indexHeader == null ? null : Long.parseLong(indexHeader);
+				indexConsumer.accept(propertySourceContext, consulIndex);
+				if (response.hasBody()) {
 					ConsulFilesPropertySource filesPropertySource = new ConsulFilesPropertySource(propertySourceContext,
 							consul, properties);
-					filesPropertySource.init(response.getValue());
+					filesPropertySource.init(value);
 					propertySource = filesPropertySource;
 				}
 			}
@@ -149,7 +169,7 @@ public class ConsulPropertySources {
 		return null;
 	}
 
-	private ConsulPropertySource create(String context, ConsulClient consulClient,
+	private ConsulPropertySource create(String context, IConsulClient consulClient,
 			BiConsumer<String, Long> indexConsumer) {
 		ConsulPropertySource propertySource = new ConsulPropertySource(context, consulClient, this.properties);
 		propertySource.init();

@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.consul;
 
+import java.nio.charset.StandardCharsets;
 import java.util.function.Supplier;
 
 import com.ecwid.consul.transport.TLSConfig;
@@ -23,6 +24,8 @@ import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.ConsulRawClient;
 import com.ecwid.consul.v1.ConsulRawClient.Builder;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.boot.actuate.autoconfigure.endpoint.condition.ConditionalOnAvailableEndpoint;
 import org.springframework.boot.actuate.autoconfigure.health.ConditionalOnEnabledHealthIndicator;
@@ -35,6 +38,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.interceptor.RetryInterceptorBuilder;
@@ -53,6 +57,8 @@ import org.springframework.web.util.UriBuilder;
 @EnableConfigurationProperties
 @ConditionalOnConsulEnabled
 public class ConsulAutoConfiguration {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ConsulAutoConfiguration.class);
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -76,7 +82,14 @@ public class ConsulAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public IConsulClient newConsulClient(ConsulProperties consulProperties) {
-		RestClient.Builder builder = RestClient.builder();
+		return createNewConsulClient(consulProperties);
+	}
+
+	public static IConsulClient createNewConsulClient(ConsulProperties consulProperties) {
+		RestClient.Builder builder = RestClient.builder()
+			.defaultStatusHandler(HttpStatusCode::isError, (request, response) -> {
+				LOGGER.error(new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8));
+			});
 
 		UriBuilder uriBuilder = new DefaultUriBuilderFactory().builder();
 

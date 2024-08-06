@@ -23,10 +23,10 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import com.ecwid.consul.v1.OperationException;
-import com.ecwid.consul.v1.event.model.Event;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.cloud.consul.model.http.event.Event;
 import org.springframework.integration.endpoint.MessageProducerSupport;
 
 import static org.springframework.util.Base64Utils.decodeFromString;

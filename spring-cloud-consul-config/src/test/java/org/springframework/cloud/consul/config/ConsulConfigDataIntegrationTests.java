@@ -81,16 +81,16 @@ public class ConsulConfigDataIntegrationTests {
 
 	private static ConfigurableEnvironment environment;
 
-	private static ConsulClient client;
+	private static ConsulClient testClient;
 
 	@BeforeAll
 	public static void setup() {
 		ConsulTestcontainers.start();
-		client = ConsulTestcontainers.client();
-		client.deleteKVValues(PREFIX);
-		client.setKVValue(KEY1, VALUE1);
-		client.setKVValue(KEY2, VALUE2_DEFAULT);
-		client.setKVValue(KEY2_APP_NAME, VALUE2);
+		testClient = ConsulTestcontainers.client();
+		testClient.deleteKVValues(PREFIX);
+		testClient.setKVValue(KEY1, VALUE1);
+		testClient.setKVValue(KEY2, VALUE2_DEFAULT);
+		testClient.setKVValue(KEY2_APP_NAME, VALUE2);
 
 		context = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
 			.run("--logging.level.org.springframework.cloud.consul.config.ConfigWatch=TRACE",
@@ -99,31 +99,29 @@ public class ConsulConfigDataIntegrationTests {
 							+ ConsulTestcontainers.getPort(),
 					"--spring.cloud.consul.config.prefix=" + ROOT, "--spring.cloud.consul.config.watch.delay=10",
 					"--spring.cloud.consul.config.watch.wait-time=1");
-
-		client = context.getBean(ConsulClient.class);
 		environment = context.getEnvironment();
 	}
 
 	@AfterAll
 	public static void teardown() {
-		client.deleteKVValues(PREFIX);
+		testClient.deleteKVValues(PREFIX);
 		if (context != null) {
 			context.close();
 		}
 	}
 
 	@Test
-	public void propertyLoaded() {
+	void propertyLoaded() {
 		String testProp2 = environment.getProperty(TEST_PROP2_CANONICAL);
 		assertThat(testProp2).as(TEST_PROP2 + " was wrong").isEqualTo(VALUE2);
 	}
 
 	@Test
-	public void propertyLoadedAndUpdated() throws Exception {
+	void propertyLoadedAndUpdated() throws Exception {
 		String testProp = environment.getProperty(TEST_PROP_CANONICAL);
 		assertThat(testProp).as("testProp was wrong").isEqualTo(VALUE1);
 
-		client.setKVValue(KEY1, "testPropValUpdate");
+		testClient.setKVValue(KEY1, "testPropValUpdate");
 
 		CountDownLatch latch = context.getBean("countDownLatch1", CountDownLatch.class);
 		boolean receivedEvent = latch.await(15, TimeUnit.SECONDS);
@@ -134,11 +132,11 @@ public class ConsulConfigDataIntegrationTests {
 	}
 
 	@Test
-	public void contextDoesNotExistThenExists() throws Exception {
+	void contextDoesNotExistThenExists() throws Exception {
 		String testProp = environment.getProperty(TEST_PROP3_CANONICAL);
 		assertThat(testProp).as("testProp was wrong").isNull();
 
-		client.setKVValue(KEY3, "testPropValInsert");
+		testClient.setKVValue(KEY3, "testPropValInsert");
 
 		CountDownLatch latch = context.getBean("countDownLatch2", CountDownLatch.class);
 		boolean receivedEvent = latch.await(15, TimeUnit.SECONDS);

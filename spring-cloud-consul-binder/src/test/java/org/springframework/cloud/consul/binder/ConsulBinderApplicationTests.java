@@ -18,7 +18,6 @@ package org.springframework.cloud.consul.binder;
 
 import java.util.concurrent.TimeUnit;
 
-import com.ecwid.consul.v1.ConsulClient;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -29,6 +28,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.IConsulClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -112,12 +114,15 @@ public class ConsulBinderApplicationTests {
 	public static class Application {
 
 		@Bean
-		public ConsulClient consulClient() {
-			return new ConsulClient("localhost", 18500);
+		public IConsulClient consulClient() {
+			ConsulProperties consulProperties = new ConsulProperties();
+			consulProperties.setHost("localhost");
+			consulProperties.setPort(18500);
+			return ConsulAutoConfiguration.createNewConsulClient(consulProperties);
 		}
 
 		@Bean
-		public EventService eventService(ConsulClient consulClient) {
+		public EventService eventService(IConsulClient consulClient) {
 			EventService eventService = mock(EventService.class);
 			when(eventService.getConsulClient()).thenReturn(consulClient);
 			return eventService;

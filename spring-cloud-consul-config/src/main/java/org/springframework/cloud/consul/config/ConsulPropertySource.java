@@ -25,14 +25,13 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.kv.model.GetValue;
-
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.model.http.ConsulHeaders;
+import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.core.env.EnumerablePropertySource;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.PROPERTIES;
@@ -42,7 +41,7 @@ import static org.springframework.util.Base64Utils.decodeFromString;
 /**
  * @author Spencer Gibb
  */
-public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient> {
+public class ConsulPropertySource extends EnumerablePropertySource<IConsulClient> {
 
 	private final Map<String, Object> properties = new LinkedHashMap<>();
 
@@ -52,7 +51,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 	private Long initialIndex;
 
-	public ConsulPropertySource(String context, ConsulClient source, ConsulConfigProperties configProperties) {
+	public ConsulPropertySource(String context, IConsulClient source, ConsulConfigProperties configProperties) {
 		super(context, source);
 		this.context = context;
 		this.configProperties = configProperties;
@@ -67,12 +66,13 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 			this.context = this.context.substring(1);
 		}
 
-		Response<List<GetValue>> response = this.source.getKVValues(this.context, this.configProperties.getAclToken(),
-				QueryParams.DEFAULT);
+		ResponseEntity<List<GetValue>> response = this.source.getKVValues(this.context,
+				this.configProperties.getAclToken());
 
-		this.initialIndex = response.getConsulIndex();
+		String indexHeader = response.getHeaders().getFirst(ConsulHeaders.ConsulIndex.getHeaderName());
+		this.initialIndex = indexHeader == null ? null : Long.parseLong(indexHeader);
 
-		final List<GetValue> values = response.getValue();
+		final List<GetValue> values = response.getBody();
 		ConsulConfigProperties.Format format = this.configProperties.getFormat();
 		switch (format) {
 			case KEY_VALUE:

@@ -21,31 +21,40 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.IConsulClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConsulPropertyPrefixTests {
 
-	private ConsulClient client;
+	private ConsulClient testClient;
+
+	private IConsulClient consulClient;
 
 	@Before
 	public void setup() {
 		ConsulTestcontainers.start();
-		this.client = ConsulTestcontainers.client();
+		ConsulProperties consulProperties = new ConsulProperties();
+		consulProperties.setHost(ConsulTestcontainers.getHost());
+		consulProperties.setPort(ConsulTestcontainers.getPort());
+		this.testClient = ConsulTestcontainers.client();
+		this.consulClient = ConsulAutoConfiguration.createNewConsulClient(consulProperties);
 	}
 
 	@After
 	public void teardown() {
-		this.client.deleteKVValues("");
+		this.testClient.deleteKVValues("");
 	}
 
 	@Test
 	public void testEmptyPrefix() {
 		// because prefix is empty, a leading forward slash is omitted
 		String kvContext = "appname";
-		this.client.setKVValue(kvContext + "/fooprop", "fookvval");
-		this.client.setKVValue(kvContext + "/bar/prop", "8080");
+		this.testClient.setKVValue(kvContext + "/fooprop", "fookvval");
+		this.testClient.setKVValue(kvContext + "/bar/prop", "8080");
 
 		ConsulPropertySource source = getConsulPropertySource(new ConsulConfigProperties(), kvContext);
 		assertProperties(source, "fookvval", "8080");
@@ -58,7 +67,7 @@ public class ConsulPropertyPrefixTests {
 
 	@SuppressWarnings("Duplicates")
 	private ConsulPropertySource getConsulPropertySource(ConsulConfigProperties configProperties, String context) {
-		ConsulPropertySource source = new ConsulPropertySource(context, this.client, configProperties);
+		ConsulPropertySource source = new ConsulPropertySource(context, this.consulClient, configProperties);
 		source.init();
 		String[] names = source.getPropertyNames();
 		assertThat(names).as("names was null").isNotNull();
