@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.consul.binder;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,8 +29,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.integration.endpoint.MessageProducerSupport;
-
-import static org.springframework.util.Base64Utils.decodeFromString;
 
 /**
  * Adapter that receives Messages from Consul Events, converts them into Spring
@@ -98,7 +97,7 @@ public class ConsulInboundMessageProducer extends MessageProducerSupport {
 			for (Event event : events) {
 				// Map<String, Object> headers = new HashMap<>();
 				// headers.put(MessageHeaders.REPLY_CHANNEL, outputChannel.)
-				String decoded = new String(decodeFromString(event.getPayload()));
+				String decoded = new String(Base64.getDecoder().decode(event.getPayload()));
 				sendMessage(getMessageBuilderFactory().withPayload(decoded)
 					// TODO: support headers
 					.build());

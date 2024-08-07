@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.config;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,6 @@ import org.springframework.util.StringUtils;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.PROPERTIES;
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.YAML;
-import static org.springframework.util.Base64Utils.decodeFromString;
 
 /**
  * @author Spencer Gibb
@@ -175,7 +175,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		if (value == null) {
 			return null;
 		}
-		return new String(decodeFromString(value));
+		return new String(Base64.getDecoder().decode(value));
 	}
 
 	protected Map<String, Object> getProperties() {
