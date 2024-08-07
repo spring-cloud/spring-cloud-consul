@@ -67,8 +67,8 @@ public class ConsulConfigDataCustomizationIntegrationTests {
 		application.setWebApplicationType(WebApplicationType.NONE);
 		bindHandlerBootstrapper = new BindHandlerBootstrapper();
 		application.addBootstrapRegistryInitializer(bindHandlerBootstrapper);
-		application.addBootstrapRegistryInitializer(ConsulBootstrapper.fromConsulProperties(
-			ConsulAutoConfiguration::createNewConsulClient));
+		application.addBootstrapRegistryInitializer(
+				ConsulBootstrapper.fromConsulProperties(ConsulAutoConfiguration::createNewConsulClient));
 		application.addBootstrapRegistryInitializer(
 				registry -> registry.register(ConsulBootstrapper.LoaderInterceptor.class, context1 -> loadContext -> {
 					ConfigData configData = loadContext.getInvocation()
