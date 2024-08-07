@@ -119,7 +119,7 @@ public class ConfigWatchTests {
 		headers.add(ConsulHeaders.ConsulIndex.getHeaderName(), "1");
 		headers.add(ConsulHeaders.ConsulLastContact.getHeaderName(), "1");
 		response.headers(headers);
-		when(consul.getKVValues(eq(context), nullable(String.class), anyString(), anyLong()))
+		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong()))
 			.thenReturn(response.body(getValues));
 
 		if (StringUtils.hasText(aclToken)) {
@@ -146,7 +146,7 @@ public class ConfigWatchTests {
 		List<GetValue> getValues = Collections.singletonList(getValue);
 
 		ResponseEntity<List<GetValue>> response = ResponseEntity.ok(getValues);
-		when(consul.getKVValues(eq(context), anyString(), anyString(), anyLong())).thenReturn(response);
+		when(consul.getKVValues(eq(context), anyString(), anyLong(), anyLong())).thenReturn(response);
 
 		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, new LinkedHashMap<>());
 		watch.setApplicationEventPublisher(eventPublisher);

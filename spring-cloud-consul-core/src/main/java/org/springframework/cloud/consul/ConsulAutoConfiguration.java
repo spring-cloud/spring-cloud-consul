@@ -16,7 +16,13 @@
 
 package org.springframework.cloud.consul;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.function.Supplier;
 
 import com.ecwid.consul.transport.TLSConfig;
@@ -35,10 +41,19 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.ssl.SslBundle;
+import org.springframework.boot.ssl.SslStoreBundle;
+import org.springframework.boot.web.client.ClientHttpRequestFactories;
+import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
+import org.springframework.cloud.consul.model.http.KeyStoreInstanceType;
+import org.springframework.cloud.consul.model.http.format.WaitTimeAnnotationFormatterFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.interceptor.RetryInterceptorBuilder;
@@ -46,6 +61,7 @@ import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.invoker.HttpExchangeAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
@@ -81,16 +97,13 @@ public class ConsulAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public IConsulClient newConsulClient(ConsulProperties consulProperties) {
+	public IConsulClient newConsulClient(ConsulProperties consulProperties)
+			throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 		return createNewConsulClient(consulProperties);
 	}
 
-	public static IConsulClient createNewConsulClient(ConsulProperties consulProperties) {
-		RestClient.Builder builder = RestClient.builder()
-			.defaultStatusHandler(HttpStatusCode::isError, (request, response) -> {
-				LOGGER.error(new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8));
-			});
-
+	public static IConsulClient createNewConsulClient(ConsulProperties consulProperties)
+			throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 		UriBuilder uriBuilder = new DefaultUriBuilderFactory().builder();
 
 		if (StringUtils.hasLength(consulProperties.getScheme())) {
@@ -102,11 +115,6 @@ public class ConsulAutoConfiguration {
 
 		uriBuilder.host(consulProperties.getHost()).port(consulProperties.getPort());
 
-		if (consulProperties.getTls() != null) {
-			ConsulProperties.TLSConfig tls = consulProperties.getTls();
-			// TODO: Set the TLS config
-		}
-
 		final String agentPath = consulProperties.getPath();
 		if (StringUtils.hasLength(agentPath)) {
 			String normalizedAgentPath = StringUtils.trimTrailingCharacter(agentPath, '/');
@@ -117,11 +125,48 @@ public class ConsulAutoConfiguration {
 
 		String baseUrl = uriBuilder.build().toString();
 
-		RestClient restClient = builder.baseUrl(baseUrl).build();
-		RestClientAdapter adapter = RestClientAdapter.create(restClient);
-		HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+		HttpExchangeAdapter adapter = createConsulRestClientAdapter(baseUrl, consulProperties.getTls());
+		HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter)
+			.conversionService(createConsulClientConversionService())
+			.build();
 
 		return factory.createClient(IConsulClient.class);
+	}
+
+	public static RestClientAdapter createConsulRestClientAdapter(String baseUrl, ConsulProperties.TLSConfig tlsConfig)
+			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
+		RestClient.Builder builder = RestClient.builder()
+			.defaultStatusHandler(HttpStatusCode::is4xxClientError, (request, response) -> {
+			})
+			.defaultStatusHandler(HttpStatusCode::is5xxServerError,
+					(request, response) -> LOGGER
+						.error(new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8)))
+			.baseUrl(baseUrl);
+
+		if (tlsConfig != null) {
+			KeyStore clientStore = KeyStore.getInstance(tlsConfig.getKeyStoreInstanceType().name());
+			clientStore.load(new FileInputStream(tlsConfig.getCertificatePath()),
+					tlsConfig.getCertificatePassword().toCharArray());
+
+			KeyStore trustStore = KeyStore.getInstance(KeyStoreInstanceType.JKS.name());
+			trustStore.load(new FileInputStream(tlsConfig.getKeyStorePath()),
+					tlsConfig.getKeyStorePassword().toCharArray());
+
+			SslStoreBundle sslStoreBundle = SslStoreBundle.of(clientStore, tlsConfig.getKeyStorePassword(), trustStore);
+			SslBundle sslBundle = SslBundle.of(sslStoreBundle);
+			ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+				.withSslBundle(sslBundle);
+			ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
+			builder.requestFactory(requestFactory);
+		}
+
+		return RestClientAdapter.create(builder.build());
+	}
+
+	public static ConversionService createConsulClientConversionService() {
+		DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService();
+		conversionService.addFormatterForFieldAnnotation(new WaitTimeAnnotationFormatterFactory());
+		return conversionService;
 	}
 
 	public static Supplier<Builder> createConsulRawClientBuilder() {

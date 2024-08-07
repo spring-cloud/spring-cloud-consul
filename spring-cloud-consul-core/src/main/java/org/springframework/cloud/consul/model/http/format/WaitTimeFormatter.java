@@ -25,7 +25,18 @@ public class WaitTimeFormatter implements Formatter<Long> {
 
 	@Override
 	public Long parse(String text, Locale locale) throws ParseException {
-		return 0L;
+		try {
+			if (text.endsWith("s")) {
+				return Long.parseLong(text.substring(0, text.length() - 1));
+			}
+			else {
+				return Long.parseLong(text);
+			}
+		}
+		catch (NumberFormatException e) {
+			throw new ParseException(e.getMessage(), 0);
+		}
+
 	}
 
 	@Override

@@ -16,6 +16,10 @@
 
 package org.springframework.cloud.consul.binder;
 
+import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.concurrent.TimeUnit;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
@@ -114,7 +118,8 @@ public class ConsulBinderApplicationTests {
 	public static class Application {
 
 		@Bean
-		public IConsulClient consulClient() {
+		public IConsulClient consulClient()
+				throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 			ConsulProperties consulProperties = new ConsulProperties();
 			consulProperties.setHost("localhost");
 			consulProperties.setPort(18500);

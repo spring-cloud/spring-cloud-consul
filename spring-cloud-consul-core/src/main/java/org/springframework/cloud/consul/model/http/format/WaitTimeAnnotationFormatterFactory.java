@@ -22,9 +22,7 @@ import org.springframework.format.AnnotationFormatterFactory;
 import org.springframework.format.Formatter;
 import org.springframework.format.Parser;
 import org.springframework.format.Printer;
-import org.springframework.stereotype.Component;
 
-@Component
 public class WaitTimeAnnotationFormatterFactory implements AnnotationFormatterFactory<WaitTimeFormat> {
 
 	private static final Set<Class<?>> FIELD_TYPES = Set.of(Long.class);

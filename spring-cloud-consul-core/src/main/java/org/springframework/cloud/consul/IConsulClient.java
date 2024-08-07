@@ -69,7 +69,7 @@ public interface IConsulClient {
 	@GetExchange("/v1/kv/{context}?recurse")
 	ResponseEntity<List<GetValue>> getKVValues(@PathVariable String context,
 			@RequestHeader(value = ACL_TOKEN_HEADER, required = false) String aclToken,
-			@RequestParam("wait") @WaitTimeFormat String waitTime, @RequestParam("index") long index);
+			@RequestParam("wait") @WaitTimeFormat Long waitTime, @RequestParam("index") long index);
 
 	@GetExchange("/v1/events")
 	ResponseEntity<List<Event>> eventList();

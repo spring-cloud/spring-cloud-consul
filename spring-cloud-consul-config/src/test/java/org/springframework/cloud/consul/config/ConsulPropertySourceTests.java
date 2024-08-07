@@ -16,6 +16,10 @@
 
 package org.springframework.cloud.consul.config;
 
+import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.Random;
 
 import com.ecwid.consul.v1.ConsulClient;
@@ -46,7 +50,7 @@ public class ConsulPropertySourceTests {
 	private String propertiesContext;
 
 	@Before
-	public void setup() {
+	public void setup() throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 		ConsulTestcontainers.start();
 		this.prefix = "/consulPropertySourceTests" + new Random().nextInt(Integer.MAX_VALUE);
 		ConsulProperties consulProperties = new ConsulProperties();
