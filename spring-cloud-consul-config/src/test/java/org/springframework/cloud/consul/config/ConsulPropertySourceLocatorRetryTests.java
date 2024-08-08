@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.consul.config;
 
-import com.ecwid.consul.transport.TransportException;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -24,6 +23,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.ResourceAccessException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -49,7 +49,7 @@ public class ConsulPropertySourceLocatorRetryTests {
 						"spring.cloud.consul.config.failFast=true")
 				.run();
 			fail("Did not throw expected exception");
-		}).hasCauseInstanceOf(TransportException.class);
+		}).hasCauseInstanceOf(ResourceAccessException.class);
 		assertThat(output).contains("RetryContext retrieved");
 	}
 
