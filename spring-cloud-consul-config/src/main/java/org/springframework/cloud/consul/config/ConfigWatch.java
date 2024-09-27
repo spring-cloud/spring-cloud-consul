@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.QueryParams;
 import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.kv.model.GetValue;
 import io.micrometer.core.annotation.Timed;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -154,8 +153,8 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 					aclToken = null;
 				}
 
-				Response<List<GetValue>> response = this.consul.getKVValues(context, aclToken,
-						new QueryParams(this.properties.getWatch().getWaitTime(), currentIndex));
+				Response<List<String>> response = this.consul.getKVKeysOnly(context, this.properties.getProfileSeparator(), aclToken
+						,new QueryParams(this.properties.getWatch().getWaitTime(), currentIndex));
 
 				// if response.value == null, response was a 404, otherwise it was a
 				// 200, reducing churn if there wasn't anything
