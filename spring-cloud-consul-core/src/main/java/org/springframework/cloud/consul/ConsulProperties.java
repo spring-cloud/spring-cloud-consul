@@ -16,10 +16,10 @@
 
 package org.springframework.cloud.consul;
 
-import com.ecwid.consul.transport.TLSConfig.KeyStoreInstanceType;
 import jakarta.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.cloud.consul.model.http.KeyStoreInstanceType;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.validation.annotation.Validated;
 

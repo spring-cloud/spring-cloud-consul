@@ -88,8 +88,6 @@ public class ConsulConfigDataMultiplePrefixesIntegrationTests {
 							+ ConsulTestcontainers.getPort(),
 					"--spring.cloud.consul.config.prefixes=" + ROOT + "," + ROOT2,
 					"--spring.cloud.consul.config.watch.delay=10", "--spring.cloud.consul.config.watch.wait-time=1");
-
-		client = context.getBean(ConsulClient.class);
 		environment = context.getEnvironment();
 	}
 
@@ -103,7 +101,7 @@ public class ConsulConfigDataMultiplePrefixesIntegrationTests {
 	}
 
 	@Test
-	public void propertyLoaded() {
+	void propertyLoaded() {
 		String testProp = environment.getProperty(TEST_PROP_CANONICAL);
 		assertThat(testProp).as(TEST_PROP + " was wrong").isEqualTo(VALUE1);
 		String testProp2 = environment.getProperty(TEST_PROP2_CANONICAL);
