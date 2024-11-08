@@ -6,7 +6,7 @@
 
 	<groupId>org.springframework.cloud</groupId>
 	<artifactId>spring-cloud-consul</artifactId>
-	<version>4.2.0-RC1</version>
+	<version>4.2.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Spring Cloud Consul</name>
 	<description>Spring Cloud Consul</description>
@@ -15,18 +15,18 @@
 		<groupId>org.springframework.cloud</groupId>
 		<artifactId>spring-cloud-build</artifactId>
 
-		<version>4.2.0-RC1</version>
+		<version>4.2.0-SNAPSHOT</version>
 		<relativePath/>
 		<!-- lookup parent from repository -->
 	</parent>
 
 	<properties>
-		<spring-cloud-bus.version>4.2.0-RC1</spring-cloud-bus.version>
-		<spring-cloud-commons.version>4.2.0-RC1</spring-cloud-commons.version>
-		<spring-cloud-config.version>4.2.0-RC1</spring-cloud-config.version>
+		<spring-cloud-bus.version>4.2.0-SNAPSHOT</spring-cloud-bus.version>
+		<spring-cloud-commons.version>4.2.0-SNAPSHOT</spring-cloud-commons.version>
+		<spring-cloud-config.version>4.2.0-SNAPSHOT</spring-cloud-config.version>
 		<spring-cloud-deployer.version>2.8.3</spring-cloud-deployer.version>
-		<spring-cloud-openfeign.version>4.2.0-RC1</spring-cloud-openfeign.version>
-		<spring-cloud-stream.version>4.2.0-RC1</spring-cloud-stream.version>
+		<spring-cloud-openfeign.version>4.2.0-SNAPSHOT</spring-cloud-openfeign.version>
+		<spring-cloud-stream.version>4.2.0-SNAPSHOT</spring-cloud-stream.version>
 		<testcontainers.version>1.17.6</testcontainers.version>
 		<mockserverclient.version>5.15.0</mockserverclient.version>
 	</properties>
