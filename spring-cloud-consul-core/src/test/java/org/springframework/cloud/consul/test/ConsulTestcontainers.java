@@ -45,11 +45,11 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 	public static ConsulContainer consul = createConsulContainer();
 
 	public static ConsulContainer createConsulContainer() {
-		return createConsulContainer("1.7");
+		return createConsulContainer("1.19");
 	}
 
 	public static ConsulContainer createConsulContainer(String consulVersion) {
-		String dockerImageName = "consul:" + consulVersion;
+		String dockerImageName = "hashicorp/consul:" + consulVersion;
 		return new ConsulContainer(dockerImageName)
 			.withLogConsumer(new Slf4jLogConsumer(logger).withSeparateOutputStreams());
 	}

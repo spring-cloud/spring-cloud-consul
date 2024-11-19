@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.consul.binder.config;
 
-import com.ecwid.consul.v1.ConsulClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
+import org.springframework.cloud.consul.IConsulClient;
 import org.springframework.cloud.consul.binder.ConsulBinder;
 import org.springframework.cloud.consul.binder.EventService;
 import org.springframework.cloud.stream.binder.Binder;
@@ -52,7 +52,7 @@ public class ConsulBinderConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public EventService eventService(ConsulClient consulClient) {
+	public EventService eventService(IConsulClient consulClient) {
 		return new EventService(null/* consulBinderProperties */, consulClient, this.objectMapper);
 	}
 
