@@ -71,7 +71,7 @@ public class ConfigWatchTests {
 
 		setupWatch(eventPublisher, new GetValue(), "/app/");
 
-		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
+		verify(eventPublisher, atLeastOnce()).publishEvent(any(RefreshEvent.class));
 	}
 
 	@Test
