@@ -18,8 +18,6 @@ package org.springframework.cloud.consul.bootstraptests;
 
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -48,7 +46,6 @@ import org.springframework.web.client.RestTemplate;
 @RestController
 @EnableConfigurationProperties
 @EnableFeignClients
-@Slf4j
 public class ConsulBootstrapApplication {
 
 	@Autowired
