@@ -36,4 +36,4 @@ public class Application {
 }
 ```
 
-A local Consul agent must be running.  See the https://consul.io/docs/agent/basics.html[Consul agent documentation] on how to run an agent.
+A local Consul agent must be running.  See the https://developer.hashicorp.com/consul/docs/agent#starting-the-consul-agent[Consul agent documentation] on how to run an agent.
