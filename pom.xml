@@ -23,7 +23,7 @@
 	<properties>
 		<spring-cloud-bus.version>4.1.4-SNAPSHOT</spring-cloud-bus.version>
 		<spring-cloud-commons.version>4.1.6-SNAPSHOT</spring-cloud-commons.version>
-		<spring-cloud-config.version>4.1.6-SNAPSHOT</spring-cloud-config.version>
+		<spring-cloud-config.version>4.1.7-SNAPSHOT</spring-cloud-config.version>
 		<spring-cloud-deployer.version>2.8.3</spring-cloud-deployer.version>
 		<spring-cloud-openfeign.version>4.1.5-SNAPSHOT</spring-cloud-openfeign.version>
 		<spring-cloud-stream.version>4.1.6-SNAPSHOT</spring-cloud-stream.version>
