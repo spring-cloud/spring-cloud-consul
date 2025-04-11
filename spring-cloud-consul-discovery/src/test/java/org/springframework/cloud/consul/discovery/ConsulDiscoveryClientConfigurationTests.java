@@ -27,7 +27,7 @@ import org.springframework.cloud.commons.util.UtilAutoConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Fail.fail;
 
 /**
  * @author Olga Maciaszek-Sharma
