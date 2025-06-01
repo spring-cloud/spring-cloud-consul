@@ -27,7 +27,7 @@
 		<spring-cloud-deployer.version>2.8.3</spring-cloud-deployer.version>
 		<spring-cloud-openfeign.version>4.3.1-SNAPSHOT</spring-cloud-openfeign.version>
 		<spring-cloud-stream.version>4.3.1-SNAPSHOT</spring-cloud-stream.version>
-		<testcontainers.version>1.17.6</testcontainers.version>
+		<testcontainers.version>1.21.1</testcontainers.version>
 		<mockserverclient.version>5.15.0</mockserverclient.version>
 	</properties>
 
