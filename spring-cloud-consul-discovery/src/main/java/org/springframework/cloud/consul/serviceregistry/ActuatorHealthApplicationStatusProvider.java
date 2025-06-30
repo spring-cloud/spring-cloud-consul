@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@ import java.util.Optional;
 
 import com.ecwid.consul.v1.health.model.Check.CheckStatus;
 
-import org.springframework.boot.actuate.health.HealthComponent;
+import org.springframework.boot.actuate.health.HealthDescriptor;
 import org.springframework.boot.actuate.health.HealthEndpoint;
-import org.springframework.boot.actuate.health.Status;
+import org.springframework.boot.health.contributor.Status;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 
-import static org.springframework.boot.actuate.health.Status.DOWN;
-import static org.springframework.boot.actuate.health.Status.OUT_OF_SERVICE;
-import static org.springframework.boot.actuate.health.Status.UP;
+import static org.springframework.boot.health.contributor.Status.DOWN;
+import static org.springframework.boot.health.contributor.Status.OUT_OF_SERVICE;
+import static org.springframework.boot.health.contributor.Status.UP;
 
 /**
  * Leverages Spring Boot Actuator health endpoint to determine the current health of the
@@ -65,7 +65,7 @@ public class ActuatorHealthApplicationStatusProvider implements ApplicationStatu
 		String healthGroup = heartbeatProperties.getActuatorHealthGroup();
 		String[] path = healthGroup == null ? new String[0] : new String[] { healthGroup };
 		return Optional.ofNullable(healthEndpoint.healthForPath(path))
-			.map(HealthComponent::getStatus)
+			.map(HealthDescriptor::getStatus)
 			.map(this::healthStatusToCheckStatus)
 			.orElse(CheckStatus.UNKNOWN);
 	}
