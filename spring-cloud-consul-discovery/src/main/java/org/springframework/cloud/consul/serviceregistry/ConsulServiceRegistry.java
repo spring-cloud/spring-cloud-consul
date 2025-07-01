@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2019 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,8 @@ import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.util.ReflectionUtils;
 
-import static org.springframework.boot.actuate.health.Status.OUT_OF_SERVICE;
-import static org.springframework.boot.actuate.health.Status.UP;
+import static org.springframework.boot.health.contributor.Status.OUT_OF_SERVICE;
+import static org.springframework.boot.health.contributor.Status.UP;
 
 /**
  * @author Spencer Gibb
