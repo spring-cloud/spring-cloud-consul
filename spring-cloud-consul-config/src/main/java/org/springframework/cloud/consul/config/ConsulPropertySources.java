@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 
-import org.springframework.cloud.consul.ConsulException;
 import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulException;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.core.style.ToStringCreator;
@@ -113,7 +113,7 @@ public class ConsulPropertySources {
 
 	@Deprecated
 	public ConsulPropertySource createPropertySource(String propertySourceContext, boolean optional,
-                                                     ConsulClient consul, BiConsumer<String, Long> indexConsumer) {
+			ConsulClient consul, BiConsumer<String, Long> indexConsumer) {
 		return createPropertySource(propertySourceContext, consul, indexConsumer);
 	}
 

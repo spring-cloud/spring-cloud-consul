@@ -51,7 +51,7 @@ public class ConsulConfigAutoConfiguration {
 		@Bean
 		@ConditionalOnBean(ConsulConfigIndexes.class)
 		public ConfigWatch configWatch(ConsulConfigProperties properties, ConsulConfigIndexes indexes,
-									   ConsulClient consul, @Qualifier(CONFIG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
+				ConsulClient consul, @Qualifier(CONFIG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
 			return new ConfigWatch(properties, consul, indexes.getIndexes(), taskScheduler);
 		}
 

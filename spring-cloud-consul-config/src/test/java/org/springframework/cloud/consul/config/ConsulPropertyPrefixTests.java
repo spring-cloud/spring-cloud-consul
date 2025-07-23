@@ -26,8 +26,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;

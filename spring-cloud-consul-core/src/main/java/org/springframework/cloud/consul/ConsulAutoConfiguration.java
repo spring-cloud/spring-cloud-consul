@@ -92,7 +92,7 @@ public class ConsulAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public com.ecwid.consul.v1.ConsulClient consulClient(ConsulProperties consulProperties,
-														 Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
+			Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
 		return createConsulClient(consulProperties, consulRawClientBuilderSupplier);
 	}
 
@@ -174,7 +174,7 @@ public class ConsulAutoConfiguration {
 	}
 
 	public static com.ecwid.consul.v1.ConsulClient createConsulClient(ConsulProperties consulProperties,
-																	  Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
+			Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
 		ConsulRawClient.Builder builder = consulRawClientBuilderSupplier.get();
 		final String agentPath = consulProperties.getPath();
 		final String agentHost = StringUtils.hasLength(consulProperties.getScheme())
@@ -216,7 +216,7 @@ public class ConsulAutoConfiguration {
 		@ConditionalOnMissingBean
 		@ConditionalOnEnabledHealthIndicator("consul")
 		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient,
-														   ConsulHealthIndicatorProperties properties) {
+				ConsulHealthIndicatorProperties properties) {
 			return new ConsulHealthIndicator(consulClient, properties);
 		}
 

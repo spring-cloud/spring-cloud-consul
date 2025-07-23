@@ -25,8 +25,8 @@ import org.springframework.boot.BootstrapRegistryInitializer;
 import org.springframework.boot.context.config.ConfigData;
 import org.springframework.boot.context.config.ConfigDataLoaderContext;
 import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.util.Assert;
 
 public class ConsulBootstrapper implements BootstrapRegistryInitializer {
