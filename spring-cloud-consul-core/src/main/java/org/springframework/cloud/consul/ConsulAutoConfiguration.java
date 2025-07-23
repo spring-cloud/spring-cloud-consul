@@ -16,9 +16,10 @@
 
 package org.springframework.cloud.consul;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -42,10 +43,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.health.autoconfigure.contributor.ConditionalOnEnabledHealthIndicator;
 import org.springframework.boot.health.contributor.Health;
+import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
+import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
 import org.springframework.boot.ssl.SslBundle;
 import org.springframework.boot.ssl.SslStoreBundle;
-import org.springframework.boot.web.client.ClientHttpRequestFactories;
-import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.cloud.consul.model.http.KeyStoreInstanceType;
 import org.springframework.cloud.consul.model.http.format.WaitTimeAnnotationFormatterFactory;
 import org.springframework.context.annotation.Bean;
@@ -146,18 +147,17 @@ public class ConsulAutoConfiguration {
 
 		if (tlsConfig != null) {
 			KeyStore clientStore = KeyStore.getInstance(tlsConfig.getKeyStoreInstanceType().name());
-			clientStore.load(new FileInputStream(tlsConfig.getCertificatePath()),
+			clientStore.load(Files.newInputStream(Paths.get(tlsConfig.getCertificatePath())),
 					tlsConfig.getCertificatePassword().toCharArray());
 
 			KeyStore trustStore = KeyStore.getInstance(KeyStoreInstanceType.JKS.name());
-			trustStore.load(new FileInputStream(tlsConfig.getKeyStorePath()),
+			trustStore.load(Files.newInputStream(Paths.get(tlsConfig.getKeyStorePath())),
 					tlsConfig.getKeyStorePassword().toCharArray());
 
 			SslStoreBundle sslStoreBundle = SslStoreBundle.of(clientStore, tlsConfig.getKeyStorePassword(), trustStore);
 			SslBundle sslBundle = SslBundle.of(sslStoreBundle);
-			ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-				.withSslBundle(sslBundle);
-			ClientHttpRequestFactory requestFactory = ClientHttpRequestFactories.get(settings);
+			ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.ofSslBundle(sslBundle);
+			ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder.detect().build(settings);
 			builder.requestFactory(requestFactory);
 		}
 
