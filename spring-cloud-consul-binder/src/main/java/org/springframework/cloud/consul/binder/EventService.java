@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.binder.config.ConsulBinderProperties;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.cloud.consul.model.http.event.Event;
@@ -35,19 +35,19 @@ public class EventService {
 
 	protected ConsulBinderProperties properties;
 
-	protected IConsulClient consul;
+	protected ConsulClient consul;
 
 	protected ObjectMapper objectMapper = new ObjectMapper();
 
 	private AtomicReference<Long> lastIndex = new AtomicReference<>();
 
-	public EventService(ConsulBinderProperties properties, IConsulClient consul, ObjectMapper objectMapper) {
+	public EventService(ConsulBinderProperties properties, ConsulClient consul, ObjectMapper objectMapper) {
 		this.properties = properties;
 		this.consul = consul;
 		this.objectMapper = objectMapper;
 	}
 
-	public IConsulClient getConsulClient() {
+	public ConsulClient getConsulClient() {
 		return this.consul;
 	}
 

@@ -18,7 +18,7 @@ package org.springframework.cloud.consul.binder;
 
 import java.util.Arrays;
 
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.model.http.event.Event;
 import org.springframework.http.ResponseEntity;
 import org.springframework.integration.handler.AbstractMessageHandler;
@@ -31,11 +31,11 @@ import org.springframework.messaging.Message;
  */
 public class ConsulSendingHandler extends AbstractMessageHandler {
 
-	private final IConsulClient consul;
+	private final ConsulClient consul;
 
 	private final String eventName;
 
-	public ConsulSendingHandler(IConsulClient consul, String eventName) {
+	public ConsulSendingHandler(ConsulClient consul, String eventName) {
 		this.consul = consul;
 		this.eventName = eventName;
 	}

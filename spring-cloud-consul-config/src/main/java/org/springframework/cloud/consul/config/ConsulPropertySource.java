@@ -27,7 +27,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.core.env.EnumerablePropertySource;
@@ -41,7 +41,7 @@ import static org.springframework.cloud.consul.config.ConsulConfigProperties.For
 /**
  * @author Spencer Gibb
  */
-public class ConsulPropertySource extends EnumerablePropertySource<IConsulClient> {
+public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient> {
 
 	private final Map<String, Object> properties = new LinkedHashMap<>();
 
@@ -51,7 +51,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<IConsulClient
 
 	private Long initialIndex;
 
-	public ConsulPropertySource(String context, IConsulClient source, ConsulConfigProperties configProperties) {
+	public ConsulPropertySource(String context, ConsulClient source, ConsulConfigProperties configProperties) {
 		super(context, source);
 		this.context = context;
 		this.configProperties = configProperties;

@@ -21,23 +21,22 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
-import com.ecwid.consul.v1.ConsulClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConsulPropertyPrefixTests {
 
-	private ConsulClient testClient;
+	private com.ecwid.consul.v1.ConsulClient testClient;
 
-	private IConsulClient consulClient;
+	private ConsulClient consulClient;
 
 	@Before
 	public void setup() throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {

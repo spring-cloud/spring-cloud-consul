@@ -30,7 +30,7 @@ public class ConsulHealthIndicatorProperties {
 	/**
 	 * Whether or not the indicator should include a query for all registered services
 	 * during its execution. When set to {@code false} the indicator only uses the lighter
-	 * {@link IConsulClient#getStatusLeader()}. This can be helpful in large deployments
+	 * {@link ConsulClient#getStatusLeader()}. This can be helpful in large deployments
 	 * where the number of services returned makes the operation unnecessarily heavy.
 	 */
 	private boolean includeServicesQuery = true;

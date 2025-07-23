@@ -21,7 +21,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -42,9 +42,9 @@ public class ConsulConfigBootstrapConfiguration {
 	@ConditionalOnProperty(name = "spring.cloud.consul.config.enabled", matchIfMissing = true)
 	protected static class ConsulPropertySourceConfiguration {
 
-		private IConsulClient consul;
+		private ConsulClient consul;
 
-		public ConsulPropertySourceConfiguration(IConsulClient consul) {
+		public ConsulPropertySourceConfiguration(ConsulClient consul) {
 			this.consul = consul;
 		}
 

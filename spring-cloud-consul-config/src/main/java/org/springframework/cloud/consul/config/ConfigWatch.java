@@ -26,7 +26,7 @@ import io.micrometer.core.annotation.Timed;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
@@ -52,7 +52,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 	private final ConsulConfigProperties properties;
 
-	private final IConsulClient consul;
+	private final ConsulClient consul;
 
 	private final TaskScheduler taskScheduler;
 
@@ -66,12 +66,12 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 	private ScheduledFuture<?> watchFuture;
 
-	public ConfigWatch(ConsulConfigProperties properties, IConsulClient consul,
+	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul,
 			LinkedHashMap<String, Long> initialIndexes) {
 		this(properties, consul, initialIndexes, getTaskScheduler());
 	}
 
-	public ConfigWatch(ConsulConfigProperties properties, IConsulClient consul,
+	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul,
 			LinkedHashMap<String, Long> initialIndexes, TaskScheduler taskScheduler) {
 		this.properties = properties;
 		this.consul = consul;

@@ -44,7 +44,7 @@ import static org.mockito.Mockito.verify;
 public class ConsulHealthIndicatorUpTest {
 
 	@MockitoSpyBean
-	private IConsulClient consulClient;
+	private ConsulClient consulClient;
 
 	@Autowired
 	private HealthEndpoint healthEndpoint;

@@ -24,7 +24,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
@@ -103,7 +103,7 @@ public class ConfigWatchTests {
 
 	private void setupWatch(ApplicationEventPublisher eventPublisher, GetValue getValue, String context,
 			String aclToken) {
-		IConsulClient consul = mock(IConsulClient.class);
+		ConsulClient consul = mock(ConsulClient.class);
 		List<GetValue> getValues = null;
 
 		BodyBuilder response;
@@ -142,7 +142,7 @@ public class ConfigWatchTests {
 
 		GetValue getValue = new GetValue();
 		String context = "/config/app.yml";
-		IConsulClient consul = mock(IConsulClient.class);
+		ConsulClient consul = mock(ConsulClient.class);
 		List<GetValue> getValues = Collections.singletonList(getValue);
 
 		ResponseEntity<List<GetValue>> response = ResponseEntity.ok(getValues);

@@ -16,7 +16,7 @@
 
 package org.springframework.cloud.consul.config;
 
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 
 import static org.springframework.cloud.consul.config.ConsulConfigProperties.Format.PROPERTIES;
@@ -27,7 +27,7 @@ import static org.springframework.cloud.consul.config.ConsulConfigProperties.For
  */
 public class ConsulFilesPropertySource extends ConsulPropertySource {
 
-	public ConsulFilesPropertySource(String context, IConsulClient source, ConsulConfigProperties configProperties) {
+	public ConsulFilesPropertySource(String context, ConsulClient source, ConsulConfigProperties configProperties) {
 		super(context, source, configProperties);
 	}
 

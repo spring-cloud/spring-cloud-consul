@@ -39,7 +39,7 @@ import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.logging.DeferredLogFactory;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.config.ConsulPropertySources.Context;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.lang.Nullable;
@@ -95,7 +95,7 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		// create consul client
 		registerBean(resolverContext, ConsulProperties.class, loadProperties(resolverContext, locationUri));
 
-		registerAndPromoteBean(resolverContext, IConsulClient.class, this::createConsulClient);
+		registerAndPromoteBean(resolverContext, ConsulClient.class, this::createConsulClient);
 
 		// create locations
 		ConsulConfigProperties properties = loadConfigProperties(resolverContext);
@@ -182,7 +182,7 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		bootstrapContext.registerIfAbsent(type, supplier);
 	}
 
-	protected IConsulClient createConsulClient(BootstrapContext context) {
+	protected ConsulClient createConsulClient(BootstrapContext context) {
 		ConsulProperties properties = context.get(ConsulProperties.class);
 
 		try {

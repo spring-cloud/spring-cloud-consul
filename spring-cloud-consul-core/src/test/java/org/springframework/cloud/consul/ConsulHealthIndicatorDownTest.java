@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 public class ConsulHealthIndicatorDownTest {
 
 	@MockitoBean
-	private IConsulClient consulClient;
+	private ConsulClient consulClient;
 
 	@Autowired
 	private HealthEndpoint healthEndpoint;

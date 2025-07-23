@@ -26,7 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.cloud.bootstrap.config.PropertySourceLocator;
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -42,7 +42,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 
 	private static final Log log = LogFactory.getLog(ConsulPropertySourceLocator.class);
 
-	private final IConsulClient consul;
+	private final ConsulClient consul;
 
 	private final ConsulConfigProperties properties;
 
@@ -50,7 +50,7 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 
 	private final LinkedHashMap<String, Long> contextIndex = new LinkedHashMap<>();
 
-	public ConsulPropertySourceLocator(IConsulClient consul, ConsulConfigProperties properties) {
+	public ConsulPropertySourceLocator(ConsulClient consul, ConsulConfigProperties properties) {
 		this.consul = consul;
 		this.properties = properties;
 	}

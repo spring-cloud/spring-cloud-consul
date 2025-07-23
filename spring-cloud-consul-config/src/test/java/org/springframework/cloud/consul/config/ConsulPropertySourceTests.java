@@ -22,14 +22,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.util.Random;
 
-import com.ecwid.consul.v1.ConsulClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,9 +38,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class ConsulPropertySourceTests {
 
-	private ConsulClient testClient;
+	private com.ecwid.consul.v1.ConsulClient testClient;
 
-	private IConsulClient consulClient;
+	private ConsulClient consulClient;
 
 	private String prefix;
 

@@ -26,24 +26,24 @@ import org.springframework.boot.context.config.ConfigData;
 import org.springframework.boot.context.config.ConfigDataLoaderContext;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.cloud.consul.ConsulProperties;
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.util.Assert;
 
 public class ConsulBootstrapper implements BootstrapRegistryInitializer {
 
-	private Function<BootstrapContext, IConsulClient> consulClientFactory;
+	private Function<BootstrapContext, ConsulClient> consulClientFactory;
 
 	private LoaderInterceptor loaderInterceptor;
 
-	static BootstrapRegistryInitializer fromConsulProperties(Function<ConsulProperties, IConsulClient> factory) {
-		return registry -> registry.register(IConsulClient.class, context -> {
+	static BootstrapRegistryInitializer fromConsulProperties(Function<ConsulProperties, ConsulClient> factory) {
+		return registry -> registry.register(ConsulClient.class, context -> {
 			ConsulProperties properties = context.get(ConsulProperties.class);
 			return factory.apply(properties);
 		});
 	}
 
-	static BootstrapRegistryInitializer fromBootstrapContext(Function<BootstrapContext, IConsulClient> factory) {
-		return registry -> registry.register(IConsulClient.class, factory::apply);
+	static BootstrapRegistryInitializer fromBootstrapContext(Function<BootstrapContext, ConsulClient> factory) {
+		return registry -> registry.register(ConsulClient.class, factory::apply);
 	}
 
 	static ConsulBootstrapper create() {
@@ -51,7 +51,7 @@ public class ConsulBootstrapper implements BootstrapRegistryInitializer {
 	}
 
 	// TODO: document there will be a ConsulProperties in BootstrapContext
-	public ConsulBootstrapper withConsulClientFactory(Function<BootstrapContext, IConsulClient> consulClientFactory) {
+	public ConsulBootstrapper withConsulClientFactory(Function<BootstrapContext, ConsulClient> consulClientFactory) {
 		this.consulClientFactory = consulClientFactory;
 		return this;
 	}
@@ -64,7 +64,7 @@ public class ConsulBootstrapper implements BootstrapRegistryInitializer {
 	@Override
 	public void initialize(BootstrapRegistry registry) {
 		if (consulClientFactory != null) {
-			registry.register(IConsulClient.class, consulClientFactory::apply);
+			registry.register(ConsulClient.class, consulClientFactory::apply);
 		}
 		if (loaderInterceptor != null) {
 			registry.register(LoaderInterceptor.class, BootstrapRegistry.InstanceSupplier.of(loaderInterceptor));

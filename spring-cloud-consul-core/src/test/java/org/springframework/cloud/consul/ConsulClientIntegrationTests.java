@@ -44,14 +44,14 @@ import static org.mockserver.model.HttpResponse.response;
 import static org.mockserver.model.JsonBody.json;
 
 @Testcontainers
-class IConsulClientIntegrationTests {
+class ConsulClientIntegrationTests {
 
 	@Container
 	static MockServerContainer mockServerContainer = new MockServerContainer(
 			DockerImageName.parse("mockserver/mockserver:5.15.0"));
 	static MockServerClient mockServerClient;
 
-	private IConsulClient client;
+	private ConsulClient client;
 
 	@BeforeAll
 	static void beforeAll() {

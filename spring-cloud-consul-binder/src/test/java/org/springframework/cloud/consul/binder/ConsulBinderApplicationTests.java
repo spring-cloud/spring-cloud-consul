@@ -34,7 +34,7 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulProperties;
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -118,7 +118,7 @@ public class ConsulBinderApplicationTests {
 	public static class Application {
 
 		@Bean
-		public IConsulClient consulClient()
+		public ConsulClient consulClient()
 				throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 			ConsulProperties consulProperties = new ConsulProperties();
 			consulProperties.setHost("localhost");
@@ -127,7 +127,7 @@ public class ConsulBinderApplicationTests {
 		}
 
 		@Bean
-		public EventService eventService(IConsulClient consulClient) {
+		public EventService eventService(ConsulClient consulClient) {
 			EventService eventService = mock(EventService.class);
 			when(eventService.getConsulClient()).thenReturn(consulClient);
 			return eventService;

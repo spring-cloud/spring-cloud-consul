@@ -27,7 +27,6 @@ import java.security.cert.CertificateException;
 import java.util.function.Supplier;
 
 import com.ecwid.consul.transport.TLSConfig;
-import com.ecwid.consul.v1.ConsulClient;
 import com.ecwid.consul.v1.ConsulRawClient;
 import com.ecwid.consul.v1.ConsulRawClient.Builder;
 import org.aspectj.lang.annotation.Aspect;
@@ -92,19 +91,19 @@ public class ConsulAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulClient consulClient(ConsulProperties consulProperties,
-			Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
+	public com.ecwid.consul.v1.ConsulClient consulClient(ConsulProperties consulProperties,
+														 Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
 		return createConsulClient(consulProperties, consulRawClientBuilderSupplier);
 	}
 
 	@Bean
 	@ConditionalOnMissingBean
-	public IConsulClient newConsulClient(ConsulProperties consulProperties)
+	public ConsulClient newConsulClient(ConsulProperties consulProperties)
 			throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 		return createNewConsulClient(consulProperties);
 	}
 
-	public static IConsulClient createNewConsulClient(ConsulProperties consulProperties)
+	public static ConsulClient createNewConsulClient(ConsulProperties consulProperties)
 			throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 		UriBuilder uriBuilder = new DefaultUriBuilderFactory().builder();
 
@@ -132,7 +131,7 @@ public class ConsulAutoConfiguration {
 			.conversionService(createConsulClientConversionService())
 			.build();
 
-		return factory.createClient(IConsulClient.class);
+		return factory.createClient(ConsulClient.class);
 	}
 
 	public static RestClientAdapter createConsulRestClientAdapter(String baseUrl, ConsulProperties.TLSConfig tlsConfig)
@@ -174,8 +173,8 @@ public class ConsulAutoConfiguration {
 		return Builder::builder;
 	}
 
-	public static ConsulClient createConsulClient(ConsulProperties consulProperties,
-			Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
+	public static com.ecwid.consul.v1.ConsulClient createConsulClient(ConsulProperties consulProperties,
+																	  Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
 		ConsulRawClient.Builder builder = consulRawClientBuilderSupplier.get();
 		final String agentPath = consulProperties.getPath();
 		final String agentHost = StringUtils.hasLength(consulProperties.getScheme())
@@ -198,7 +197,7 @@ public class ConsulAutoConfiguration {
 			builder.setPath(normalizedAgentPath);
 		}
 
-		return new ConsulClient(builder.build());
+		return new com.ecwid.consul.v1.ConsulClient(builder.build());
 	}
 
 	@Configuration(proxyBeanMethods = false)
@@ -209,15 +208,15 @@ public class ConsulAutoConfiguration {
 		@Bean
 		@ConditionalOnMissingBean
 		@ConditionalOnAvailableEndpoint
-		public ConsulEndpoint consulEndpoint(IConsulClient consulClient) {
+		public ConsulEndpoint consulEndpoint(ConsulClient consulClient) {
 			return new ConsulEndpoint(consulClient);
 		}
 
 		@Bean
 		@ConditionalOnMissingBean
 		@ConditionalOnEnabledHealthIndicator("consul")
-		public ConsulHealthIndicator consulHealthIndicator(IConsulClient consulClient,
-				ConsulHealthIndicatorProperties properties) {
+		public ConsulHealthIndicator consulHealthIndicator(ConsulClient consulClient,
+														   ConsulHealthIndicatorProperties properties) {
 			return new ConsulHealthIndicator(consulClient, properties);
 		}
 

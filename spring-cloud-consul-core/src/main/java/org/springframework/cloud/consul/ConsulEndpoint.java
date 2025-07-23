@@ -33,9 +33,9 @@ import org.springframework.core.style.ToStringCreator;
 @Endpoint(id = "consul")
 public class ConsulEndpoint {
 
-	private final IConsulClient consul;
+	private final ConsulClient consul;
 
-	public ConsulEndpoint(IConsulClient consul) {
+	public ConsulEndpoint(ConsulClient consul) {
 		this.consul = consul;
 	}
 

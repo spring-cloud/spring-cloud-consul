@@ -31,7 +31,7 @@ import org.springframework.boot.context.config.ConfigDataLoaderContext;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.logging.DeferredLogFactory;
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.config.ConsulBootstrapper.LoadContext;
 import org.springframework.cloud.consul.config.ConsulBootstrapper.LoaderInterceptor;
 import org.springframework.util.StringUtils;
@@ -60,7 +60,7 @@ public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigData
 
 	public ConfigData doLoad(ConfigDataLoaderContext context, ConsulConfigDataResource resource) {
 		try {
-			IConsulClient consul = getBean(context, IConsulClient.class);
+			ConsulClient consul = getBean(context, ConsulClient.class);
 			ConsulConfigIndexes indexes = getBean(context, ConsulConfigIndexes.class);
 
 			ConsulPropertySource propertySource = resource.getConsulPropertySources()

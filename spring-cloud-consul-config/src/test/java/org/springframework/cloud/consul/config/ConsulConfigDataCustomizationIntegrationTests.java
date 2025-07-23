@@ -33,7 +33,7 @@ import org.springframework.boot.context.properties.bind.BindHandler;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.cloud.consul.IConsulClient;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -110,8 +110,8 @@ public class ConsulConfigDataCustomizationIntegrationTests {
 
 	@Test
 	void consulClientIsCustom() {
-		IConsulClient client = context.getBean(IConsulClient.class);
-		assertThat(client).isInstanceOf(IConsulClient.class);
+		ConsulClient client = context.getBean(ConsulClient.class);
+		assertThat(client).isInstanceOf(ConsulClient.class);
 		assertThat(bindHandlerBootstrapper.onSuccessCount).isGreaterThan(0);
 	}
 
