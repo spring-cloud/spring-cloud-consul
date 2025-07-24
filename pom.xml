@@ -28,7 +28,7 @@
 		<spring-cloud-openfeign.version>5.0.0-SNAPSHOT</spring-cloud-openfeign.version>
 		<spring-cloud-stream.version>5.0.0-SNAPSHOT</spring-cloud-stream.version>
 		<testcontainers.version>1.21.2</testcontainers.version>
-		<mockserverclient.version>5.15.0</mockserverclient.version>
+		<mockserver.version>5.15.0</mockserver.version>
 	</properties>
 
 	<scm>
@@ -181,7 +181,12 @@
 			<dependency>
 				<groupId>org.mock-server</groupId>
 				<artifactId>mockserver-client-java</artifactId>
-				<version>${mockserverclient.version}</version>
+				<version>${mockserver.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.mock-server</groupId>
+				<artifactId>mockserver-netty</artifactId>
+				<version>${mockserver.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
