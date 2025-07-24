@@ -98,13 +98,11 @@ public class ConsulAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public ConsulClient newConsulClient(ConsulProperties consulProperties)
-			throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
+	public ConsulClient coreConsulClient(ConsulProperties consulProperties) {
 		return createNewConsulClient(consulProperties);
 	}
 
-	public static ConsulClient createNewConsulClient(ConsulProperties consulProperties)
-			throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
+	public static ConsulClient createNewConsulClient(ConsulProperties consulProperties) {
 		UriBuilder uriBuilder = new DefaultUriBuilderFactory().builder();
 
 		if (StringUtils.hasLength(consulProperties.getScheme())) {
@@ -134,33 +132,39 @@ public class ConsulAutoConfiguration {
 		return factory.createClient(ConsulClient.class);
 	}
 
-	public static RestClientAdapter createConsulRestClientAdapter(String baseUrl, ConsulProperties.TLSConfig tlsConfig)
-			throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
-		RestClient.Builder builder = RestClient.builder()
-			.defaultStatusHandler(HttpStatusCode::is4xxClientError, (request, response) -> {
-			})
-			.defaultStatusHandler(HttpStatusCode::is5xxServerError,
-					(request, response) -> LOGGER
-						.error(new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8)))
-			.baseUrl(baseUrl);
+	public static RestClientAdapter createConsulRestClientAdapter(String baseUrl,
+			ConsulProperties.TLSConfig tlsConfig) {
+		try {
+			RestClient.Builder builder = RestClient.builder()
+				.defaultStatusHandler(HttpStatusCode::is4xxClientError, (request, response) -> {
+				})
+				.defaultStatusHandler(HttpStatusCode::is5xxServerError,
+						(request, response) -> LOGGER
+							.error(new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8)))
+				.baseUrl(baseUrl);
 
-		if (tlsConfig != null) {
-			KeyStore clientStore = KeyStore.getInstance(tlsConfig.getKeyStoreInstanceType().name());
-			clientStore.load(Files.newInputStream(Paths.get(tlsConfig.getCertificatePath())),
-					tlsConfig.getCertificatePassword().toCharArray());
+			if (tlsConfig != null) {
+				KeyStore clientStore = KeyStore.getInstance(tlsConfig.getKeyStoreInstanceType().name());
+				clientStore.load(Files.newInputStream(Paths.get(tlsConfig.getCertificatePath())),
+						tlsConfig.getCertificatePassword().toCharArray());
 
-			KeyStore trustStore = KeyStore.getInstance(KeyStoreInstanceType.JKS.name());
-			trustStore.load(Files.newInputStream(Paths.get(tlsConfig.getKeyStorePath())),
-					tlsConfig.getKeyStorePassword().toCharArray());
+				KeyStore trustStore = KeyStore.getInstance(KeyStoreInstanceType.JKS.name());
+				trustStore.load(Files.newInputStream(Paths.get(tlsConfig.getKeyStorePath())),
+						tlsConfig.getKeyStorePassword().toCharArray());
 
-			SslStoreBundle sslStoreBundle = SslStoreBundle.of(clientStore, tlsConfig.getKeyStorePassword(), trustStore);
-			SslBundle sslBundle = SslBundle.of(sslStoreBundle);
-			ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.ofSslBundle(sslBundle);
-			ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder.detect().build(settings);
-			builder.requestFactory(requestFactory);
+				SslStoreBundle sslStoreBundle = SslStoreBundle.of(clientStore, tlsConfig.getKeyStorePassword(),
+						trustStore);
+				SslBundle sslBundle = SslBundle.of(sslStoreBundle);
+				ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.ofSslBundle(sslBundle);
+				ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder.detect().build(settings);
+				builder.requestFactory(requestFactory);
+			}
+
+			return RestClientAdapter.create(builder.build());
 		}
-
-		return RestClientAdapter.create(builder.build());
+		catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static ConversionService createConsulClientConversionService() {
