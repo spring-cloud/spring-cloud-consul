@@ -197,7 +197,7 @@ public class ConsulConfigProperties {
 			.append("profileSeparator", this.profileSeparator)
 			.append("format", this.format)
 			.append("dataKey", this.dataKey)
-			.append("aclToken", this.aclToken)
+			.append("aclToken", this.aclToken != null ? "******" : null)
 			.append("watch", this.watch)
 			.append("failFast", this.failFast)
 			.append("name", this.name)
