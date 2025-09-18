@@ -41,7 +41,7 @@ import static org.mockito.Mockito.verify;
  * @author Dave Syer
  */
 @RunWith(ModifiedClassPathRunner.class)
-@ClassPathExclusions({ "spring-retry-*.jar", "spring-boot-starter-aop-*.jar" })
+@ClassPathExclusions({ "spring-retry-*.jar", "spring-boot-starter-aspectj-*.jar" })
 public class DiscoveryClientConfigServiceAutoConfigurationTests {
 
 	private ConfigurableApplicationContext context;

@@ -19,8 +19,8 @@ package org.springframework.cloud.consul.binder;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import tools.jackson.databind.ObjectMapper;
 
 import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.binder.config.ConsulBinderProperties;

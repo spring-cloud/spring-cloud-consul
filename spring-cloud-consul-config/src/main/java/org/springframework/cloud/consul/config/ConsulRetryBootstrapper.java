@@ -16,8 +16,8 @@
 
 package org.springframework.cloud.consul.config;
 
-import org.springframework.boot.BootstrapRegistry;
-import org.springframework.boot.BootstrapRegistryInitializer;
+import org.springframework.boot.bootstrap.BootstrapRegistry;
+import org.springframework.boot.bootstrap.BootstrapRegistryInitializer;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.cloud.consul.RetryProperties;
 import org.springframework.cloud.consul.config.ConsulBootstrapper.LoaderInterceptor;
