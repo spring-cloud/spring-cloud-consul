@@ -33,6 +33,7 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 
 import static java.util.Collections.emptyList;
@@ -89,8 +90,17 @@ class ConsulReactiveDiscoveryClientTests {
 	}
 
 	@Test
+	public void aclTokenToStringMasked() {
+		InetUtils inetUtils = mock(InetUtils.class);
+		when(inetUtils.findFirstNonLoopbackHostInfo()).thenReturn(mock(InetUtils.HostInfo.class));
+		ConsulDiscoveryProperties consulDiscoveryProperties = new ConsulDiscoveryProperties(inetUtils);
+		consulDiscoveryProperties.setAclToken("myAclToken");
+		assertThat(consulDiscoveryProperties.toString()).doesNotContain("myAclToken").contains("******");
+	}
+
+	@Test
 	public void shouldReturnFluxOfServicesWithAclToken() {
-		when(properties.getAclToken()).thenReturn("aclToken");
+		when(properties.getAclToken()).thenReturn("myAclToken");
 		when(consulClient.getCatalogServices(any(CatalogServicesRequest.class))).thenReturn(consulServicesResponse());
 		Flux<String> services = client.getServices();
 		StepVerifier.create(services).expectNext("my-service").expectComplete().verify();
