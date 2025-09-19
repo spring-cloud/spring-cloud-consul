@@ -619,7 +619,7 @@ public class ConsulDiscoveryProperties {
 
 	@Override
 	public String toString() {
-		return new ToStringCreator(this).append("aclToken", this.aclToken)
+		return new ToStringCreator(this).append("aclToken", this.aclToken != null ? "******" : null)
 			.append("catalogServicesWatchDelay", this.catalogServicesWatchDelay)
 			.append("catalogServicesWatchTimeout", this.catalogServicesWatchTimeout)
 			.append("consistencyMode", this.consistencyMode)
