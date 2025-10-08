@@ -86,8 +86,11 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	public List<ServiceInstance> getAllInstances() {
 		List<ServiceInstance> instances = new ArrayList<>();
 
-		Response<Map<String, List<String>>> services = this.client
-			.getCatalogServices(CatalogServicesRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
+		CatalogServicesRequest request = CatalogServicesRequest.newBuilder()
+			.setQueryParams(QueryParams.DEFAULT)
+			.setToken(this.properties.getAclToken())
+			.build();
+		Response<Map<String, List<String>>> services = this.client.getCatalogServices(request);
 		for (String serviceId : services.getValue().keySet()) {
 			addInstancesToList(instances, serviceId, QueryParams.DEFAULT);
 		}
