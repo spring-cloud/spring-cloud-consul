@@ -18,20 +18,18 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.model.http.agent.Service;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
@@ -39,7 +37,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * @author Spencer Gibb
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulAutoServiceRegistrationNonWebTests.TestConfig.class,
 		properties = { "spring.application.name=consulNonWebTest", "server.port=32111" }, webEnvironment = NONE)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
@@ -55,8 +52,8 @@ public class ConsulAutoServiceRegistrationNonWebTests {
 	public void contextLoads() {
 		assertThat(this.autoServiceRegistration).as("ConsulAutoServiceRegistration was created").isNotNull();
 
-		Response<Map<String, Service>> response = this.consul.getAgentServices();
-		Map<String, Service> services = response.getValue();
+		ResponseEntity<Map<String, Service>> response = this.consul.getAgentServices();
+		Map<String, Service> services = response.getBody();
 		Service service = services.get("consulNonWebTest");
 		assertThat(service).as("service was registered").isNull(); // no port to listen,
 																	// hence no

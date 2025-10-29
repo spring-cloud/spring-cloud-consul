@@ -16,14 +16,16 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.OperationException;
-import com.ecwid.consul.v1.Response;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
@@ -32,7 +34,7 @@ import static org.mockito.Mockito.when;
 /**
  * Unit tests for {@link ConsulDiscoveryClient} probe API.
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ConsulDiscoveryClientProbeTests {
 
 	@Mock
@@ -46,16 +48,16 @@ public class ConsulDiscoveryClientProbeTests {
 
 	@Test
 	public void probeSucceeds() {
-		when(consulClient.getStatusLeader())
-			.thenReturn(new Response<>("5150", 5150L, false, System.currentTimeMillis()));
+		when(consulClient.getStatusLeader()).thenReturn(ResponseEntity.ok("5150"));
 		discoveryClient.probe();
 		verify(consulClient).getStatusLeader();
 	}
 
 	@Test
 	public void probeFails() {
-		when(consulClient.getStatusLeader()).thenThrow(new OperationException(5150, "5150", "No leader"));
-		assertThatThrownBy(() -> discoveryClient.probe()).isInstanceOf(OperationException.class)
+		when(consulClient.getStatusLeader())
+			.thenThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "No leader"));
+		assertThatThrownBy(() -> discoveryClient.probe()).isInstanceOf(HttpClientErrorException.class)
 			.hasMessageContaining("No leader");
 		verify(consulClient).getStatusLeader();
 	}

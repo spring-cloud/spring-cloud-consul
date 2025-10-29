@@ -69,8 +69,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		ResponseEntity<List<GetValue>> response = this.source.getKVValues(this.context,
 				this.configProperties.getAclToken());
 
-		String indexHeader = response.getHeaders().getFirst(ConsulHeaders.ConsulIndex.getHeaderName());
-		this.initialIndex = indexHeader == null ? null : Long.parseLong(indexHeader);
+		this.initialIndex = ConsulHeaders.getConsulIndex(response);
 
 		final List<GetValue> values = response.getBody();
 		ConsulConfigProperties.Format format = this.configProperties.getFormat();

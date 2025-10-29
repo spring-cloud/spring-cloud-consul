@@ -18,16 +18,16 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.runner.WebApplicationContextRunner;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
+import org.springframework.cloud.consul.model.http.agent.Service;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -56,8 +56,8 @@ public class ConsulServiceRegistryDisabledTests {
 
 				ConsulClient consul = context.getBean(ConsulClient.class);
 
-				Response<Map<String, Service>> response = consul.getAgentServices();
-				Map<String, Service> services = response.getValue();
+				ResponseEntity<Map<String, Service>> response = consul.getAgentServices();
+				Map<String, Service> services = response.getBody();
 				Service service = services.get(testName);
 				assertThat(service).as("service was registered").isNull();
 			});

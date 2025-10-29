@@ -21,9 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ecwid.consul.v1.health.model.HealthService;
-
 import org.springframework.cloud.client.DefaultServiceInstance;
+import org.springframework.cloud.consul.model.http.health.HealthService;
 import org.springframework.core.style.ToStringCreator;
 
 import static org.springframework.cloud.consul.discovery.ConsulServerUtils.findHost;

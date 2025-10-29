@@ -18,12 +18,13 @@ package org.springframework.cloud.consul.test;
 
 import java.util.HashMap;
 
-import com.ecwid.consul.v1.ConsulClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.consul.ConsulContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 
+import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -89,7 +90,10 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 	}
 
 	public static ConsulClient client() {
-		return new ConsulClient(getHost(), getPort());
+		ConsulProperties properties = new ConsulProperties();
+		properties.setPort(getPort());
+		properties.setHost(getHost());
+		return ConsulAutoConfiguration.createNewConsulClient(properties);
 	}
 
 	public static void initializeSystemProperties() {

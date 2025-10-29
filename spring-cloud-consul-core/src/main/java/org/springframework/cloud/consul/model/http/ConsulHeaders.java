@@ -16,36 +16,73 @@
 
 package org.springframework.cloud.consul.model.http;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.util.StringUtils;
+
 /**
  * Custom Consul Defined Response Headers.
  *
  * @author Matthew Whitaker
  */
-public enum ConsulHeaders {
+public final class ConsulHeaders {
 
-	/**
-	 *
-	 */
-	ConsulIndex("X-Consul-Index"),
-
-	/**
-	 *
-	 */
-	ConsulKnownLeader("X-Consul-Knownleader"),
-
-	/**
-	 *
-	 */
-	ConsulLastContact("X-Consul-Lastcontact");
-
-	private final String headerName;
-
-	ConsulHeaders(String headerName) {
-		this.headerName = headerName;
+	private ConsulHeaders() {
 	}
 
-	public String getHeaderName() {
-		return this.headerName;
+	/**
+	 * Header name for Consul Index.
+	 */
+	public static String INDEX_HEADER = "X-Consul-Index";
+
+	/**
+	 * Header name for Consul Knownleader.
+	 */
+	public static String KNOWN_LEADER_HEADER = "X-Consul-Knownleader";
+
+	/**
+	 * Header name for Consul Lastcontact.
+	 */
+	public static String LAST_CONTACT_HEADER = "X-Consul-Lastcontact";
+
+	public static Long getConsulIndex(HttpEntity<?> entity) {
+		String header = entity.getHeaders().getFirst(INDEX_HEADER);
+		return parseUnsignedLong(header);
+	}
+
+	public static Boolean getConsulKnownLeader(HttpEntity<?> entity) {
+		String header = entity.getHeaders().getFirst(KNOWN_LEADER_HEADER);
+		return parseBoolean(header);
+	}
+
+	public static Long getConsulLastContact(HttpEntity<?> entity) {
+		String header = entity.getHeaders().getFirst(LAST_CONTACT_HEADER);
+		return parseUnsignedLong(header);
+	}
+
+	private static Long parseUnsignedLong(String value) {
+		if (StringUtils.hasText(value)) {
+			try {
+				return Long.parseUnsignedLong(value);
+			}
+			catch (Exception e) {
+			}
+		}
+
+		return null;
+	}
+
+	private static Boolean parseBoolean(String value) {
+		if (StringUtils.hasText(value)) {
+			if ("true".equals(value)) {
+				return true;
+			}
+
+			if ("false".equals(value)) {
+				return false;
+			}
+		}
+
+		return null;
 	}
 
 }

@@ -18,11 +18,7 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -30,11 +26,12 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.model.http.agent.Service;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -42,7 +39,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * @author Jon Freedman
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulAutoServiceRegistrationDisabledTests.TestConfig.class,
 		properties = { "spring.application.name=myTestNotDeRegisteredService",
 				"spring.cloud.consul.discovery.instanceId=myTestNotDeRegisteredService-D",
@@ -74,8 +70,7 @@ public class ConsulAutoServiceDeRegistrationDisabledTests {
 	}
 
 	private void checkService(final boolean expected) {
-		final Response<Map<String, Service>> response = this.consul.getAgentServices();
-		final Map<String, Service> services = response.getValue();
+		final Map<String, Service> services = this.consul.getAgentServices().getBody();
 		final Service service = services.get("myTestNotDeRegisteredService-D");
 		if (expected) {
 			assertThat(service).as("service was not registered").isNotNull();

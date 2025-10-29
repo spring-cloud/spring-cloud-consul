@@ -16,16 +16,16 @@
 
 package org.springframework.cloud.consul.discovery.configclient;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.test.ClassPathExclusions;
-import org.springframework.cloud.test.ModifiedClassPathRunner;
+import org.springframework.cloud.test.ModifiedClassPathExtension;
 
-@RunWith(ModifiedClassPathRunner.class)
+@ExtendWith(ModifiedClassPathExtension.class)
 @ClassPathExclusions({ "spring-cloud-config-client-*.jar", "spring-cloud-config-server-*.jar" })
 public class ConsulConfigServerBootstrapperNoConfigClientTests {
 

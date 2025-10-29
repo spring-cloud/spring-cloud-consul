@@ -18,20 +18,17 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.List;
 
-import com.ecwid.consul.ConsulException;
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.NewService;
-import com.ecwid.consul.v1.health.HealthChecksForServiceRequest;
-import com.ecwid.consul.v1.health.model.Check;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.cloud.client.serviceregistry.ServiceRegistry;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
+import org.springframework.cloud.consul.model.http.agent.NewService;
+import org.springframework.cloud.consul.model.http.health.Check;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
 
 import static org.springframework.boot.health.contributor.Status.OUT_OF_SERVICE;
@@ -64,14 +61,15 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 	public void register(ConsulRegistration reg) {
 		log.info("Registering service with consul: " + reg.getService());
 		try {
-			this.client.agentServiceRegister(reg.getService(), this.properties.getAclToken());
+			ResponseEntity<Void> response = this.client.agentServiceRegister(this.properties.getAclToken(),
+					reg.getService());
 			NewService service = reg.getService();
 			if (this.heartbeatProperties.isEnabled() && this.ttlScheduler != null && service.getCheck() != null
 					&& service.getCheck().getTtl() != null) {
 				this.ttlScheduler.add(reg.getService());
 			}
 		}
-		catch (ConsulException e) {
+		catch (RuntimeException e) {
 			if (this.properties.isFailFast()) {
 				log.error("Error registering service with consul: " + reg.getService(), e);
 				ReflectionUtils.rethrowRuntimeException(e);
@@ -99,10 +97,12 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 	@Override
 	public void setStatus(ConsulRegistration registration, String status) {
 		if (status.equalsIgnoreCase(OUT_OF_SERVICE.getCode())) {
-			this.client.agentServiceSetMaintenance(registration.getInstanceId(), true);
+			this.client.agentServiceSetMaintenance(registration.getInstanceId(), true, null,
+					this.properties.getAclToken());
 		}
 		else if (status.equalsIgnoreCase(UP.getCode())) {
-			this.client.agentServiceSetMaintenance(registration.getInstanceId(), false);
+			this.client.agentServiceSetMaintenance(registration.getInstanceId(), false, null,
+					this.properties.getAclToken());
 		}
 		else {
 			throw new IllegalArgumentException("Unknown status: " + status);
@@ -113,9 +113,8 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 	@Override
 	public Object getStatus(ConsulRegistration registration) {
 		String serviceId = registration.getServiceId();
-		Response<List<Check>> response = this.client.getHealthChecksForService(serviceId,
-				HealthChecksForServiceRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
-		List<Check> checks = response.getValue();
+		ResponseEntity<List<Check>> response = this.client.getHealthChecksForService(serviceId);
+		List<Check> checks = response.getBody();
 
 		for (Check check : checks) {
 			if (check.getServiceId().equals(registration.getInstanceId())) {

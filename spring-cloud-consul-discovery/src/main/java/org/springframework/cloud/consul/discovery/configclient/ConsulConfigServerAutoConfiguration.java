@@ -16,13 +16,13 @@
 
 package org.springframework.cloud.consul.discovery.configclient;
 
-import com.ecwid.consul.v1.ConsulClient;
 import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.config.server.config.ConfigServerProperties;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;

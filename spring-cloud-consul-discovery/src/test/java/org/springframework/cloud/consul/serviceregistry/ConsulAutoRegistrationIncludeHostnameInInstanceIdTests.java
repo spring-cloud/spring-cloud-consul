@@ -16,9 +16,7 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import com.ecwid.consul.v1.agent.model.NewService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -27,10 +25,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.model.http.agent.NewService;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -38,7 +36,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * @author varnson
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulAutoRegistrationIncludeHostnameInInstanceIdTests.TestConfig.class,
 		properties = { "spring.application.name=myTestService-IncludeHostnameInInstanceId",
 				"spring.cloud.consul.discovery.include-hostname-in-instance-id=true",

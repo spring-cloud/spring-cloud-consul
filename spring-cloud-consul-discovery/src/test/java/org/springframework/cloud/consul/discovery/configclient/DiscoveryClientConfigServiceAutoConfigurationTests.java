@@ -17,10 +17,10 @@
 package org.springframework.cloud.consul.discovery.configclient;
 
 import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -28,7 +28,7 @@ import org.springframework.cloud.config.client.ConfigClientProperties;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.cloud.test.ClassPathExclusions;
-import org.springframework.cloud.test.ModifiedClassPathRunner;
+import org.springframework.cloud.test.ModifiedClassPathExtension;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -40,19 +40,19 @@ import static org.mockito.Mockito.verify;
 /**
  * @author Dave Syer
  */
-@RunWith(ModifiedClassPathRunner.class)
+@ExtendWith(ModifiedClassPathExtension.class)
 @ClassPathExclusions({ "spring-retry-*.jar", "spring-boot-starter-aspectj-*.jar" })
 public class DiscoveryClientConfigServiceAutoConfigurationTests {
 
 	private ConfigurableApplicationContext context;
 
-	@Before
+	@BeforeEach
 	public void init() {
 		// FIXME: why do I need to do this? (fails in maven build without it.
 		TomcatURLStreamHandlerFactory.disable();
 	}
 
-	@After
+	@AfterEach
 	public void close() {
 		if (this.context != null) {
 			if (this.context.getParent() != null) {

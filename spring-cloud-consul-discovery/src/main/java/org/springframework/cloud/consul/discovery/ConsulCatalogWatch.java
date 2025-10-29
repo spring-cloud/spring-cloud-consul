@@ -23,18 +23,18 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
 import io.micrometer.core.annotation.Timed;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.cloud.client.discovery.event.HeartbeatEvent;
+import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulClient.QueryParams;
+import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
@@ -124,18 +124,16 @@ public class ConsulCatalogWatch implements ApplicationEventPublisherAware, Smart
 				index = this.catalogServicesIndex.get().longValue();
 			}
 
-			CatalogServicesRequest request = CatalogServicesRequest.newBuilder()
-				.setQueryParams(new QueryParams(this.properties.getCatalogServicesWatchTimeout(), index))
-				.setToken(this.properties.getAclToken())
-				.build();
-			Response<Map<String, List<String>>> response = this.consul.getCatalogServices(request);
-			Long consulIndex = response.getConsulIndex();
+			QueryParams queryParams = new QueryParams(this.properties.getCatalogServicesWatchTimeout(), index);
+			ResponseEntity<Map<String, List<String>>> response = this.consul
+				.getCatalogServices(properties.getAclToken(), queryParams);
+			Long consulIndex = ConsulHeaders.getConsulIndex(response);
 			if (consulIndex != null) {
 				this.catalogServicesIndex.set(BigInteger.valueOf(consulIndex));
 			}
 
 			if (log.isTraceEnabled()) {
-				log.trace("Received services update from consul: " + response.getValue() + ", index: " + consulIndex);
+				log.trace("Received services update from consul: " + response.getBody() + ", index: " + consulIndex);
 			}
 			this.publisher.publishEvent(new HeartbeatEvent(this, consulIndex));
 		}

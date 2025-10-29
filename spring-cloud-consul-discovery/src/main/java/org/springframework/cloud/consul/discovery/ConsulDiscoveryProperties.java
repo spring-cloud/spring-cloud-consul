@@ -22,8 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ecwid.consul.v1.ConsistencyMode;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.commons.util.InetUtils;
@@ -684,6 +682,25 @@ public class ConsulDiscoveryProperties {
 		public String toString() {
 			return "Lifecycle{" + "enabled=" + this.enabled + '}';
 		}
+
+	}
+
+	public enum ConsistencyMode {
+
+		/**
+		 * Default consistency mode.
+		 */
+		DEFAULT,
+
+		/**
+		 * Stale consistency mode.
+		 */
+		STALE,
+
+		/**
+		 * Consistent1 consistency mode.
+		 */
+		CONSISTENT
 
 	}
 

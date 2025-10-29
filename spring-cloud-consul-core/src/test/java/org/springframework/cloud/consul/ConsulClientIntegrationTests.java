@@ -74,7 +74,7 @@ class ConsulClientIntegrationTests {
 				.withHeaders(new Header("Content-Type", "application/json"))
 				.withBody("\"172.17.0.2:8300\""));
 
-		String statusLeader = client.getStatusLeader();
+		String statusLeader = client.getStatusLeader().getBody();
 
 		verifyRequestSentToConsul("GET", "/v1/status/leader", 1);
 

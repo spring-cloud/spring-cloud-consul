@@ -24,11 +24,8 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.util.function.Supplier;
+import java.util.Collections;
 
-import com.ecwid.consul.transport.TLSConfig;
-import com.ecwid.consul.v1.ConsulRawClient;
-import com.ecwid.consul.v1.ConsulRawClient.Builder;
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +40,16 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.health.autoconfigure.contributor.ConditionalOnEnabledHealthIndicator;
 import org.springframework.boot.health.contributor.Health;
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
-import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
+import org.springframework.boot.http.client.HttpClientSettings;
 import org.springframework.boot.ssl.SslBundle;
 import org.springframework.boot.ssl.SslStoreBundle;
+import org.springframework.cloud.consul.ConsulClient.QueryParams;
 import org.springframework.cloud.consul.model.http.KeyStoreInstanceType;
 import org.springframework.cloud.consul.model.http.format.WaitTimeAnnotationFormatterFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.http.HttpStatusCode;
@@ -63,6 +62,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpExchangeAdapter;
+import org.springframework.web.service.invoker.HttpRequestValues;
+import org.springframework.web.service.invoker.HttpServiceArgumentResolver;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
@@ -81,19 +82,6 @@ public class ConsulAutoConfiguration {
 	@ConditionalOnMissingBean
 	public ConsulProperties consulProperties() {
 		return new ConsulProperties();
-	}
-
-	@Bean
-	@ConditionalOnMissingBean(value = ConsulRawClient.Builder.class, parameterizedContainer = Supplier.class)
-	public Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier() {
-		return createConsulRawClientBuilder();
-	}
-
-	@Bean
-	@ConditionalOnMissingBean
-	public com.ecwid.consul.v1.ConsulClient consulClient(ConsulProperties consulProperties,
-			Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
-		return createConsulClient(consulProperties, consulRawClientBuilderSupplier);
 	}
 
 	@Bean
@@ -126,6 +114,7 @@ public class ConsulAutoConfiguration {
 
 		HttpExchangeAdapter adapter = createConsulRestClientAdapter(baseUrl, consulProperties.getTls());
 		HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter)
+			.customArgumentResolver(new QueryParamsArgumentResolver())
 			.conversionService(createConsulClientConversionService())
 			.build();
 
@@ -155,7 +144,7 @@ public class ConsulAutoConfiguration {
 				SslStoreBundle sslStoreBundle = SslStoreBundle.of(clientStore, tlsConfig.getKeyStorePassword(),
 						trustStore);
 				SslBundle sslBundle = SslBundle.of(sslStoreBundle);
-				ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.ofSslBundle(sslBundle);
+				HttpClientSettings settings = HttpClientSettings.ofSslBundle(sslBundle);
 				ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder.detect().build(settings);
 				builder.requestFactory(requestFactory);
 			}
@@ -171,37 +160,6 @@ public class ConsulAutoConfiguration {
 		DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService();
 		conversionService.addFormatterForFieldAnnotation(new WaitTimeAnnotationFormatterFactory());
 		return conversionService;
-	}
-
-	public static Supplier<Builder> createConsulRawClientBuilder() {
-		return Builder::builder;
-	}
-
-	public static com.ecwid.consul.v1.ConsulClient createConsulClient(ConsulProperties consulProperties,
-			Supplier<ConsulRawClient.Builder> consulRawClientBuilderSupplier) {
-		ConsulRawClient.Builder builder = consulRawClientBuilderSupplier.get();
-		final String agentPath = consulProperties.getPath();
-		final String agentHost = StringUtils.hasLength(consulProperties.getScheme())
-				? consulProperties.getScheme() + "://" + consulProperties.getHost() : consulProperties.getHost();
-		builder.setHost(agentHost).setPort(consulProperties.getPort());
-
-		if (consulProperties.getTls() != null) {
-			ConsulProperties.TLSConfig tls = consulProperties.getTls();
-			TLSConfig.KeyStoreInstanceType keyStoreInstanceType = TLSConfig.KeyStoreInstanceType
-				.valueOf(tls.getKeyStoreInstanceType().toString());
-			TLSConfig tlsConfig = new TLSConfig(keyStoreInstanceType, tls.getCertificatePath(),
-					tls.getCertificatePassword(), tls.getKeyStorePath(), tls.getKeyStorePassword());
-			builder.setTlsConfig(tlsConfig);
-		}
-
-		if (StringUtils.hasLength(agentPath)) {
-			String normalizedAgentPath = StringUtils.trimTrailingCharacter(agentPath, '/');
-			normalizedAgentPath = StringUtils.trimLeadingCharacter(normalizedAgentPath, '/');
-
-			builder.setPath(normalizedAgentPath);
-		}
-
-		return new com.ecwid.consul.v1.ConsulClient(builder.build());
 	}
 
 	@Configuration(proxyBeanMethods = false)
@@ -242,6 +200,42 @@ public class ConsulAutoConfiguration {
 						properties.getMaxInterval())
 				.maxAttempts(properties.getMaxAttempts())
 				.build();
+		}
+
+	}
+
+	static class QueryParamsArgumentResolver implements HttpServiceArgumentResolver {
+
+		@Override
+		public boolean resolve(Object argument, MethodParameter parameter, HttpRequestValues.Builder builder) {
+			if (parameter.getParameterType().equals(QueryParams.class)) {
+				if (argument == null) {
+					return false;
+				}
+				QueryParams params = (QueryParams) argument;
+				if (params.getDatacenter() != null) {
+					builder.addRequestParameter("dc", params.getDatacenter());
+				}
+
+				if (params.getConsistencyMode() != ConsulClient.ConsistencyMode.DEFAULT) {
+					builder.configureRequestParams(
+							map -> map.put(params.getConsistencyMode().getParamName(), Collections.emptyList()));
+				}
+
+				if (params.getWaitTime() != -1) {
+					builder.addRequestParameter("wait", params.getWaitTime() + "s");
+				}
+
+				if (params.getIndex() != -1) {
+					builder.addRequestParameter("index", Long.toUnsignedString(params.getIndex()));
+				}
+
+				if (params.getNear() != null) {
+					builder.addRequestParameter("near", params.getNear());
+				}
+				return true;
+			}
+			return false;
 		}
 
 	}

@@ -18,11 +18,6 @@ package org.springframework.cloud.consul;
 
 import java.net.URL;
 
-import com.ecwid.consul.transport.DefaultHttpsTransport;
-import com.ecwid.consul.transport.HttpTransport;
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.ConsulRawClient;
-import com.ecwid.consul.v1.catalog.CatalogConsulClient;
 import org.junit.Test;
 
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
@@ -30,7 +25,6 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -70,10 +64,14 @@ public class ConsulAutoConfigurationTests {
 			assertThat(context).hasNotFailed().hasSingleBean(ConsulClient.class);
 
 			ConsulClient consulClient = context.getBean(ConsulClient.class);
-			CatalogConsulClient client = (CatalogConsulClient) ReflectionTestUtils.getField(consulClient,
-					"catalogClient");
-			ConsulRawClient rawClient = (ConsulRawClient) ReflectionTestUtils.getField(client, "rawClient");
-			String agentAddress = (String) ReflectionTestUtils.getField(rawClient, "agentAddress");
+			// CatalogConsulClient client = (CatalogConsulClient)
+			// ReflectionTestUtils.getField(consulClient,
+			// "catalogClient");
+			// ConsulRawClient rawClient = (ConsulRawClient)
+			// ReflectionTestUtils.getField(client, "rawClient");
+			String agentAddress = null; // (String)
+										// ReflectionTestUtils.getField(rawClient,
+										// "agentAddress");
 
 			assertThat(agentAddress).isNotNull();
 			assertThat(new URL(agentAddress).getPath()).isEqualTo("/consul/proxy");
@@ -92,11 +90,15 @@ public class ConsulAutoConfigurationTests {
 				assertThat(context).hasNotFailed().hasSingleBean(ConsulClient.class);
 
 				ConsulClient consulClient = context.getBean(ConsulClient.class);
-				CatalogConsulClient client = (CatalogConsulClient) ReflectionTestUtils.getField(consulClient,
-						"catalogClient");
-				ConsulRawClient rawClient = (ConsulRawClient) ReflectionTestUtils.getField(client, "rawClient");
-				HttpTransport httpTransport = (HttpTransport) ReflectionTestUtils.getField(rawClient, "httpTransport");
-				assertThat(httpTransport).isInstanceOf(DefaultHttpsTransport.class);
+				// CatalogConsulClient client = (CatalogConsulClient)
+				// ReflectionTestUtils.getField(consulClient,
+				// "catalogClient");
+				// ConsulRawClient rawClient = (ConsulRawClient)
+				// ReflectionTestUtils.getField(client, "rawClient");
+				// HttpTransport httpTransport = (HttpTransport)
+				// ReflectionTestUtils.getField(rawClient, "httpTransport");
+				// assertThat(httpTransport).isInstanceOf(DefaultHttpsTransport.class);
+				assertThat(consulClient).isNull();
 			});
 	}
 

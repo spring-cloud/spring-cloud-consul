@@ -20,14 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-import com.ecwid.consul.v1.health.HealthChecksForServiceRequest;
-import com.ecwid.consul.v1.health.model.Check;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -35,11 +28,14 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.model.http.agent.Service;
+import org.springframework.cloud.consul.model.http.health.Check;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -48,7 +44,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  * @author Venil Noronha
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedPropsTests.TestPropsConfig.class, properties = {
 		"spring.application.name=myTestService-B", "spring.cloud.consul.discovery.instanceId=myTestService1-B",
 		"spring.cloud.consul.discovery.port=4452", "spring.cloud.consul.discovery.hostname=myhost",
@@ -70,8 +65,8 @@ public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 
 	@Test
 	public void propertiesAreCorrect() {
-		Response<Map<String, Service>> response = this.consul.getAgentServices();
-		Map<String, Service> services = response.getValue();
+		ResponseEntity<Map<String, Service>> response = this.consul.getAgentServices();
+		Map<String, Service> services = response.getBody();
 		Service service = services.get("myTestService1-B");
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort()).as("service port is discovery port").isEqualTo(4452);
@@ -91,9 +86,8 @@ public class ConsulAutoServiceRegistrationCustomizedPropsTests {
 		assertThat(service.getMeta()).as("property metadata contains the wrong entries")
 			.containsExactlyInAnyOrderEntriesOf(entries);
 
-		Response<List<Check>> checkResponse = this.consul.getHealthChecksForService("myTestService-B",
-				HealthChecksForServiceRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
-		List<Check> checks = checkResponse.getValue();
+		ResponseEntity<List<Check>> checkResponse = this.consul.getHealthChecksForService("myTestService-B");
+		List<Check> checks = checkResponse.getBody();
 		assertThat(checks).as("checks was wrong size").hasSize(0);
 	}
 

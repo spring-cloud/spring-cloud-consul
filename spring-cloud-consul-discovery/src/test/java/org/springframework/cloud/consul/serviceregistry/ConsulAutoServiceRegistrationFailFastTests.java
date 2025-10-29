@@ -16,12 +16,10 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import com.ecwid.consul.ConsulException;
-import com.ecwid.consul.v1.ConsulClient;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -29,12 +27,11 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
-
-import static org.hamcrest.Matchers.isA;
 
 /**
  * @author Spencer Gibb
@@ -44,18 +41,16 @@ import static org.hamcrest.Matchers.isA;
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoServiceRegistrationFailFastTests {
 
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
-
-	@Ignore
+	@Disabled
 	@Test
 	public void testFailFastEnabled() {
-		this.exception.expectCause(isA(ConsulException.class));
-		new SpringApplicationBuilder(TestConfig.class)
-			.properties("spring.application.name=testregistrationfails-fast",
-					"spring.jmx.default-domain=testautoregfailfast", "server.port=0",
-					"spring.cloud.consul.discovery.failFast=true")
-			.run();
+		Assertions.assertThatThrownBy(() -> {
+			new SpringApplicationBuilder(TestConfig.class)
+				.properties("spring.application.name=testregistrationfails-fast",
+						"spring.jmx.default-domain=testautoregfailfast", "server.port=0",
+						"spring.cloud.consul.discovery.failFast=true")
+				.run();
+		}).isInstanceOf(IllegalStateException.class);
 	}
 
 	@SpringBootConfiguration
@@ -66,7 +61,7 @@ public class ConsulAutoServiceRegistrationFailFastTests {
 
 		@Bean
 		public ConsulClient consulClient() {
-			return new ConsulClient("localhost", 4321);
+			return Mockito.mock(ConsulClient.class);
 		}
 
 	}

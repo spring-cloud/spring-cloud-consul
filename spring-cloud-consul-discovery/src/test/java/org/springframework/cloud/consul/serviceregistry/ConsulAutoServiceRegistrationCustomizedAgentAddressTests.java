@@ -18,11 +18,7 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -30,10 +26,11 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.model.http.agent.Service;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ObjectUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +39,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * @author Spencer Gibb
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedAgentAddressTests.TestConfig.class,
 		properties = { "spring.application.name=myTestService-AA",
 				"spring.cloud.consul.discovery.instanceId=myTestService1-AA",
@@ -57,8 +53,7 @@ public class ConsulAutoServiceRegistrationCustomizedAgentAddressTests {
 
 	@Test
 	public void contextLoads() {
-		Response<Map<String, Service>> response = this.consul.getAgentServices();
-		Map<String, Service> services = response.getValue();
+		Map<String, Service> services = this.consul.getAgentServices().getBody();
 		Service service = services.get("myTestService1-AA");
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);

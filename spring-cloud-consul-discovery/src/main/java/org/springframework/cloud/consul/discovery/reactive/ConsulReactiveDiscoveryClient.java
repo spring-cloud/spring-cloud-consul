@@ -16,17 +16,8 @@
 
 package org.springframework.cloud.consul.discovery.reactive;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
-import com.ecwid.consul.v1.health.HealthServicesRequest;
-import com.ecwid.consul.v1.health.model.HealthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -34,8 +25,9 @@ import reactor.core.scheduler.Schedulers;
 
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.ReactiveDiscoveryClient;
+import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
-import org.springframework.cloud.consul.discovery.ConsulServiceInstance;
 
 /**
  * Consul version of {@link ReactiveDiscoveryClient}.
@@ -51,9 +43,13 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 
 	private final ConsulDiscoveryProperties properties;
 
+	// TODO: implement ReactiveConsulClient to remove the need for subscribeOn()
+	private final ConsulDiscoveryClient blockingClient;
+
 	public ConsulReactiveDiscoveryClient(ConsulClient client, ConsulDiscoveryProperties properties) {
 		this.client = client;
 		this.properties = properties;
+		blockingClient = new ConsulDiscoveryClient(client, properties);
 	}
 
 	@Override
@@ -64,10 +60,7 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 	@Override
 	public Flux<ServiceInstance> getInstances(String serviceId) {
 		return Flux.defer(() -> {
-			List<ServiceInstance> instances = new ArrayList<>();
-			for (HealthService healthService : getHealthServices(serviceId)) {
-				instances.add(new ConsulServiceInstance(healthService, serviceId));
-			}
+			List<ServiceInstance> instances = blockingClient.getInstances(serviceId);
 			return Flux.fromIterable(instances);
 		}).onErrorResume(exception -> {
 			logger.error("Error getting instances from Consul.", exception);
@@ -75,31 +68,11 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 		}).subscribeOn(Schedulers.boundedElastic());
 	}
 
-	private List<HealthService> getHealthServices(String serviceId) {
-		HealthServicesRequest.Builder requestBuilder = HealthServicesRequest.newBuilder()
-			.setPassing(properties.isQueryPassing())
-			.setQueryParams(QueryParams.DEFAULT)
-			.setToken(properties.getAclToken());
-		String[] queryTags = properties.getQueryTagsForService(serviceId);
-		if (queryTags != null) {
-			requestBuilder.setTags(queryTags);
-		}
-		HealthServicesRequest request = requestBuilder.build();
-
-		Response<List<HealthService>> services = client.getHealthServices(serviceId, request);
-
-		return services == null ? Collections.emptyList() : services.getValue();
-	}
-
 	@Override
 	public Flux<String> getServices() {
 		return Flux.defer(() -> {
-			CatalogServicesRequest request = CatalogServicesRequest.newBuilder()
-				.setToken(properties.getAclToken())
-				.setQueryParams(QueryParams.DEFAULT)
-				.build();
-			Response<Map<String, List<String>>> services = client.getCatalogServices(request);
-			return services == null ? Flux.empty() : Flux.fromIterable(services.getValue().keySet());
+			List<String> services = blockingClient.getServices();
+			return services == null ? Flux.empty() : Flux.fromIterable(services);
 		}).onErrorResume(exception -> {
 			logger.error("Error getting services from Consul.", exception);
 			return Flux.empty();

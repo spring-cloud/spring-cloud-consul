@@ -18,7 +18,6 @@ package org.springframework.cloud.consul.config;
 
 import java.util.UUID;
 
-import com.ecwid.consul.v1.ConsulClient;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,6 +25,7 @@ import org.junit.Test;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;

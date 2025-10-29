@@ -19,8 +19,6 @@ package org.springframework.cloud.consul.discovery;
 import java.util.Arrays;
 import java.util.List;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.agent.model.NewService;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.junit.jupiter.api.Test;
@@ -31,6 +29,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.assertj.AssertableApplicationContext;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.model.http.agent.NewService;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -197,18 +197,18 @@ class ConsulDiscoveryClientQueryTagsTests {
 
 		@PostConstruct
 		void init() {
-			consulClient.agentServiceRegister(ConsulDiscoveryClientQueryTagsTests.QA_WEST_SERVICE);
-			consulClient.agentServiceRegister(ConsulDiscoveryClientQueryTagsTests.QA_EAST_SERVICE);
-			consulClient.agentServiceRegister(ConsulDiscoveryClientQueryTagsTests.PROD_WEST_SERVICE);
-			consulClient.agentServiceRegister(ConsulDiscoveryClientQueryTagsTests.PROD_EAST_SERVICE);
+			consulClient.agentServiceRegister(null, ConsulDiscoveryClientQueryTagsTests.QA_WEST_SERVICE);
+			consulClient.agentServiceRegister(null, ConsulDiscoveryClientQueryTagsTests.QA_EAST_SERVICE);
+			consulClient.agentServiceRegister(null, ConsulDiscoveryClientQueryTagsTests.PROD_WEST_SERVICE);
+			consulClient.agentServiceRegister(null, ConsulDiscoveryClientQueryTagsTests.PROD_EAST_SERVICE);
 		}
 
 		@PreDestroy
 		void destroy() {
-			consulClient.agentServiceDeregister(ConsulDiscoveryClientQueryTagsTests.QA_WEST_SERVICE.getId());
-			consulClient.agentServiceDeregister(ConsulDiscoveryClientQueryTagsTests.QA_EAST_SERVICE.getId());
-			consulClient.agentServiceDeregister(ConsulDiscoveryClientQueryTagsTests.PROD_WEST_SERVICE.getId());
-			consulClient.agentServiceDeregister(ConsulDiscoveryClientQueryTagsTests.PROD_EAST_SERVICE.getId());
+			consulClient.agentServiceDeregister(null, ConsulDiscoveryClientQueryTagsTests.QA_WEST_SERVICE.getId());
+			consulClient.agentServiceDeregister(null, ConsulDiscoveryClientQueryTagsTests.QA_EAST_SERVICE.getId());
+			consulClient.agentServiceDeregister(null, ConsulDiscoveryClientQueryTagsTests.PROD_WEST_SERVICE.getId());
+			consulClient.agentServiceDeregister(null, ConsulDiscoveryClientQueryTagsTests.PROD_EAST_SERVICE.getId());
 		}
 
 	}

@@ -25,40 +25,32 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulClient;
-import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConsulPropertyPrefixTests {
 
-	private com.ecwid.consul.v1.ConsulClient testClient;
-
 	private ConsulClient consulClient;
 
 	@Before
 	public void setup() throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 		ConsulTestcontainers.start();
-		ConsulProperties consulProperties = new ConsulProperties();
-		consulProperties.setHost(ConsulTestcontainers.getHost());
-		consulProperties.setPort(ConsulTestcontainers.getPort());
-		this.testClient = ConsulTestcontainers.client();
-		this.consulClient = ConsulAutoConfiguration.createNewConsulClient(consulProperties);
+		this.consulClient = ConsulTestcontainers.client();
 	}
 
 	@After
 	public void teardown() {
-		this.testClient.deleteKVValues("");
+		this.consulClient.deleteKVValues("");
 	}
 
 	@Test
 	public void testEmptyPrefix() {
 		// because prefix is empty, a leading forward slash is omitted
 		String kvContext = "appname";
-		this.testClient.setKVValue(kvContext + "/fooprop", "fookvval");
-		this.testClient.setKVValue(kvContext + "/bar/prop", "8080");
+		this.consulClient.setKVValue(kvContext + "/fooprop", "fookvval");
+		this.consulClient.setKVValue(kvContext + "/bar/prop", "8080");
 
 		ConsulPropertySource source = getConsulPropertySource(new ConsulConfigProperties(), kvContext);
 		assertProperties(source, "fookvval", "8080");

@@ -16,7 +16,7 @@
 
 package org.springframework.cloud.consul.discovery;
 
-import com.ecwid.consul.v1.OperationException;
+import org.springframework.web.client.HttpStatusCodeException;
 
 /**
  * Predicate on whether to re-register service.
@@ -30,12 +30,12 @@ public interface ReregistrationPredicate {
 	 * @param e OperationException
 	 * @return if the exception is eligible for re-registration
 	 */
-	boolean isEligible(OperationException e);
+	boolean isEligible(HttpStatusCodeException e);
 
 	/**
 	 * Default implementation that performs re-registration when the status code is either
 	 * 404 or 500.
 	 */
-	ReregistrationPredicate DEFAULT = e -> (e.getStatusCode() == 404 || e.getStatusCode() == 500);
+	ReregistrationPredicate DEFAULT = e -> (e.getStatusCode().value() == 404 || e.getStatusCode().is5xxServerError());
 
 }

@@ -18,12 +18,11 @@ package org.springframework.cloud.consul.discovery.configclient;
 
 import java.util.Arrays;
 
-import com.ecwid.consul.v1.health.model.HealthService;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.ConsulServiceInstance;
+import org.springframework.cloud.consul.model.http.health.HealthService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

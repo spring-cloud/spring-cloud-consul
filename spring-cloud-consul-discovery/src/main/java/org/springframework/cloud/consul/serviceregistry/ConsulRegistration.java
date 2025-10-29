@@ -19,11 +19,10 @@ package org.springframework.cloud.consul.serviceregistry;
 import java.net.URI;
 import java.util.Map;
 
-import com.ecwid.consul.v1.agent.model.NewService;
-
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.model.http.agent.NewService;
 
 /**
  * @author Spencer Gibb

@@ -18,11 +18,7 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
@@ -31,13 +27,16 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.model.http.agent.Service;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ObjectUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistration.normalizeForDns;
 
@@ -45,7 +44,6 @@ import static org.springframework.cloud.consul.serviceregistry.ConsulAutoRegistr
  * @author Spencer Gibb
  * @author Venil Noronha
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(properties = { "spring.application.name=myTestService1-FF::something" }, webEnvironment = RANDOM_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulAutoServiceRegistrationTests {
@@ -61,8 +59,8 @@ public class ConsulAutoServiceRegistrationTests {
 
 	@Test
 	public void contextLoads() {
-		Response<Map<String, Service>> response = this.consul.getAgentServices();
-		Map<String, Service> services = response.getValue();
+		ResponseEntity<Map<String, Service>> response = this.consul.getAgentServices();
+		Map<String, Service> services = response.getBody();
 		Service service = services.get(this.registration.getInstanceId());
 		assertThat(service).as("service was null").isNotNull();
 		assertThat(service.getPort().intValue()).as("service port is 0").isNotEqualTo(0);
@@ -82,19 +80,19 @@ public class ConsulAutoServiceRegistrationTests {
 		assertThat(normalizeForDns("ab::c1")).isEqualTo("ab-c1");
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void normalizedFailsIfFirstCharIsNumber() {
-		normalizeForDns("9abc");
+		assertThatThrownBy(() -> normalizeForDns("9abc")).isInstanceOf(IllegalArgumentException.class);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void normalizedFailsIfFirstCharIsNotAlpha() {
-		normalizeForDns(":abc");
+		assertThatThrownBy(() -> normalizeForDns(":abc")).isInstanceOf(IllegalArgumentException.class);
 	}
 
-	@Test(expected = IllegalArgumentException.class)
+	@Test
 	public void normalizedFailsIfLastCharIsNotAlphaNumeric() {
-		normalizeForDns("abc:");
+		assertThatThrownBy(() -> normalizeForDns("abc:")).isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@SpringBootConfiguration

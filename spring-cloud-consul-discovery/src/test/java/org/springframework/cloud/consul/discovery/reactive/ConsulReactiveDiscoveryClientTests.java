@@ -19,11 +19,6 @@ package org.springframework.cloud.consul.discovery.reactive;
 import java.util.List;
 import java.util.Map;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
-import com.ecwid.consul.v1.health.HealthServicesRequest;
-import com.ecwid.consul.v1.health.model.HealthService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,7 +29,11 @@ import reactor.test.StepVerifier;
 
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.commons.util.InetUtils;
+import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulClient.QueryParams;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.model.http.health.HealthService;
+import org.springframework.http.ResponseEntity;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -74,19 +73,20 @@ class ConsulReactiveDiscoveryClientTests {
 	@Test
 	public void shouldReturnEmptyFluxOfServicesWhenConsulFails() {
 		Flux<String> services = client.getServices();
-		when(consulClient.getCatalogServices(any(CatalogServicesRequest.class)))
+		when(consulClient.getCatalogServices(any(String.class), any(QueryParams.class)))
 			.thenThrow(new RuntimeException("Possible runtime exception"));
 		StepVerifier.create(services).expectNextCount(0).expectComplete().verify();
-		verify(consulClient).getCatalogServices(any(CatalogServicesRequest.class));
+		verify(consulClient).getCatalogServices(any(String.class), any(QueryParams.class));
 	}
 
 	@Test
 	public void shouldReturnFluxOfServices() {
 		Flux<String> services = client.getServices();
-		when(consulClient.getCatalogServices(any(CatalogServicesRequest.class))).thenReturn(consulServicesResponse());
+		when(consulClient.getCatalogServices(any(String.class), any(QueryParams.class)))
+			.thenReturn(consulServicesResponse());
 		StepVerifier.create(services).expectNext("my-service").expectComplete().verify();
 		verify(properties).getAclToken();
-		verify(consulClient).getCatalogServices(any(CatalogServicesRequest.class));
+		verify(consulClient).getCatalogServices(any(String.class), any(QueryParams.class));
 	}
 
 	@Test
@@ -101,65 +101,65 @@ class ConsulReactiveDiscoveryClientTests {
 	@Test
 	public void shouldReturnFluxOfServicesWithAclToken() {
 		when(properties.getAclToken()).thenReturn("myAclToken");
-		when(consulClient.getCatalogServices(any(CatalogServicesRequest.class))).thenReturn(consulServicesResponse());
+		when(consulClient.getCatalogServices(any(String.class), any(QueryParams.class)))
+			.thenReturn(consulServicesResponse());
 		Flux<String> services = client.getServices();
 		StepVerifier.create(services).expectNext("my-service").expectComplete().verify();
 		verify(properties, times(1)).getAclToken();
-		verify(consulClient).getCatalogServices(any(CatalogServicesRequest.class));
+		verify(consulClient).getCatalogServices(any(String.class), any(QueryParams.class));
 	}
 
 	@Test
 	public void shouldReturnEmptyFluxForNonExistingService() {
 		configureCommonProperties();
-		when(consulClient.getHealthServices(eq("nonexistent-service"), any(HealthServicesRequest.class)))
-			.thenReturn(emptyConsulInstancesResponse());
+		when(consulClient.getHealthServices(eq("nonexistent-service"))).thenReturn(emptyConsulInstancesResponse());
 		Flux<ServiceInstance> instances = client.getInstances("nonexistent-service");
 		StepVerifier.create(instances).expectNextCount(0).expectComplete().verify();
 		verify(properties).getAclToken();
-		verify(consulClient).getHealthServices(eq("nonexistent-service"), any());
+		verify(consulClient).getHealthServices(eq("nonexistent-service"));
 	}
 
 	@Test
 	public void shouldReturnEmptyFluxWhenConsulFails() {
 		configureCommonProperties();
-		when(consulClient.getHealthServices(eq("existing-service"), any(HealthServicesRequest.class)))
+		when(consulClient.getHealthServices(eq("existing-service")))
 			.thenThrow(new RuntimeException("Possible runtime exception"));
 		Flux<ServiceInstance> instances = client.getInstances("existing-service");
 		StepVerifier.create(instances).expectNextCount(0).expectComplete().verify();
-		verify(consulClient).getHealthServices(eq("existing-service"), any());
+		verify(consulClient).getHealthServices(eq("existing-service"));
 	}
 
 	@Test
 	public void shouldReturnFluxOfServiceInstances() {
 		configureCommonProperties();
-		Response<List<HealthService>> response = consulInstancesResponse();
-		when(consulClient.getHealthServices(eq("existing-service"), any(HealthServicesRequest.class)))
-			.thenReturn(response);
+		ResponseEntity<List<HealthService>> response = consulInstancesResponse();
+		when(consulClient.getHealthServices(eq("existing-service"))).thenReturn(response);
 		Flux<ServiceInstance> instances = client.getInstances("existing-service");
 		StepVerifier.create(instances).expectNextCount(1).expectComplete().verify();
 		verify(properties).getAclToken();
 		verify(properties).getQueryTagsForService("existing-service");
 		verify(properties).isQueryPassing();
-		verify(consulClient).getHealthServices(eq("existing-service"), any());
+		verify(consulClient).getHealthServices(eq("existing-service"));
 	}
 
 	@Test
 	public void shouldReturnFluxOfServiceInstancesWithAclToken() {
 		configureCommonProperties();
 		when(properties.getAclToken()).thenReturn("aclToken");
-		Response<List<HealthService>> response = consulInstancesResponse();
-		when(consulClient.getHealthServices(eq("existing-service"), any(HealthServicesRequest.class)))
-			.thenReturn(response);
+		ResponseEntity<List<HealthService>> response = consulInstancesResponse();
+		when(consulClient.getHealthServices(eq("existing-service"))).thenReturn(response);
 		Flux<ServiceInstance> instances = client.getInstances("existing-service");
 		StepVerifier.create(instances).expectNextCount(1).expectComplete().verify();
 		verify(properties, times(1)).getAclToken();
 		verify(properties).getQueryTagsForService("existing-service");
 		verify(properties).isQueryPassing();
-		verify(consulClient).getHealthServices(eq("existing-service"), any());
+		verify(consulClient).getHealthServices(eq("existing-service"));
 	}
 
-	private Response<Map<String, List<String>>> consulServicesResponse() {
-		return new Response<>(singletonMap("my-service", singletonList("")), 0L, true, System.currentTimeMillis());
+	private ResponseEntity<Map<String, List<String>>> consulServicesResponse() {
+		return ResponseEntity.ok(singletonMap("my-service", singletonList(""))); // , 0L,
+																					// true,
+																					// System.currentTimeMillis());
 	}
 
 	private void configureCommonProperties() {
@@ -167,11 +167,11 @@ class ConsulReactiveDiscoveryClientTests {
 		when(properties.isQueryPassing()).thenReturn(false);
 	}
 
-	private Response<List<HealthService>> emptyConsulInstancesResponse() {
-		return new Response<>(emptyList(), 0L, true, System.currentTimeMillis());
+	private ResponseEntity<List<HealthService>> emptyConsulInstancesResponse() {
+		return ResponseEntity.ok(emptyList()); // , 0L, true, System.currentTimeMillis());
 	}
 
-	private Response<List<HealthService>> consulInstancesResponse() {
+	private ResponseEntity<List<HealthService>> consulInstancesResponse() {
 		HealthService healthService = mock(HealthService.class);
 		HealthService.Service service = mock(HealthService.Service.class);
 
@@ -180,7 +180,8 @@ class ConsulReactiveDiscoveryClientTests {
 		when(service.getPort()).thenReturn(443);
 		lenient().when(service.getTags()).thenReturn(singletonList("secure=true"));
 
-		return new Response<>(singletonList(healthService), 0L, true, System.currentTimeMillis());
+		return ResponseEntity.ok(singletonList(healthService)); // , 0L, true,
+																// System.currentTimeMillis());
 	}
 
 }

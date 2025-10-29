@@ -18,11 +18,7 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -30,11 +26,13 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.model.http.agent.Service;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ObjectUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +42,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Aleksandr Tarasov (aatarasov)
  * @author Lomesh Patel (lomeshpatel)
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulAutoServiceRegistrationManagementServiceTests.TestConfig.class,
 		properties = { "spring.application.name=myTestService-EE",
 				"spring.cloud.consul.discovery.registerHealthCheck=false", "management.server.port=4452" },
@@ -60,8 +57,8 @@ public class ConsulAutoServiceRegistrationManagementServiceTests {
 
 	@Test
 	public void contextLoads() {
-		final Response<Map<String, Service>> response = this.consul.getAgentServices();
-		final Map<String, Service> services = response.getValue();
+		final ResponseEntity<Map<String, Service>> response = this.consul.getAgentServices();
+		final Map<String, Service> services = response.getBody();
 
 		final Service service = services.get("myTestService-EE-0");
 		assertThat(service).as("service was null").isNotNull();

@@ -21,8 +21,8 @@ import org.junit.runner.RunWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
 import org.springframework.boot.health.contributor.Status;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
@@ -55,7 +55,7 @@ public class ConsulHealthIndicatorLightweightUpTest {
 	public void statusIsUp() {
 		assertThat(this.healthEndpoint.health().getStatus()).as("health status was not UP").isEqualTo(Status.UP);
 		verify(consulClient).getStatusLeader();
-		verify(consulClient, never()).getCatalogServices();
+		verify(consulClient, never()).getCatalogServices(null, null);
 	}
 
 	@EnableAutoConfiguration

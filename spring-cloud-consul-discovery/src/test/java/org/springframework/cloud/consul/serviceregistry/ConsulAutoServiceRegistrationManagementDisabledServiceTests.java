@@ -18,11 +18,7 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Map;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.agent.model.Service;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -30,11 +26,13 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.model.http.agent.Service;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ObjectUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +41,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * @author Dmitry Zhikharev (jihor)
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulAutoServiceRegistrationManagementDisabledServiceTests.TestConfig.class,
 		properties = { "spring.application.name=myTestService-NM",
 				"spring.cloud.consul.discovery.instanceId=myTestService1-NM",
@@ -61,8 +58,8 @@ public class ConsulAutoServiceRegistrationManagementDisabledServiceTests {
 
 	@Test
 	public void contextLoads() {
-		Response<Map<String, Service>> response = this.consul.getAgentServices();
-		Map<String, Service> services = response.getValue();
+		ResponseEntity<Map<String, Service>> response = this.consul.getAgentServices();
+		Map<String, Service> services = response.getBody();
 
 		Service mgmtService = services.get("myTestService-NM-0-management");
 		assertThat(mgmtService).as("Management service was not null").isNull();

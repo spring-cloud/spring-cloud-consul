@@ -116,8 +116,8 @@ public class ConfigWatchTests {
 		}
 
 		HttpHeaders headers = new HttpHeaders();
-		headers.add(ConsulHeaders.ConsulIndex.getHeaderName(), "1");
-		headers.add(ConsulHeaders.ConsulLastContact.getHeaderName(), "1");
+		headers.add(ConsulHeaders.INDEX_HEADER, "1");
+		headers.add(ConsulHeaders.LAST_CONTACT_HEADER, "1");
 		response.headers(headers);
 		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong()))
 			.thenReturn(response.body(getValues));

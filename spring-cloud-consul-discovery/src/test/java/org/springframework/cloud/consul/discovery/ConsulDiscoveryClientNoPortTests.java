@@ -18,8 +18,6 @@ package org.springframework.cloud.consul.discovery;
 
 import java.util.List;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.agent.model.NewService;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.consul.ConsulContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -32,7 +30,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.model.http.agent.NewService;
 import org.springframework.cloud.consul.serviceregistry.ConsulAutoServiceRegistrationAutoConfiguration;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
@@ -73,7 +73,7 @@ public class ConsulDiscoveryClientNoPortTests {
 		NewService newService = new NewService();
 		newService.setId("myTestService2-NoPort");
 		newService.setName("myTestService2-NoPort");
-		client.agentServiceRegister(newService);
+		client.agentServiceRegister(null, newService);
 
 		List<ServiceInstance> instances = discoveryClient.getInstances("myTestService2-NoPort");
 		assertThat(instances.size()).isEqualTo(1);

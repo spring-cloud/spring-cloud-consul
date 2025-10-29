@@ -18,21 +18,19 @@ package org.springframework.cloud.consul.discovery;
 
 import java.util.List;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulClient.QueryParams;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -41,7 +39,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  * @author Joe Athman
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(properties = { "spring.application.name=testConsulDiscovery",
 		"spring.cloud.consul.discovery.prefer-ip-address=true", "spring.cloud.consul.discovery.metadata[foo]=bar" },
 		classes = ConsulDiscoveryClientTests.MyTestConfig.class, webEnvironment = RANDOM_PORT)
@@ -68,9 +65,9 @@ public class ConsulDiscoveryClientTests {
 
 	@Test
 	public void getInstancesForServiceRespectsQueryParams() {
-		Response<List<String>> catalogDatacenters = this.consulClient.getCatalogDatacenters();
+		ResponseEntity<List<String>> catalogDatacenters = this.consulClient.getCatalogDatacenters(null);
 
-		List<String> dataCenterList = catalogDatacenters.getValue();
+		List<String> dataCenterList = catalogDatacenters.getBody();
 		assertThat(dataCenterList.isEmpty()).as("no data centers found").isFalse();
 		List<ServiceInstance> instances = this.discoveryClient.getInstances("testConsulDiscovery",
 				new QueryParams(dataCenterList.get(0)));

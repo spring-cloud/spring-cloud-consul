@@ -20,10 +20,10 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import com.ecwid.consul.v1.health.model.HealthService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.cloud.consul.model.http.health.HealthService;
 import org.springframework.util.StringUtils;
 
 /**

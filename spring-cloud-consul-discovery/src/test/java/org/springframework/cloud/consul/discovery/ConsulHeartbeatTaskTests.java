@@ -16,22 +16,24 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.OperationException;
-import com.ecwid.consul.v1.agent.model.NewService;
-import com.ecwid.consul.v1.health.model.Check;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtilsProperties;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.discovery.TtlScheduler.ConsulHeartbeatTask;
+import org.springframework.cloud.consul.model.http.agent.NewService;
+import org.springframework.cloud.consul.model.http.health.Check;
 import org.springframework.cloud.consul.serviceregistry.ApplicationStatusProvider;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -60,7 +62,7 @@ public class ConsulHeartbeatTaskTests {
 
 	private ApplicationStatusProvider applicationStatusProvider;
 
-	@Before
+	@BeforeEach
 	public void setUp() {
 		this.heartbeatProperties = new HeartbeatProperties();
 		this.discoveryProperties = new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties()));
@@ -85,12 +87,14 @@ public class ConsulHeartbeatTaskTests {
 		NewService service = new NewService();
 		service.setId(serviceId);
 		ttlScheduler.add(service);
-		given(consulClient.agentCheckPass("service:" + serviceId)).willThrow(new OperationException(500,
-				"Internal Server Error", "CheckID \"service:service-A\" does not have associated TTL"));
+		given(consulClient.agentCheckPass("service:" + serviceId, null, null))
+			.willThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",
+					"CheckID \"service:service-A\" does not have associated TTL".getBytes(StandardCharsets.UTF_8),
+					StandardCharsets.UTF_8));
 		consulHeartbeatTask.run();
 		ArgumentCaptor<NewService> serviceCaptor = ArgumentCaptor.forClass(NewService.class);
 		ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
-		verify(consulClient, atLeastOnce()).agentServiceRegister(serviceCaptor.capture(), tokenCaptor.capture());
+		verify(consulClient, atLeastOnce()).agentServiceRegister(tokenCaptor.capture(), serviceCaptor.capture());
 		assertThat(serviceCaptor.getValue()).isSameAs(service);
 	}
 
@@ -105,12 +109,14 @@ public class ConsulHeartbeatTaskTests {
 		NewService service = new NewService();
 		service.setId(serviceId);
 		ttlScheduler.add(service);
-		given(consulClient.agentCheckWarn("service:" + serviceId)).willThrow(new OperationException(500,
-				"Internal Server Error", "CheckID \"service:service-A\" does not have associated TTL"));
+		given(consulClient.agentCheckPass("service:" + serviceId, null, null))
+			.willThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",
+					"CheckID \"service:service-A\" does not have associated TTL".getBytes(StandardCharsets.UTF_8),
+					StandardCharsets.UTF_8));
 		consulHeartbeatTask.run();
 		ArgumentCaptor<NewService> serviceCaptor = ArgumentCaptor.forClass(NewService.class);
 		ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
-		verify(consulClient, atLeastOnce()).agentServiceRegister(serviceCaptor.capture(), tokenCaptor.capture());
+		verify(consulClient, atLeastOnce()).agentServiceRegister(tokenCaptor.capture(), serviceCaptor.capture());
 		assertThat(serviceCaptor.getValue()).isSameAs(service);
 	}
 
@@ -125,12 +131,14 @@ public class ConsulHeartbeatTaskTests {
 		NewService service = new NewService();
 		service.setId(serviceId);
 		ttlScheduler.add(service);
-		given(consulClient.agentCheckFail("service:" + serviceId)).willThrow(new OperationException(500,
-				"Internal Server Error", "CheckID \"service:service-A\" does not have associated TTL"));
+		given(consulClient.agentCheckPass("service:" + serviceId, null, null))
+			.willThrow(new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error",
+					"CheckID \"service:service-A\" does not have associated TTL".getBytes(StandardCharsets.UTF_8),
+					StandardCharsets.UTF_8));
 		consulHeartbeatTask.run();
 		ArgumentCaptor<NewService> serviceCaptor = ArgumentCaptor.forClass(NewService.class);
 		ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
-		verify(consulClient, atLeastOnce()).agentServiceRegister(serviceCaptor.capture(), tokenCaptor.capture());
+		verify(consulClient, atLeastOnce()).agentServiceRegister(tokenCaptor.capture(), serviceCaptor.capture());
 		assertThat(serviceCaptor.getValue()).isSameAs(service);
 	}
 
@@ -144,9 +152,11 @@ public class ConsulHeartbeatTaskTests {
 		NewService service = new NewService();
 		service.setId(serviceId);
 		ttlScheduler.add(service);
-		OperationException operationException = new OperationException(404, "Internal Server Error",
-				"CheckID \"service:service-A\" does not have associated TTL");
-		given(consulClient.agentCheckPass("service:" + serviceId)).willThrow(operationException);
+		HttpClientErrorException operationException = new HttpClientErrorException(HttpStatus.NOT_FOUND,
+				"Internal Server Error",
+				"CheckID \"service:service-A\" does not have associated TTL".getBytes(StandardCharsets.UTF_8),
+				StandardCharsets.UTF_8);
+		given(consulClient.agentCheckPass("service:" + serviceId, null, null)).willThrow(operationException);
 		consulHeartbeatTask.run();
 	}
 
@@ -160,28 +170,32 @@ public class ConsulHeartbeatTaskTests {
 		NewService service = new NewService();
 		service.setId(serviceId);
 		ttlScheduler.add(service);
-		OperationException operationException = new OperationException(400, "Internal Server Error",
-				"CheckID \"service:service-A\" does not have associated TTL");
-		given(consulClient.agentCheckPass("service:" + serviceId)).willThrow(operationException);
+		HttpClientErrorException operationException = new HttpClientErrorException(HttpStatus.BAD_REQUEST,
+				"Internal Server Error",
+				"CheckID \"service:service-A\" does not have associated TTL".getBytes(StandardCharsets.UTF_8),
+				StandardCharsets.UTF_8);
+		given(consulClient.agentCheckPass("service:" + serviceId, null, null)).willThrow(operationException);
 		assertThatThrownBy(consulHeartbeatTask::run).isSameAs(operationException);
 	}
 
 	@Test
 	public void enableReRegistrationWithCustomPredicate() {
 		TtlScheduler ttlScheduler = new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient,
-				e -> e.getStatusContent().endsWith("does not have associated TTL"), applicationStatusProviders);
+				e -> e.getStatusText().endsWith("does not have associated TTL"), applicationStatusProviders);
 		ConsulHeartbeatTask consulHeartbeatTask = new ConsulHeartbeatTask(serviceId, ttlScheduler,
 				() -> Check.CheckStatus.PASSING);
 		heartbeatProperties.setReregisterServiceOnFailure(true);
 		NewService service = new NewService();
 		service.setId(serviceId);
 		ttlScheduler.add(service);
-		given(consulClient.agentCheckPass("service:" + serviceId)).willThrow(new OperationException(400,
-				"Internal Server Error", "CheckID \"service:service-A\" does not have associated TTL"));
+		given(consulClient.agentCheckPass("service:" + serviceId, null, null))
+			.willThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Internal Server Error",
+					"CheckID \"service:service-A\" does not have associated TTL".getBytes(StandardCharsets.UTF_8),
+					StandardCharsets.UTF_8));
 		consulHeartbeatTask.run();
 		ArgumentCaptor<NewService> serviceCaptor = ArgumentCaptor.forClass(NewService.class);
 		ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
-		verify(consulClient, atLeastOnce()).agentServiceRegister(serviceCaptor.capture(), tokenCaptor.capture());
+		verify(consulClient, atLeastOnce()).agentServiceRegister(tokenCaptor.capture(), serviceCaptor.capture());
 		assertThat(serviceCaptor.getValue()).isSameAs(service);
 	}
 
@@ -195,9 +209,11 @@ public class ConsulHeartbeatTaskTests {
 		NewService service = new NewService();
 		service.setId(serviceId);
 		ttlScheduler.add(service);
-		OperationException operationException = new OperationException(500, "Internal Server Error",
-				"CheckID \"service:service-A\" does not have associated TTL");
-		given(consulClient.agentCheckPass("service:" + serviceId)).willThrow(operationException);
+		HttpClientErrorException operationException = new HttpClientErrorException(HttpStatus.INTERNAL_SERVER_ERROR,
+				"Internal Server Error",
+				"CheckID \"service:service-A\" does not have associated TTL".getBytes(StandardCharsets.UTF_8),
+				StandardCharsets.UTF_8);
+		given(consulClient.agentCheckPass("service:" + serviceId, null, null)).willThrow(operationException);
 		assertThatThrownBy(consulHeartbeatTask::run).isSameAs(operationException);
 	}
 

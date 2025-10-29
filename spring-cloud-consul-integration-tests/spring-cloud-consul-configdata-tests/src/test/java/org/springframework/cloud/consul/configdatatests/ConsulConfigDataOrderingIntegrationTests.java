@@ -19,15 +19,15 @@ package org.springframework.cloud.consul.configdatatests;
 import java.util.Map;
 import java.util.UUID;
 
-import com.ecwid.consul.v1.ConsulClient;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.endpoint.web.WebEndpointProperties;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.test.client.TestRestTemplate;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.config.ConsulConfigProperties;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;

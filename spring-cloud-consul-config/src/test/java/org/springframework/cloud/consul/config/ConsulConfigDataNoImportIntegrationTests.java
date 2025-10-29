@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.consul.config;
 
-import com.ecwid.consul.v1.ConsulClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,6 +28,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.cloud.commons.ConfigDataMissingEnvironmentPostProcessor;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;

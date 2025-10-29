@@ -140,8 +140,7 @@ public class ConsulPropertySources {
 					}
 				}
 
-				String indexHeader = response.getHeaders().getFirst(ConsulHeaders.ConsulIndex.getHeaderName());
-				Long consulIndex = indexHeader == null ? null : Long.parseLong(indexHeader);
+				Long consulIndex = ConsulHeaders.getConsulIndex(response);
 				indexConsumer.accept(propertySourceContext, consulIndex);
 				if (response.hasBody()) {
 					ConsulFilesPropertySource filesPropertySource = new ConsulFilesPropertySource(propertySourceContext,

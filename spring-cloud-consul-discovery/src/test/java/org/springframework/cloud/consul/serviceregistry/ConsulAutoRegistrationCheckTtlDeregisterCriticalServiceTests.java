@@ -16,9 +16,7 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import com.ecwid.consul.v1.agent.model.NewService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -26,18 +24,17 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.model.http.agent.NewService;
 import org.springframework.cloud.consul.support.ConsulHeartbeatAutoConfiguration;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Niko Tung
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulAutoRegistrationCheckTtlDeregisterCriticalServiceTests.TestConfig.class,
 		properties = { "spring.application.name=myConsulServiceRegistryHealthCheckTtlDeregisterCriticalServiceAfter-N",
 				"spring.cloud.consul.discovery.health-check-critical-timeout=1m",

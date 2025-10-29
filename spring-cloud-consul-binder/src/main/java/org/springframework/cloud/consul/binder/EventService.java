@@ -61,8 +61,7 @@ public class EventService {
 	}
 
 	private void setLastIndex(ResponseEntity<?> response) {
-		String indexHeader = response.getHeaders().getFirst(ConsulHeaders.ConsulIndex.getHeaderName());
-		Long consulIndex = indexHeader == null ? null : Long.parseLong(indexHeader);
+		Long consulIndex = ConsulHeaders.getConsulIndex(response);
 		if (consulIndex != null) {
 			this.lastIndex.set(consulIndex);
 		}

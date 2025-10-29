@@ -20,25 +20,23 @@ import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.health.HealthChecksForServiceRequest;
-import com.ecwid.consul.v1.health.model.Check;
-import com.ecwid.consul.v1.health.model.Check.CheckStatus;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
+import org.springframework.cloud.consul.model.http.health.Check;
+import org.springframework.cloud.consul.model.http.health.Check.CheckStatus;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 
-import static com.ecwid.consul.v1.health.model.Check.CheckStatus.CRITICAL;
-import static com.ecwid.consul.v1.health.model.Check.CheckStatus.PASSING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.springframework.cloud.consul.model.http.health.Check.CheckStatus.CRITICAL;
+import static org.springframework.cloud.consul.model.http.health.Check.CheckStatus.PASSING;
 
 /**
  * Integration test that verifies the TTL checks basic functionality.
@@ -103,12 +101,11 @@ class ConsulAutoServiceRegistrationTtlCheckTests {
 	}
 
 	private Check getCheckForService(String serviceName) {
-		Response<List<Check>> checkResponse = this.consul.getHealthChecksForService(serviceName,
-				HealthChecksForServiceRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
-		if (checkResponse.getValue() == null || checkResponse.getValue().isEmpty()) {
+		ResponseEntity<List<Check>> checkResponse = this.consul.getHealthChecksForService(serviceName);
+		if (checkResponse.getBody() == null || checkResponse.getBody().isEmpty()) {
 			return null;
 		}
-		return checkResponse.getValue().get(0);
+		return checkResponse.getBody().get(0);
 	}
 
 	@ConsulAutoServiceRegistrationIntegrationTestConfig
@@ -116,7 +113,7 @@ class ConsulAutoServiceRegistrationTtlCheckTests {
 
 		@Bean
 		ApplicationStatusProvider alwaysPassingApplicationStatusProvider() {
-			return () -> CheckStatus.PASSING;
+			return () -> PASSING;
 		}
 
 	}

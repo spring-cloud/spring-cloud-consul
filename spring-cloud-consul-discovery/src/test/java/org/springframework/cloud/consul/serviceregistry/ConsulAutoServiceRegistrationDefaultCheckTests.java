@@ -16,17 +16,15 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import com.ecwid.consul.v1.ConsulClient;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.serviceregistry.ConsulAutoServiceRegistrationCustomizedPropsTests.TestPropsConfig;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -35,7 +33,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @author Spencer Gibb
  * @deprecated remove in Edgware
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestPropsConfig.class,
 		properties = { "spring.application.name=myTestServiceDefaultChecks",
 				"spring.cloud.consul.discovery.instanceId=myTestServiceDefaultChecks",
@@ -64,6 +61,7 @@ public class ConsulAutoServiceRegistrationDefaultCheckTests {
 		// accept
 		// it is going to have to suffice
 
+		// FIXME:
 		// final Response<List<com.ecwid.consul.v1.health.model.Check>> checksForService =
 		// consul.getHealthChecksForService("myTestServiceDefaultChecks",
 		// QueryParams.DEFAULT);

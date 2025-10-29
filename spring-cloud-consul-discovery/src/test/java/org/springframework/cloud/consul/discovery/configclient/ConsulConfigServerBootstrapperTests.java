@@ -19,7 +19,6 @@ package org.springframework.cloud.consul.discovery.configclient;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.ecwid.consul.transport.TransportException;
 import org.apache.commons.logging.Log;
 import org.junit.jupiter.api.Test;
 
@@ -109,7 +108,7 @@ public class ConsulConfigServerBootstrapperTests {
 					.get(ConfigServerInstanceProvider.Function.class);
 				assertThatThrownBy(() -> providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
 						event.getBootstrapContext().get(BindHandler.class), mock(Log.class)))
-					.isInstanceOf(TransportException.class)
+					.isInstanceOf(IllegalArgumentException.class)
 					.hasMessageContaining("org.apache.http.conn.HttpHostConnectException: Connect to localhost:8500")
 					.as("Should have tried to reach out to Consul to get config server instance")
 					.isNotNull();

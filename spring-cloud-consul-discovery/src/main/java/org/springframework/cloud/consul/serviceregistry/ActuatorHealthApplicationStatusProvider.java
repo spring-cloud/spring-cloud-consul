@@ -18,12 +18,11 @@ package org.springframework.cloud.consul.serviceregistry;
 
 import java.util.Optional;
 
-import com.ecwid.consul.v1.health.model.Check.CheckStatus;
-
-import org.springframework.boot.actuate.health.HealthDescriptor;
-import org.springframework.boot.actuate.health.HealthEndpoint;
+import org.springframework.boot.health.actuate.endpoint.HealthDescriptor;
+import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
 import org.springframework.boot.health.contributor.Status;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
+import org.springframework.cloud.consul.model.http.health.Check.CheckStatus;
 
 import static org.springframework.boot.health.contributor.Status.DOWN;
 import static org.springframework.boot.health.contributor.Status.OUT_OF_SERVICE;

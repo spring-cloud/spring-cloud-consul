@@ -22,18 +22,17 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.function.Supplier;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.OperationException;
-import com.ecwid.consul.v1.agent.model.NewService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.model.http.agent.NewService;
+import org.springframework.cloud.consul.model.http.health.Check.CheckStatus;
 import org.springframework.cloud.consul.serviceregistry.ApplicationStatusProvider;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
-
-import static com.ecwid.consul.v1.health.model.Check.CheckStatus;
+import org.springframework.web.client.HttpStatusCodeException;
 
 /**
  * Created by nicu on 11.03.2015.
@@ -155,7 +154,7 @@ public class TtlScheduler {
 			try {
 				consulClientCall.run();
 			}
-			catch (OperationException e) {
+			catch (HttpStatusCodeException e) {
 				if (this.ttlScheduler.heartbeatProperties.isReregisterServiceOnFailure()
 						&& this.ttlScheduler.reregistrationPredicate.isEligible(e)) {
 					log.warn(e.getMessage());
@@ -164,8 +163,8 @@ public class TtlScheduler {
 						if (log.isInfoEnabled()) {
 							log.info("Re-register " + registeredService);
 						}
-						this.ttlScheduler.client.agentServiceRegister(registeredService,
-								this.ttlScheduler.discoveryProperties.getAclToken());
+						this.ttlScheduler.client.agentServiceRegister(
+								this.ttlScheduler.discoveryProperties.getAclToken(), registeredService);
 					}
 					else {
 						log.warn("The service to re-register is not found.");

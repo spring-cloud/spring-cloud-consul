@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.consul.config;
 
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -94,7 +95,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 	public void start() {
 		if (this.running.compareAndSet(false, true)) {
 			this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(this::watchConfigKeyValues,
-					this.properties.getWatch().getDelay());
+					Duration.ofMillis(this.properties.getWatch().getDelay()));
 		}
 	}
 
@@ -162,8 +163,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 				// 200, reducing churn if there wasn't anything
 				if (HttpStatus.OK.isSameCodeAs(response.getStatusCode()) && response.hasBody()
 						&& !response.getBody().isEmpty()) {
-					String indexHeader = response.getHeaders().getFirst(ConsulHeaders.ConsulIndex.getHeaderName());
-					Long newIndex = indexHeader == null ? null : Long.parseLong(indexHeader);
+					Long newIndex = ConsulHeaders.getConsulIndex(response);
 
 					if (newIndex != null && !newIndex.equals(currentIndex)) {
 						// don't publish the same index again, don't publish the first

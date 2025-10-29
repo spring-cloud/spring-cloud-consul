@@ -19,7 +19,6 @@ package org.springframework.cloud.consul.discovery;
 import java.time.Duration;
 import java.util.Collections;
 
-import com.ecwid.consul.v1.ConsulClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,16 +26,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.beans.factory.support.StaticListableBeanFactory;
+import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.model.http.health.Check;
 import org.springframework.cloud.consul.serviceregistry.ApplicationStatusProvider;
 
-import static com.ecwid.consul.v1.health.model.Check.CheckStatus;
-import static com.ecwid.consul.v1.health.model.Check.CheckStatus.CRITICAL;
-import static com.ecwid.consul.v1.health.model.Check.CheckStatus.PASSING;
-import static com.ecwid.consul.v1.health.model.Check.CheckStatus.WARNING;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.cloud.consul.model.http.health.Check.CheckStatus.CRITICAL;
+import static org.springframework.cloud.consul.model.http.health.Check.CheckStatus.PASSING;
+import static org.springframework.cloud.consul.model.http.health.Check.CheckStatus.WARNING;
 
 /**
  * Unit tests for {@link TtlScheduler}.
@@ -97,7 +97,7 @@ class TtlSchedulerTests {
 		verify(client).agentCheckFail("service:" + serviceId, null, null);
 	}
 
-	private String addServiceToSchedulerWhenApplicationStatusIs(CheckStatus checkStatus) {
+	private String addServiceToSchedulerWhenApplicationStatusIs(Check.CheckStatus checkStatus) {
 		String serviceId = "svc-" + checkStatus.name();
 		when(applicationStatusProvider.currentStatus()).thenReturn(checkStatus);
 		ttlScheduler.add(serviceId);

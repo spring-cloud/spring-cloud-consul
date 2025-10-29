@@ -43,17 +43,17 @@ public class ConsulEndpoint {
 	public ConsulData invoke() {
 		ConsulData data = new ConsulData();
 		// data.setKeyValues(kvClient.getKeyValueRecurse());
-		Map<String, Service> agentServices = this.consul.getAgentServices();
+		Map<String, Service> agentServices = this.consul.getAgentServices().getBody();
 		data.setAgentServices(agentServices);
 
-		Map<String, List<String>> catalogServices = this.consul.getCatalogServices();
+		Map<String, List<String>> catalogServices = this.consul.getCatalogServices(null, null).getBody();
 
 		for (String serviceId : catalogServices.keySet()) {
-			List<CatalogService> response = this.consul.getCatalogService(serviceId);
+			List<CatalogService> response = this.consul.getCatalogService(serviceId).getBody();
 			data.getCatalogServices().put(serviceId, response);
 		}
 
-		List<Node> catalogNodes = this.consul.getCatalogNodes();
+		List<Node> catalogNodes = this.consul.getCatalogNodes().getBody();
 		data.setCatalogNodes(catalogNodes);
 
 		return data;

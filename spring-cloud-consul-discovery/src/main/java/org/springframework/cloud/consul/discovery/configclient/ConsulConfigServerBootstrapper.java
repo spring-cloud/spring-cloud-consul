@@ -18,8 +18,6 @@ package org.springframework.cloud.consul.discovery.configclient;
 
 import java.util.Collections;
 
-import com.ecwid.consul.v1.ConsulClient;
-
 import org.springframework.boot.bootstrap.BootstrapContext;
 import org.springframework.boot.bootstrap.BootstrapRegistry;
 import org.springframework.boot.bootstrap.BootstrapRegistryInitializer;
@@ -31,6 +29,7 @@ import org.springframework.cloud.config.client.ConfigClientProperties;
 import org.springframework.cloud.config.client.ConfigServerConfigDataLocationResolver;
 import org.springframework.cloud.config.client.ConfigServerInstanceProvider;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.discovery.ConditionalOnConsulDiscoveryEnabled;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryClient;
@@ -60,8 +59,7 @@ public class ConsulConfigServerBootstrapper implements BootstrapRegistryInitiali
 				return null;
 			}
 			ConsulProperties consulProperties = context.get(ConsulProperties.class);
-			return ConsulAutoConfiguration.createConsulClient(consulProperties,
-					ConsulAutoConfiguration.createConsulRawClientBuilder());
+			return ConsulAutoConfiguration.createNewConsulClient(consulProperties);
 		});
 		registry.registerIfAbsent(ConsulDiscoveryClient.class, context -> {
 			if (!isDiscoveryEnabled(context)) {

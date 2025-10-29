@@ -42,7 +42,6 @@ import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.config.ConsulPropertySources.Context;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponents;
@@ -143,7 +142,6 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 		return DIR_SUFFIXES;
 	}
 
-	@Nullable
 	protected UriComponents parseLocation(ConfigDataLocationResolverContext context, ConfigDataLocation location) {
 		String originalLocation = location.getNonPrefixedValue(PREFIX);
 		if (!StringUtils.hasText(originalLocation)) {

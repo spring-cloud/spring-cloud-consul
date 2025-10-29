@@ -16,8 +16,8 @@
 
 package org.springframework.cloud.consul.discovery.configclient;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
@@ -36,7 +36,7 @@ public class ConsulConfigServerAutoConfigurationTests {
 
 	private ConfigurableApplicationContext context;
 
-	@After
+	@AfterEach
 	public void close() {
 		if (this.context != null) {
 			this.context.close();

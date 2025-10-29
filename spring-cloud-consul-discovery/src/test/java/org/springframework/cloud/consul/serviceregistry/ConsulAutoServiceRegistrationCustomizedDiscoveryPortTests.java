@@ -16,11 +16,9 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import com.ecwid.consul.v1.agent.model.NewService;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -29,11 +27,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.cloud.consul.model.http.agent.NewService;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.cloud.test.TestSocketUtils;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.DEFINED_PORT;
@@ -41,7 +39,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * @author Spencer Gibb
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest(classes = ConsulAutoServiceRegistrationCustomizedDiscoveryPortTests.TestConfig.class,
 		properties = { "spring.application.name=myTestService-DiscoveryPort" }, webEnvironment = DEFINED_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
@@ -53,14 +50,14 @@ public class ConsulAutoServiceRegistrationCustomizedDiscoveryPortTests {
 	@Autowired
 	private ConsulDiscoveryProperties properties;
 
-	@BeforeClass
+	@BeforeAll
 	public static void initClass() {
 		Integer port = TestSocketUtils.findAvailableTcpPort();
 		System.setProperty("spring.cloud.consul.discovery.port", port.toString());
 		System.setProperty("server.port", port.toString());
 	}
 
-	@AfterClass
+	@AfterAll
 	public static void teardownClass() {
 		System.clearProperty("spring.cloud.consul.discovery.port");
 		System.clearProperty("server.port");

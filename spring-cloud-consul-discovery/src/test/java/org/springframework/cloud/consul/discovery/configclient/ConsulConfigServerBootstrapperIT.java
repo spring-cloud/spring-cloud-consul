@@ -22,8 +22,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.agent.model.NewService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
@@ -42,7 +40,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.cloud.config.environment.Environment;
 import org.springframework.cloud.config.environment.PropertySource;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.ConsulProperties;
+import org.springframework.cloud.consul.model.http.agent.NewService;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.ConfigurableApplicationContext;
 
@@ -73,14 +73,13 @@ public class ConsulConfigServerBootstrapperIT {
 		ConsulProperties consulProperties = new ConsulProperties();
 		consulProperties.setHost(consul.getHost());
 		consulProperties.setPort(consul.getMappedPort(ConsulTestcontainers.DEFAULT_PORT));
-		ConsulClient client = ConsulAutoConfiguration.createConsulClient(consulProperties,
-				ConsulAutoConfiguration.createConsulRawClientBuilder());
+		ConsulClient client = ConsulAutoConfiguration.createNewConsulClient(consulProperties);
 		NewService newService = new NewService();
 		newService.setId("consul-configserver");
 		newService.setName("consul-configserver");
 		newService.setAddress(mockServer.getHost());
 		newService.setPort(mockServer.getServerPort());
-		client.agentServiceRegister(newService);
+		client.agentServiceRegister(null, newService);
 
 	}
 

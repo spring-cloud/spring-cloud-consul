@@ -16,28 +16,26 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import com.ecwid.consul.ConsulException;
-import com.ecwid.consul.v1.ConsulClient;
-import org.hamcrest.Matchers;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.test.system.OutputCaptureRule;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
+import org.springframework.cloud.consul.ConsulException;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
-import static org.hamcrest.Matchers.isA;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * @author Spencer Gibb
@@ -45,25 +43,22 @@ import static org.hamcrest.Matchers.isA;
  */
 @DirtiesContext
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
+@SpringBootTest(classes = { ConsulAutoServiceRegistrationRetryTests.TestConfig.class })
+@ExtendWith(OutputCaptureExtension.class)
 public class ConsulAutoServiceRegistrationRetryTests {
 
-	@Rule
-	public ExpectedException exception = ExpectedException.none();
-
-	@Rule
-	public OutputCaptureRule output = new OutputCaptureRule();
-
-	@Ignore
+	// @Disabled
 	@Test
-	public void testRetry() {
-		this.exception.expectCause(isA(ConsulException.class));
-		try (ConfigurableApplicationContext context = new SpringApplicationBuilder(TestConfig.class)
-			.properties("spring.application.name=testregistrationretry", "spring.jmx.default-domain=testautoregretry",
-					"spring.cloud.consul.retry.max-attempts=2", "logging.level.org.springframework.retry=DEBUG",
-					"server.port=0")
-			.run()) {
-			this.output.expect(Matchers.containsString("Retry: count="));
-		}
+	public void testRetry(CapturedOutput output) {
+		assertThatThrownBy(() -> {
+			try (ConfigurableApplicationContext context = new SpringApplicationBuilder(TestConfig.class)
+				.properties("spring.application.name=testregistrationretry",
+						"spring.jmx.default-domain=testautoregretry", "spring.cloud.consul.retry.max-attempts=2",
+						"logging.level.org.springframework.retry=DEBUG", "server.port=0")
+				.run()) {
+				assertThat(output).contains("Retry: count=");
+			}
+		}).isInstanceOf(ConsulException.class);
 	}
 
 	@SpringBootConfiguration
@@ -71,11 +66,6 @@ public class ConsulAutoServiceRegistrationRetryTests {
 	@ImportAutoConfiguration({ AutoServiceRegistrationConfiguration.class, ConsulAutoConfiguration.class,
 			ConsulAutoServiceRegistrationAutoConfiguration.class })
 	protected static class TestConfig {
-
-		@Bean
-		public ConsulClient consulClient() {
-			return new ConsulClient("localhost", 4321);
-		}
 
 	}
 

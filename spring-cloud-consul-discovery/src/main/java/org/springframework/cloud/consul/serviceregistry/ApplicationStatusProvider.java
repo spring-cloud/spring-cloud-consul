@@ -16,7 +16,7 @@
 
 package org.springframework.cloud.consul.serviceregistry;
 
-import com.ecwid.consul.v1.health.model.Check.CheckStatus;
+import org.springframework.cloud.consul.model.http.health.Check.CheckStatus;
 
 /**
  * Provides the current health of the application represented in Consul's

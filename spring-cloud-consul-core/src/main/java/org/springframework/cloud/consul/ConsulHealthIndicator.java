@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.springframework.boot.health.contributor.AbstractHealthIndicator;
 import org.springframework.boot.health.contributor.Health;
+import org.springframework.http.ResponseEntity;
 
 /**
  * @author Spencer Gibb
@@ -38,10 +39,11 @@ public class ConsulHealthIndicator extends AbstractHealthIndicator {
 
 	@Override
 	protected void doHealthCheck(Health.Builder builder) {
-		final String leaderStatus = this.consul.getStatusLeader();
+		final String leaderStatus = this.consul.getStatusLeader().getBody();
 		builder.up().withDetail("leader", leaderStatus);
 		if (properties.isIncludeServicesQuery()) {
-			final Map<String, List<String>> services = this.consul.getCatalogServices();
+			ResponseEntity<Map<String, List<String>>> response = this.consul.getCatalogServices(null, null);
+			final Map<String, List<String>> services = response.getBody();
 			builder.withDetail("services", services);
 		}
 	}

@@ -17,18 +17,17 @@
 package org.springframework.cloud.consul.discovery;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-
-import com.ecwid.consul.v1.ConsulClient;
-import com.ecwid.consul.v1.QueryParams;
-import com.ecwid.consul.v1.Response;
-import com.ecwid.consul.v1.catalog.CatalogServicesRequest;
-import com.ecwid.consul.v1.health.HealthServicesRequest;
-import com.ecwid.consul.v1.health.model.HealthService;
 
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulClient.QueryParams;
+import org.springframework.cloud.consul.model.http.health.HealthService;
+import org.springframework.http.ResponseEntity;
 
 /**
  * @author Spencer Gibb
@@ -54,7 +53,9 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<ServiceInstance> getInstances(final String serviceId) {
-		return getInstances(serviceId, new QueryParams(this.properties.getConsistencyMode()));
+		ConsulClient.ConsistencyMode consistencyMode = ConsulClient.ConsistencyMode
+			.valueOf(this.properties.getConsistencyMode().name().toUpperCase(Locale.ROOT));
+		return getInstances(serviceId, new QueryParams(consistencyMode));
 	}
 
 	public List<ServiceInstance> getInstances(final String serviceId, final QueryParams queryParams) {
@@ -66,41 +67,34 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	private void addInstancesToList(List<ServiceInstance> instances, String serviceId, QueryParams queryParams) {
-		HealthServicesRequest.Builder requestBuilder = HealthServicesRequest.newBuilder()
-			.setPassing(properties.isQueryPassing())
-			.setQueryParams(queryParams)
-			.setToken(properties.getAclToken());
 		String[] queryTags = properties.getQueryTagsForService(serviceId);
+		List<String> tags = null;
 		if (queryTags != null) {
-			requestBuilder.setTags(queryTags);
+			tags = Arrays.asList(queryTags);
 		}
-		HealthServicesRequest request = requestBuilder.build();
 
-		Response<List<HealthService>> services = this.client.getHealthServices(serviceId, request);
+		ResponseEntity<List<HealthService>> healthServices = client.getHealthServices(serviceId,
+				properties.isQueryPassing(), properties.getAclToken(), tags, queryParams);
 
-		for (HealthService service : services.getValue()) {
+		for (HealthService service : healthServices.getBody()) {
 			instances.add(new ConsulServiceInstance(service, serviceId));
 		}
 	}
 
 	public List<ServiceInstance> getAllInstances() {
 		List<ServiceInstance> instances = new ArrayList<>();
+		Map<String, List<String>> catalogServices = client.getCatalogServices(properties.getAclToken(), null).getBody();
 
-		Response<Map<String, List<String>>> services = this.client
-			.getCatalogServices(CatalogServicesRequest.newBuilder().setQueryParams(QueryParams.DEFAULT).build());
-		for (String serviceId : services.getValue().keySet()) {
-			addInstancesToList(instances, serviceId, QueryParams.DEFAULT);
+		for (String serviceId : catalogServices.keySet()) {
+			addInstancesToList(instances, serviceId, null);
 		}
 		return instances;
 	}
 
 	@Override
 	public List<String> getServices() {
-		CatalogServicesRequest request = CatalogServicesRequest.newBuilder()
-			.setQueryParams(QueryParams.DEFAULT)
-			.setToken(this.properties.getAclToken())
-			.build();
-		return new ArrayList<>(this.client.getCatalogServices(request).getValue().keySet());
+		Map<String, List<String>> catalogServices = client.getCatalogServices(properties.getAclToken(), null).getBody();
+		return new ArrayList<>(catalogServices.keySet());
 	}
 
 	@Override

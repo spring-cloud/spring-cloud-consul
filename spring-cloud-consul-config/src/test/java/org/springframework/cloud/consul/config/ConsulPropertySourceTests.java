@@ -26,9 +26,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.ConsulClient;
-import org.springframework.cloud.consul.ConsulProperties;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,8 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Spencer Gibb
  */
 public class ConsulPropertySourceTests {
-
-	private com.ecwid.consul.v1.ConsulClient testClient;
 
 	private ConsulClient consulClient;
 
@@ -52,24 +48,20 @@ public class ConsulPropertySourceTests {
 	public void setup() throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 		ConsulTestcontainers.start();
 		this.prefix = "/consulPropertySourceTests" + new Random().nextInt(Integer.MAX_VALUE);
-		ConsulProperties consulProperties = new ConsulProperties();
-		consulProperties.setHost(ConsulTestcontainers.getHost());
-		consulProperties.setPort(ConsulTestcontainers.getPort());
-		this.testClient = ConsulTestcontainers.client();
-		this.consulClient = ConsulAutoConfiguration.createNewConsulClient(consulProperties);
+		this.consulClient = ConsulTestcontainers.client();
 	}
 
 	@After
 	public void teardown() {
-		this.testClient.deleteKVValues(this.prefix);
+		this.consulClient.deleteKVValues(this.prefix);
 	}
 
 	@Test
 	public void testKv() {
 		// key value properties
 		this.kvContext = this.prefix + "/kv";
-		this.testClient.setKVValue(this.kvContext + "/fooprop", "fookvval");
-		this.testClient.setKVValue(this.prefix + "/kv" + "/bar/prop", "8080");
+		this.consulClient.setKVValue(this.kvContext + "/fooprop", "fookvval");
+		this.consulClient.setKVValue(this.prefix + "/kv" + "/bar/prop", "8080");
 
 		ConsulPropertySource source = getConsulPropertySource(new ConsulConfigProperties(), this.kvContext);
 
@@ -85,7 +77,7 @@ public class ConsulPropertySourceTests {
 	public void testProperties() {
 		// properties file property
 		this.propertiesContext = this.prefix + "/properties";
-		this.testClient.setKVValue(this.propertiesContext + "/data", "fooprop=foopropval\nbar.prop=8080");
+		this.consulClient.setKVValue(this.propertiesContext + "/data", "fooprop=foopropval\nbar.prop=8080");
 
 		ConsulConfigProperties configProperties = new ConsulConfigProperties();
 		configProperties.setFormat(ConsulConfigProperties.Format.PROPERTIES);
@@ -98,7 +90,7 @@ public class ConsulPropertySourceTests {
 	public void testYaml() {
 		// yaml file property
 		String yamlContext = this.prefix + "/yaml";
-		this.testClient.setKVValue(yamlContext + "/data", "fooprop: fooymlval\nbar:\n  prop: 8080");
+		this.consulClient.setKVValue(yamlContext + "/data", "fooprop: fooymlval\nbar:\n  prop: 8080");
 
 		ConsulConfigProperties configProperties = new ConsulConfigProperties();
 		configProperties.setFormat(ConsulConfigProperties.Format.YAML);
@@ -111,7 +103,7 @@ public class ConsulPropertySourceTests {
 	public void testEmptyYaml() {
 		// yaml file property
 		String yamlContext = this.prefix + "/yaml";
-		this.testClient.setKVValue(yamlContext + "/data", "");
+		this.consulClient.setKVValue(yamlContext + "/data", "");
 
 		ConsulConfigProperties configProperties = new ConsulConfigProperties();
 		configProperties.setFormat(ConsulConfigProperties.Format.YAML);
