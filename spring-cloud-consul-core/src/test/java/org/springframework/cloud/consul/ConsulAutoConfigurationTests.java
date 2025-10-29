@@ -22,8 +22,10 @@ import org.junit.Test;
 
 import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.ssl.SslBundle;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.cloud.consul.ConsulAutoConfiguration.ConsulClientSettings;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,20 +63,13 @@ public class ConsulAutoConfigurationTests {
 	@Test
 	public void customPathConfigured() {
 		appContextRunner.withPropertyValues("spring.cloud.consul.path=/consul/proxy/").run(context -> {
-			assertThat(context).hasNotFailed().hasSingleBean(ConsulClient.class);
+			assertThat(context).hasNotFailed()
+				.hasSingleBean(ConsulClient.class)
+				.hasSingleBean(ConsulClientSettings.class);
 
-			ConsulClient consulClient = context.getBean(ConsulClient.class);
-			// CatalogConsulClient client = (CatalogConsulClient)
-			// ReflectionTestUtils.getField(consulClient,
-			// "catalogClient");
-			// ConsulRawClient rawClient = (ConsulRawClient)
-			// ReflectionTestUtils.getField(client, "rawClient");
-			String agentAddress = null; // (String)
-										// ReflectionTestUtils.getField(rawClient,
-										// "agentAddress");
-
-			assertThat(agentAddress).isNotNull();
-			assertThat(new URL(agentAddress).getPath()).isEqualTo("/consul/proxy");
+			ConsulClientSettings settings = context.getBean(ConsulClientSettings.class);
+			assertThat(settings).isNotNull();
+			assertThat(new URL(settings.baseUrl()).getPath()).isEqualTo("/consul/proxy");
 		});
 	}
 
@@ -87,18 +82,18 @@ public class ConsulAutoConfigurationTests {
 					"spring.cloud.consul.tls.certificate-path=src/test/resources/trustStore.jks",
 					"spring.cloud.consul.tls.certificate-password=change_me")
 			.run(context -> {
-				assertThat(context).hasNotFailed().hasSingleBean(ConsulClient.class);
+				assertThat(context).hasNotFailed()
+					.hasSingleBean(ConsulClient.class)
+					.hasSingleBean(ConsulClientSettings.class);
 
-				ConsulClient consulClient = context.getBean(ConsulClient.class);
-				// CatalogConsulClient client = (CatalogConsulClient)
-				// ReflectionTestUtils.getField(consulClient,
-				// "catalogClient");
-				// ConsulRawClient rawClient = (ConsulRawClient)
-				// ReflectionTestUtils.getField(client, "rawClient");
-				// HttpTransport httpTransport = (HttpTransport)
-				// ReflectionTestUtils.getField(rawClient, "httpTransport");
-				// assertThat(httpTransport).isInstanceOf(DefaultHttpsTransport.class);
-				assertThat(consulClient).isNull();
+				ConsulClientSettings settings = context.getBean(ConsulClientSettings.class);
+				assertThat(settings).isNotNull();
+				assertThat(settings.httpClientSettings()).isNotNull();
+				SslBundle sslBundle = settings.httpClientSettings().sslBundle();
+				assertThat(sslBundle).isNotNull();
+				assertThat(sslBundle.getStores().getKeyStore()).isNotNull();
+				assertThat(sslBundle.getStores().getKeyStorePassword()).isEqualTo("letmein");
+				assertThat(sslBundle.getStores().getTrustStore()).isNotNull();
 			});
 	}
 

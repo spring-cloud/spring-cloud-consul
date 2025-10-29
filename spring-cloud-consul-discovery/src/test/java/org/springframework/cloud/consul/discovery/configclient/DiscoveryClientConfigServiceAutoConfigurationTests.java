@@ -73,7 +73,7 @@ public class DiscoveryClientConfigServiceAutoConfigurationTests {
 				"spring.cloud.consul.discovery.test.enabled:true",
 				"spring.application.name=discoveryclientconfigservicetest", "spring.jmx.enabled=false",
 				"spring.cloud.consul.discovery.port:7001", "spring.cloud.consul.discovery.hostname:foo",
-				"spring.cloud.config.discovery.service-id:configserver");
+				"spring.cloud.config.discovery.service-id:configserver", "spring.cloud.bootstrap.enabled=true");
 
 		assertThat(this.context.getBeanNamesForType(ConsulConfigServerAutoConfiguration.class).length).isEqualTo(1);
 		ConsulDiscoveryClient client = this.context.getParent().getBean(ConsulDiscoveryClient.class);

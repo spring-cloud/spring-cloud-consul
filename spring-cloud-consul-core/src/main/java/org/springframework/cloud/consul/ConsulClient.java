@@ -28,6 +28,7 @@ import org.springframework.cloud.consul.model.http.format.WaitTimeFormat;
 import org.springframework.cloud.consul.model.http.health.Check;
 import org.springframework.cloud.consul.model.http.health.HealthService;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -56,55 +57,56 @@ public interface ConsulClient {
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
 	@GetExchange("/v1/catalog/services")
+	ResponseEntity<Map<String, List<String>>> getCatalogServices();
+
+	@GetExchange("/v1/catalog/services")
 	ResponseEntity<Map<String, List<String>>> getCatalogServices(
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken, QueryParams queryParams);
 
 	@PutExchange("/v1/agent/check/fail/{checkId}")
-	ResponseEntity<Void> agentCheckFail(String checkId, @RequestParam(name = "note", required = false) String note,
+	ResponseEntity<Void> agentCheckFail(String checkId, @RequestParam(required = false) String note,
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
 	@PutExchange("/v1/agent/check/pass/{checkId}")
-	ResponseEntity<Void> agentCheckPass(String checkId, @RequestParam(name = "note", required = false) String note,
+	ResponseEntity<Void> agentCheckPass(String checkId, @RequestParam(required = false) String note,
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
 	@PutExchange("/v1/agent/check/warn/{checkId}")
-	ResponseEntity<Void> agentCheckWarn(String checkId, @RequestParam(name = "note", required = false) String note,
+	ResponseEntity<Void> agentCheckWarn(String checkId, @RequestParam(required = false) String note,
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
 	@GetExchange("/v1/agent/services")
 	ResponseEntity<Map<String, Service>> getAgentServices();
 
 	@PutExchange("/v1/agent/service/deregister/{serviceId}")
-	ResponseEntity<Void> agentServiceDeregister(String serviceId,
+	ResponseEntity<Void> agentServiceDeregister(@PathVariable String serviceId,
 			@RequestHeader(name = ACL_TOKEN_HEADER) String aclToken);
 
 	@PutExchange("/v1/agent/service/register")
-	ResponseEntity<Void> agentServiceRegister(@RequestHeader(name = ACL_TOKEN_HEADER) String aclToken,
-			NewService newService);
+	ResponseEntity<Void> agentServiceRegister(@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken,
+			@RequestBody NewService newService);
 
 	@PutExchange("/v1/agent/service/maintenance/{serviceId}")
-	ResponseEntity<Void> agentServiceSetMaintenance(String serviceId,
-			@RequestParam(name = "maintenanceEnabled", required = false) Boolean maintenanceEnabled,
-			@RequestParam(name = "reason", required = false) String reason,
+	ResponseEntity<Void> agentServiceSetMaintenance(@PathVariable String serviceId,
+			@RequestParam(required = false) Boolean enable, @RequestParam(required = false) String reason,
 			@RequestHeader(name = ACL_TOKEN_HEADER) String aclToken);
 
 	@GetExchange("/v1/catalog/service/{serviceId}")
-	ResponseEntity<List<CatalogService>> getCatalogService(String serviceId);
+	ResponseEntity<List<CatalogService>> getCatalogService(@PathVariable String serviceId);
 
 	@GetExchange("/v1/catalog/nodes")
 	ResponseEntity<List<Node>> getCatalogNodes();
-
-	@GetExchange("/v1/health/service/{serviceName}")
-	ResponseEntity<List<HealthService>> getHealthServices(@PathVariable String serviceName);
 
 	@GetExchange("/v1/health/checks/{serviceName}")
 	ResponseEntity<List<Check>> getHealthChecksForService(@PathVariable String serviceName);
 
 	@GetExchange("/v1/health/service/{serviceName}")
+	ResponseEntity<List<HealthService>> getHealthServices(@PathVariable String serviceName);
+
+	@GetExchange("/v1/health/service/{serviceName}")
 	ResponseEntity<List<HealthService>> getHealthServices(@PathVariable String serviceName,
-			@RequestParam("passing") boolean passing,
-			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken,
-			@RequestParam(name = "tags", required = false) List<String> tags, QueryParams queryParams);
+			@RequestParam boolean passing, @RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken,
+			@RequestParam(required = false) List<String> tag, QueryParams queryParams);
 
 	@DeleteExchange("/v1/kv/{context}")
 	ResponseEntity<Void> deleteKVValues(@PathVariable String context);
@@ -126,8 +128,8 @@ public interface ConsulClient {
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken,
 			@RequestParam("wait") @WaitTimeFormat Long waitTime, @RequestParam("index") long index);
 
-	@PutExchange("/v1/kv/{context}")
-	ResponseEntity<List<GetValue>> setKVValue(@PathVariable String context, @RequestBody String value);
+	@PutExchange(url = "/v1/kv/{context}", contentType = MediaType.TEXT_PLAIN_VALUE)
+	ResponseEntity<Boolean> setKVValue(@PathVariable String context, @RequestBody String value);
 
 	@GetExchange("/v1/events")
 	ResponseEntity<List<Event>> eventList();
@@ -135,8 +137,8 @@ public interface ConsulClient {
 	@GetExchange("/v1/events")
 	ResponseEntity<List<Event>> eventList(int eventTimeout, long index);
 
-	@PostExchange("/v1/events")
-	ResponseEntity<Event> eventFire(String name, @RequestBody String payload);
+	@PostExchange("/v1/event/fire/{name}")
+	ResponseEntity<Event> eventFire(@PathVariable String name, @RequestBody String payload);
 
 	class QueryParams {
 

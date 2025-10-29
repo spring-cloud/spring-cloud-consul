@@ -42,7 +42,7 @@ public class ConsulHealthIndicator extends AbstractHealthIndicator {
 		final String leaderStatus = this.consul.getStatusLeader().getBody();
 		builder.up().withDetail("leader", leaderStatus);
 		if (properties.isIncludeServicesQuery()) {
-			ResponseEntity<Map<String, List<String>>> response = this.consul.getCatalogServices(null, null);
+			ResponseEntity<Map<String, List<String>>> response = this.consul.getCatalogServices();
 			final Map<String, List<String>> services = response.getBody();
 			builder.withDetail("services", services);
 		}

@@ -56,9 +56,9 @@ public class ConsulHealthIndicatorDownTest {
 	public void statusIsDownWhenConsulClientFailsToGetServices() {
 		String leaderStatus = "OK";
 		when(consulClient.getStatusLeader()).thenReturn(ResponseEntity.ok(leaderStatus));
-		when(consulClient.getCatalogServices(null, null)).thenThrow(new RuntimeException("no services"));
+		when(consulClient.getCatalogServices()).thenThrow(new RuntimeException("no services"));
 		assertThat(this.healthEndpoint.health().getStatus()).as("health status was not DOWN").isEqualTo(Status.DOWN);
-		verify(consulClient).getCatalogServices(null, null);
+		verify(consulClient).getCatalogServices();
 	}
 
 	@EnableAutoConfiguration

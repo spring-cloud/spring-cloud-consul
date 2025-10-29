@@ -55,7 +55,7 @@ public class ConsulHealthIndicatorLightweightUpTest {
 	public void statusIsUp() {
 		assertThat(this.healthEndpoint.health().getStatus()).as("health status was not UP").isEqualTo(Status.UP);
 		verify(consulClient).getStatusLeader();
-		verify(consulClient, never()).getCatalogServices(null, null);
+		verify(consulClient, never()).getCatalogServices();
 	}
 
 	@EnableAutoConfiguration

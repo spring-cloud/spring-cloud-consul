@@ -66,6 +66,7 @@ import org.springframework.web.service.invoker.HttpRequestValues;
 import org.springframework.web.service.invoker.HttpServiceArgumentResolver;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.web.util.DefaultUriBuilderFactory.EncodingMode;
 import org.springframework.web.util.UriBuilder;
 
 /**
@@ -86,11 +87,18 @@ public class ConsulAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
+	public ConsulClientSettings consulClientRestClientAdapter(ConsulProperties consulProperties) {
+		String baseUrl = createConsulClientBaseUrl(consulProperties);
+		return createConsulClientSettings(baseUrl, consulProperties.getTls());
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
 	public ConsulClient coreConsulClient(ConsulProperties consulProperties) {
 		return createNewConsulClient(consulProperties);
 	}
 
-	public static ConsulClient createNewConsulClient(ConsulProperties consulProperties) {
+	public static String createConsulClientBaseUrl(ConsulProperties consulProperties) {
 		UriBuilder uriBuilder = new DefaultUriBuilderFactory().builder();
 
 		if (StringUtils.hasLength(consulProperties.getScheme())) {
@@ -111,8 +119,16 @@ public class ConsulAutoConfiguration {
 		}
 
 		String baseUrl = uriBuilder.build().toString();
+		return baseUrl;
+	}
 
-		HttpExchangeAdapter adapter = createConsulRestClientAdapter(baseUrl, consulProperties.getTls());
+	public static ConsulClient createNewConsulClient(ConsulProperties consulProperties) {
+		String baseUrl = createConsulClientBaseUrl(consulProperties);
+		HttpExchangeAdapter adapter = createConsulClientSettings(baseUrl, consulProperties.getTls()).adapter();
+		return createNewConsulClient(adapter);
+	}
+
+	public static ConsulClient createNewConsulClient(HttpExchangeAdapter adapter) {
 		HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter)
 			.customArgumentResolver(new QueryParamsArgumentResolver())
 			.conversionService(createConsulClientConversionService())
@@ -121,17 +137,21 @@ public class ConsulAutoConfiguration {
 		return factory.createClient(ConsulClient.class);
 	}
 
-	public static RestClientAdapter createConsulRestClientAdapter(String baseUrl,
+	// TODO: migrate to boot managed sslbundle
+	public static ConsulClientSettings createConsulClientSettings(String baseUrl,
 			ConsulProperties.TLSConfig tlsConfig) {
 		try {
+			DefaultUriBuilderFactory uriBuilderFactory = new DefaultUriBuilderFactory(baseUrl);
+			uriBuilderFactory.setEncodingMode(EncodingMode.NONE);
 			RestClient.Builder builder = RestClient.builder()
 				.defaultStatusHandler(HttpStatusCode::is4xxClientError, (request, response) -> {
 				})
 				.defaultStatusHandler(HttpStatusCode::is5xxServerError,
 						(request, response) -> LOGGER
 							.error(new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8)))
-				.baseUrl(baseUrl);
+				.uriBuilderFactory(uriBuilderFactory);
 
+			HttpClientSettings settings = null;
 			if (tlsConfig != null) {
 				KeyStore clientStore = KeyStore.getInstance(tlsConfig.getKeyStoreInstanceType().name());
 				clientStore.load(Files.newInputStream(Paths.get(tlsConfig.getCertificatePath())),
@@ -144,12 +164,12 @@ public class ConsulAutoConfiguration {
 				SslStoreBundle sslStoreBundle = SslStoreBundle.of(clientStore, tlsConfig.getKeyStorePassword(),
 						trustStore);
 				SslBundle sslBundle = SslBundle.of(sslStoreBundle);
-				HttpClientSettings settings = HttpClientSettings.ofSslBundle(sslBundle);
+				settings = HttpClientSettings.ofSslBundle(sslBundle);
 				ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder.detect().build(settings);
 				builder.requestFactory(requestFactory);
 			}
 
-			return RestClientAdapter.create(builder.build());
+			return new ConsulClientSettings(baseUrl, settings, RestClientAdapter.create(builder.build()));
 		}
 		catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
 			throw new RuntimeException(e);
@@ -160,6 +180,10 @@ public class ConsulAutoConfiguration {
 		DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService();
 		conversionService.addFormatterForFieldAnnotation(new WaitTimeAnnotationFormatterFactory());
 		return conversionService;
+	}
+
+	public record ConsulClientSettings(String baseUrl, HttpClientSettings httpClientSettings,
+			RestClientAdapter adapter) {
 	}
 
 	@Configuration(proxyBeanMethods = false)

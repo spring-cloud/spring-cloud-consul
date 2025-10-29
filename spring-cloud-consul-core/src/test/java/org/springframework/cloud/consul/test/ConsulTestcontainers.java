@@ -46,7 +46,7 @@ public class ConsulTestcontainers implements ApplicationContextInitializer<Confi
 	public static ConsulContainer consul = createConsulContainer();
 
 	public static ConsulContainer createConsulContainer() {
-		return createConsulContainer("1.19");
+		return createConsulContainer("1.22");
 	}
 
 	public static ConsulContainer createConsulContainer(String consulVersion) {

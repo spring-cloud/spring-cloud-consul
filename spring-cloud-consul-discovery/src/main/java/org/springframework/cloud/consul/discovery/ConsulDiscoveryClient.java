@@ -53,8 +53,11 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<ServiceInstance> getInstances(final String serviceId) {
-		ConsulClient.ConsistencyMode consistencyMode = ConsulClient.ConsistencyMode
-			.valueOf(this.properties.getConsistencyMode().name().toUpperCase(Locale.ROOT));
+		ConsulDiscoveryProperties.ConsistencyMode consistencyModeProp = this.properties.getConsistencyMode();
+		ConsulClient.ConsistencyMode consistencyMode = ConsulClient.ConsistencyMode.DEFAULT;
+		if (consistencyModeProp != null) {
+			consistencyMode = ConsulClient.ConsistencyMode.valueOf(consistencyModeProp.name().toUpperCase(Locale.ROOT));
+		}
 		return getInstances(serviceId, new QueryParams(consistencyMode));
 	}
 

@@ -28,6 +28,8 @@ import org.junit.Test;
 
 import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -47,7 +49,7 @@ public class ConsulPropertySourceTests {
 	@Before
 	public void setup() throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
 		ConsulTestcontainers.start();
-		this.prefix = "/consulPropertySourceTests" + new Random().nextInt(Integer.MAX_VALUE);
+		this.prefix = "consulPropertySourceTests" + new Random().nextInt(Integer.MAX_VALUE);
 		this.consulClient = ConsulTestcontainers.client();
 	}
 
@@ -60,8 +62,15 @@ public class ConsulPropertySourceTests {
 	public void testKv() {
 		// key value properties
 		this.kvContext = this.prefix + "/kv";
-		this.consulClient.setKVValue(this.kvContext + "/fooprop", "fookvval");
-		this.consulClient.setKVValue(this.prefix + "/kv" + "/bar/prop", "8080");
+		ResponseEntity<Boolean> fookvval = this.consulClient.setKVValue(this.kvContext + "/fooprop", "fookvval");
+		assertThat(fookvval).isNotNull();
+		assertThat(fookvval.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(fookvval.getBody()).isTrue();
+		ResponseEntity<Boolean> listResponseEntity = this.consulClient.setKVValue(this.prefix + "/kv" + "/bar/prop",
+				"8080");
+		assertThat(listResponseEntity).isNotNull();
+		assertThat(listResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(listResponseEntity.getBody()).isTrue();
 
 		ConsulPropertySource source = getConsulPropertySource(new ConsulConfigProperties(), this.kvContext);
 

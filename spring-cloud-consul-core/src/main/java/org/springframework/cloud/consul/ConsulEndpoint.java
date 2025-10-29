@@ -46,7 +46,7 @@ public class ConsulEndpoint {
 		Map<String, Service> agentServices = this.consul.getAgentServices().getBody();
 		data.setAgentServices(agentServices);
 
-		Map<String, List<String>> catalogServices = this.consul.getCatalogServices(null, null).getBody();
+		Map<String, List<String>> catalogServices = this.consul.getCatalogServices().getBody();
 
 		for (String serviceId : catalogServices.keySet()) {
 			List<CatalogService> response = this.consul.getCatalogService(serviceId).getBody();

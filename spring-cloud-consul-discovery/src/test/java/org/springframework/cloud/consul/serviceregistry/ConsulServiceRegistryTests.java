@@ -40,7 +40,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 /**
  * @author Spencer Gibb
  */
-@SpringBootTest(properties = "spring.cloud.consul.discovery.query-passing=true", webEnvironment = RANDOM_PORT)
+@SpringBootTest(properties = { "spring.cloud.consul.discovery.query-passing=true", "debug=true" },
+		webEnvironment = RANDOM_PORT)
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
 public class ConsulServiceRegistryTests {
 

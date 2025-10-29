@@ -28,6 +28,7 @@ import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.cloud.consul.model.http.agent.NewService;
 import org.springframework.cloud.consul.model.http.health.Check;
+import org.springframework.core.log.LogMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
 
@@ -97,12 +98,18 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 	@Override
 	public void setStatus(ConsulRegistration registration, String status) {
 		if (status.equalsIgnoreCase(OUT_OF_SERVICE.getCode())) {
-			this.client.agentServiceSetMaintenance(registration.getInstanceId(), true, null,
-					this.properties.getAclToken());
+			ResponseEntity<Void> response = this.client.agentServiceSetMaintenance(registration.getInstanceId(), true,
+					null, this.properties.getAclToken());
+			log.debug(LogMessage.format(
+					"Set status for service with consul: %s, status %s, response %s" + registration.getInstanceId(),
+					status, response));
 		}
 		else if (status.equalsIgnoreCase(UP.getCode())) {
-			this.client.agentServiceSetMaintenance(registration.getInstanceId(), false, null,
-					this.properties.getAclToken());
+			ResponseEntity<Void> response = this.client.agentServiceSetMaintenance(registration.getInstanceId(), false,
+					null, this.properties.getAclToken());
+			log.debug(LogMessage.format(
+					"Set status for service with consul: %s, status %s, response %s" + registration.getInstanceId(),
+					status, response));
 		}
 		else {
 			throw new IllegalArgumentException("Unknown status: " + status);

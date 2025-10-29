@@ -53,7 +53,7 @@ public class ConsulHealthIndicatorUpTest {
 	public void statusIsUp() {
 		assertThat(this.healthEndpoint.health().getStatus()).as("health status was not UP").isEqualTo(Status.UP);
 		verify(consulClient).getStatusLeader();
-		verify(consulClient).getCatalogServices(null, null);
+		verify(consulClient).getCatalogServices();
 	}
 
 	@EnableAutoConfiguration

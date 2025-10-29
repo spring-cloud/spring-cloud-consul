@@ -140,8 +140,8 @@ public class NewService {
 
 	public static class Check {
 
-		@JsonProperty("Script")
-		private String script;
+		@JsonProperty("Args")
+		private List<String> args;
 
 		@JsonProperty("DockerContainerID")
 		private String dockerContainerID;
@@ -185,12 +185,12 @@ public class NewService {
 		@JsonProperty("GRPCUseTLS")
 		private Boolean grpcUseTLS;
 
-		public String getScript() {
-			return script;
+		public List<String> getArgs() {
+			return args;
 		}
 
-		public void setScript(String script) {
-			this.script = script;
+		public void setArgs(List<String> args) {
+			this.args = args;
 		}
 
 		public String getDockerContainerID() {
@@ -307,7 +307,7 @@ public class NewService {
 
 		@Override
 		public String toString() {
-			return new ToStringCreator(this).append("script", script)
+			return new ToStringCreator(this).append("args", args)
 				.append("dockerContainerID", dockerContainerID)
 				.append("shell", shell)
 				.append("interval", interval)
