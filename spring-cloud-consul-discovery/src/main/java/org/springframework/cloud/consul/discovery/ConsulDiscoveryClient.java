@@ -86,7 +86,9 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	public List<ServiceInstance> getAllInstances() {
 		List<ServiceInstance> instances = new ArrayList<>();
-		Map<String, List<String>> catalogServices = client.getCatalogServices(properties.getAclToken(), null).getBody();
+		Map<String, List<String>> catalogServices = client
+			.getCatalogServices(properties.getAclToken(), QueryParams.DEFAULT)
+			.getBody();
 
 		for (String serviceId : catalogServices.keySet()) {
 			addInstancesToList(instances, serviceId, null);
@@ -96,7 +98,9 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<String> getServices() {
-		Map<String, List<String>> catalogServices = client.getCatalogServices(properties.getAclToken(), null).getBody();
+		Map<String, List<String>> catalogServices = client
+			.getCatalogServices(properties.getAclToken(), QueryParams.DEFAULT)
+			.getBody();
 		return new ArrayList<>(catalogServices.keySet());
 	}
 
