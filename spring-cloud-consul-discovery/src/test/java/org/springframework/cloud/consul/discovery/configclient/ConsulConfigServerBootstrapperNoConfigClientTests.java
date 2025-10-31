@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.discovery.configclient;
 
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -28,6 +30,12 @@ import org.springframework.cloud.test.ModifiedClassPathExtension;
 @ExtendWith(ModifiedClassPathExtension.class)
 @ClassPathExclusions({ "spring-cloud-config-client-*.jar", "spring-cloud-config-server-*.jar" })
 public class ConsulConfigServerBootstrapperNoConfigClientTests {
+
+	@BeforeEach
+	public void init() {
+		// FIXME: why do I need to do this? (fails in maven build without it.
+		TomcatURLStreamHandlerFactory.disable();
+	}
 
 	@Test
 	public void enabledAddsInstanceProviderFn() {

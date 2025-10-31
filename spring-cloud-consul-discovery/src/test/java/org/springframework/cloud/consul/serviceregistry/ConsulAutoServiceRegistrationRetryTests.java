@@ -23,12 +23,10 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
-import org.springframework.cloud.consul.ConsulException;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
@@ -43,7 +41,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 @DirtiesContext
 @ContextConfiguration(initializers = ConsulTestcontainers.class)
-@SpringBootTest(classes = { ConsulAutoServiceRegistrationRetryTests.TestConfig.class })
 @ExtendWith(OutputCaptureExtension.class)
 public class ConsulAutoServiceRegistrationRetryTests {
 
@@ -56,9 +53,10 @@ public class ConsulAutoServiceRegistrationRetryTests {
 						"spring.jmx.default-domain=testautoregretry", "spring.cloud.consul.retry.max-attempts=2",
 						"logging.level.org.springframework.retry=DEBUG", "server.port=0")
 				.run()) {
-				assertThat(output).contains("Retry: count=");
+				// try with resources
 			}
-		}).isInstanceOf(ConsulException.class);
+		}).cause().hasMessageContaining("Connection refused");
+		assertThat(output).contains("Retry: count=");
 	}
 
 	@SpringBootConfiguration

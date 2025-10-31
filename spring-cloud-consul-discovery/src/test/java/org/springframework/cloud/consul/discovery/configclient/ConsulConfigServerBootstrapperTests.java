@@ -108,8 +108,7 @@ public class ConsulConfigServerBootstrapperTests {
 					.get(ConfigServerInstanceProvider.Function.class);
 				assertThatThrownBy(() -> providerFn.apply("id", event.getBootstrapContext().get(Binder.class),
 						event.getBootstrapContext().get(BindHandler.class), mock(Log.class)))
-					.isInstanceOf(IllegalArgumentException.class)
-					.hasMessageContaining("org.apache.http.conn.HttpHostConnectException: Connect to localhost:8500")
+					.hasMessageContaining("Connection refused")
 					.as("Should have tried to reach out to Consul to get config server instance")
 					.isNotNull();
 			}))
