@@ -64,15 +64,15 @@ public interface ConsulClient {
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken, QueryParams queryParams);
 
 	@PutExchange("/v1/agent/check/fail/{checkId}")
-	ResponseEntity<Void> agentCheckFail(String checkId, @RequestParam(required = false) String note,
+	ResponseEntity<Void> agentCheckFail(@PathVariable String checkId, @RequestParam(required = false) String note,
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
 	@PutExchange("/v1/agent/check/pass/{checkId}")
-	ResponseEntity<Void> agentCheckPass(String checkId, @RequestParam(required = false) String note,
+	ResponseEntity<Void> agentCheckPass(@PathVariable String checkId, @RequestParam(required = false) String note,
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
 	@PutExchange("/v1/agent/check/warn/{checkId}")
-	ResponseEntity<Void> agentCheckWarn(String checkId, @RequestParam(required = false) String note,
+	ResponseEntity<Void> agentCheckWarn(@PathVariable String checkId, @RequestParam(required = false) String note,
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
 	@GetExchange("/v1/agent/services")
@@ -142,6 +142,11 @@ public interface ConsulClient {
 
 	class QueryParams {
 
+		/**
+		 * Default QueryParams to use. Passing null results in an exception.
+		 */
+		public static final QueryParams DEFAULT = new QueryParams();
+
 		private final String datacenter;
 
 		private final ConsistencyMode consistencyMode;
@@ -152,17 +157,8 @@ public interface ConsulClient {
 
 		private final String near;
 
-		private QueryParams(String datacenter, ConsistencyMode consistencyMode, long waitTime, long index,
-				String near) {
-			this.datacenter = datacenter;
-			this.consistencyMode = consistencyMode;
-			this.waitTime = waitTime;
-			this.index = index;
-			this.near = near;
-		}
-
-		private QueryParams(String datacenter, ConsistencyMode consistencyMode, long waitTime, long index) {
-			this(datacenter, consistencyMode, waitTime, index, null);
+		public QueryParams() {
+			this(null, ConsistencyMode.DEFAULT, -1, -1);
 		}
 
 		public QueryParams(String datacenter) {
@@ -183,6 +179,19 @@ public interface ConsulClient {
 
 		public QueryParams(String datacenter, long waitTime, long index) {
 			this(datacenter, ConsistencyMode.DEFAULT, waitTime, index, null);
+		}
+
+		private QueryParams(String datacenter, ConsistencyMode consistencyMode, long waitTime, long index) {
+			this(datacenter, consistencyMode, waitTime, index, null);
+		}
+
+		private QueryParams(String datacenter, ConsistencyMode consistencyMode, long waitTime, long index,
+				String near) {
+			this.datacenter = datacenter;
+			this.consistencyMode = consistencyMode;
+			this.waitTime = waitTime;
+			this.index = index;
+			this.near = near;
 		}
 
 		public String getDatacenter() {
