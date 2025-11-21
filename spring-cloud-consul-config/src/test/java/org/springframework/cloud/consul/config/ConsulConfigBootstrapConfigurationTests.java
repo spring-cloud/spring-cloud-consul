@@ -66,7 +66,7 @@ public class ConsulConfigBootstrapConfigurationTests {
 	/**
 	 * Test config that simulates a "user provided bean".
 	 */
-	private static class TestConfig {
+	private static final class TestConfig {
 
 		@Bean
 		public ConsulConfigProperties consulConfigProperties() {
