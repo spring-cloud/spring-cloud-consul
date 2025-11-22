@@ -23,6 +23,7 @@ import org.springframework.boot.web.server.context.WebServerInitializedEvent;
 import org.springframework.cloud.client.serviceregistry.AbstractAutoServiceRegistration;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
@@ -40,8 +41,8 @@ public class ConsulAutoServiceRegistration extends AbstractAutoServiceRegistrati
 
 	public ConsulAutoServiceRegistration(ConsulServiceRegistry serviceRegistry,
 			AutoServiceRegistrationProperties autoServiceRegistrationProperties, ConsulDiscoveryProperties properties,
-			ConsulAutoRegistration registration) {
-		super(serviceRegistry, autoServiceRegistrationProperties);
+			ConsulAutoRegistration registration, ApplicationContext applicationContext) {
+		super(applicationContext, serviceRegistry, autoServiceRegistrationProperties);
 		this.properties = properties;
 		this.registration = registration;
 	}

@@ -28,6 +28,7 @@ import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationP
 import org.springframework.cloud.consul.ConsulAutoConfiguration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.test.ConsulTestcontainers;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -68,9 +69,10 @@ public class ConsulAutoServiceRegistrationCustomizedTests {
 		@Bean
 		public CustomAutoRegistration consulAutoServiceRegistration(ConsulServiceRegistry serviceRegistry,
 				AutoServiceRegistrationProperties autoServiceRegistrationProperties,
-				ConsulDiscoveryProperties properties, ConsulAutoRegistration registration) {
+				ConsulDiscoveryProperties properties, ConsulAutoRegistration registration,
+				ApplicationContext applicationContext) {
 			return new CustomAutoRegistration(serviceRegistry, autoServiceRegistrationProperties, properties,
-					registration);
+					registration, applicationContext);
 		}
 
 	}
@@ -80,8 +82,9 @@ public class ConsulAutoServiceRegistrationCustomizedTests {
 		@Autowired
 		public CustomAutoRegistration(ConsulServiceRegistry serviceRegistry,
 				AutoServiceRegistrationProperties autoServiceRegistrationProperties,
-				ConsulDiscoveryProperties properties, ConsulAutoRegistration registration) {
-			super(serviceRegistry, autoServiceRegistrationProperties, properties, registration);
+				ConsulDiscoveryProperties properties, ConsulAutoRegistration registration,
+				ApplicationContext applicationContext) {
+			super(serviceRegistry, autoServiceRegistrationProperties, properties, registration, applicationContext);
 		}
 
 		@Override

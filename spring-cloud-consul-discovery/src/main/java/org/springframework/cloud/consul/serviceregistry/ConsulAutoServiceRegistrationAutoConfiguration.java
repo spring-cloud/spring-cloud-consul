@@ -56,9 +56,9 @@ public class ConsulAutoServiceRegistrationAutoConfiguration {
 	@ConditionalOnMissingBean
 	public ConsulAutoServiceRegistration consulAutoServiceRegistration(ConsulServiceRegistry registry,
 			AutoServiceRegistrationProperties autoServiceRegistrationProperties, ConsulDiscoveryProperties properties,
-			ConsulAutoRegistration consulRegistration) {
+			ConsulAutoRegistration consulRegistration, ApplicationContext applicationContext) {
 		return new ConsulAutoServiceRegistration(registry, autoServiceRegistrationProperties, properties,
-				consulRegistration);
+				consulRegistration, applicationContext);
 	}
 
 	@Bean
