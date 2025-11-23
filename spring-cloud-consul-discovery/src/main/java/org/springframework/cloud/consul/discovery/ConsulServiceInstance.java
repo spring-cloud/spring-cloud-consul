@@ -21,6 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.cloud.client.DefaultServiceInstance;
 import org.springframework.cloud.consul.model.http.health.HealthService;
 import org.springframework.core.style.ToStringCreator;
@@ -38,16 +40,13 @@ public class ConsulServiceInstance extends DefaultServiceInstance {
 		this.healthService = healthService;
 	}
 
-	public ConsulServiceInstance(String instanceId, String serviceId, String host, int port, boolean secure,
+	public ConsulServiceInstance(@Nullable String instanceId, String serviceId, String host, int port, boolean secure,
 			Map<String, String> metadata, List<String> tags) {
 		super(instanceId, serviceId, host, port, secure, metadata);
 	}
 
-	public ConsulServiceInstance(String instanceId, String serviceId, String host, int port, boolean secure) {
+	public ConsulServiceInstance(@Nullable String instanceId, String serviceId, String host, int port, boolean secure) {
 		super(instanceId, serviceId, host, port, secure);
-	}
-
-	public ConsulServiceInstance() {
 	}
 
 	private static Map<String, String> getMetadata(HealthService healthService) {

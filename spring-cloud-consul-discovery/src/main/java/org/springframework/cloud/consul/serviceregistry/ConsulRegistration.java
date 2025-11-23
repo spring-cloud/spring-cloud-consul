@@ -19,7 +19,7 @@ package org.springframework.cloud.consul.serviceregistry;
 import java.net.URI;
 import java.util.Map;
 
-import org.springframework.cloud.client.DefaultServiceInstance;
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.model.http.agent.NewService;
@@ -71,7 +71,7 @@ public class ConsulRegistration implements Registration {
 
 	@Override
 	public URI getUri() {
-		return DefaultServiceInstance.getUri(this);
+		return ServiceInstance.createUri(this);
 	}
 
 	@Override
