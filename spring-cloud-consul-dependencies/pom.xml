@@ -64,17 +64,6 @@
 				<artifactId>spring-cloud-starter-consul-all</artifactId>
 				<version>${project.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>com.ecwid.consul</groupId>
-				<artifactId>consul-api</artifactId>
-				<version>${consul-api.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>javax.servlet</groupId>
-						<artifactId>servlet-api</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<profiles>
