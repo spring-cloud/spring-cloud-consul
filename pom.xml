@@ -166,6 +166,12 @@
 			</dependency>
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-deployer-spi</artifactId>
+				<version>${spring-cloud-deployer.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-stream-binder-test</artifactId>
 				<version>${spring-cloud-stream.version}</version>
 				<scope>test</scope>
