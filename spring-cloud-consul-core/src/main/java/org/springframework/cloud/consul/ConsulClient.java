@@ -80,7 +80,7 @@ public interface ConsulClient {
 
 	@PutExchange("/v1/agent/service/deregister/{serviceId}")
 	ResponseEntity<Void> agentServiceDeregister(@PathVariable String serviceId,
-			@RequestHeader(name = ACL_TOKEN_HEADER) String aclToken);
+			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
 	@PutExchange("/v1/agent/service/register")
 	ResponseEntity<Void> agentServiceRegister(@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken,
@@ -89,7 +89,7 @@ public interface ConsulClient {
 	@PutExchange("/v1/agent/service/maintenance/{serviceId}")
 	ResponseEntity<Void> agentServiceSetMaintenance(@PathVariable String serviceId,
 			@RequestParam(required = false) Boolean enable, @RequestParam(required = false) String reason,
-			@RequestHeader(name = ACL_TOKEN_HEADER) String aclToken);
+			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
 	@GetExchange("/v1/catalog/service/{serviceId}")
 	ResponseEntity<List<CatalogService>> getCatalogService(@PathVariable String serviceId);
