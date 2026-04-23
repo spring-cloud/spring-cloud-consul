@@ -119,6 +119,9 @@ public class ConsulPropertySources {
 
 	public ConsulPropertySource createPropertySource(String propertySourceContext, ConsulClient consul,
 			BiConsumer<String, Long> indexConsumer) {
+		if (propertySourceContext.startsWith("/")) {
+			propertySourceContext = propertySourceContext.substring(1);
+		}
 		try {
 			ConsulPropertySource propertySource = null;
 
