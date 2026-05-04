@@ -100,16 +100,14 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 		if (status.equalsIgnoreCase(OUT_OF_SERVICE.getCode())) {
 			ResponseEntity<Void> response = this.client.agentServiceSetMaintenance(registration.getInstanceId(), true,
 					null, this.properties.getAclToken());
-			log.debug(LogMessage.format(
-					"Set status for service with consul: %s, status %s, response %s" + registration.getInstanceId(),
-					status, response));
+			log.debug(LogMessage.format("Set status for service with consul: %s, status %s, response %s",
+					registration.getInstanceId(), status, response));
 		}
 		else if (status.equalsIgnoreCase(UP.getCode())) {
 			ResponseEntity<Void> response = this.client.agentServiceSetMaintenance(registration.getInstanceId(), false,
 					null, this.properties.getAclToken());
-			log.debug(LogMessage.format(
-					"Set status for service with consul: %s, status %s, response %s" + registration.getInstanceId(),
-					status, response));
+			log.debug(LogMessage.format("Set status for service with consul: %s, status %s, response %s",
+					registration.getInstanceId(), status, response));
 		}
 		else {
 			throw new IllegalArgumentException("Unknown status: " + status);
