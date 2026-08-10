@@ -34,6 +34,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import org.springframework.cloud.consul.model.http.event.Event;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -148,6 +149,37 @@ class ConsulClientIntegrationTests {
 		assertThat(value.getKey()).isEqualTo("zip");
 		assertThat(value.getValue()).isEqualTo("dGVzdA==");
 		assertThat(value.getDecodedValue()).isEqualTo("test");
+	}
+
+	@Test
+	void eventListWithWaitTimeAndIndex() {
+
+		mockServerClient.when(request().withMethod("GET").withPath("/v1/events"))
+			.respond(response().withStatusCode(200)
+				.withHeaders(new Header("Content-Type", "application/json"))
+				.withBody(json("[\n" + "  {\n" + "    \"ID\": \"5548d61d-9e97-8e0e-e2b3-1f5f0af5b1a2\",\n"
+						+ "    \"Name\": \"deploy\",\n" + "    \"Payload\": \"MTYwOTAwMzMxOA==\",\n"
+						+ "    \"NodeFilter\": \"\",\n" + "    \"ServiceFilter\": \"\",\n"
+						+ "    \"TagFilter\": \"\",\n" + "    \"Version\": 1,\n" + "    \"LTime\": 19\n" + "  }\n"
+						+ "]\n")));
+
+		ResponseEntity<List<Event>> response = client.eventList(5L, 2);
+
+		mockServerClient.verify(
+				request().withMethod("GET")
+					.withPath("/v1/events")
+					.withQueryStringParameters(Parameter.param("wait", "5s"), Parameter.param("index", "2")),
+				VerificationTimes.exactly(1));
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.hasBody()).isTrue();
+
+		List<Event> events = response.getBody();
+
+		assertThat(events).hasSize(1);
+		Event event = events.get(0);
+		assertThat(event.getId()).isEqualTo("5548d61d-9e97-8e0e-e2b3-1f5f0af5b1a2");
+		assertThat(event.getName()).isEqualTo("deploy");
 	}
 
 	private void verifyRequestSentToConsul(String method, String path, int times) {

@@ -98,7 +98,7 @@ public class EventService {
 		if (this.properties != null) {
 			eventTimeout = this.properties.getEventTimeout();
 		}
-		ResponseEntity<List<Event>> watch = this.consul.eventList(eventTimeout, index);
+		ResponseEntity<List<Event>> watch = this.consul.eventList((long) eventTimeout, index);
 		return filterEvents(readEvents(watch), lastIndex);
 	}
 

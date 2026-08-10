@@ -135,7 +135,8 @@ public interface ConsulClient {
 	ResponseEntity<List<Event>> eventList();
 
 	@GetExchange("/v1/events")
-	ResponseEntity<List<Event>> eventList(int eventTimeout, long index);
+	ResponseEntity<List<Event>> eventList(@RequestParam("wait") @WaitTimeFormat Long eventTimeout,
+			@RequestParam("index") long index);
 
 	@PostExchange("/v1/event/fire/{name}")
 	ResponseEntity<Event> eventFire(@PathVariable String name, @RequestBody String payload);
