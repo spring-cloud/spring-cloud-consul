@@ -24,7 +24,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
-import java.util.Collections;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
@@ -241,9 +240,8 @@ public class ConsulAutoConfiguration {
 					builder.addRequestParameter("dc", params.getDatacenter());
 				}
 
-				if (params.getConsistencyMode() != ConsulClient.ConsistencyMode.DEFAULT) {
-					builder.configureRequestParams(
-							map -> map.put(params.getConsistencyMode().getParamName(), Collections.emptyList()));
+				if (params.getConsistencyMode() != null && params.getConsistencyMode() != ConsulClient.ConsistencyMode.DEFAULT) {
+					builder.addRequestParameter(params.getConsistencyMode().getParamName(), "true");
 				}
 
 				if (params.getWaitTime() != -1) {
