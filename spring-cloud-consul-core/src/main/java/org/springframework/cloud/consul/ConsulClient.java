@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.springframework.cloud.consul.model.http.agent.NewService;
 import org.springframework.cloud.consul.model.http.agent.Service;
+import org.springframework.cloud.consul.model.http.catalog.CatalogDeregistration;
+import org.springframework.cloud.consul.model.http.catalog.CatalogRegistration;
 import org.springframework.cloud.consul.model.http.catalog.CatalogService;
 import org.springframework.cloud.consul.model.http.catalog.Node;
 import org.springframework.cloud.consul.model.http.event.Event;
@@ -96,6 +98,16 @@ public interface ConsulClient {
 
 	@GetExchange("/v1/catalog/nodes")
 	ResponseEntity<List<Node>> getCatalogNodes();
+
+	@PutExchange("/v1/catalog/register")
+	ResponseEntity<Void> catalogServiceRegister(
+			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken,
+			@RequestBody CatalogRegistration registration);
+
+	@PutExchange("/v1/catalog/deregister")
+	ResponseEntity<Void> catalogServiceDeregister(
+			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken,
+			@RequestBody CatalogDeregistration deregistration);
 
 	@GetExchange("/v1/health/checks/{serviceName}")
 	ResponseEntity<List<Check>> getHealthChecksForService(@PathVariable String serviceName);
