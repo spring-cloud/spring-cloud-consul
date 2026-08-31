@@ -59,15 +59,19 @@ spring:
     consul:
       config:
         enabled: true
-        prefix: configuration
+        prefixes:
+          - configuration
         defaultContext: apps
         profileSeparator: '::'
 ----
 
+A comma-separated string also works: `spring.cloud.consul.config.prefixes=configuration,shared`.
+
 CAUTION: If you have set `spring.cloud.bootstrap.enabled=true` or `spring.config.use-legacy-processing=true`, or included `spring-cloud-starter-bootstrap`, then the above values will need to be placed in `bootstrap.yml` instead of `application.yml`.
 
 * `enabled` setting this value to "false" disables Consul Config
-* `prefix` sets the base folder for configuration values
+* `prefixes` sets one or more base folders for configuration values (YAML list or comma-separated string). The default is a single folder, `config`. Automatic contexts are generated for each prefix.
+* `prefix` is a deprecated alias for a single prefix. It still works and maps to a one-element `prefixes` list. An empty `prefix` (`prefix:`) keeps keys under `name` / `defaultContext` with no extra folder. An empty `prefixes` list generates no automatic contexts.
 * `defaultContext` sets the folder name used by all applications
 * `profileSeparator` sets the value of the separator used to separate the profile name in property sources with profiles
 
