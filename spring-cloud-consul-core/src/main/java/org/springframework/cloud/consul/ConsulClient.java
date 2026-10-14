@@ -108,6 +108,12 @@ public interface ConsulClient {
 			@RequestParam boolean passing, @RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken,
 			@RequestParam(required = false) List<String> tag, QueryParams queryParams);
 
+	@GetExchange("/v1/health/service/{serviceName}")
+	ResponseEntity<List<HealthService>> getHealthServices(@PathVariable String serviceName,
+			@RequestParam boolean passing, @RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken,
+			@RequestParam(required = false) List<String> tag, QueryParams queryParams,
+			@RequestParam(required = false) Boolean cached);
+
 	@DeleteExchange("/v1/kv/{context}")
 	ResponseEntity<Void> deleteKVValues(@PathVariable String context);
 
@@ -191,12 +197,11 @@ public interface ConsulClient {
 			this(datacenter, ConsistencyMode.DEFAULT, waitTime, index, null);
 		}
 
-		private QueryParams(String datacenter, ConsistencyMode consistencyMode, long waitTime, long index) {
+		public QueryParams(String datacenter, ConsistencyMode consistencyMode, long waitTime, long index) {
 			this(datacenter, consistencyMode, waitTime, index, null);
 		}
 
-		private QueryParams(String datacenter, ConsistencyMode consistencyMode, long waitTime, long index,
-				String near) {
+		public QueryParams(String datacenter, ConsistencyMode consistencyMode, long waitTime, long index, String near) {
 			this.datacenter = datacenter;
 			this.consistencyMode = consistencyMode;
 			this.waitTime = waitTime;
