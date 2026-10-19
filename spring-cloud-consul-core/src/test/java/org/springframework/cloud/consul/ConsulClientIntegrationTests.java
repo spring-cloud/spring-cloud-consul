@@ -35,6 +35,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import org.springframework.cloud.consul.model.http.event.Event;
+import org.springframework.cloud.consul.model.http.health.HealthService;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -149,6 +150,46 @@ class ConsulClientIntegrationTests {
 		assertThat(value.getKey()).isEqualTo("zip");
 		assertThat(value.getValue()).isEqualTo("dGVzdA==");
 		assertThat(value.getDecodedValue()).isEqualTo("test");
+	}
+
+	@Test
+	void getHealthServiceWithCached() {
+
+		mockServerClient.when(request().withMethod("GET").withPath("/v1/health/service/testservice"))
+			.respond(response().withStatusCode(200));
+		ResponseEntity<List<HealthService>> response = client.getHealthServices("testservice", true, "token12345",
+				List.of("tag1", "tag2"),
+				new ConsulClient.QueryParams(null, ConsulClient.ConsistencyMode.STALE, 3, 12345), true);
+
+		mockServerClient.verify(request().withMethod("GET")
+			.withPath("/v1/health/service/testservice")
+			.withHeader(Header.header("X-Consul-Token", "token12345"))
+			.withQueryStringParameter("tag", "tag1", "tag2")
+			.withQueryStringParameter("passing", "true")
+			.withQueryStringParameter("stale", "true")
+			.withQueryStringParameter("wait", "3s")
+			.withQueryStringParameter("index", "12345")
+			.withQueryStringParameter("cached", "true"), VerificationTimes.exactly(1));
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	@Test
+	void getHealthServiceWithoutCached() {
+
+		mockServerClient.when(request().withMethod("GET").withPath("/v1/health/service/testservice"))
+			.respond(response().withStatusCode(200));
+		ResponseEntity<List<HealthService>> response = client.getHealthServices("testservice", true, "token12345",
+			List.of("tag1", "tag2"),
+			new ConsulClient.QueryParams(null, null, 3, 12345), null);
+
+		mockServerClient.verify(request().withMethod("GET")
+			.withPath("/v1/health/service/testservice")
+			.withHeader(Header.header("X-Consul-Token", "token12345"))
+			.withQueryStringParameter("tag", "tag1", "tag2")
+			.withQueryStringParameter("passing", "true")
+			.withQueryStringParameter("wait", "3s")
+			.withQueryStringParameter("index", "12345"), VerificationTimes.exactly(1));
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
 	@Test
