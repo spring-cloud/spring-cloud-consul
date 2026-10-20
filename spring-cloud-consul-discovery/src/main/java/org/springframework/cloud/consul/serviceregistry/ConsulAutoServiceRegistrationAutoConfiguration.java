@@ -28,7 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationConfiguration;
+import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationAutoConfiguration;
 import org.springframework.cloud.client.serviceregistry.AutoServiceRegistrationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
@@ -46,7 +46,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnMissingBean(type = "org.springframework.cloud.consul.discovery.ConsulLifecycle")
 @ConditionalOnConsulEnabled
 @Conditional(ConsulAutoServiceRegistrationAutoConfiguration.OnConsulRegistrationEnabledCondition.class)
-@AutoConfigureAfter({ AutoServiceRegistrationConfiguration.class, ConsulServiceRegistryAutoConfiguration.class })
+@AutoConfigureAfter({ AutoServiceRegistrationAutoConfiguration.class, ConsulServiceRegistryAutoConfiguration.class })
 public class ConsulAutoServiceRegistrationAutoConfiguration {
 
 	@Autowired
