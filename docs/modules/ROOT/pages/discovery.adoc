@@ -52,6 +52,21 @@ To disable the Consul Discovery Client you can set `spring.cloud.consul.discover
 
 To disable the service registration you can set `spring.cloud.consul.discovery.register` to `false`.
 
+[[using-zuul-with-consul]]
+== Using Zuul with Consul
+
+When using Spring Cloud Netflix Zuul with Consul service discovery, Zuul may automatically create routes for discovered services, including the Consul service itself.
+
+To exclude the `consul` service from Zuul's automatically created routes, configure the `zuul.ignoredServices` property:
+
+.application.yml
+----
+zuul:
+  ignoredServices: consul
+----
+
+This configuration prevents Zuul from automatically creating a route for the `consul` service. It does not disable Consul service discovery or service registration.
+
 [[registering-management-as-a-separate-service]]
 === Registering Management as a Separate Service
 
