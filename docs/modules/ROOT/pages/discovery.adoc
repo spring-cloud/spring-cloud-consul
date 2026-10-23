@@ -48,6 +48,33 @@ CAUTION: If you use xref:config.adoc[Spring Cloud Consul Config], and you have s
 
 The default service name, instance id and port, taken from the `Environment`, are `${spring.application.name}`, the Spring Context ID and `${server.port}` respectively.
 
+=== Configuring the Service Hostname and IP Address
+
+By default, Spring Cloud Consul determines the hostname and IP address of the local service instance. You can customize these values using the `spring.cloud.consul.discovery.hostname` and `spring.cloud.consul.discovery.ip-address` properties.
+
+For example, to register a service using a custom hostname:
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        hostname: my-service-host
+----
+
+To use a specific IP address instead of the hostname, configure `spring.cloud.consul.discovery.ip-address` and set `spring.cloud.consul.discovery.prefer-ip-address` to `true`.
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        ip-address: 192.168.1.100
+        prefer-ip-address: true
+----
+
 To disable the Consul Discovery Client you can set `spring.cloud.consul.discovery.enabled` to `false`. Consul Discovery Client will also be disabled when `spring.cloud.discovery.enabled` is set to `false`.
 
 To disable the service registration you can set `spring.cloud.consul.discovery.register` to `false`.
