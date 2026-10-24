@@ -150,16 +150,23 @@ public class ConsulAutoConfiguration {
 						LOGGER.error(new String(body, StandardCharsets.UTF_8));
 					}
 
-					if (response.getStatusCode().is4xxClientError()) {
-						throw new org.springframework.web.client.HttpClientErrorException(response.getStatusCode(),
+					String path = request.getURI().getPath();
+					boolean heartbeatRequest = path.matches(".*/v1/agent/check/(pass|warn|fail)/[^/]+/?");
+
+					if (heartbeatRequest) {
+						if (response.getStatusCode().is4xxClientError()) {
+							throw new org.springframework.web.client.HttpClientErrorException(response.getStatusCode(),
+									response.getStatusText(), response.getHeaders(), body, StandardCharsets.UTF_8);
+						}
+
+						throw new org.springframework.web.client.HttpServerErrorException(response.getStatusCode(),
 								response.getStatusText(), response.getHeaders(), body, StandardCharsets.UTF_8);
 					}
-
-					throw new org.springframework.web.client.HttpServerErrorException(response.getStatusCode(),
-							response.getStatusText(), response.getHeaders(), body, StandardCharsets.UTF_8);
+					// Preserve the original behavior for non-heartbeat requests.
+					// 4xx responses are ignored, and 5xx responses are logged above.
+					return;
 				})
 				.uriBuilderFactory(uriBuilderFactory);
-
 			HttpClientSettings settings = null;
 			if (tlsConfig != null) {
 				KeyStore clientStore = KeyStore.getInstance(tlsConfig.getKeyStoreInstanceType().name());
