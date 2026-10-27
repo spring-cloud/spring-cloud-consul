@@ -62,13 +62,7 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 	public void register(ConsulRegistration reg) {
 		log.info("Registering service with consul: " + reg.getService());
 		try {
-			ResponseEntity<Void> response = this.client.agentServiceRegister(this.properties.getAclToken(),
-					reg.getService());
-			NewService service = reg.getService();
-			if (this.heartbeatProperties.isEnabled() && this.ttlScheduler != null && service.getCheck() != null
-					&& service.getCheck().getTtl() != null) {
-				this.ttlScheduler.add(reg.getService());
-			}
+			this.client.agentServiceRegister(this.properties.getAclToken(), reg.getService());
 		}
 		catch (RuntimeException e) {
 			if (this.properties.isFailFast()) {
@@ -76,6 +70,12 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 				ReflectionUtils.rethrowRuntimeException(e);
 			}
 			log.warn("Failfast is false. Error registering service with consul: " + reg.getService(), e);
+		}
+
+		NewService service = reg.getService();
+		if (this.heartbeatProperties.isEnabled() && this.ttlScheduler != null && service.getCheck() != null
+				&& service.getCheck().getTtl() != null) {
+			this.ttlScheduler.add(service);
 		}
 	}
 

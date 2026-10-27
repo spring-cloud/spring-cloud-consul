@@ -35,12 +35,15 @@ import org.springframework.cloud.consul.serviceregistry.ApplicationStatusProvide
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -215,6 +218,22 @@ public class ConsulHeartbeatTaskTests {
 				StandardCharsets.UTF_8);
 		given(consulClient.agentCheckPass("service:" + serviceId, null, null)).willThrow(operationException);
 		assertThatThrownBy(consulHeartbeatTask::run).isSameAs(operationException);
+	}
+
+	@Test
+	public void connectionFailureDoesNotPreventSubsequentHeartbeatAttempts() {
+		TtlScheduler ttlScheduler = new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient,
+				ReregistrationPredicate.DEFAULT, applicationStatusProviders);
+		ConsulHeartbeatTask consulHeartbeatTask = new ConsulHeartbeatTask(serviceId, ttlScheduler,
+				() -> Check.CheckStatus.PASSING);
+
+		given(consulClient.agentCheckPass("service:" + serviceId, null, null))
+			.willThrow(new ResourceAccessException("Consul is unavailable"));
+
+		assertThatCode(consulHeartbeatTask::run).doesNotThrowAnyException();
+		assertThatCode(consulHeartbeatTask::run).doesNotThrowAnyException();
+
+		verify(consulClient, times(2)).agentCheckPass("service:" + serviceId, null, null);
 	}
 
 }
