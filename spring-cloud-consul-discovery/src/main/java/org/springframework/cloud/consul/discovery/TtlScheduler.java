@@ -34,6 +34,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
 
 /**
  * Created by nicu on 11.03.2015.
@@ -157,7 +158,8 @@ public class TtlScheduler {
 			}
 			catch (ResourceAccessException e) {
 				log.warn("Unable to send heartbeat to Consul for service " + this.serviceId
-						+ ". Will retry on the next heartbeat.", e);
+						+ ". Will retry on the next heartbeat.");
+				log.debug("Consul heartbeat failed for service " + this.serviceId + ": " + e);
 			}
 			catch (HttpStatusCodeException e) {
 				if (this.ttlScheduler.heartbeatProperties.isReregisterServiceOnFailure()
@@ -172,9 +174,11 @@ public class TtlScheduler {
 							this.ttlScheduler.client.agentServiceRegister(
 									this.ttlScheduler.discoveryProperties.getAclToken(), registeredService);
 						}
-						catch (ResourceAccessException registrationException) {
+						catch (RestClientException registrationException) {
 							log.warn("Unable to re-register service " + this.serviceId
-									+ " with Consul. Will retry on the next heartbeat.", registrationException);
+									+ " with Consul. Will retry on the next heartbeat.");
+							log.debug("Consul service re-registration failed for service " + this.serviceId + ": "
+									+ registrationException);
 						}
 					}
 					else {

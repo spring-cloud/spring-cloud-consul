@@ -36,11 +36,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -234,6 +236,31 @@ public class ConsulHeartbeatTaskTests {
 		assertThatCode(consulHeartbeatTask::run).doesNotThrowAnyException();
 
 		verify(consulClient, times(2)).agentCheckPass("service:" + serviceId, null, null);
+	}
+
+	@Test
+	public void reRegistrationFailureDoesNotPreventSubsequentHeartbeatAttempts() {
+		TtlScheduler ttlScheduler = new TtlScheduler(heartbeatProperties, discoveryProperties, consulClient,
+				ReregistrationPredicate.DEFAULT, applicationStatusProviders);
+		ConsulHeartbeatTask consulHeartbeatTask = new ConsulHeartbeatTask(serviceId, ttlScheduler,
+				() -> Check.CheckStatus.PASSING);
+		heartbeatProperties.setReregisterServiceOnFailure(true);
+
+		NewService service = new NewService();
+		service.setId(serviceId);
+		ttlScheduler.add(service);
+
+		given(consulClient.agentCheckPass("service:" + serviceId, null, null))
+			.willThrow(new HttpServerErrorException(HttpStatus.SERVICE_UNAVAILABLE));
+
+		given(consulClient.agentServiceRegister(null, service))
+			.willThrow(new RestClientException("Consul is unavailable"));
+
+		assertThatCode(consulHeartbeatTask::run).doesNotThrowAnyException();
+		assertThatCode(consulHeartbeatTask::run).doesNotThrowAnyException();
+
+		verify(consulClient, atLeast(2)).agentCheckPass("service:" + serviceId, null, null);
+		verify(consulClient, atLeast(2)).agentServiceRegister(null, service);
 	}
 
 }
