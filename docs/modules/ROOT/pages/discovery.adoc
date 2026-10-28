@@ -234,6 +234,10 @@ spring:
           enabled: true
           ttl: 10s
 ----
+Service re-registration after a heartbeat failure is disabled by default. To enable it, set
+`spring.cloud.consul.discovery.heartbeat.reregister-service-on-failure` to `true`.
+This option allows Spring Cloud Consul to attempt to re-register the service when a
+heartbeat failure meets the configured re-registration criteria.
 
 [[ttl-application-status]]
 ==== TTL Application Status

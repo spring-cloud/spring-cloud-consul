@@ -33,6 +33,8 @@ import org.springframework.cloud.consul.serviceregistry.ApplicationStatusProvide
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientException;
 
 /**
  * Created by nicu on 11.03.2015.
@@ -154,6 +156,11 @@ public class TtlScheduler {
 			try {
 				consulClientCall.run();
 			}
+			catch (ResourceAccessException e) {
+				log.warn("Unable to send heartbeat to Consul for service " + this.serviceId
+						+ ". Will retry on the next heartbeat. Reason: " + e.getMessage());
+				log.debug("Consul heartbeat failed for service " + this.serviceId, e);
+			}
 			catch (HttpStatusCodeException e) {
 				if (this.ttlScheduler.heartbeatProperties.isReregisterServiceOnFailure()
 						&& this.ttlScheduler.reregistrationPredicate.isEligible(e)) {
@@ -163,8 +170,17 @@ public class TtlScheduler {
 						if (log.isInfoEnabled()) {
 							log.info("Re-register " + registeredService);
 						}
-						this.ttlScheduler.client.agentServiceRegister(
-								this.ttlScheduler.discoveryProperties.getAclToken(), registeredService);
+						try {
+							this.ttlScheduler.client.agentServiceRegister(
+									this.ttlScheduler.discoveryProperties.getAclToken(), registeredService);
+						}
+						catch (RestClientException registrationException) {
+							log.warn("Unable to re-register service " + this.serviceId
+									+ " with Consul. Will retry on the next heartbeat. Reason: "
+									+ registrationException.getMessage());
+							log.debug("Consul service re-registration failed for service " + this.serviceId,
+									registrationException);
+						}
 					}
 					else {
 						log.warn("The service to re-register is not found.");
