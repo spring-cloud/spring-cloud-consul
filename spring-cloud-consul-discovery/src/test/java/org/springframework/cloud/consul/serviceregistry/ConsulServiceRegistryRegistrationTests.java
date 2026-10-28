@@ -62,4 +62,36 @@ class ConsulServiceRegistryRegistrationTests {
 		verify(ttlScheduler).add(service);
 	}
 
+	@Test
+	void doesNotScheduleHeartbeatWhenInitialRegistrationFailsAndFailFastIsEnabled() {
+		ConsulClient consulClient = mock(ConsulClient.class);
+		ConsulDiscoveryProperties discoveryProperties = mock(ConsulDiscoveryProperties.class);
+		HeartbeatProperties heartbeatProperties = new HeartbeatProperties();
+		heartbeatProperties.setEnabled(true);
+		TtlScheduler ttlScheduler = mock(TtlScheduler.class);
+
+		given(discoveryProperties.isFailFast()).willReturn(true);
+
+		ConsulServiceRegistry serviceRegistry = new ConsulServiceRegistry(consulClient, discoveryProperties,
+				ttlScheduler, heartbeatProperties);
+
+		NewService service = new NewService();
+		service.setId("test-service");
+		service.setName("test-service");
+
+		NewService.Check check = new NewService.Check();
+		check.setTtl("10s");
+		service.setCheck(check);
+
+		ConsulRegistration registration = new ConsulRegistration(service, discoveryProperties);
+
+		given(consulClient.agentServiceRegister(discoveryProperties.getAclToken(), service))
+			.willThrow(new IllegalStateException("Consul is unavailable"));
+
+		assertThatCode(() -> serviceRegistry.register(registration)).isInstanceOf(IllegalStateException.class)
+			.hasMessage("Consul is unavailable");
+
+		verify(ttlScheduler, org.mockito.Mockito.never()).add(service);
+	}
+
 }

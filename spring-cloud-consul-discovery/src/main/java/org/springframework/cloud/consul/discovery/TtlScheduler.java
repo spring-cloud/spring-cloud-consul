@@ -158,8 +158,8 @@ public class TtlScheduler {
 			}
 			catch (ResourceAccessException e) {
 				log.warn("Unable to send heartbeat to Consul for service " + this.serviceId
-						+ ". Will retry on the next heartbeat.");
-				log.debug("Consul heartbeat failed for service " + this.serviceId + ": " + e);
+						+ ". Will retry on the next heartbeat. Reason: " + e.getMessage());
+				log.debug("Consul heartbeat failed for service " + this.serviceId, e);
 			}
 			catch (HttpStatusCodeException e) {
 				if (this.ttlScheduler.heartbeatProperties.isReregisterServiceOnFailure()
@@ -176,9 +176,10 @@ public class TtlScheduler {
 						}
 						catch (RestClientException registrationException) {
 							log.warn("Unable to re-register service " + this.serviceId
-									+ " with Consul. Will retry on the next heartbeat.");
-							log.debug("Consul service re-registration failed for service " + this.serviceId + ": "
-									+ registrationException);
+									+ " with Consul. Will retry on the next heartbeat. Reason: "
+									+ registrationException.getMessage());
+							log.debug("Consul service re-registration failed for service " + this.serviceId,
+									registrationException);
 						}
 					}
 					else {
