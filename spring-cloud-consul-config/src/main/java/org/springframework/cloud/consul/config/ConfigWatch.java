@@ -28,6 +28,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulClient.QueryParams;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
@@ -157,7 +158,8 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 				}
 
 				ResponseEntity<List<GetValue>> response = this.consul.getKVValues(context, aclToken,
-						(long) properties.getWatch().getWaitTime(), currentIndex);
+						new QueryParams(this.properties.getConsistencyMode(),
+								(long) this.properties.getWatch().getWaitTime(), currentIndex));
 
 				// if response.value == null, response was a 404, otherwise it was a
 				// 200, reducing churn if there wasn't anything
