@@ -71,12 +71,20 @@ class ConsulReactiveDiscoveryClientTests {
 	}
 
 	@Test
-	public void shouldReturnEmptyFluxOfServicesWhenConsulFails() {
+	public void shouldPropagateErrorFromServicesWhenConsulFails() {
 		Flux<String> services = client.getServices();
 		when(consulClient.getCatalogServices(any(), any()))
 			.thenThrow(new RuntimeException("Possible runtime exception"));
-		StepVerifier.create(services).expectNextCount(0).expectComplete().verify();
+		StepVerifier.create(services).expectErrorMessage("Possible runtime exception").verify();
 		verify(consulClient).getCatalogServices(any(), any());
+	}
+
+	@Test
+	public void shouldPropagateErrorFromServicesWhenConsulReturnsNoBody() {
+		Flux<String> services = client.getServices();
+		when(consulClient.getCatalogServices(any(), any()))
+			.thenReturn(ResponseEntity.status(500).<Map<String, List<String>>>build());
+		StepVerifier.create(services).expectError(IllegalStateException.class).verify();
 	}
 
 	@Test
@@ -121,15 +129,25 @@ class ConsulReactiveDiscoveryClientTests {
 	}
 
 	@Test
-	public void shouldReturnEmptyFluxWhenConsulFails() {
+	public void shouldPropagateErrorFromInstancesWhenConsulFails() {
 		configureCommonProperties();
 		when(consulClient.getHealthServices(eq("existing-service"), any(boolean.class), any(), any(List.class),
 				any(QueryParams.class)))
 			.thenThrow(new RuntimeException("Possible runtime exception"));
 		Flux<ServiceInstance> instances = client.getInstances("existing-service");
-		StepVerifier.create(instances).expectNextCount(0).expectComplete().verify();
+		StepVerifier.create(instances).expectErrorMessage("Possible runtime exception").verify();
 		verify(consulClient).getHealthServices(eq("existing-service"), any(boolean.class), any(), any(List.class),
 				any(QueryParams.class));
+	}
+
+	@Test
+	public void shouldPropagateErrorFromInstancesWhenConsulReturnsNoBody() {
+		configureCommonProperties();
+		when(consulClient.getHealthServices(eq("existing-service"), any(boolean.class), any(), any(List.class),
+				any(QueryParams.class)))
+			.thenReturn(ResponseEntity.status(500).<List<HealthService>>build());
+		Flux<ServiceInstance> instances = client.getInstances("existing-service");
+		StepVerifier.create(instances).expectError(IllegalStateException.class).verify();
 	}
 
 	@Test

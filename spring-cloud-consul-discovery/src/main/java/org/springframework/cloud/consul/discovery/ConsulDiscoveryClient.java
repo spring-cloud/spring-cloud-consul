@@ -79,18 +79,20 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 		ResponseEntity<List<HealthService>> healthServices = client.getHealthServices(serviceId,
 				properties.isQueryPassing(), properties.getAclToken(), tags, queryParams);
 
-		for (HealthService service : healthServices.getBody()) {
+		List<HealthService> body = healthServices.getBody();
+		if (body == null) {
+			throw new IllegalStateException("Consul did not return instances for service " + serviceId
+					+ " (HTTP status " + healthServices.getStatusCode() + ")");
+		}
+
+		for (HealthService service : body) {
 			instances.add(new ConsulServiceInstance(service, serviceId));
 		}
 	}
 
 	public List<ServiceInstance> getAllInstances() {
 		List<ServiceInstance> instances = new ArrayList<>();
-		Map<String, List<String>> catalogServices = client
-			.getCatalogServices(properties.getAclToken(), QueryParams.DEFAULT)
-			.getBody();
-
-		for (String serviceId : catalogServices.keySet()) {
+		for (String serviceId : getServices()) {
 			addInstancesToList(instances, serviceId, null);
 		}
 		return instances;
@@ -98,9 +100,13 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<String> getServices() {
-		Map<String, List<String>> catalogServices = client
-			.getCatalogServices(properties.getAclToken(), QueryParams.DEFAULT)
-			.getBody();
+		ResponseEntity<Map<String, List<String>>> response = client.getCatalogServices(properties.getAclToken(),
+				QueryParams.DEFAULT);
+		Map<String, List<String>> catalogServices = response.getBody();
+		if (catalogServices == null) {
+			throw new IllegalStateException(
+					"Consul did not return a service catalog (HTTP status " + response.getStatusCode() + ")");
+		}
 		return new ArrayList<>(catalogServices.keySet());
 	}
 
