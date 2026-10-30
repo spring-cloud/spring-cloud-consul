@@ -62,10 +62,9 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 		return Flux.defer(() -> {
 			List<ServiceInstance> instances = blockingClient.getInstances(serviceId);
 			return Flux.fromIterable(instances);
-		}).onErrorResume(exception -> {
-			logger.error("Error getting instances from Consul.", exception);
-			return Flux.empty();
-		}).subscribeOn(Schedulers.boundedElastic());
+		})
+			.doOnError(exception -> logger.error("Error getting instances from Consul.", exception))
+			.subscribeOn(Schedulers.boundedElastic());
 	}
 
 	@Override
@@ -73,10 +72,9 @@ public class ConsulReactiveDiscoveryClient implements ReactiveDiscoveryClient {
 		return Flux.defer(() -> {
 			List<String> services = blockingClient.getServices();
 			return services == null ? Flux.empty() : Flux.fromIterable(services);
-		}).onErrorResume(exception -> {
-			logger.error("Error getting services from Consul.", exception);
-			return Flux.empty();
-		}).subscribeOn(Schedulers.boundedElastic());
+		})
+			.doOnError(exception -> logger.error("Error getting services from Consul.", exception))
+			.subscribeOn(Schedulers.boundedElastic());
 	}
 
 	@Override
