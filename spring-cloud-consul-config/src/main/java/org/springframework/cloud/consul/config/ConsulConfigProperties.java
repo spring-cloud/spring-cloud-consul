@@ -27,6 +27,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
+import org.springframework.cloud.consul.ConsulClient.ConsistencyMode;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
@@ -67,6 +68,12 @@ public class ConsulConfigProperties {
 
 	@Value("${consul.token:${CONSUL_TOKEN:${spring.cloud.consul.token:${SPRING_CLOUD_CONSUL_TOKEN:}}}}")
 	private String aclToken;
+
+	/**
+	 * Consistency mode for Consul KV requests.
+	 */
+	@NotNull
+	private ConsistencyMode consistencyMode = ConsistencyMode.DEFAULT;
 
 	private Watch watch = new Watch();
 
@@ -165,6 +172,14 @@ public class ConsulConfigProperties {
 		this.aclToken = aclToken;
 	}
 
+	public ConsistencyMode getConsistencyMode() {
+		return this.consistencyMode;
+	}
+
+	public void setConsistencyMode(ConsistencyMode consistencyMode) {
+		this.consistencyMode = consistencyMode;
+	}
+
 	public Watch getWatch() {
 		return this.watch;
 	}
@@ -198,6 +213,7 @@ public class ConsulConfigProperties {
 			.append("format", this.format)
 			.append("dataKey", this.dataKey)
 			.append("aclToken", this.aclToken != null ? "******" : null)
+			.append("consistencyMode", this.consistencyMode)
 			.append("watch", this.watch)
 			.append("failFast", this.failFast)
 			.append("name", this.name)
