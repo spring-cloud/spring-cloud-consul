@@ -57,7 +57,8 @@ public class ConsulBinder extends AbstractBinder<MessageChannel, ConsumerPropert
 		Assert.isInstanceOf(SubscribableChannel.class, channel);
 
 		this.logger.debug("Binding Consul client to eventName " + name);
-		ConsulSendingHandler sendingHandler = new ConsulSendingHandler(this.eventService.getConsulClient(), name);
+		ConsulSendingHandler sendingHandler = new ConsulSendingHandler(this.eventService.getConsulClient(), name,
+				this.eventService.getAclToken());
 
 		EventDrivenConsumer consumer = new EventDrivenConsumer((SubscribableChannel) channel, sendingHandler);
 		consumer.setBeanFactory(getBeanFactory());

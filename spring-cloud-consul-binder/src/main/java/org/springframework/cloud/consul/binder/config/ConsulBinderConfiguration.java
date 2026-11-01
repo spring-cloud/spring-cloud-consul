@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.binder.ConsulBinder;
@@ -41,19 +42,16 @@ import org.springframework.context.annotation.Import;
 @Import({ PropertyPlaceholderAutoConfiguration.class })
 @ConditionalOnConsulEnabled
 @ConditionalOnProperty(name = "spring.cloud.consul.binder.enabled", matchIfMissing = true)
-// FIXME: boot 2.0.0 @EnableConfigurationProperties({ConsulBinderProperties.class})
+@EnableConfigurationProperties(ConsulBinderProperties.class)
 public class ConsulBinderConfiguration {
-
-	// @Autowired
-	// private ConsulBinderProperties consulBinderProperties;
 
 	@Autowired(required = false)
 	protected ObjectMapper objectMapper = new ObjectMapper();
 
 	@Bean
 	@ConditionalOnMissingBean
-	public EventService eventService(ConsulClient consulClient) {
-		return new EventService(null/* consulBinderProperties */, consulClient, this.objectMapper);
+	public EventService eventService(ConsulBinderProperties consulBinderProperties, ConsulClient consulClient) {
+		return new EventService(consulBinderProperties, consulClient, this.objectMapper);
 	}
 
 	@Bean

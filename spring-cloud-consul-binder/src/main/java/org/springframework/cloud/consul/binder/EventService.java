@@ -51,6 +51,10 @@ public class EventService {
 		return this.consul;
 	}
 
+	public String getAclToken() {
+		return this.properties != null ? this.properties.getAclToken() : null;
+	}
+
 	@PostConstruct
 	public void init() {
 		setLastIndex(getEventsResponse());
@@ -68,7 +72,7 @@ public class EventService {
 	}
 
 	public Event fire(String name, String payload) {
-		ResponseEntity<Event> response = this.consul.eventFire(name, payload, null);
+		ResponseEntity<Event> response = this.consul.eventFire(name, payload, getAclToken());
 		return response.getBody();
 	}
 
