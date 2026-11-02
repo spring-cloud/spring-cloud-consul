@@ -67,6 +67,9 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER
 @Ignore("update to stream 4.0.0 testing")
 public class ConsulBinderApplicationTests {
 
+	/**
+	 * WireMock rule.
+	 */
 	@Rule
 	public final WireMockRule wireMock = new WireMockRule(18500);
 

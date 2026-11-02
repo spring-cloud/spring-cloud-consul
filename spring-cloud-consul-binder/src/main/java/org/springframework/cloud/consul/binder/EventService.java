@@ -77,7 +77,7 @@ public class EventService {
 	}
 
 	public ResponseEntity<List<Event>> getEventsResponse() {
-		return this.consul.eventList(null, null, null, null, null);
+		return this.consul.eventList(null, null, null, null, getAclToken());
 	}
 
 	public List<Event> getEvents() {
@@ -103,7 +103,7 @@ public class EventService {
 			eventTimeout = this.properties.getEventTimeout();
 		}
 		ResponseEntity<List<Event>> watch = this.consul.eventList((long) eventTimeout, index, null, null, null, null,
-				null);
+				getAclToken());
 		return filterEvents(readEvents(watch), lastIndex);
 	}
 

@@ -93,6 +93,9 @@ public class TestProducer implements ApplicationRunner {
 
 	public static class StubPartitionSelectorStrategy implements PartitionSelectorStrategy {
 
+		/**
+		 * Whether the partition selector was invoked.
+		 */
 		public volatile boolean invoked = false;
 
 		@Override

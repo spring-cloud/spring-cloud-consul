@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.consul.binder;
 
+import java.util.List;
+
 import org.junit.Test;
 import tools.jackson.databind.ObjectMapper;
 
@@ -46,6 +48,37 @@ public class EventServiceTests {
 
 		assertThat(result).isSameAs(event);
 		verify(consul).eventFire("test-event", "test-payload", "test-acl-token");
+	}
+
+	@Test
+	public void getEventsResponseShouldSendAclToken() {
+		ConsulBinderProperties properties = new ConsulBinderProperties();
+		properties.setAclToken("test-acl-token");
+
+		ConsulClient consul = mock(ConsulClient.class);
+		when(consul.eventList(null, null, null, null, "test-acl-token")).thenReturn(ResponseEntity.ok(List.of()));
+
+		EventService eventService = new EventService(properties, consul, new ObjectMapper());
+
+		eventService.getEventsResponse();
+
+		verify(consul).eventList(null, null, null, null, "test-acl-token");
+	}
+
+	@Test
+	public void watchShouldSendAclToken() {
+		ConsulBinderProperties properties = new ConsulBinderProperties();
+		properties.setAclToken("test-acl-token");
+
+		ConsulClient consul = mock(ConsulClient.class);
+		when(consul.eventList(5L, -1L, null, null, null, null, "test-acl-token"))
+			.thenReturn(ResponseEntity.ok(List.of()));
+
+		EventService eventService = new EventService(properties, consul, new ObjectMapper());
+
+		eventService.watch();
+
+		verify(consul).eventList(5L, -1L, null, null, null, null, "test-acl-token");
 	}
 
 }
