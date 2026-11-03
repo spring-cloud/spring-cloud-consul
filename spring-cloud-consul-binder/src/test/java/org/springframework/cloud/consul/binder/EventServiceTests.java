@@ -81,4 +81,14 @@ public class EventServiceTests {
 		verify(consul).eventList(5L, -1L, null, null, null, null, "test-acl-token");
 	}
 
+	@Test
+	public void getAclTokenShouldReturnNullWhenTokenIsEmpty() {
+		ConsulBinderProperties properties = new ConsulBinderProperties();
+		properties.setAclToken("");
+
+		EventService eventService = new EventService(properties, mock(ConsulClient.class), new ObjectMapper());
+
+		assertThat(eventService.getAclToken()).isNull();
+	}
+
 }

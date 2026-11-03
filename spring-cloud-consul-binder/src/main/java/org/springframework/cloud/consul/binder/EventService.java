@@ -27,6 +27,7 @@ import org.springframework.cloud.consul.binder.config.ConsulBinderProperties;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.cloud.consul.model.http.event.Event;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Spencer Gibb
@@ -52,7 +53,8 @@ public class EventService {
 	}
 
 	public String getAclToken() {
-		return this.properties != null ? this.properties.getAclToken() : null;
+		return this.properties != null && StringUtils.hasText(this.properties.getAclToken())
+				? this.properties.getAclToken() : null;
 	}
 
 	@PostConstruct
