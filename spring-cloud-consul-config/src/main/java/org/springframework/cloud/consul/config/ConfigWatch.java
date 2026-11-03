@@ -161,8 +161,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 				// if response.value == null, response was a 404, otherwise it was a
 				// 200, reducing churn if there wasn't anything
-				if (HttpStatus.OK.isSameCodeAs(response.getStatusCode()) && response.hasBody()
-						&& !response.getBody().isEmpty()) {
+				if (HttpStatus.OK.isSameCodeAs(response.getStatusCode()) && response.hasBody()) {
 					Long newIndex = ConsulHeaders.getConsulIndex(response);
 
 					if (newIndex != null && !newIndex.equals(currentIndex)) {

@@ -136,6 +136,33 @@ public class ConfigWatchTests {
 	}
 
 	@Test
+	public void watchPublishesEventWhenConfigIsDeleted() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		String context = "/app/";
+		ConsulClient consul = mock(ConsulClient.class);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(ConsulHeaders.INDEX_HEADER, "2");
+		headers.add(ConsulHeaders.LAST_CONTACT_HEADER, "1");
+
+		ResponseEntity<List<GetValue>> response = ResponseEntity.ok().headers(headers).body(Collections.emptyList());
+
+		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong())).thenReturn(response);
+
+		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
+		initialIndexes.put(context, 1L);
+
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes);
+		watch.setApplicationEventPublisher(eventPublisher);
+		watch.start();
+
+		watch.watchConfigKeyValues();
+
+		verify(eventPublisher, atLeastOnce()).publishEvent(any(RefreshEvent.class));
+	}
+
+	@Test
 	public void firstCallDoesNotPublishEvent() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 		this.configProperties.setFormat(FILES);
