@@ -18,7 +18,7 @@ package org.springframework.cloud.consul.binder;
 
 import org.junit.Test;
 
-import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -34,12 +34,7 @@ public class ConsulInboundMessageProducerTests {
 
 		ConsulInboundMessageProducer producer = new ConsulInboundMessageProducer(eventService);
 
-		try {
-			producer.getEvents();
-		}
-		catch (Exception e) {
-			fail("ConsulInboundMessageProducer threw unexpected exception: " + e);
-		}
+		assertThatNoException().isThrownBy(producer::getEvents);
 
 	}
 
