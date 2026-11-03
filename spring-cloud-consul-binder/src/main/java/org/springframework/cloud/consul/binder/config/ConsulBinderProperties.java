@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.consul.binder.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.style.ToStringCreator;
 
@@ -27,6 +28,9 @@ public class ConsulBinderProperties {
 
 	private int eventTimeout = 5;
 
+	@Value("${consul.token:${CONSUL_TOKEN:${spring.cloud.consul.token:${SPRING_CLOUD_CONSUL_TOKEN:}}}}")
+	private String aclToken;
+
 	public ConsulBinderProperties() {
 	}
 
@@ -36,6 +40,14 @@ public class ConsulBinderProperties {
 
 	public void setEventTimeout(int eventTimeout) {
 		this.eventTimeout = eventTimeout;
+	}
+
+	public String getAclToken() {
+		return this.aclToken;
+	}
+
+	public void setAclToken(String aclToken) {
+		this.aclToken = aclToken;
 	}
 
 	@Override

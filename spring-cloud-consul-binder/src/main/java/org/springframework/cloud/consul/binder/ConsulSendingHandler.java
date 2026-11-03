@@ -35,9 +35,12 @@ public class ConsulSendingHandler extends AbstractMessageHandler {
 
 	private final String eventName;
 
-	public ConsulSendingHandler(ConsulClient consul, String eventName) {
+	private final String aclToken;
+
+	public ConsulSendingHandler(ConsulClient consul, String eventName, String aclToken) {
 		this.consul = consul;
 		this.eventName = eventName;
+		this.aclToken = aclToken;
 	}
 
 	@Override
@@ -53,7 +56,7 @@ public class ConsulSendingHandler extends AbstractMessageHandler {
 
 		// TODO: support headers
 		// TODO: support consul event filters: NodeFilter, ServiceFilter, TagFilter
-		ResponseEntity<Event> event = this.consul.eventFire(this.eventName, (String) payload, null);
+		ResponseEntity<Event> event = this.consul.eventFire(this.eventName, (String) payload, this.aclToken);
 		// TODO: return event?
 	}
 

@@ -27,6 +27,7 @@ import org.springframework.cloud.consul.binder.config.ConsulBinderProperties;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.cloud.consul.model.http.event.Event;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 
 /**
  * @author Spencer Gibb
@@ -51,6 +52,11 @@ public class EventService {
 		return this.consul;
 	}
 
+	public String getAclToken() {
+		return this.properties != null && StringUtils.hasText(this.properties.getAclToken())
+				? this.properties.getAclToken() : null;
+	}
+
 	@PostConstruct
 	public void init() {
 		setLastIndex(getEventsResponse());
@@ -68,12 +74,12 @@ public class EventService {
 	}
 
 	public Event fire(String name, String payload) {
-		ResponseEntity<Event> response = this.consul.eventFire(name, payload, null);
+		ResponseEntity<Event> response = this.consul.eventFire(name, payload, getAclToken());
 		return response.getBody();
 	}
 
 	public ResponseEntity<List<Event>> getEventsResponse() {
-		return this.consul.eventList(null, null, null, null, null);
+		return this.consul.eventList(null, null, null, null, getAclToken());
 	}
 
 	public List<Event> getEvents() {
@@ -99,7 +105,7 @@ public class EventService {
 			eventTimeout = this.properties.getEventTimeout();
 		}
 		ResponseEntity<List<Event>> watch = this.consul.eventList((long) eventTimeout, index, null, null, null, null,
-				null);
+				getAclToken());
 		return filterEvents(readEvents(watch), lastIndex);
 	}
 
