@@ -34,6 +34,7 @@ import static org.assertj.core.api.Assertions.fail;
  */
 public class ConsulPropertySourceLocatorRetryTests {
 
+	/** Captures application output during retry tests. */
 	@Rule
 	public OutputCaptureRule output = new OutputCaptureRule();
 
