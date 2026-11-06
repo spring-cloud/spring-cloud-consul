@@ -9,3 +9,7 @@ patterns provided include Service Discovery, Control Bus and Configuration.
 Intelligent Routing and Client Side Load Balancing, Circuit Breaker
 are provided by integration with other Spring Cloud projects.
 
+== Consul Version Compatibility
+
+Spring Cloud Consul does not define a minimum supported Consul server version.
+Compatibility with Consul server versions is provided on a best-effort basis.
