@@ -35,6 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.util.StringUtils;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -136,6 +137,62 @@ public class ConfigWatchTests {
 	}
 
 	@Test
+	public void watchPublishesEventWhenConfigIsDeleted() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		String context = "/app/";
+		ConsulClient consul = mock(ConsulClient.class);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(ConsulHeaders.INDEX_HEADER, "2");
+		headers.add(ConsulHeaders.LAST_CONTACT_HEADER, "1");
+
+		ResponseEntity<List<GetValue>> response = ResponseEntity.ok().headers(headers).body(Collections.emptyList());
+
+		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong())).thenReturn(response);
+
+		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
+		initialIndexes.put(context, 1L);
+
+		this.configProperties.getWatch().setRefreshOnDelete(true);
+
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes);
+		watch.setApplicationEventPublisher(eventPublisher);
+		watch.start();
+
+		watch.watchConfigKeyValues();
+
+		verify(eventPublisher, atLeastOnce()).publishEvent(any(RefreshEvent.class));
+	}
+
+	@Test
+	public void watchDoesNotPublishEventWhenConfigIsDeletedAndRefreshOnDeleteIsDisabled() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		String context = "/app/";
+		ConsulClient consul = mock(ConsulClient.class);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(ConsulHeaders.INDEX_HEADER, "2");
+		headers.add(ConsulHeaders.LAST_CONTACT_HEADER, "1");
+
+		ResponseEntity<List<GetValue>> response = ResponseEntity.ok().headers(headers).body(Collections.emptyList());
+
+		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong())).thenReturn(response);
+
+		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
+		initialIndexes.put(context, 1L);
+
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes);
+		watch.setApplicationEventPublisher(eventPublisher);
+		watch.start();
+
+		watch.watchConfigKeyValues();
+
+		verify(eventPublisher, never()).publishEvent(any(RefreshEvent.class));
+	}
+
+	@Test
 	public void firstCallDoesNotPublishEvent() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 		this.configProperties.setFormat(FILES);
@@ -153,6 +210,11 @@ public class ConfigWatchTests {
 
 		watch.watchConfigKeyValues();
 		verify(eventPublisher, times(0)).publishEvent(any(RefreshEvent.class));
+	}
+
+	@Test
+	public void refreshOnDeleteIsDisabledByDefault() {
+		assertThat(this.configProperties.getWatch().isRefreshOnDelete()).isFalse();
 	}
 
 }
