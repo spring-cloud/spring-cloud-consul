@@ -18,6 +18,8 @@ package org.springframework.cloud.consul.config;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.cloud.consul.ConsulClient.ConsistencyMode;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConsulConfigPropertiesTests {
@@ -27,6 +29,22 @@ public class ConsulConfigPropertiesTests {
 		ConsulConfigProperties properties = new ConsulConfigProperties();
 		properties.setAclToken("myAclToken");
 		assertThat(properties.toString()).doesNotContain("myAclToken").contains("******");
+	}
+
+	@Test
+	public void consistencyModeDefaultsToDefault() {
+		ConsulConfigProperties properties = new ConsulConfigProperties();
+
+		assertThat(properties.getConsistencyMode()).isEqualTo(ConsistencyMode.DEFAULT);
+	}
+
+	@Test
+	public void consistencyModeCanBeConfigured() {
+		ConsulConfigProperties properties = new ConsulConfigProperties();
+
+		properties.setConsistencyMode(ConsistencyMode.CONSISTENT);
+
+		assertThat(properties.getConsistencyMode()).isEqualTo(ConsistencyMode.CONSISTENT);
 	}
 
 }

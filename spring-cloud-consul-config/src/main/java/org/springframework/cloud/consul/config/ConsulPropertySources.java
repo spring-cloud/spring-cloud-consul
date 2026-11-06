@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.logging.Log;
 
 import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulClient.QueryParams;
 import org.springframework.cloud.consul.ConsulException;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
@@ -127,7 +128,7 @@ public class ConsulPropertySources {
 
 			if (properties.getFormat() == FILES) {
 				ResponseEntity<List<GetValue>> response = consul.getKVValue(propertySourceContext,
-						properties.getAclToken());
+						properties.getAclToken(), new QueryParams(properties.getConsistencyMode()));
 
 				GetValue value = null;
 				if (response.getStatusCode().is2xxSuccessful()) {

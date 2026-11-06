@@ -115,14 +115,44 @@ public interface ConsulClient {
 	ResponseEntity<Void> deleteKVValues(@PathVariable String context,
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
+	/**
+	 * Retrieves a single KV entry using the default query parameters.
+	 */
 	@GetExchange("/v1/kv/{context}")
 	ResponseEntity<List<GetValue>> getKVValue(@PathVariable String context,
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
+	/**
+	 * Retrieves a single KV entry using the supplied query parameters.
+	 */
+	@GetExchange("/v1/kv/{context}")
+	ResponseEntity<List<GetValue>> getKVValue(@PathVariable String context,
+			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken, QueryParams queryParams);
+
+	/**
+	 * Retrieves KV entries recursively using the default query parameters.
+	 */
 	@GetExchange("/v1/kv/{context}?recurse")
 	ResponseEntity<List<GetValue>> getKVValues(@PathVariable String context,
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
+	/**
+	 * Retrieves KV entries recursively using the supplied query parameters.
+	 *
+	 * The QueryParams argument allows callers to specify the datacenter, consistency
+	 * mode, and other supported Consul query parameters.
+	 */
+	@GetExchange("/v1/kv/{context}?recurse")
+	ResponseEntity<List<GetValue>> getKVValues(@PathVariable String context,
+			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken, QueryParams queryParams);
+
+	/**
+	 * Retrieves KV entries recursively using blocking queries.
+	 *
+	 * This existing method is retained for compatibility. Callers requiring a consistency
+	 * mode for blocking queries should use the QueryParams overload and include waitTime
+	 * and index in QueryParams.
+	 */
 	@GetExchange("/v1/kv/{context}?recurse")
 	ResponseEntity<List<GetValue>> getKVValues(@PathVariable String context,
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken,
@@ -150,6 +180,9 @@ public interface ConsulClient {
 	ResponseEntity<Event> eventFire(@PathVariable String name, @RequestBody String payload,
 			@RequestHeader(name = ACL_TOKEN_HEADER, required = false) String aclToken);
 
+	/**
+	 * Query parameters supported by Consul HTTP API requests.
+	 */
 	class QueryParams {
 
 		/**
@@ -185,6 +218,13 @@ public interface ConsulClient {
 
 		public QueryParams(long waitTime, long index) {
 			this(null, ConsistencyMode.DEFAULT, waitTime, index);
+		}
+
+		/**
+		 * Creates query parameters with a consistency mode and blocking-query settings.
+		 */
+		public QueryParams(ConsistencyMode consistencyMode, long waitTime, long index) {
+			this(null, consistencyMode, waitTime, index);
 		}
 
 		public QueryParams(String datacenter, long waitTime, long index) {
@@ -226,31 +266,34 @@ public interface ConsulClient {
 
 	}
 
+	/**
+	 * Consistency modes supported by the Consul HTTP API.
+	 */
 	enum ConsistencyMode {
 
 		/**
-		 * Default Consul Consistency Mode.
+		 * Default Consul consistency mode.
 		 */
 		DEFAULT("default"),
 
 		/**
-		 * Stale Consul Consistency Mode.
+		 * Stale Consul consistency mode.
 		 */
 		STALE("stale"),
 
 		/**
-		 * Consistent Consul Consistency Mode.
+		 * Consistent Consul consistency mode.
 		 */
 		CONSISTENT("consistent");
 
-		private String paramName;
+		private final String paramName;
 
 		ConsistencyMode(String paramName) {
 			this.paramName = paramName;
 		}
 
 		public String getParamName() {
-			return paramName;
+			return this.paramName;
 		}
 
 		@Override
