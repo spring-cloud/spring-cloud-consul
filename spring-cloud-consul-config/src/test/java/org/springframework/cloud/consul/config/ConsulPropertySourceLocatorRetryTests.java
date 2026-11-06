@@ -27,7 +27,6 @@ import org.springframework.web.client.ResourceAccessException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.fail;
 
 /**
  * @author Spencer Gibb
@@ -48,7 +47,6 @@ public class ConsulPropertySourceLocatorRetryTests {
 						"spring.cloud.consul.port=65530", "spring.cloud.consul.retry.maxAttempts=1",
 						"spring.cloud.consul.config.failFast=true")
 				.run();
-			fail("Did not throw expected exception");
 		}).hasCauseInstanceOf(ResourceAccessException.class);
 		assertThat(output).contains("RetryContext retrieved");
 	}
