@@ -53,12 +53,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<ServiceInstance> getInstances(final String serviceId) {
-		ConsulDiscoveryProperties.ConsistencyMode consistencyModeProp = this.properties.getConsistencyMode();
-		ConsulClient.ConsistencyMode consistencyMode = ConsulClient.ConsistencyMode.DEFAULT;
-		if (consistencyModeProp != null) {
-			consistencyMode = ConsulClient.ConsistencyMode.valueOf(consistencyModeProp.name().toUpperCase(Locale.ROOT));
-		}
-		return getInstances(serviceId, new QueryParams(consistencyMode));
+		return getInstances(serviceId, createQueryParams());
 	}
 
 	public List<ServiceInstance> getInstances(final String serviceId, final QueryParams queryParams) {
@@ -91,11 +86,21 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	public List<ServiceInstance> getAllInstances() {
+		QueryParams queryParams = createQueryParams();
 		List<ServiceInstance> instances = new ArrayList<>();
 		for (String serviceId : getServices()) {
-			addInstancesToList(instances, serviceId, null);
+			addInstancesToList(instances, serviceId, queryParams);
 		}
 		return instances;
+	}
+
+	private QueryParams createQueryParams() {
+		ConsulDiscoveryProperties.ConsistencyMode consistencyModeProp = this.properties.getConsistencyMode();
+		ConsulClient.ConsistencyMode consistencyMode = ConsulClient.ConsistencyMode.DEFAULT;
+		if (consistencyModeProp != null) {
+			consistencyMode = ConsulClient.ConsistencyMode.valueOf(consistencyModeProp.name().toUpperCase(Locale.ROOT));
+		}
+		return new QueryParams(consistencyMode);
 	}
 
 	@Override
