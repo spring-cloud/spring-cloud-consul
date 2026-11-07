@@ -24,6 +24,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.time.Duration;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
@@ -77,6 +78,13 @@ import org.springframework.web.util.UriBuilder;
 public class ConsulAutoConfiguration {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConsulAutoConfiguration.class);
+
+	/**
+	 * Read timeout of the Consul client. Consul caps the wait of a blocking query at 10
+	 * minutes and adds up to 1/16 of the wait as jitter, so the timeout must exceed that
+	 * for a query to return before the client gives up on it.
+	 */
+	private static final Duration READ_TIMEOUT = Duration.ofMinutes(11);
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -150,7 +158,7 @@ public class ConsulAutoConfiguration {
 							.error(new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8)))
 				.uriBuilderFactory(uriBuilderFactory);
 
-			HttpClientSettings settings = null;
+			HttpClientSettings settings = HttpClientSettings.defaults().withReadTimeout(READ_TIMEOUT);
 			if (tlsConfig != null) {
 				KeyStore clientStore = KeyStore.getInstance(tlsConfig.getKeyStoreInstanceType().name());
 				clientStore.load(Files.newInputStream(Paths.get(tlsConfig.getCertificatePath())),
@@ -163,10 +171,10 @@ public class ConsulAutoConfiguration {
 				SslStoreBundle sslStoreBundle = SslStoreBundle.of(clientStore, tlsConfig.getKeyStorePassword(),
 						trustStore);
 				SslBundle sslBundle = SslBundle.of(sslStoreBundle);
-				settings = HttpClientSettings.ofSslBundle(sslBundle);
-				ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder.detect().build(settings);
-				builder.requestFactory(requestFactory);
+				settings = settings.withSslBundle(sslBundle);
 			}
+			ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder.detect().build(settings);
+			builder.requestFactory(requestFactory);
 
 			return new ConsulClientSettings(baseUrl, settings, RestClientAdapter.create(builder.build()));
 		}
