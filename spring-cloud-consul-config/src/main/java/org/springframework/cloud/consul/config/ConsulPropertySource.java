@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulClient.QueryParams;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.core.env.EnumerablePropertySource;
@@ -55,7 +56,6 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		super(context, source);
 		this.context = context;
 		this.configProperties = configProperties;
-
 	}
 
 	public void init() {
@@ -70,7 +70,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 		}
 
 		ResponseEntity<List<GetValue>> response = this.source.getKVValues(this.context,
-				this.configProperties.getAclToken());
+				this.configProperties.getAclToken(), new QueryParams(this.configProperties.getConsistencyMode()));
 
 		this.initialIndex = ConsulHeaders.getConsulIndex(response);
 
