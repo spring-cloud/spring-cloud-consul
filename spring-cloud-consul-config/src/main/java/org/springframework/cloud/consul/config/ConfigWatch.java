@@ -59,6 +59,8 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 	private final AtomicBoolean running = new AtomicBoolean(false);
 
+	private final Object lifecycleMonitor = new Object();
+
 	private LinkedHashMap<String, Long> consulIndexes;
 
 	private ApplicationEventPublisher publisher;
@@ -93,9 +95,11 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 	@Override
 	public void start() {
-		if (this.running.compareAndSet(false, true)) {
-			this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(this::watchConfigKeyValues,
-					Duration.ofMillis(this.properties.getWatch().getDelay()));
+		synchronized (this.lifecycleMonitor) {
+			if (this.running.compareAndSet(false, true)) {
+				this.watchFuture = this.taskScheduler.scheduleWithFixedDelay(this::watchConfigKeyValues,
+						Duration.ofMillis(this.properties.getWatch().getDelay()));
+			}
 		}
 	}
 
@@ -117,8 +121,10 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 	@Override
 	public void stop() {
-		if (this.running.compareAndSet(true, false) && this.watchFuture != null) {
-			this.watchFuture.cancel(true);
+		synchronized (this.lifecycleMonitor) {
+			if (this.running.compareAndSet(true, false) && this.watchFuture != null) {
+				this.watchFuture.cancel(true);
+			}
 		}
 	}
 
@@ -133,6 +139,10 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 			return;
 		}
 		for (String context : this.consulIndexes.keySet()) {
+
+			if (!this.running.get()) {
+				return;
+			}
 
 			// turn the context into a Consul folder path (unless our config format
 			// are FILES)
@@ -171,11 +181,19 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 						// don't publish the same index again, don't publish the first
 						// time (-1) so index can be primed
 						if (!this.consulIndexes.containsValue(newIndex) && !currentIndex.equals(-1L)) {
+							if (!this.running.get()) {
+								return;
+							}
 							if (log.isTraceEnabled()) {
 								log.trace("Context " + context + " has new index " + newIndex);
 							}
 							RefreshEventData data = new RefreshEventData(context, currentIndex, newIndex);
-							this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
+							synchronized (this.lifecycleMonitor) {
+								if (!this.running.get()) {
+									return;
+								}
+								this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
+							}
 						}
 						else if (log.isTraceEnabled()) {
 							log.trace("Event for index already published for context " + context);
@@ -192,6 +210,9 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 			}
 			catch (Exception e) {
+				if (!this.running.get() && (isInterruptedException(e) || Thread.currentThread().isInterrupted())) {
+					return;
+				}
 				// only fail fast on the initial query, otherwise just log the error
 				if (this.firstTime && this.properties.isFailFast()) {
 					log.error("Fail fast is set and there was an error reading configuration from consul.");
@@ -209,6 +230,17 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 			}
 		}
 		this.firstTime = false;
+	}
+
+	private boolean isInterruptedException(Throwable exception) {
+		Throwable cause = exception;
+		while (cause != null) {
+			if (cause instanceof InterruptedException) {
+				return true;
+			}
+			cause = cause.getCause();
+		}
+		return false;
 	}
 
 	public static class RefreshEventData {
