@@ -26,6 +26,9 @@
 |spring.cloud.consul.discovery.enabled | `+++true+++` | Is service discovery enabled?
 |spring.cloud.consul.discovery.fail-fast | `+++true+++` | Throw exceptions during service registration if true, otherwise, log warnings (defaults to true).
 |spring.cloud.consul.discovery.health-check-critical-timeout |  | Timeout to deregister services critical for longer than timeout (e.g. 30m). Requires consul version 7.x or higher.
+|spring.cloud.consul.discovery.health-check-grpc-port |  | Port of the gRPC server to health check. When set, a gRPC health check is registered instead of the HTTP health check.
+|spring.cloud.consul.discovery.health-check-grpc-service |  | Name of the service to health check using the gRPC health checking protocol. The health of the whole gRPC server is checked if not set.
+|spring.cloud.consul.discovery.health-check-grpc-use-tls | `+++false+++` | Whether to use TLS for the gRPC health check.
 |spring.cloud.consul.discovery.health-check-headers |  | Headers to be applied to the Health Check calls.
 |spring.cloud.consul.discovery.health-check-interval | `+++10s+++` | How often to perform the health check (e.g. 10s), defaults to 10s.
 |spring.cloud.consul.discovery.health-check-path | `+++/actuator/health+++` | Alternate server path to invoke for health checking.
