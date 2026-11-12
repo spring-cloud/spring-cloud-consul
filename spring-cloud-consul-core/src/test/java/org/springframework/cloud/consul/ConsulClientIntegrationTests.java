@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.model.Header;
+import org.mockserver.model.HttpRequest;
 import org.mockserver.model.Parameter;
 import org.mockserver.verify.VerificationTimes;
 import org.testcontainers.containers.MockServerContainer;
@@ -149,6 +150,65 @@ class ConsulClientIntegrationTests {
 		assertThat(value.getKey()).isEqualTo("zip");
 		assertThat(value.getValue()).isEqualTo("dGVzdA==");
 		assertThat(value.getDecodedValue()).isEqualTo("test");
+	}
+
+	@Test
+	void getKVValuesWithNestedContext() {
+		mockServerClient.when(request().withMethod("GET").withPath("/v1/kv/config/application/"))
+			.respond(response().withStatusCode(200)
+				.withHeaders(new Header("Content-Type", "application/json"))
+				.withBody("[]"));
+
+		ResponseEntity<List<GetValue>> response = client.getKVValues("config/application/", null);
+
+		HttpRequest[] recordedRequests = mockServerClient.retrieveRecordedRequests(request().withMethod("GET"));
+
+		assertThat(recordedRequests).hasSize(1);
+		assertThat(recordedRequests[0].getPath().getValue()).isEqualTo("/v1/kv/config/application/");
+
+		mockServerClient.verify(request().withMethod("GET")
+			.withPath("/v1/kv/config/application/")
+			.withQueryStringParameters(Parameter.param("recurse")), VerificationTimes.exactly(1));
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	@Test
+	void getKVValueWithNestedContext() {
+		mockServerClient.when(request().withMethod("GET").withPath("/v1/kv/config/application"))
+			.respond(response().withStatusCode(200)
+				.withHeaders(new Header("Content-Type", "application/json"))
+				.withBody("[]"));
+
+		client.getKVValue("config/application", null);
+
+		mockServerClient.verify(request().withMethod("GET").withPath("/v1/kv/config/application"),
+				VerificationTimes.exactly(1));
+	}
+
+	@Test
+	void deleteKVValuesWithNestedContext() {
+		mockServerClient.when(request().withMethod("DELETE").withPath("/v1/kv/config/application"))
+			.respond(response().withStatusCode(200));
+
+		client.deleteKVValues("config/application");
+
+		mockServerClient.verify(request().withMethod("DELETE").withPath("/v1/kv/config/application"),
+				VerificationTimes.exactly(1));
+	}
+
+	@Test
+	void setKVValueWithNestedContext() {
+		mockServerClient.when(request().withMethod("PUT").withPath("/v1/kv/config/application"))
+			.respond(response().withStatusCode(200).withHeader("Content-Type", "application/json").withBody("true"));
+
+		ResponseEntity<Boolean> response = client.setKVValue("config/application", "test-value");
+
+		mockServerClient.verify(request().withMethod("PUT").withPath("/v1/kv/config/application"),
+				VerificationTimes.exactly(1));
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(response.getBody()).isTrue();
 	}
 
 	@Test
