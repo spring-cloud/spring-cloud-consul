@@ -17,6 +17,7 @@
 package org.springframework.cloud.consul;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -52,7 +53,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.format.support.DefaultFormattingConversionService;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
@@ -68,6 +71,7 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.DefaultUriBuilderFactory.EncodingMode;
 import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * @author Spencer Gibb
@@ -80,11 +84,11 @@ public class ConsulAutoConfiguration {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConsulAutoConfiguration.class);
 
 	/**
-	 * Read timeout of the Consul client. Consul caps the wait of a blocking query at 10
+	 * Read timeout of blocking queries. Consul caps the wait of a blocking query at 10
 	 * minutes and adds up to 1/16 of the wait as jitter, so the timeout must exceed that
 	 * for a query to return before the client gives up on it.
 	 */
-	private static final Duration READ_TIMEOUT = Duration.ofMinutes(11);
+	static final Duration BLOCKING_QUERY_READ_TIMEOUT = Duration.ofMinutes(11);
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -158,7 +162,7 @@ public class ConsulAutoConfiguration {
 							.error(new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8)))
 				.uriBuilderFactory(uriBuilderFactory);
 
-			HttpClientSettings settings = HttpClientSettings.defaults().withReadTimeout(READ_TIMEOUT);
+			HttpClientSettings settings = null;
 			if (tlsConfig != null) {
 				KeyStore clientStore = KeyStore.getInstance(tlsConfig.getKeyStoreInstanceType().name());
 				clientStore.load(Files.newInputStream(Paths.get(tlsConfig.getCertificatePath())),
@@ -171,10 +175,12 @@ public class ConsulAutoConfiguration {
 				SslStoreBundle sslStoreBundle = SslStoreBundle.of(clientStore, tlsConfig.getKeyStorePassword(),
 						trustStore);
 				SslBundle sslBundle = SslBundle.of(sslStoreBundle);
-				settings = settings.withSslBundle(sslBundle);
+				settings = HttpClientSettings.ofSslBundle(sslBundle);
 			}
-			ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder.detect().build(settings);
-			builder.requestFactory(requestFactory);
+			HttpClientSettings defaultSettings = (settings != null) ? settings : HttpClientSettings.defaults();
+			ClientHttpRequestFactoryBuilder<?> requestFactoryBuilder = ClientHttpRequestFactoryBuilder.detect();
+			builder.requestFactory(new BlockingQueryRequestFactory(requestFactoryBuilder.build(defaultSettings),
+					requestFactoryBuilder.build(defaultSettings.withReadTimeout(BLOCKING_QUERY_READ_TIMEOUT))));
 
 			return new ConsulClientSettings(baseUrl, settings, RestClientAdapter.create(builder.build()));
 		}
@@ -187,6 +193,31 @@ public class ConsulAutoConfiguration {
 		DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService();
 		conversionService.addFormatterForFieldAnnotation(new WaitTimeAnnotationFormatterFactory());
 		return conversionService;
+	}
+
+	/**
+	 * Sends blocking queries, which carry a {@code wait} parameter, through a request
+	 * factory with a read timeout longer than any wait Consul accepts. All other requests
+	 * keep the default read timeout, so a hung agent still fails quickly.
+	 */
+	static final class BlockingQueryRequestFactory implements ClientHttpRequestFactory {
+
+		private final ClientHttpRequestFactory defaultFactory;
+
+		private final ClientHttpRequestFactory blockingQueryFactory;
+
+		BlockingQueryRequestFactory(ClientHttpRequestFactory defaultFactory,
+				ClientHttpRequestFactory blockingQueryFactory) {
+			this.defaultFactory = defaultFactory;
+			this.blockingQueryFactory = blockingQueryFactory;
+		}
+
+		@Override
+		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
+			boolean blockingQuery = UriComponentsBuilder.fromUri(uri).build().getQueryParams().containsKey("wait");
+			return (blockingQuery ? this.blockingQueryFactory : this.defaultFactory).createRequest(uri, httpMethod);
+		}
+
 	}
 
 	public record ConsulClientSettings(String baseUrl, HttpClientSettings httpClientSettings,
