@@ -26,6 +26,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.representer.Representer;
+
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
@@ -158,7 +164,9 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 			return props;
 		}
 		else if (format == YAML) {
-			final YamlPropertiesFactoryBean yaml = new YamlPropertiesFactoryBean();
+			final YamlPropertiesFactoryBean yaml = new ConsulYamlPropertiesFactoryBean(
+					this.configProperties.getYamlMaxAliasesForCollections(),
+					this.configProperties.getYamlCodePointLimit());
 			yaml.setResources(new ByteArrayResource(value.getBytes(Charset.forName("UTF-8"))));
 
 			return yaml.getObject();
@@ -201,6 +209,35 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 	public String[] getPropertyNames() {
 		Set<String> strings = this.properties.keySet();
 		return strings.toArray(new String[strings.size()]);
+	}
+
+	/**
+	 * Applies the configured SnakeYAML limits on aliases for non-scalar nodes and on code
+	 * points. By default both are lifted, as Spring Boot does for local configuration
+	 * files, because configuration read from Consul is as trusted as them.
+	 */
+	private static final class ConsulYamlPropertiesFactoryBean extends YamlPropertiesFactoryBean {
+
+		private final int maxAliasesForCollections;
+
+		private final int codePointLimit;
+
+		private ConsulYamlPropertiesFactoryBean(int maxAliasesForCollections, int codePointLimit) {
+			this.maxAliasesForCollections = maxAliasesForCollections;
+			this.codePointLimit = codePointLimit;
+		}
+
+		@Override
+		protected Yaml createYaml() {
+			LoaderOptions loaderOptions = new LoaderOptions();
+			loaderOptions.setAllowDuplicateKeys(false);
+			loaderOptions.setMaxAliasesForCollections(this.maxAliasesForCollections);
+			loaderOptions.setCodePointLimit(this.codePointLimit);
+			DumperOptions dumperOptions = new DumperOptions();
+			return new Yaml(new Constructor(loaderOptions), new Representer(dumperOptions), dumperOptions,
+					loaderOptions);
+		}
+
 	}
 
 }
