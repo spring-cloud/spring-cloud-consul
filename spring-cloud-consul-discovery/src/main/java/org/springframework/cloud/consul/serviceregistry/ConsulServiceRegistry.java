@@ -28,6 +28,8 @@ import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.cloud.consul.model.http.agent.NewService;
 import org.springframework.cloud.consul.model.http.health.Check;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.core.log.LogMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
@@ -38,7 +40,7 @@ import static org.springframework.boot.health.contributor.Status.UP;
 /**
  * @author Spencer Gibb
  */
-public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration> {
+public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration>, ApplicationEventPublisherAware {
 
 	private static Log log = LogFactory.getLog(ConsulServiceRegistry.class);
 
@@ -50,6 +52,8 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 
 	private final HeartbeatProperties heartbeatProperties;
 
+	private ApplicationEventPublisher publisher;
+
 	public ConsulServiceRegistry(ConsulClient client, ConsulDiscoveryProperties properties, TtlScheduler ttlScheduler,
 			HeartbeatProperties heartbeatProperties) {
 		this.client = client;
@@ -59,10 +63,18 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 	}
 
 	@Override
+	public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
+		this.publisher = publisher;
+	}
+
+	@Override
 	public void register(ConsulRegistration reg) {
 		log.info("Registering service with consul: " + reg.getService());
+
+		boolean registered = false;
 		try {
 			this.client.agentServiceRegister(this.properties.getAclToken(), reg.getService());
+			registered = true;
 		}
 		catch (RuntimeException e) {
 			if (this.properties.isFailFast()) {
@@ -76,6 +88,10 @@ public class ConsulServiceRegistry implements ServiceRegistry<ConsulRegistration
 		if (this.heartbeatProperties.isEnabled() && this.ttlScheduler != null && service.getCheck() != null
 				&& service.getCheck().getTtl() != null) {
 			this.ttlScheduler.add(service);
+		}
+
+		if (registered && this.publisher != null) {
+			this.publisher.publishEvent(new ConsulRegistrationCompleted(this, reg));
 		}
 	}
 

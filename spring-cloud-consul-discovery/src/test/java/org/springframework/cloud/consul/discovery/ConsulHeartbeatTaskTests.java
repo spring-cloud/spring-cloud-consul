@@ -49,7 +49,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * Test for ConsulHeartbeatTask
+ * Test for ConsulHeartbeatTask.
  *
  * @author Toshiaki Maki
  * @author Chris Bono
