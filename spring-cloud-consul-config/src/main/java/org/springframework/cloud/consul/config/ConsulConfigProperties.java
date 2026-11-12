@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -64,6 +65,20 @@ public class ConsulConfigProperties {
 	 */
 	@NotEmpty
 	private String dataKey = "data";
+
+	/**
+	 * Maximum number of aliases that may refer to non-scalar nodes (maps and lists) in a
+	 * YAML document when format is Format.YAML or Format.FILES. Defaults to no limit.
+	 */
+	@Min(1)
+	private int yamlMaxAliasesForCollections = Integer.MAX_VALUE;
+
+	/**
+	 * Maximum size, in code points, of a YAML document when format is Format.YAML or
+	 * Format.FILES. Defaults to no limit.
+	 */
+	@Min(1)
+	private int yamlCodePointLimit = Integer.MAX_VALUE;
 
 	@Value("${consul.token:${CONSUL_TOKEN:${spring.cloud.consul.token:${SPRING_CLOUD_CONSUL_TOKEN:}}}}")
 	private String aclToken;
@@ -157,6 +172,22 @@ public class ConsulConfigProperties {
 		this.dataKey = dataKey;
 	}
 
+	public int getYamlMaxAliasesForCollections() {
+		return this.yamlMaxAliasesForCollections;
+	}
+
+	public void setYamlMaxAliasesForCollections(int yamlMaxAliasesForCollections) {
+		this.yamlMaxAliasesForCollections = yamlMaxAliasesForCollections;
+	}
+
+	public int getYamlCodePointLimit() {
+		return this.yamlCodePointLimit;
+	}
+
+	public void setYamlCodePointLimit(int yamlCodePointLimit) {
+		this.yamlCodePointLimit = yamlCodePointLimit;
+	}
+
 	public String getAclToken() {
 		return this.aclToken;
 	}
@@ -197,6 +228,8 @@ public class ConsulConfigProperties {
 			.append("profileSeparator", this.profileSeparator)
 			.append("format", this.format)
 			.append("dataKey", this.dataKey)
+			.append("yamlMaxAliasesForCollections", this.yamlMaxAliasesForCollections)
+			.append("yamlCodePointLimit", this.yamlCodePointLimit)
 			.append("aclToken", this.aclToken != null ? "******" : null)
 			.append("watch", this.watch)
 			.append("failFast", this.failFast)

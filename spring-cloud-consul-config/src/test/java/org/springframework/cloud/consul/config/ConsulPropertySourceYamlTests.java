@@ -82,20 +82,50 @@ class ConsulPropertySourceYamlTests {
 
 	@Test
 	void yamlWithDuplicateKeysIsRejected() {
-		assertThatExceptionOfType(DuplicateKeyException.class)
-			.isThrownBy(() -> generateProperties("foo: 1\nfoo: 2"));
+		assertThatExceptionOfType(DuplicateKeyException.class).isThrownBy(() -> generateProperties("foo: 1\nfoo: 2"));
 	}
 
 	@Test
 	void yamlWithGlobalTagIsRejected() {
-		assertThatExceptionOfType(YAMLException.class)
-			.isThrownBy(() -> generateProperties("foo: !!java.util.Date {}"))
+		assertThatExceptionOfType(YAMLException.class).isThrownBy(() -> generateProperties("foo: !!java.util.Date {}"))
 			.withMessageContaining("Global tag is not allowed");
 	}
 
+	@Test
+	void aliasLimitCanBeConfigured() {
+		ConsulConfigProperties properties = new ConsulConfigProperties();
+		properties.setYamlMaxAliasesForCollections(ALIAS_COUNT - 1);
+
+		assertThatExceptionOfType(YAMLException.class)
+			.isThrownBy(() -> generateProperties(yamlWithAliases(), properties))
+			.withMessageContaining("Number of aliases for non-scalar nodes exceeds the specified max=");
+	}
+
+	@Test
+	void aliasLimitAllowsDocumentWithinConfiguredLimit() {
+		ConsulConfigProperties properties = new ConsulConfigProperties();
+		properties.setYamlMaxAliasesForCollections(ALIAS_COUNT);
+
+		assertThat(generateProperties(yamlWithAliases(), properties)).containsEntry("service0.timeout", 5);
+	}
+
+	@Test
+	void codePointLimitCanBeConfigured() {
+		ConsulConfigProperties properties = new ConsulConfigProperties();
+		properties.setYamlCodePointLimit(100);
+
+		assertThatExceptionOfType(YAMLException.class)
+			.isThrownBy(() -> generateProperties("foo: " + "x".repeat(100), properties))
+			.withMessageContaining("exceeds the limit: 100 code points");
+	}
+
 	private Properties generateProperties(String yaml) {
-		return new ConsulPropertySource("config/app", mock(ConsulClient.class), new ConsulConfigProperties())
-			.generateProperties(yaml, ConsulConfigProperties.Format.YAML);
+		return generateProperties(yaml, new ConsulConfigProperties());
+	}
+
+	private Properties generateProperties(String yaml, ConsulConfigProperties properties) {
+		return new ConsulPropertySource("config/app", mock(ConsulClient.class), properties).generateProperties(yaml,
+				ConsulConfigProperties.Format.YAML);
 	}
 
 	private static String yamlWithAliases() {

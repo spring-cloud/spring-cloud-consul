@@ -122,6 +122,8 @@ You could store a YAML document in any of the keys listed above.
 
 You can change the data key using `spring.cloud.consul.config.data-key`.
 
+By default there is no limit on the size of a YAML document or on the number of aliases it can use for maps and lists. To restrict them, set `spring.cloud.consul.config.yaml-code-point-limit` and `spring.cloud.consul.config.yaml-max-aliases-for-collections`. These also apply to the `FILES` format.
+
 [[spring-cloud-consul-config-git2consul]]
 == git2consul with Config
 git2consul is a Consul community project that loads files from a git repository to individual keys into Consul. By default the names of the keys are names of the files. YAML and Properties files are supported with file extensions of `.yml` and `.properties` respectively.  Set the `spring.cloud.consul.config.format` property to `FILES`. For example:
