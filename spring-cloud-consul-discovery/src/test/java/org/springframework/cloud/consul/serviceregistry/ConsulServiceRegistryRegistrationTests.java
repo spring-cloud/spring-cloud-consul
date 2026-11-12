@@ -17,19 +17,52 @@
 package org.springframework.cloud.consul.serviceregistry;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.discovery.TtlScheduler;
 import org.springframework.cloud.consul.model.http.agent.NewService;
+import org.springframework.context.ApplicationEventPublisher;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 class ConsulServiceRegistryRegistrationTests {
+
+	@Test
+	void publishesRegistrationCompletedEventAfterSuccessfulRegistration() {
+		ConsulClient consulClient = mock(ConsulClient.class);
+		ConsulDiscoveryProperties discoveryProperties = mock(ConsulDiscoveryProperties.class);
+		HeartbeatProperties heartbeatProperties = new HeartbeatProperties();
+		TtlScheduler ttlScheduler = mock(TtlScheduler.class);
+		ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+
+		ConsulServiceRegistry serviceRegistry = new ConsulServiceRegistry(consulClient, discoveryProperties,
+				ttlScheduler, heartbeatProperties);
+		serviceRegistry.setApplicationEventPublisher(publisher);
+
+		NewService service = new NewService();
+		service.setId("test-service");
+		service.setName("test-service");
+
+		ConsulRegistration registration = new ConsulRegistration(service, discoveryProperties);
+
+		serviceRegistry.register(registration);
+
+		ArgumentCaptor<ConsulRegistrationCompleted> eventCaptor = ArgumentCaptor
+			.forClass(ConsulRegistrationCompleted.class);
+
+		verify(publisher).publishEvent(eventCaptor.capture());
+
+		assertThat(eventCaptor.getValue().getRegistration()).isSameAs(registration);
+	}
 
 	@Test
 	void schedulesHeartbeatWhenInitialRegistrationFailsAndFailFastIsDisabled() {
@@ -38,11 +71,13 @@ class ConsulServiceRegistryRegistrationTests {
 		HeartbeatProperties heartbeatProperties = new HeartbeatProperties();
 		heartbeatProperties.setEnabled(true);
 		TtlScheduler ttlScheduler = mock(TtlScheduler.class);
+		ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
 
 		given(discoveryProperties.isFailFast()).willReturn(false);
 
 		ConsulServiceRegistry serviceRegistry = new ConsulServiceRegistry(consulClient, discoveryProperties,
 				ttlScheduler, heartbeatProperties);
+		serviceRegistry.setApplicationEventPublisher(publisher);
 
 		NewService service = new NewService();
 		service.setId("test-service");
@@ -60,6 +95,7 @@ class ConsulServiceRegistryRegistrationTests {
 		assertThatCode(() -> serviceRegistry.register(registration)).doesNotThrowAnyException();
 
 		verify(ttlScheduler).add(service);
+		verify(publisher, never()).publishEvent(any(ConsulRegistrationCompleted.class));
 	}
 
 	@Test
@@ -69,11 +105,13 @@ class ConsulServiceRegistryRegistrationTests {
 		HeartbeatProperties heartbeatProperties = new HeartbeatProperties();
 		heartbeatProperties.setEnabled(true);
 		TtlScheduler ttlScheduler = mock(TtlScheduler.class);
+		ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
 
 		given(discoveryProperties.isFailFast()).willReturn(true);
 
 		ConsulServiceRegistry serviceRegistry = new ConsulServiceRegistry(consulClient, discoveryProperties,
 				ttlScheduler, heartbeatProperties);
+		serviceRegistry.setApplicationEventPublisher(publisher);
 
 		NewService service = new NewService();
 		service.setId("test-service");
@@ -91,7 +129,8 @@ class ConsulServiceRegistryRegistrationTests {
 		assertThatCode(() -> serviceRegistry.register(registration)).isInstanceOf(IllegalStateException.class)
 			.hasMessage("Consul is unavailable");
 
-		verify(ttlScheduler, org.mockito.Mockito.never()).add(service);
+		verify(ttlScheduler, never()).add(service);
+		verify(publisher, never()).publishEvent(any(ConsulRegistrationCompleted.class));
 	}
 
 }
