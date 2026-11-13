@@ -41,18 +41,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 public class ConsulPropertySourceLocatorFilesTests {
 
+	/** Prefix used for Consul keys created by these tests. */
 	public static final String PREFIX = "_propertySourceLocatorFilesTests_config__";
 
+	/** Root Consul key path for the test configuration. */
 	public static final String ROOT = PREFIX + UUID.randomUUID();
 
+	/** Application name used to locate application-specific configuration files. */
 	public static final String APP_NAME = "testFilesFormat";
 
+	/** Name of the default YAML configuration file. */
 	public static final String APPLICATION_YML = "/application.yml";
 
+	/** Name of the development YAML configuration file. */
 	public static final String APPLICATION_DEV_YML = "/application-dev.yaml";
 
+	/** Path of the application-specific properties file. */
 	public static final String APP_NAME_PROPS = "/" + APP_NAME + ".properties";
 
+	/** Path of the application-specific development properties file. */
 	public static final String APP_NAME_DEV_PROPS = "/" + APP_NAME + "-dev.properties";
 
 	private ConfigurableApplicationContext context;

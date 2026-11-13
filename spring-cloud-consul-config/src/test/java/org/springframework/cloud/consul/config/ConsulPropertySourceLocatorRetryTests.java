@@ -33,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  */
 public class ConsulPropertySourceLocatorRetryTests {
 
+	/** Captures application output during retry tests. */
 	@Rule
 	public OutputCaptureRule output = new OutputCaptureRule();
 

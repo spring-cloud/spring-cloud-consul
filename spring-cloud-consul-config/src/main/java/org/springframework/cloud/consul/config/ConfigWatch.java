@@ -65,7 +65,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 	private boolean firstTime = true;
 
-	private ScheduledFuture<?> watchFuture;
+	private volatile ScheduledFuture<?> watchFuture;
 
 	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul,
 			LinkedHashMap<String, Long> initialIndexes) {
@@ -132,7 +132,14 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 		if (!this.running.get()) {
 			return;
 		}
+
 		for (String context : this.consulIndexes.keySet()) {
+
+			// Stop processing when the watcher is stopped. No further polling is
+			// required.
+			if (!this.running.get()) {
+				return;
+			}
 
 			// turn the context into a Consul folder path (unless our config format
 			// are FILES)
@@ -161,8 +168,10 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 				// if response.value == null, response was a 404, otherwise it was a
 				// 200, reducing churn if there wasn't anything
-				if (HttpStatus.OK.isSameCodeAs(response.getStatusCode()) && response.hasBody()
-						&& !response.getBody().isEmpty()) {
+				if ((HttpStatus.OK.isSameCodeAs(response.getStatusCode()) && response.hasBody()
+						&& (!response.getBody().isEmpty() || this.properties.getWatch().isRefreshOnDelete()))
+						|| (HttpStatus.NOT_FOUND.isSameCodeAs(response.getStatusCode())
+								&& this.properties.getWatch().isRefreshOnDelete())) {
 					Long newIndex = ConsulHeaders.getConsulIndex(response);
 
 					if (newIndex != null && !newIndex.equals(currentIndex)) {
@@ -172,12 +181,20 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 							if (log.isTraceEnabled()) {
 								log.trace("Context " + context + " has new index " + newIndex);
 							}
+
 							RefreshEventData data = new RefreshEventData(context, currentIndex, newIndex);
+
+							// Skip event publication if the watcher has been stopped.
+							if (!this.running.get()) {
+								return;
+							}
+
 							this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
 						}
 						else if (log.isTraceEnabled()) {
 							log.trace("Event for index already published for context " + context);
 						}
+
 						this.consulIndexes.put(context, newIndex);
 					}
 					else if (log.isTraceEnabled()) {
@@ -190,6 +207,11 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 			}
 			catch (Exception e) {
+				if (!this.running.get() && (isInterruptedException(e) || Thread.currentThread().isInterrupted())) {
+					// The scheduled task was interrupted during shutdown.
+					return;
+				}
+
 				// only fail fast on the initial query, otherwise just log the error
 				if (this.firstTime && this.properties.isFailFast()) {
 					log.error("Fail fast is set and there was an error reading configuration from consul.");
@@ -206,7 +228,19 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 				}
 			}
 		}
+
 		this.firstTime = false;
+	}
+
+	private boolean isInterruptedException(Throwable exception) {
+		Throwable cause = exception;
+		while (cause != null) {
+			if (cause instanceof InterruptedException) {
+				return true;
+			}
+			cause = cause.getCause();
+		}
+		return false;
 	}
 
 	public static class RefreshEventData {
