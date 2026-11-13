@@ -53,7 +53,7 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 
 	@Override
 	public List<ServiceInstance> getInstances(final String serviceId) {
-		return getInstances(serviceId, createQueryParams());
+		return getInstances(serviceId, createQueryParams(serviceId));
 	}
 
 	public List<ServiceInstance> getInstances(final String serviceId, final QueryParams queryParams) {
@@ -86,21 +86,29 @@ public class ConsulDiscoveryClient implements DiscoveryClient {
 	}
 
 	public List<ServiceInstance> getAllInstances() {
-		QueryParams queryParams = createQueryParams();
 		List<ServiceInstance> instances = new ArrayList<>();
 		for (String serviceId : getServices()) {
-			addInstancesToList(instances, serviceId, queryParams);
+			addInstancesToList(instances, serviceId, createQueryParams(serviceId));
 		}
 		return instances;
 	}
 
-	private QueryParams createQueryParams() {
+	/**
+	 * Creates the {@link QueryParams} used to look up the instances of a service. The
+	 * configured consistency mode is applied, and the service is looked up in the
+	 * datacenter configured for it in {@link ConsulDiscoveryProperties#getDatacenters()}
+	 * or in the agent's datacenter if none is configured.
+	 * @param serviceId the id of the service to look up
+	 * @return the query parameters for the service
+	 */
+	private QueryParams createQueryParams(String serviceId) {
 		ConsulDiscoveryProperties.ConsistencyMode consistencyModeProp = this.properties.getConsistencyMode();
 		ConsulClient.ConsistencyMode consistencyMode = ConsulClient.ConsistencyMode.DEFAULT;
 		if (consistencyModeProp != null) {
 			consistencyMode = ConsulClient.ConsistencyMode.valueOf(consistencyModeProp.name().toUpperCase(Locale.ROOT));
 		}
-		return new QueryParams(consistencyMode);
+		String datacenter = this.properties.getDatacenters().get(serviceId);
+		return new QueryParams(datacenter, consistencyMode);
 	}
 
 	@Override
