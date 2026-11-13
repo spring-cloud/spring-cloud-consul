@@ -292,6 +292,25 @@ public CustomApplicationStatusProvider customAppStatusProvider() {
 }
 ----
 
+[[initial-health-check-status]]
+=== Initial Health Check Status
+
+By default, Consul sets the status of a newly registered check to `critical` until the first health check runs or, for a TTL check, until the first heartbeat arrives.
+Tooling that reacts to critical services, such as Consul watches, can therefore see a freshly started instance as unhealthy.
+To start the check with a different status, set `spring.cloud.consul.discovery.health-check-initial-status` to `passing`, `warning` or `critical`.
+The status applies to the HTTP or TTL check that Spring Cloud Consul registers, including the check of a separately registered management service.
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        health-check-initial-status: warning
+----
+
+See the https://developer.hashicorp.com/consul/docs/register/health-check/vm#define-initial-health-check-status[Consul documentation] for details.
+
 [[actuator-health-indicators]]
 === Actuator Health Indicator(s)
 If the service instance is a Spring Boot Actuator application, it may be provided the following Actuator health indicators.
