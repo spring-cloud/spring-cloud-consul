@@ -27,6 +27,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtils.HostInfo;
 import org.springframework.cloud.commons.util.InetUtilsProperties;
+import org.springframework.cloud.consul.model.http.health.Check.CheckStatus;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
@@ -95,6 +96,12 @@ public class ConsulDiscoveryProperties {
 	 * Requires consul version 7.x or higher.
 	 */
 	private String healthCheckCriticalTimeout;
+
+	/**
+	 * Initial status of the registered health check (passing, warning or critical).
+	 * Consul sets new checks to critical when this is not set.
+	 */
+	private CheckStatus healthCheckInitialStatus;
 
 	/**
 	 * IP address to use when accessing service (must also set preferIpAddress to use).
@@ -340,6 +347,14 @@ public class ConsulDiscoveryProperties {
 
 	public void setHealthCheckUrl(String healthCheckUrl) {
 		this.healthCheckUrl = healthCheckUrl;
+	}
+
+	public CheckStatus getHealthCheckInitialStatus() {
+		return this.healthCheckInitialStatus;
+	}
+
+	public void setHealthCheckInitialStatus(CheckStatus healthCheckInitialStatus) {
+		this.healthCheckInitialStatus = healthCheckInitialStatus;
 	}
 
 	public Map<String, List<String>> getHealthCheckHeaders() {
@@ -631,6 +646,7 @@ public class ConsulDiscoveryProperties {
 			.append("hostInfo", this.hostInfo)
 			.append("healthCheckCriticalTimeout", this.healthCheckCriticalTimeout)
 			.append("healthCheckHeaders", this.healthCheckHeaders)
+			.append("healthCheckInitialStatus", this.healthCheckInitialStatus)
 			.append("healthCheckInterval", this.healthCheckInterval)
 			.append("healthCheckPath", this.healthCheckPath)
 			.append("healthCheckTimeout", this.healthCheckTimeout)

@@ -27,6 +27,7 @@
 |spring.cloud.consul.discovery.fail-fast | `+++true+++` | Throw exceptions during service registration if true, otherwise, log warnings (defaults to true).
 |spring.cloud.consul.discovery.health-check-critical-timeout |  | Timeout to deregister services critical for longer than timeout (e.g. 30m). Requires consul version 7.x or higher.
 |spring.cloud.consul.discovery.health-check-headers |  | Headers to be applied to the Health Check calls.
+|spring.cloud.consul.discovery.health-check-initial-status |  | Initial status of the registered health check (passing, warning or critical). Consul sets new checks to critical when this is not set.
 |spring.cloud.consul.discovery.health-check-interval | `+++10s+++` | How often to perform the health check (e.g. 10s), defaults to 10s.
 |spring.cloud.consul.discovery.health-check-path | `+++/actuator/health+++` | Alternate server path to invoke for health checking.
 |spring.cloud.consul.discovery.health-check-timeout |  | Timeout for health check (e.g. 10s).
