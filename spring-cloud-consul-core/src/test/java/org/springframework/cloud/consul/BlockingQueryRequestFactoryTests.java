@@ -68,7 +68,7 @@ class BlockingQueryRequestFactoryTests {
 	void blockingQueryTimeoutExceedsLongestWait() {
 		// Consul caps the wait at 10 minutes and adds up to wait / 16 of jitter
 		Duration maxWait = Duration.ofMinutes(10);
-		assertThat(ConsulAutoConfiguration.DEFAULT_BLOCKING_QUERY_READ_TIMEOUT)
+		assertThat(ConsulProperties.DEFAULT_BLOCKING_QUERY_READ_TIMEOUT)
 			.isGreaterThan(maxWait.plus(maxWait.dividedBy(16)));
 	}
 

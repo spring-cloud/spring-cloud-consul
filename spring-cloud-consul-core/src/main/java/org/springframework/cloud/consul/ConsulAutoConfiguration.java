@@ -84,13 +84,6 @@ public class ConsulAutoConfiguration {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConsulAutoConfiguration.class);
 
-	/**
-	 * Default read timeout of blocking queries. Consul caps the wait of a blocking query
-	 * at 10 minutes and adds up to 1/16 of the wait as jitter, so the timeout must exceed
-	 * that for a query to return before the client gives up on it.
-	 */
-	static final Duration DEFAULT_BLOCKING_QUERY_READ_TIMEOUT = Duration.ofMinutes(11);
-
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulProperties consulProperties() {
@@ -154,7 +147,7 @@ public class ConsulAutoConfiguration {
 
 	public static ConsulClientSettings createConsulClientSettings(String baseUrl,
 			ConsulProperties.TLSConfig tlsConfig) {
-		return createConsulClientSettings(baseUrl, tlsConfig, DEFAULT_BLOCKING_QUERY_READ_TIMEOUT);
+		return createConsulClientSettings(baseUrl, tlsConfig, ConsulProperties.DEFAULT_BLOCKING_QUERY_READ_TIMEOUT);
 	}
 
 	// TODO: migrate to boot managed sslbundle

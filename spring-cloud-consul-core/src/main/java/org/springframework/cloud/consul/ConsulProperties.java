@@ -19,6 +19,7 @@ package org.springframework.cloud.consul;
 import java.time.Duration;
 
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.time.DurationMin;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.consul.model.http.KeyStoreInstanceType;
@@ -38,6 +39,13 @@ public class ConsulProperties {
 	 * Prefix for configuration properties.
 	 */
 	public static final String PREFIX = "spring.cloud.consul";
+
+	/**
+	 * Default read timeout of blocking queries. Consul caps the wait of a blocking query
+	 * at 10 minutes and adds up to 1/16 of the wait as jitter, so the timeout must exceed
+	 * that for a query to return before the client gives up on it.
+	 */
+	public static final Duration DEFAULT_BLOCKING_QUERY_READ_TIMEOUT = Duration.ofMinutes(11);
 
 	/** Consul agent hostname. Defaults to 'localhost'. */
 	@NotNull
@@ -67,7 +75,8 @@ public class ConsulProperties {
 	 * exceed the longest wait time used. All other requests keep the default read
 	 * timeout.
 	 */
-	private Duration blockingQueryReadTimeout = ConsulAutoConfiguration.DEFAULT_BLOCKING_QUERY_READ_TIMEOUT;
+	@DurationMin(nanos = 1)
+	private Duration blockingQueryReadTimeout = DEFAULT_BLOCKING_QUERY_READ_TIMEOUT;
 
 	public String getHost() {
 		return this.host;
