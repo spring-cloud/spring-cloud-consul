@@ -17,9 +17,12 @@
 package org.springframework.cloud.consul.config;
 
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 public interface ConsulConfigIndexes {
 
 	LinkedHashMap<String, Long> getIndexes();
+
+	Set<String> getPopulatedContexts();
 
 }

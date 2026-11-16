@@ -68,6 +68,13 @@ public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigData
 			if (propertySource == null) {
 				return null;
 			}
+			if (propertySource.getPropertyNames().length > 0) {
+				String contextPath = resource.getContext();
+				if (contextPath.startsWith("/")) {
+					contextPath = contextPath.substring(1);
+				}
+				indexes.getPopulatedContexts().add(contextPath);
+			}
 			List<ConsulPropertySource> propertySources = Collections.singletonList(propertySource);
 			if (ALL_OPTIONS.size() == 1) {
 				// boot 2.4.2 and prior

@@ -33,6 +33,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.util.StringUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -156,13 +158,14 @@ public class ConfigWatchTests {
 
 		this.configProperties.getWatch().setRefreshOnDelete(true);
 
-		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes);
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes,
+				Collections.singleton(context), getTaskSchedulerForTest());
 		watch.setApplicationEventPublisher(eventPublisher);
 		watch.start();
 
 		watch.watchConfigKeyValues();
 
-		verify(eventPublisher, atLeastOnce()).publishEvent(any(RefreshEvent.class));
+		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
 	}
 
 	@Test
@@ -184,6 +187,66 @@ public class ConfigWatchTests {
 		initialIndexes.put(context, 1L);
 
 		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes);
+		watch.setApplicationEventPublisher(eventPublisher);
+		watch.start();
+
+		watch.watchConfigKeyValues();
+
+		verify(eventPublisher, never()).publishEvent(any(RefreshEvent.class));
+	}
+
+	@Test
+	public void watchDoesNotPublishEventWhenEmptyContextIsNeverPopulated() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		String context = "/app/";
+		ConsulClient consul = mock(ConsulClient.class);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(ConsulHeaders.INDEX_HEADER, "2");
+		headers.add(ConsulHeaders.LAST_CONTACT_HEADER, "1");
+
+		ResponseEntity<List<GetValue>> response = ResponseEntity.ok().headers(headers).body(Collections.emptyList());
+
+		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong())).thenReturn(response);
+
+		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
+		initialIndexes.put(context, 1L);
+
+		this.configProperties.getWatch().setRefreshOnDelete(true);
+
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes, Collections.emptySet(),
+				getTaskSchedulerForTest());
+		watch.setApplicationEventPublisher(eventPublisher);
+		watch.start();
+
+		watch.watchConfigKeyValues();
+
+		verify(eventPublisher, never()).publishEvent(any(RefreshEvent.class));
+	}
+
+	@Test
+	public void watchDoesNotPublishEventWhenNeverPopulatedContextIsNotFound() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		String context = "/app/";
+		ConsulClient consul = mock(ConsulClient.class);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(ConsulHeaders.INDEX_HEADER, "2");
+		headers.add(ConsulHeaders.LAST_CONTACT_HEADER, "1");
+
+		ResponseEntity<List<GetValue>> response = ResponseEntity.status(HttpStatus.NOT_FOUND).headers(headers).build();
+
+		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong())).thenReturn(response);
+
+		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
+		initialIndexes.put(context, 1L);
+
+		this.configProperties.getWatch().setRefreshOnDelete(true);
+
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes, Collections.emptySet(),
+				getTaskSchedulerForTest());
 		watch.setApplicationEventPublisher(eventPublisher);
 		watch.start();
 
@@ -232,18 +295,149 @@ public class ConfigWatchTests {
 
 		this.configProperties.getWatch().setRefreshOnDelete(true);
 
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes,
+				Collections.singleton(context), getTaskSchedulerForTest());
+		watch.setApplicationEventPublisher(eventPublisher);
+		watch.start();
+
+		watch.watchConfigKeyValues();
+
+		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
+	}
+
+	@Test
+	public void watchDoesNotPublishEventWhenNotFoundAndRefreshOnDeleteIsDisabled() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		String context = "/app/";
+		ConsulClient consul = mock(ConsulClient.class);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(ConsulHeaders.INDEX_HEADER, "2");
+
+		ResponseEntity<List<GetValue>> response = ResponseEntity.status(HttpStatus.NOT_FOUND).headers(headers).build();
+
+		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong())).thenReturn(response);
+
+		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
+		initialIndexes.put(context, 1L);
+
 		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes);
 		watch.setApplicationEventPublisher(eventPublisher);
 		watch.start();
 
 		watch.watchConfigKeyValues();
 
-		verify(eventPublisher, atLeastOnce()).publishEvent(any(RefreshEvent.class));
+		verify(eventPublisher, times(0)).publishEvent(any(RefreshEvent.class));
+	}
+
+	@Test
+	public void watchDoesNotPublishEventWhenNotFoundAndIndexIsInitiallyUnprimed() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		String context = "/app/";
+		ConsulClient consul = mock(ConsulClient.class);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(ConsulHeaders.INDEX_HEADER, "2");
+
+		ResponseEntity<List<GetValue>> response = ResponseEntity.status(HttpStatus.NOT_FOUND).headers(headers).build();
+
+		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong())).thenReturn(response);
+
+		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
+		initialIndexes.put(context, -1L);
+
+		this.configProperties.getWatch().setRefreshOnDelete(true);
+
+		TaskScheduler taskScheduler = mock(TaskScheduler.class);
+
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes, Collections.emptySet(),
+				taskScheduler);
+		watch.setApplicationEventPublisher(eventPublisher);
+		watch.start();
+
+		watch.watchConfigKeyValues();
+		watch.watchConfigKeyValues();
+
+		org.mockito.ArgumentCaptor<Long> indexCaptor = org.mockito.ArgumentCaptor.forClass(Long.class);
+		verify(consul, times(2)).getKVValues(eq(context), nullable(String.class), anyLong(), indexCaptor.capture());
+
+		assertThat(indexCaptor.getAllValues()).containsExactly(-1L, 2L);
+		verify(eventPublisher, times(0)).publishEvent(any(RefreshEvent.class));
+	}
+
+	@Test
+	public void watchDoesNotPublishEventWhenNotFoundAndIndexHasNotChanged() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		String context = "/app/";
+		ConsulClient consul = mock(ConsulClient.class);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(ConsulHeaders.INDEX_HEADER, "2");
+
+		ResponseEntity<List<GetValue>> response = ResponseEntity.status(HttpStatus.NOT_FOUND).headers(headers).build();
+
+		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong())).thenReturn(response);
+
+		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
+		initialIndexes.put(context, 2L);
+
+		this.configProperties.getWatch().setRefreshOnDelete(true);
+
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes);
+		watch.setApplicationEventPublisher(eventPublisher);
+		watch.start();
+
+		watch.watchConfigKeyValues();
+
+		verify(eventPublisher, times(0)).publishEvent(any(RefreshEvent.class));
+	}
+
+	@Test
+	public void watchDoesNotPublishDuplicateEventsForSameIndexAcrossContexts() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		String firstContext = "/app/";
+		String secondContext = "/application/";
+
+		ConsulClient consul = mock(ConsulClient.class);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(ConsulHeaders.INDEX_HEADER, "3");
+		headers.add(ConsulHeaders.LAST_CONTACT_HEADER, "1");
+
+		ResponseEntity<List<GetValue>> response = ResponseEntity.ok()
+			.headers(headers)
+			.body(Collections.singletonList(mock(GetValue.class)));
+
+		when(consul.getKVValues(eq(firstContext), nullable(String.class), anyLong(), anyLong())).thenReturn(response);
+
+		when(consul.getKVValues(eq(secondContext), nullable(String.class), anyLong(), anyLong())).thenReturn(response);
+
+		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
+		initialIndexes.put(firstContext, 1L);
+		initialIndexes.put(secondContext, 2L);
+
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes);
+		watch.setApplicationEventPublisher(eventPublisher);
+		watch.start();
+
+		watch.watchConfigKeyValues();
+
+		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
 	}
 
 	@Test
 	public void refreshOnDeleteIsDisabledByDefault() {
 		assertThat(this.configProperties.getWatch().isRefreshOnDelete()).isFalse();
+	}
+
+	private ThreadPoolTaskScheduler getTaskSchedulerForTest() {
+		ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+		taskScheduler.initialize();
+		return taskScheduler;
 	}
 
 }
