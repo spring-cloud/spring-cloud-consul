@@ -154,9 +154,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 			// Turn the context into a Consul folder path unless the config format
 			// is FILES.
-			if (this.properties.getFormat() != FILES && !context.endsWith("/")) {
-				context = context + "/";
-			}
+			context = normalizeContext(context, this.properties);
 
 			try {
 				Long currentIndex = this.consulIndexes.get(context);
@@ -194,8 +192,8 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 						// time (-1) so the index can be primed.
 						boolean indexAlreadyPublished = this.consulIndexes.containsValue(newIndex);
 
-						if ((!indexAlreadyPublished || (deletionResponse && contextWasPopulated))
-								&& !currentIndex.equals(-1L) && (!deletionResponse || contextWasPopulated)) {
+						if (shouldPublishRefreshEvent(indexAlreadyPublished, deletionResponse, contextWasPopulated,
+								currentIndex)) {
 							if (log.isTraceEnabled()) {
 								log.trace("Context " + context + " has new index " + newIndex);
 							}
@@ -208,6 +206,10 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 							}
 
 							this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
+
+							if (deletionResponse) {
+								this.populatedContexts.remove(context);
+							}
 						}
 						else if (log.isTraceEnabled()) {
 							log.trace("Event for index already published or context was never populated: " + context);
@@ -274,6 +276,20 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 			cause = cause.getCause();
 		}
 		return false;
+	}
+
+	static String normalizeContext(String context, ConsulConfigProperties properties) {
+		if (properties.getFormat() != FILES && !context.endsWith("/")) {
+			return context + "/";
+		}
+		return context;
+	}
+
+	private boolean shouldPublishRefreshEvent(boolean indexAlreadyPublished, boolean deletionResponse,
+			boolean contextWasPopulated, Long currentIndex) {
+
+		return !currentIndex.equals(-1L) && (!indexAlreadyPublished || (deletionResponse && contextWasPopulated))
+				&& (!deletionResponse || contextWasPopulated);
 	}
 
 	public static class RefreshEventData {

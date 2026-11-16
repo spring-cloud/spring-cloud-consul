@@ -69,10 +69,7 @@ public class ConsulConfigDataLoader implements ConfigDataLoader<ConsulConfigData
 				return null;
 			}
 			if (propertySource.getPropertyNames().length > 0) {
-				String contextPath = resource.getContext();
-				if (contextPath.startsWith("/")) {
-					contextPath = contextPath.substring(1);
-				}
+				String contextPath = ConfigWatch.normalizeContext(resource.getContext(), resource.getProperties());
 				indexes.getPopulatedContexts().add(contextPath);
 			}
 			List<ConsulPropertySource> propertySources = Collections.singletonList(propertySource);

@@ -110,6 +110,48 @@ public class ConsulConfigDeleteRefreshIntegrationTests {
 			.isNull();
 	}
 
+	@Test
+	public void configurationRefreshesWhenLastConsulKeyIsDeletedUsingConfigDataImport() throws Exception {
+		String configDataRoot = PREFIX + "configData" + UUID.randomUUID();
+		String configDataKey = configDataRoot + "/application/" + PROPERTY_NAME;
+
+		testClient.setKVValue(configDataKey, PROPERTY_VALUE);
+
+		ConfigurableApplicationContext configDataContext = null;
+
+		try {
+			configDataContext = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
+				.run("--spring.application.name=" + APP_NAME + "ConfigData", "--spring.config.import=consul:",
+						"--spring.cloud.consul.host=" + ConsulTestcontainers.getHost(),
+						"--spring.cloud.consul.port=" + ConsulTestcontainers.getPort(),
+						"--spring.cloud.consul.config.prefixes=" + configDataRoot,
+						"--spring.cloud.consul.config.watch.delay=1000",
+						"--spring.cloud.consul.config.watch.refresh-on-delete=true");
+
+			assertThat(configDataContext.getEnvironment().getProperty(PROPERTY_NAME)).isEqualTo(PROPERTY_VALUE);
+
+			CountDownLatch latch = configDataContext.getBean("deleteRefreshLatch", CountDownLatch.class);
+
+			testClient.deleteKVValues(configDataKey);
+
+			boolean receivedEvent = latch.await(15, TimeUnit.SECONDS);
+
+			assertThat(receivedEvent)
+				.as("refresh event was not received after deleting the Config Data imported Consul key")
+				.isTrue();
+
+			assertThat(configDataContext.getEnvironment().getProperty(PROPERTY_NAME))
+				.as("deleted Config Data property should no longer be available")
+				.isNull();
+		}
+		finally {
+			if (configDataContext != null) {
+				configDataContext.close();
+			}
+			testClient.deleteKVValues(configDataRoot);
+		}
+	}
+
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	static class Config {

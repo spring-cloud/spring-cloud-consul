@@ -430,6 +430,48 @@ public class ConfigWatchTests {
 	}
 
 	@Test
+	public void watchDoesNotPublishEventForConsecutiveNotFoundResponses() {
+		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
+
+		String context = "/app/";
+		ConsulClient consul = mock(ConsulClient.class);
+
+		HttpHeaders firstHeaders = new HttpHeaders();
+		firstHeaders.add(ConsulHeaders.INDEX_HEADER, "2");
+
+		ResponseEntity<List<GetValue>> firstResponse = ResponseEntity.status(HttpStatus.NOT_FOUND)
+			.headers(firstHeaders)
+			.build();
+
+		HttpHeaders secondHeaders = new HttpHeaders();
+		secondHeaders.add(ConsulHeaders.INDEX_HEADER, "3");
+
+		ResponseEntity<List<GetValue>> secondResponse = ResponseEntity.status(HttpStatus.NOT_FOUND)
+			.headers(secondHeaders)
+			.build();
+
+		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong())).thenReturn(firstResponse,
+				secondResponse);
+
+		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
+		initialIndexes.put(context, 1L);
+
+		this.configProperties.getWatch().setRefreshOnDelete(true);
+
+		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes,
+				Collections.singleton(context), mock(TaskScheduler.class));
+
+		watch.setApplicationEventPublisher(eventPublisher);
+		watch.start();
+
+		watch.watchConfigKeyValues();
+		watch.watchConfigKeyValues();
+
+		verify(consul, times(2)).getKVValues(eq(context), nullable(String.class), anyLong(), anyLong());
+		verify(eventPublisher, times(1)).publishEvent(any(RefreshEvent.class));
+	}
+
+	@Test
 	public void refreshOnDeleteIsDisabledByDefault() {
 		assertThat(this.configProperties.getWatch().isRefreshOnDelete()).isFalse();
 	}
