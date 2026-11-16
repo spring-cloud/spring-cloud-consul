@@ -19,11 +19,11 @@ package org.springframework.cloud.consul;
 import java.time.Duration;
 
 import jakarta.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.time.DurationMin;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.consul.model.http.KeyStoreInstanceType;
 import org.springframework.core.style.ToStringCreator;
+import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 
 import static org.springframework.cloud.consul.ConsulProperties.PREFIX;
@@ -75,7 +75,6 @@ public class ConsulProperties {
 	 * exceed the longest wait time used. All other requests keep the default read
 	 * timeout.
 	 */
-	@DurationMin(nanos = 1)
 	private Duration blockingQueryReadTimeout = DEFAULT_BLOCKING_QUERY_READ_TIMEOUT;
 
 	public String getHost() {
@@ -131,6 +130,8 @@ public class ConsulProperties {
 	}
 
 	public void setBlockingQueryReadTimeout(Duration blockingQueryReadTimeout) {
+		Assert.isTrue(!blockingQueryReadTimeout.isNegative() && !blockingQueryReadTimeout.isZero(),
+				"blockingQueryReadTimeout must be greater than zero");
 		this.blockingQueryReadTimeout = blockingQueryReadTimeout;
 	}
 
