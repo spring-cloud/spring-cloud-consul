@@ -122,7 +122,7 @@ You could store a YAML document in any of the keys listed above.
 
 You can change the data key using `spring.cloud.consul.config.data-key`.
 
-A YAML document can use at most 1000 aliases for maps and lists and can be at most 524288 code points long (the maximum size of a value in Consul). To change these limits, set `spring.cloud.consul.config.yaml-max-aliases-for-collections` and `spring.cloud.consul.config.yaml-code-point-limit`. They also apply to the `FILES` format.
+A YAML document can use at most 1000 aliases for maps and lists and can be at most 524288 code points long (the default maximum size of a value in Consul). To change these limits, set `spring.cloud.consul.config.yaml-max-aliases-for-collections` and `spring.cloud.consul.config.yaml-code-point-limit`. They also apply to the `FILES` format.
 
 [[spring-cloud-consul-config-git2consul]]
 == git2consul with Config

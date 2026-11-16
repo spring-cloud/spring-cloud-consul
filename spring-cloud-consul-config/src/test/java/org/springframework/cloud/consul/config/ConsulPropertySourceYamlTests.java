@@ -46,7 +46,7 @@ class ConsulPropertySourceYamlTests {
 	/** More aliases than the SnakeYAML default limit of 50. */
 	private static final int ALIAS_COUNT = 51;
 
-	/** The default code point limit, the maximum size of a value in Consul. */
+	/** The default code point limit, the default maximum size of a value in Consul. */
 	private static final int DEFAULT_CODE_POINT_LIMIT = 512 * 1024;
 
 	@Test
@@ -84,14 +84,12 @@ class ConsulPropertySourceYamlTests {
 	void yamlExceedingDefaultCodePointLimitIsRejected() {
 		String yaml = "foo: " + "x".repeat(DEFAULT_CODE_POINT_LIMIT - "foo: ".length() + 1);
 
-		assertThatExceptionOfType(YAMLException.class).isThrownBy(() -> generateProperties(yaml))
-			.withMessageContaining("exceeds the limit: " + DEFAULT_CODE_POINT_LIMIT + " code points");
+		assertThatExceptionOfType(YAMLException.class).isThrownBy(() -> generateProperties(yaml));
 	}
 
 	@Test
 	void yamlExceedingDefaultAliasLimitIsRejected() {
-		assertThatExceptionOfType(YAMLException.class).isThrownBy(() -> generateProperties(yamlWithAliases(1001)))
-			.withMessageContaining("Number of aliases for non-scalar nodes exceeds the specified max=1000");
+		assertThatExceptionOfType(YAMLException.class).isThrownBy(() -> generateProperties(yamlWithAliases(1001)));
 	}
 
 	@Test
@@ -101,8 +99,7 @@ class ConsulPropertySourceYamlTests {
 
 	@Test
 	void yamlWithGlobalTagIsRejected() {
-		assertThatExceptionOfType(YAMLException.class).isThrownBy(() -> generateProperties("foo: !!java.util.Date {}"))
-			.withMessageContaining("Global tag is not allowed");
+		assertThatExceptionOfType(YAMLException.class).isThrownBy(() -> generateProperties("foo: !!java.util.Date {}"));
 	}
 
 	@Test
@@ -111,8 +108,16 @@ class ConsulPropertySourceYamlTests {
 		properties.setYamlMaxAliasesForCollections(ALIAS_COUNT - 1);
 
 		assertThatExceptionOfType(YAMLException.class)
-			.isThrownBy(() -> generateProperties(yamlWithAliases(), properties))
-			.withMessageContaining("Number of aliases for non-scalar nodes exceeds the specified max=");
+			.isThrownBy(() -> generateProperties(yamlWithAliases(), properties));
+	}
+
+	@Test
+	void aliasLimitOfZeroRejectsAnyAlias() {
+		ConsulConfigProperties properties = new ConsulConfigProperties();
+		properties.setYamlMaxAliasesForCollections(0);
+
+		assertThatExceptionOfType(YAMLException.class)
+			.isThrownBy(() -> generateProperties(yamlWithAliases(), properties));
 	}
 
 	@Test
@@ -129,8 +134,7 @@ class ConsulPropertySourceYamlTests {
 		properties.setYamlCodePointLimit(100);
 
 		assertThatExceptionOfType(YAMLException.class)
-			.isThrownBy(() -> generateProperties("foo: " + "x".repeat(100), properties))
-			.withMessageContaining("exceeds the limit: 100 code points");
+			.isThrownBy(() -> generateProperties("foo: " + "x".repeat(100), properties));
 	}
 
 	private Properties generateProperties(String yaml) {

@@ -70,12 +70,12 @@ public class ConsulConfigProperties {
 	 * Maximum number of aliases that may refer to non-scalar nodes (maps and lists) in a
 	 * YAML document when format is Format.YAML or Format.FILES. Defaults to 1000.
 	 */
-	@Min(1)
+	@Min(0)
 	private int yamlMaxAliasesForCollections = 1000;
 
 	/**
 	 * Maximum size, in code points, of a YAML document when format is Format.YAML or
-	 * Format.FILES. Defaults to 524288, the maximum size of a value in Consul.
+	 * Format.FILES. Defaults to 524288, the default maximum size of a value in Consul.
 	 */
 	@Min(1)
 	private int yamlCodePointLimit = 512 * 1024;
