@@ -51,6 +51,13 @@ class BlockingQueryRequestFactoryTests {
 	}
 
 	@Test
+	void requestWithIndexOnlyUsesBlockingQueryFactory() throws Exception {
+		URI uri = URI.create("http://localhost:8500/v1/kv/config?index=10");
+
+		assertThat(this.factory.createRequest(uri, HttpMethod.GET)).isSameAs(this.blockingRequest);
+	}
+
+	@Test
 	void requestWithoutWaitUsesDefaultFactory() throws Exception {
 		URI uri = URI.create("http://localhost:8500/v1/agent/self?dc=dc1");
 
@@ -61,7 +68,7 @@ class BlockingQueryRequestFactoryTests {
 	void blockingQueryTimeoutExceedsLongestWait() {
 		// Consul caps the wait at 10 minutes and adds up to wait / 16 of jitter
 		Duration maxWait = Duration.ofMinutes(10);
-		assertThat(ConsulAutoConfiguration.BLOCKING_QUERY_READ_TIMEOUT)
+		assertThat(ConsulAutoConfiguration.DEFAULT_BLOCKING_QUERY_READ_TIMEOUT)
 			.isGreaterThan(maxWait.plus(maxWait.dividedBy(16)));
 	}
 

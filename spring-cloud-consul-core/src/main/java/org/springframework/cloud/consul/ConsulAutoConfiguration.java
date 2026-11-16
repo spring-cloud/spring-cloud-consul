@@ -61,6 +61,7 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.interceptor.RetryInterceptorBuilder;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
@@ -84,11 +85,11 @@ public class ConsulAutoConfiguration {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ConsulAutoConfiguration.class);
 
 	/**
-	 * Read timeout of blocking queries. Consul caps the wait of a blocking query at 10
-	 * minutes and adds up to 1/16 of the wait as jitter, so the timeout must exceed that
-	 * for a query to return before the client gives up on it.
+	 * Default read timeout of blocking queries. Consul caps the wait of a blocking query
+	 * at 10 minutes and adds up to 1/16 of the wait as jitter, so the timeout must exceed
+	 * that for a query to return before the client gives up on it.
 	 */
-	static final Duration BLOCKING_QUERY_READ_TIMEOUT = Duration.ofMinutes(11);
+	static final Duration DEFAULT_BLOCKING_QUERY_READ_TIMEOUT = Duration.ofMinutes(11);
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -100,7 +101,8 @@ public class ConsulAutoConfiguration {
 	@ConditionalOnMissingBean
 	public ConsulClientSettings consulClientRestClientAdapter(ConsulProperties consulProperties) {
 		String baseUrl = createConsulClientBaseUrl(consulProperties);
-		return createConsulClientSettings(baseUrl, consulProperties.getTls());
+		return createConsulClientSettings(baseUrl, consulProperties.getTls(),
+				consulProperties.getBlockingQueryReadTimeout());
 	}
 
 	@Bean
@@ -135,7 +137,9 @@ public class ConsulAutoConfiguration {
 
 	public static ConsulClient createNewConsulClient(ConsulProperties consulProperties) {
 		String baseUrl = createConsulClientBaseUrl(consulProperties);
-		HttpExchangeAdapter adapter = createConsulClientSettings(baseUrl, consulProperties.getTls()).adapter();
+		HttpExchangeAdapter adapter = createConsulClientSettings(baseUrl, consulProperties.getTls(),
+				consulProperties.getBlockingQueryReadTimeout())
+			.adapter();
 		return createNewConsulClient(adapter);
 	}
 
@@ -148,9 +152,14 @@ public class ConsulAutoConfiguration {
 		return factory.createClient(ConsulClient.class);
 	}
 
-	// TODO: migrate to boot managed sslbundle
 	public static ConsulClientSettings createConsulClientSettings(String baseUrl,
 			ConsulProperties.TLSConfig tlsConfig) {
+		return createConsulClientSettings(baseUrl, tlsConfig, DEFAULT_BLOCKING_QUERY_READ_TIMEOUT);
+	}
+
+	// TODO: migrate to boot managed sslbundle
+	public static ConsulClientSettings createConsulClientSettings(String baseUrl, ConsulProperties.TLSConfig tlsConfig,
+			Duration blockingQueryReadTimeout) {
 		try {
 			DefaultUriBuilderFactory uriBuilderFactory = new DefaultUriBuilderFactory(baseUrl);
 			uriBuilderFactory.setEncodingMode(EncodingMode.NONE);
@@ -180,9 +189,9 @@ public class ConsulAutoConfiguration {
 			HttpClientSettings defaultSettings = (settings != null) ? settings : HttpClientSettings.defaults();
 			ClientHttpRequestFactoryBuilder<?> requestFactoryBuilder = ClientHttpRequestFactoryBuilder.detect();
 			builder.requestFactory(new BlockingQueryRequestFactory(requestFactoryBuilder.build(defaultSettings),
-					requestFactoryBuilder.build(defaultSettings.withReadTimeout(BLOCKING_QUERY_READ_TIMEOUT))));
+					requestFactoryBuilder.build(defaultSettings.withReadTimeout(blockingQueryReadTimeout))));
 
-			return new ConsulClientSettings(baseUrl, settings, RestClientAdapter.create(builder.build()));
+			return new ConsulClientSettings(baseUrl, defaultSettings, RestClientAdapter.create(builder.build()));
 		}
 		catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
 			throw new RuntimeException(e);
@@ -196,9 +205,10 @@ public class ConsulAutoConfiguration {
 	}
 
 	/**
-	 * Sends blocking queries, which carry a {@code wait} parameter, through a request
-	 * factory with a read timeout longer than any wait Consul accepts. All other requests
-	 * keep the default read timeout, so a hung agent still fails quickly.
+	 * Sends blocking queries, which carry a {@code wait} or an {@code index} parameter,
+	 * through a request factory with a read timeout longer than any wait Consul accepts.
+	 * All other requests keep the default read timeout, so a hung agent still fails
+	 * quickly.
 	 */
 	static final class BlockingQueryRequestFactory implements ClientHttpRequestFactory {
 
@@ -214,7 +224,8 @@ public class ConsulAutoConfiguration {
 
 		@Override
 		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
-			boolean blockingQuery = UriComponentsBuilder.fromUri(uri).build().getQueryParams().containsKey("wait");
+			MultiValueMap<String, String> params = UriComponentsBuilder.fromUri(uri).build().getQueryParams();
+			boolean blockingQuery = params.containsKey("wait") || params.containsKey("index");
 			return (blockingQuery ? this.blockingQueryFactory : this.defaultFactory).createRequest(uri, httpMethod);
 		}
 
