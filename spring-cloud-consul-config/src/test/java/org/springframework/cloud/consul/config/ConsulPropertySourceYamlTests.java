@@ -43,11 +43,11 @@ import static org.mockito.Mockito.when;
  */
 class ConsulPropertySourceYamlTests {
 
-	/** One more alias than the SnakeYAML default limit of 50. */
+	/** More aliases than the SnakeYAML default limit of 50. */
 	private static final int ALIAS_COUNT = 51;
 
-	/** One more code point than the SnakeYAML default limit of 3 MB. */
-	private static final int CODE_POINT_COUNT = 3 * 1024 * 1024 + 1;
+	/** The default code point limit, the maximum size of a value in Consul. */
+	private static final int DEFAULT_CODE_POINT_LIMIT = 512 * 1024;
 
 	@Test
 	void yamlFormatLoadsDocumentExceedingDefaultAliasLimit() {
@@ -74,10 +74,24 @@ class ConsulPropertySourceYamlTests {
 	}
 
 	@Test
-	void yamlLoadsDocumentExceedingDefaultCodePointLimit() {
-		String value = "x".repeat(CODE_POINT_COUNT);
+	void yamlLoadsDocumentWithinDefaultCodePointLimit() {
+		String value = "x".repeat(DEFAULT_CODE_POINT_LIMIT - "foo: ".length());
 
 		assertThat(generateProperties("foo: " + value)).containsEntry("foo", value);
+	}
+
+	@Test
+	void yamlExceedingDefaultCodePointLimitIsRejected() {
+		String yaml = "foo: " + "x".repeat(DEFAULT_CODE_POINT_LIMIT - "foo: ".length() + 1);
+
+		assertThatExceptionOfType(YAMLException.class).isThrownBy(() -> generateProperties(yaml))
+			.withMessageContaining("exceeds the limit: " + DEFAULT_CODE_POINT_LIMIT + " code points");
+	}
+
+	@Test
+	void yamlExceedingDefaultAliasLimitIsRejected() {
+		assertThatExceptionOfType(YAMLException.class).isThrownBy(() -> generateProperties(yamlWithAliases(1001)))
+			.withMessageContaining("Number of aliases for non-scalar nodes exceeds the specified max=1000");
 	}
 
 	@Test
@@ -129,8 +143,12 @@ class ConsulPropertySourceYamlTests {
 	}
 
 	private static String yamlWithAliases() {
+		return yamlWithAliases(ALIAS_COUNT);
+	}
+
+	private static String yamlWithAliases(int aliasCount) {
 		StringBuilder yaml = new StringBuilder("defaults: &defaults\n  timeout: 5\n");
-		for (int i = 0; i < ALIAS_COUNT; i++) {
+		for (int i = 0; i < aliasCount; i++) {
 			yaml.append("service").append(i).append(": *defaults\n");
 		}
 		return yaml.toString();

@@ -213,8 +213,7 @@ public class ConsulPropertySource extends EnumerablePropertySource<ConsulClient>
 
 	/**
 	 * Applies the configured SnakeYAML limits on aliases for non-scalar nodes and on code
-	 * points. By default both are lifted, as Spring Boot does for local configuration
-	 * files, because configuration read from Consul is as trusted as them.
+	 * points instead of the SnakeYAML defaults.
 	 */
 	private static final class ConsulYamlPropertiesFactoryBean extends YamlPropertiesFactoryBean {
 

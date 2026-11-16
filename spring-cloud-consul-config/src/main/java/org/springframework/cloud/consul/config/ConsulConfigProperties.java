@@ -68,17 +68,17 @@ public class ConsulConfigProperties {
 
 	/**
 	 * Maximum number of aliases that may refer to non-scalar nodes (maps and lists) in a
-	 * YAML document when format is Format.YAML or Format.FILES. Defaults to no limit.
+	 * YAML document when format is Format.YAML or Format.FILES. Defaults to 1000.
 	 */
 	@Min(1)
-	private int yamlMaxAliasesForCollections = Integer.MAX_VALUE;
+	private int yamlMaxAliasesForCollections = 1000;
 
 	/**
 	 * Maximum size, in code points, of a YAML document when format is Format.YAML or
-	 * Format.FILES. Defaults to no limit.
+	 * Format.FILES. Defaults to 524288, the maximum size of a value in Consul.
 	 */
 	@Min(1)
-	private int yamlCodePointLimit = Integer.MAX_VALUE;
+	private int yamlCodePointLimit = 512 * 1024;
 
 	@Value("${consul.token:${CONSUL_TOKEN:${spring.cloud.consul.token:${SPRING_CLOUD_CONSUL_TOKEN:}}}}")
 	private String aclToken;
