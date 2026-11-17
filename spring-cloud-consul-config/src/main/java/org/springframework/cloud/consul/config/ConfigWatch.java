@@ -283,14 +283,12 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 	}
 
 	static String normalizeContext(String context, ConsulConfigProperties properties) {
-		if (properties.getFormat() != FILES) {
-			if (context.startsWith("/")) {
-				context = context.substring(1);
-			}
+		if (context.startsWith("/")) {
+			context = context.substring(1);
+		}
 
-			if (!context.endsWith("/")) {
-				context = context + "/";
-			}
+		if (properties.getFormat() != FILES && !context.endsWith("/")) {
+			context = context + "/";
 		}
 
 		return context;

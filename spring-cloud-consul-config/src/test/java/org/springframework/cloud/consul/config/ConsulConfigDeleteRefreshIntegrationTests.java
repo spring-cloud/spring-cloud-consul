@@ -19,6 +19,7 @@ package org.springframework.cloud.consul.config;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -98,7 +99,9 @@ public class ConsulConfigDeleteRefreshIntegrationTests {
 		assertThat(environment.getProperty(PROPERTY_NAME)).isEqualTo(PROPERTY_VALUE);
 
 		CountDownLatch latch = context.getBean("deleteRefreshLatch", CountDownLatch.class);
+		AtomicBoolean refreshArmed = context.getBean("deleteRefreshArmed", AtomicBoolean.class);
 
+		refreshArmed.set(true);
 		testClient.deleteKVValues(KEY);
 
 		boolean receivedEvent = latch.await(15, TimeUnit.SECONDS);
@@ -134,7 +137,9 @@ public class ConsulConfigDeleteRefreshIntegrationTests {
 				.isEqualTo(PROPERTY_VALUE);
 
 			CountDownLatch latch = configDataContext.getBean("deleteRefreshLatch", CountDownLatch.class);
+			AtomicBoolean refreshArmed = configDataContext.getBean("deleteRefreshArmed", AtomicBoolean.class);
 
+			refreshArmed.set(true);
 			testClient.deleteKVValues(configDataKey);
 
 			boolean receivedEvent = latch.await(15, TimeUnit.SECONDS);
@@ -155,6 +160,49 @@ public class ConsulConfigDeleteRefreshIntegrationTests {
 		}
 	}
 
+	@Test
+	public void configurationRefreshesWhenLastConsulFileIsDeletedUsingConfigDataImport() throws Exception {
+		String configDataRoot = PREFIX + "configDataFiles" + UUID.randomUUID();
+		String configDataKey = configDataRoot + ".yml";
+
+		testClient.setKVValue(configDataKey, PROPERTY_NAME + ": " + PROPERTY_VALUE);
+
+		ConfigurableApplicationContext configDataContext = null;
+
+		try {
+			configDataContext = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
+				.run("--spring.application.name=" + APP_NAME + "ConfigDataFiles",
+						"--spring.config.import=optional:consul:" + ConsulTestcontainers.getHost() + ":"
+								+ ConsulTestcontainers.getPort() + "//" + configDataRoot,
+						"--spring.cloud.consul.config.format=FILES", "--spring.cloud.consul.config.watch.delay=1000",
+						"--spring.cloud.consul.config.watch.refresh-on-delete=true");
+
+			assertThat(configDataContext.getEnvironment().getProperty(PROPERTY_NAME))
+				.as("property should be loaded from the explicitly imported Consul YAML file")
+				.isEqualTo(PROPERTY_VALUE);
+
+			CountDownLatch latch = configDataContext.getBean("deleteRefreshLatch", CountDownLatch.class);
+			AtomicBoolean refreshArmed = configDataContext.getBean("deleteRefreshArmed", AtomicBoolean.class);
+
+			refreshArmed.set(true);
+			testClient.deleteKVValues(configDataKey);
+
+			boolean receivedEvent = latch.await(15, TimeUnit.SECONDS);
+
+			assertThat(receivedEvent)
+				.as("refresh event was not received after deleting the Config Data imported Consul file")
+				.isTrue();
+
+		}
+		finally {
+			if (configDataContext != null) {
+				configDataContext.close();
+			}
+			testClient.deleteKVValues(configDataRoot);
+			testClient.deleteKVValues(configDataKey);
+		}
+	}
+
 	@Configuration(proxyBeanMethods = false)
 	@EnableAutoConfiguration
 	static class Config {
@@ -165,9 +213,15 @@ public class ConsulConfigDeleteRefreshIntegrationTests {
 		}
 
 		@Bean
-		public ApplicationListener<EnvironmentChangeEvent> deleteRefreshListener(CountDownLatch deleteRefreshLatch) {
+		public AtomicBoolean deleteRefreshArmed() {
+			return new AtomicBoolean(false);
+		}
+
+		@Bean
+		public ApplicationListener<EnvironmentChangeEvent> deleteRefreshListener(CountDownLatch deleteRefreshLatch,
+				AtomicBoolean deleteRefreshArmed) {
 			return event -> {
-				if (event.getKeys().contains(PROPERTY_NAME)) {
+				if (deleteRefreshArmed.compareAndSet(true, false)) {
 					deleteRefreshLatch.countDown();
 				}
 			};
