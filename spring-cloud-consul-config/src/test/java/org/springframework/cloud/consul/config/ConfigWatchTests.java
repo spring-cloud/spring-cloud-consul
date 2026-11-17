@@ -122,7 +122,9 @@ public class ConfigWatchTests {
 		headers.add(ConsulHeaders.INDEX_HEADER, "1");
 		headers.add(ConsulHeaders.LAST_CONTACT_HEADER, "1");
 		response.headers(headers);
-		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong()))
+		String normalizedContext = ConfigWatch.normalizeContext(context, this.configProperties);
+
+		when(consul.getKVValues(eq(normalizedContext), nullable(String.class), anyLong(), anyLong()))
 			.thenReturn(response.body(getValues));
 
 		if (StringUtils.hasText(aclToken)) {
@@ -130,7 +132,7 @@ public class ConfigWatchTests {
 		}
 
 		LinkedHashMap<String, Long> initialIndexes = new LinkedHashMap<>();
-		initialIndexes.put(context, 0L);
+		initialIndexes.put(normalizedContext, 0L);
 		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes);
 		watch.setApplicationEventPublisher(eventPublisher);
 		watch.start();
@@ -142,7 +144,7 @@ public class ConfigWatchTests {
 	public void watchPublishesEventWhenConfigIsDeleted() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		String context = "/app/";
+		String context = "app/";
 		ConsulClient consul = mock(ConsulClient.class);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -172,7 +174,7 @@ public class ConfigWatchTests {
 	public void watchDoesNotPublishEventWhenConfigIsDeletedAndRefreshOnDeleteIsDisabled() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		String context = "/app/";
+		String context = "app/";
 		ConsulClient consul = mock(ConsulClient.class);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -199,7 +201,7 @@ public class ConfigWatchTests {
 	public void watchDoesNotPublishEventWhenEmptyContextIsNeverPopulated() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		String context = "/app/";
+		String context = "app/";
 		ConsulClient consul = mock(ConsulClient.class);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -229,7 +231,7 @@ public class ConfigWatchTests {
 	public void watchDoesNotPublishEventWhenNeverPopulatedContextIsNotFound() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		String context = "/app/";
+		String context = "app/";
 		ConsulClient consul = mock(ConsulClient.class);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -279,7 +281,7 @@ public class ConfigWatchTests {
 	public void watchPublishesEventWhenAllConfigKeysAreDeleted() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		String context = "/app/";
+		String context = "app/";
 		ConsulClient consul = mock(ConsulClient.class);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -295,8 +297,10 @@ public class ConfigWatchTests {
 
 		this.configProperties.getWatch().setRefreshOnDelete(true);
 
+		TaskScheduler taskScheduler = mock(TaskScheduler.class);
+
 		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, initialIndexes,
-				Collections.singleton(context), getTaskSchedulerForTest());
+				Collections.singleton(context), taskScheduler);
 		watch.setApplicationEventPublisher(eventPublisher);
 		watch.start();
 
@@ -309,7 +313,7 @@ public class ConfigWatchTests {
 	public void watchDoesNotPublishEventWhenNotFoundAndRefreshOnDeleteIsDisabled() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		String context = "/app/";
+		String context = "app/";
 		ConsulClient consul = mock(ConsulClient.class);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -335,7 +339,7 @@ public class ConfigWatchTests {
 	public void watchDoesNotPublishEventWhenNotFoundAndIndexIsInitiallyUnprimed() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		String context = "/app/";
+		String context = "app/";
 		ConsulClient consul = mock(ConsulClient.class);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -371,7 +375,7 @@ public class ConfigWatchTests {
 	public void watchDoesNotPublishEventWhenNotFoundAndIndexHasNotChanged() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		String context = "/app/";
+		String context = "app/";
 		ConsulClient consul = mock(ConsulClient.class);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -399,8 +403,8 @@ public class ConfigWatchTests {
 	public void watchDoesNotPublishDuplicateEventsForSameIndexAcrossContexts() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		String firstContext = "/app/";
-		String secondContext = "/application/";
+		String firstContext = "app/";
+		String secondContext = "application/";
 
 		ConsulClient consul = mock(ConsulClient.class);
 
@@ -433,7 +437,7 @@ public class ConfigWatchTests {
 	public void watchDoesNotPublishEventForConsecutiveNotFoundResponses() {
 		ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
 
-		String context = "/app/";
+		String context = "app/";
 		ConsulClient consul = mock(ConsulClient.class);
 
 		HttpHeaders firstHeaders = new HttpHeaders();
@@ -474,6 +478,18 @@ public class ConfigWatchTests {
 	@Test
 	public void refreshOnDeleteIsDisabledByDefault() {
 		assertThat(this.configProperties.getWatch().isRefreshOnDelete()).isFalse();
+	}
+
+	@Test
+	public void normalizeContextRemovesLeadingSlash() {
+		assertThat(ConfigWatch.normalizeContext("/config/application/", this.configProperties))
+			.isEqualTo("config/application/");
+	}
+
+	@Test
+	public void normalizeContextPreservesContextWithoutLeadingSlash() {
+		assertThat(ConfigWatch.normalizeContext("config/application/", this.configProperties))
+			.isEqualTo("config/application/");
 	}
 
 	private ThreadPoolTaskScheduler getTaskSchedulerForTest() {

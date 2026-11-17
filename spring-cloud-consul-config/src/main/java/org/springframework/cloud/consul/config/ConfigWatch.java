@@ -86,8 +86,12 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 			LinkedHashMap<String, Long> initialIndexes, Set<String> populatedContexts, TaskScheduler taskScheduler) {
 		this.properties = properties;
 		this.consul = consul;
-		this.consulIndexes = new LinkedHashMap<>(initialIndexes);
-		this.populatedContexts = new HashSet<>(populatedContexts);
+		this.consulIndexes = new LinkedHashMap<>();
+		initialIndexes
+			.forEach((context, index) -> this.consulIndexes.put(normalizeContext(context, properties), index));
+
+		this.populatedContexts = new HashSet<>();
+		populatedContexts.forEach(context -> this.populatedContexts.add(normalizeContext(context, properties)));
 		this.taskScheduler = taskScheduler;
 	}
 
@@ -279,9 +283,16 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 	}
 
 	static String normalizeContext(String context, ConsulConfigProperties properties) {
-		if (properties.getFormat() != FILES && !context.endsWith("/")) {
-			return context + "/";
+		if (properties.getFormat() != FILES) {
+			if (context.startsWith("/")) {
+				context = context.substring(1);
+			}
+
+			if (!context.endsWith("/")) {
+				context = context + "/";
+			}
 		}
+
 		return context;
 	}
 
