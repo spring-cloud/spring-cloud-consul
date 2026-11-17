@@ -38,8 +38,11 @@ import org.springframework.cloud.consul.model.http.event.Event;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.mockserver.model.JsonBody.json;
@@ -180,6 +183,30 @@ class ConsulClientIntegrationTests {
 		Event event = events.get(0);
 		assertThat(event.getId()).isEqualTo("5548d61d-9e97-8e0e-e2b3-1f5f0af5b1a2");
 		assertThat(event.getName()).isEqualTo("deploy");
+	}
+
+	@Test
+	void clientErrorResponseThrowsException() {
+		mockServerClient.when(request().withMethod("PUT").withPath("/v1/agent/check/pass/test-check"))
+			.respond(response().withStatusCode(404).withBody("Check not found"));
+
+		assertThatThrownBy(() -> client.agentCheckPass("test-check", null, null))
+			.isInstanceOf(HttpClientErrorException.class)
+			.hasMessageContaining("404");
+
+		verifyRequestSentToConsul("PUT", "/v1/agent/check/pass/test-check", 1);
+	}
+
+	@Test
+	void serverErrorResponseThrowsException() {
+		mockServerClient.when(request().withMethod("PUT").withPath("/v1/agent/check/pass/test-check"))
+			.respond(response().withStatusCode(500).withBody("Consul unavailable"));
+
+		assertThatThrownBy(() -> client.agentCheckPass("test-check", null, null))
+			.isInstanceOf(HttpServerErrorException.class)
+			.hasMessageContaining("500");
+
+		verifyRequestSentToConsul("PUT", "/v1/agent/check/pass/test-check", 1);
 	}
 
 	private void verifyRequestSentToConsul(String method, String path, int times) {

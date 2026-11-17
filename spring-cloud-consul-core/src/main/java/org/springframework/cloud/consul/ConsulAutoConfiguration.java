@@ -143,13 +143,30 @@ public class ConsulAutoConfiguration {
 			DefaultUriBuilderFactory uriBuilderFactory = new DefaultUriBuilderFactory(baseUrl);
 			uriBuilderFactory.setEncodingMode(EncodingMode.NONE);
 			RestClient.Builder builder = RestClient.builder()
-				.defaultStatusHandler(HttpStatusCode::is4xxClientError, (request, response) -> {
-				})
-				.defaultStatusHandler(HttpStatusCode::is5xxServerError,
-						(request, response) -> LOGGER
-							.error(new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8)))
-				.uriBuilderFactory(uriBuilderFactory);
+				.defaultStatusHandler(HttpStatusCode::isError, (request, response) -> {
+					byte[] body = response.getBody().readAllBytes();
 
+					if (response.getStatusCode().is5xxServerError()) {
+						LOGGER.error(new String(body, StandardCharsets.UTF_8));
+					}
+
+					String path = request.getURI().getPath();
+					boolean heartbeatRequest = path.matches(".*/v1/agent/check/(pass|warn|fail)/[^/]+/?");
+
+					if (heartbeatRequest) {
+						if (response.getStatusCode().is4xxClientError()) {
+							throw new org.springframework.web.client.HttpClientErrorException(response.getStatusCode(),
+									response.getStatusText(), response.getHeaders(), body, StandardCharsets.UTF_8);
+						}
+
+						throw new org.springframework.web.client.HttpServerErrorException(response.getStatusCode(),
+								response.getStatusText(), response.getHeaders(), body, StandardCharsets.UTF_8);
+					}
+					// Preserve the original behavior for non-heartbeat requests.
+					// 4xx responses are ignored, and 5xx responses are logged above.
+					return;
+				})
+				.uriBuilderFactory(uriBuilderFactory);
 			HttpClientSettings settings = null;
 			if (tlsConfig != null) {
 				KeyStore clientStore = KeyStore.getInstance(tlsConfig.getKeyStoreInstanceType().name());
