@@ -173,7 +173,7 @@ public class ConsulConfigDeleteRefreshIntegrationTests {
 			configDataContext = new SpringApplicationBuilder(Config.class).web(WebApplicationType.NONE)
 				.run("--spring.application.name=" + APP_NAME + "ConfigDataFiles",
 						"--spring.config.import=optional:consul:" + ConsulTestcontainers.getHost() + ":"
-								+ ConsulTestcontainers.getPort() + "//" + configDataRoot,
+								+ ConsulTestcontainers.getPort() + "/" + configDataRoot,
 						"--spring.cloud.consul.config.format=FILES", "--spring.cloud.consul.config.watch.delay=1000",
 						"--spring.cloud.consul.config.watch.refresh-on-delete=true");
 
@@ -182,9 +182,15 @@ public class ConsulConfigDeleteRefreshIntegrationTests {
 				.isEqualTo(PROPERTY_VALUE);
 
 			CountDownLatch latch = configDataContext.getBean("deleteRefreshLatch", CountDownLatch.class);
+
 			AtomicBoolean refreshArmed = configDataContext.getBean("deleteRefreshArmed", AtomicBoolean.class);
 
+			AtomicBoolean requirePropertyKey = configDataContext.getBean("deleteRefreshRequirePropertyKey",
+					AtomicBoolean.class);
+
+			requirePropertyKey.set(false);
 			refreshArmed.set(true);
+
 			testClient.deleteKVValues(configDataKey);
 
 			boolean receivedEvent = latch.await(15, TimeUnit.SECONDS);
@@ -218,10 +224,18 @@ public class ConsulConfigDeleteRefreshIntegrationTests {
 		}
 
 		@Bean
+		public AtomicBoolean deleteRefreshRequirePropertyKey() {
+			return new AtomicBoolean(true);
+		}
+
+		@Bean
 		public ApplicationListener<EnvironmentChangeEvent> deleteRefreshListener(CountDownLatch deleteRefreshLatch,
-				AtomicBoolean deleteRefreshArmed) {
+				AtomicBoolean deleteRefreshArmed, AtomicBoolean deleteRefreshRequirePropertyKey) {
+
 			return event -> {
-				if (deleteRefreshArmed.compareAndSet(true, false)) {
+				if (deleteRefreshArmed.get()
+						&& (!deleteRefreshRequirePropertyKey.get() || event.getKeys().contains(PROPERTY_NAME))
+						&& deleteRefreshArmed.compareAndSet(true, false)) {
 					deleteRefreshLatch.countDown();
 				}
 			};
