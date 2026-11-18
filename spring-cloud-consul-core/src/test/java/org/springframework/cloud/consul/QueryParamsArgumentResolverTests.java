@@ -61,6 +61,15 @@ public class QueryParamsArgumentResolverTests {
 				values.getUriVariables());
 	}
 
+	@Test
+	public void consistentModePreservesBlockingQueryParameters() throws Exception {
+		URI uri = resolve(new QueryParams(ConsistencyMode.CONSISTENT, 30, 123));
+
+		assertThat(uri.getQuery()).contains("consistent=");
+		assertThat(uri.getQuery()).contains("wait=30s");
+		assertThat(uri.getQuery()).contains("index=123");
+	}
+
 	void target(QueryParams params) {
 	}
 

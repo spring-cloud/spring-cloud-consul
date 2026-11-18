@@ -24,12 +24,14 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Test;
 
 import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulClient.QueryParams;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.mock;
@@ -50,7 +52,8 @@ public class ConsulPropertySourcesTests {
 	public void createPropertySourceStoresNormalizedContextInIndex() {
 		ConsulClient consul = mock(ConsulClient.class);
 		ResponseEntity<List<GetValue>> response = new ResponseEntity<List<GetValue>>(HttpStatus.OK);
-		when(consul.getKVValues(eq("test/"), nullable(String.class))).thenReturn(response);
+
+		when(consul.getKVValues(eq("test/"), nullable(String.class), any(QueryParams.class))).thenReturn(response);
 
 		ConsulConfigProperties properties = new ConsulConfigProperties();
 		ConsulPropertySources sources = new ConsulPropertySources(properties,
@@ -70,7 +73,8 @@ public class ConsulPropertySourcesTests {
 		when(response.getStatusCode()).thenReturn(HttpStatus.OK);
 		when(response.getBody()).thenReturn(Collections.emptyList());
 		when(response.getHeaders()).thenReturn(new HttpHeaders());
-		when(consul.getKVValue(eq("test.yml"), nullable(String.class))).thenReturn(response);
+
+		when(consul.getKVValue(eq("test.yml"), nullable(String.class), any(QueryParams.class))).thenReturn(response);
 
 		ConsulConfigProperties properties = new ConsulConfigProperties();
 		properties.setFormat(ConsulConfigProperties.Format.FILES);

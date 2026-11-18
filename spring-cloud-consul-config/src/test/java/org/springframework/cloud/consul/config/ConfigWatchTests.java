@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulClient.QueryParams;
 import org.springframework.cloud.consul.model.http.ConsulHeaders;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.cloud.endpoint.event.RefreshEvent;
@@ -36,7 +37,6 @@ import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.util.StringUtils;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -119,7 +119,8 @@ public class ConfigWatchTests {
 		headers.add(ConsulHeaders.INDEX_HEADER, "1");
 		headers.add(ConsulHeaders.LAST_CONTACT_HEADER, "1");
 		response.headers(headers);
-		when(consul.getKVValues(eq(context), nullable(String.class), anyLong(), anyLong()))
+
+		when(consul.getKVValues(eq(context), nullable(String.class), any(QueryParams.class)))
 			.thenReturn(response.body(getValues));
 
 		if (StringUtils.hasText(aclToken)) {
@@ -146,7 +147,7 @@ public class ConfigWatchTests {
 		List<GetValue> getValues = Collections.singletonList(getValue);
 
 		ResponseEntity<List<GetValue>> response = ResponseEntity.ok(getValues);
-		when(consul.getKVValues(eq(context), anyString(), anyLong(), anyLong())).thenReturn(response);
+		when(consul.getKVValues(eq(context), anyString(), any(QueryParams.class))).thenReturn(response);
 
 		ConfigWatch watch = new ConfigWatch(this.configProperties, consul, new LinkedHashMap<>());
 		watch.setApplicationEventPublisher(eventPublisher);
