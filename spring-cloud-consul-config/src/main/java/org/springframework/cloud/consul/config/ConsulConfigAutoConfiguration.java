@@ -16,11 +16,14 @@
 
 package org.springframework.cloud.consul.config;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.commons.util.TaskSchedulerWrapper;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.cloud.endpoint.RefreshEndpoint;
@@ -51,13 +54,28 @@ public class ConsulConfigAutoConfiguration {
 		@Bean
 		@ConditionalOnBean(ConsulConfigIndexes.class)
 		public ConfigWatch configWatch(ConsulConfigProperties properties, ConsulConfigIndexes indexes,
-				ConsulClient consul, @Qualifier(CONFIG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
-			return new ConfigWatch(properties, consul, indexes.getIndexes(), taskScheduler);
+				ConsulClient consul,
+				@Qualifier(CONFIG_WATCH_TASK_SCHEDULER_NAME) ObjectProvider<TaskSchedulerWrapper<? extends TaskScheduler>> taskSchedulerWrapper,
+				@Qualifier(CONFIG_WATCH_TASK_SCHEDULER_NAME) ObjectProvider<TaskScheduler> taskScheduler) {
+			// a plain TaskScheduler bean with the same name is still honoured for
+			// backwards compatibility
+			TaskScheduler scheduler = taskScheduler
+				.getIfAvailable(() -> taskSchedulerWrapper.getObject().getTaskScheduler());
+			return new ConfigWatch(properties, consul, indexes.getIndexes(), scheduler);
 		}
 
+		/**
+		 * The {@link TaskScheduler} used by the {@link ConfigWatch}. It is wrapped so
+		 * that it is not exposed as a {@link TaskScheduler} bean and does not replace the
+		 * application's own scheduler or the one auto-configured by Spring Boot.
+		 * @return the wrapped config watch task scheduler
+		 */
 		@Bean(name = CONFIG_WATCH_TASK_SCHEDULER_NAME)
-		public TaskScheduler configWatchTaskScheduler() {
-			return new ThreadPoolTaskScheduler();
+		@ConditionalOnMissingBean(name = CONFIG_WATCH_TASK_SCHEDULER_NAME)
+		public TaskSchedulerWrapper<TaskScheduler> configWatchTaskScheduler() {
+			ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+			taskScheduler.setThreadNamePrefix(CONFIG_WATCH_TASK_SCHEDULER_NAME + "-");
+			return new TaskSchedulerWrapper<>(taskScheduler);
 		}
 
 	}

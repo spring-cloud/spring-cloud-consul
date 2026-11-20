@@ -436,5 +436,17 @@ To change the frequency of when the Config Watch is called change `spring.cloud.
 To disable the Catalog Watch set `spring.cloud.consul.discovery.catalogServicesWatch.enabled=false`.
 
 
-The watch uses a Spring `TaskScheduler` to schedule the call to consul. By default it is a `ThreadPoolTaskScheduler` with a `poolSize` of 1. To change the `TaskScheduler`, create a bean of type `TaskScheduler` named with the `ConsulDiscoveryClientConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME` constant.
+The watch uses a Spring `TaskScheduler` to schedule the call to consul. By default it is a `ThreadPoolTaskScheduler` with a `poolSize` of 1. The scheduler is wrapped in a Spring Cloud Commons `TaskSchedulerWrapper` instead of being registered as a `TaskScheduler` bean, so it does not replace the `TaskScheduler` auto-configured by Spring Boot or one defined by your application. To change the `TaskScheduler`, create a bean of type `TaskSchedulerWrapper` named with the `ConsulCatalogWatchAutoConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME` constant:
+
+[source,java]
+----
+@Bean(ConsulCatalogWatchAutoConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME)
+public TaskSchedulerWrapper<TaskScheduler> catalogWatchTaskScheduler() {
+	ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+	taskScheduler.setPoolSize(2);
+	return new TaskSchedulerWrapper<>(taskScheduler);
+}
+----
+
+A bean of type `TaskScheduler` with that name is still used, but it is then visible to the rest of the application like any other `TaskScheduler` bean.
 

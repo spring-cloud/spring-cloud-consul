@@ -16,12 +16,14 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
+import org.springframework.cloud.commons.util.TaskSchedulerWrapper;
 import org.springframework.cloud.consul.ConditionalOnConsulEnabled;
 import org.springframework.cloud.consul.ConsulClient;
 import org.springframework.context.annotation.Bean;
@@ -50,13 +52,28 @@ public class ConsulCatalogWatchAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean
 	public ConsulCatalogWatch consulCatalogWatch(ConsulDiscoveryProperties discoveryProperties,
-			ConsulClient consulClient, @Qualifier(CATALOG_WATCH_TASK_SCHEDULER_NAME) TaskScheduler taskScheduler) {
-		return new ConsulCatalogWatch(discoveryProperties, consulClient, taskScheduler);
+			ConsulClient consulClient,
+			@Qualifier(CATALOG_WATCH_TASK_SCHEDULER_NAME) ObjectProvider<TaskSchedulerWrapper<? extends TaskScheduler>> taskSchedulerWrapper,
+			@Qualifier(CATALOG_WATCH_TASK_SCHEDULER_NAME) ObjectProvider<TaskScheduler> taskScheduler) {
+		// a plain TaskScheduler bean with the same name is still honoured for backwards
+		// compatibility
+		TaskScheduler scheduler = taskScheduler
+			.getIfAvailable(() -> taskSchedulerWrapper.getObject().getTaskScheduler());
+		return new ConsulCatalogWatch(discoveryProperties, consulClient, scheduler);
 	}
 
+	/**
+	 * The {@link TaskScheduler} used by the {@link ConsulCatalogWatch}. It is wrapped so
+	 * that it is not exposed as a {@link TaskScheduler} bean and does not replace the
+	 * application's own scheduler or the one auto-configured by Spring Boot.
+	 * @return the wrapped catalog watch task scheduler
+	 */
 	@Bean(name = CATALOG_WATCH_TASK_SCHEDULER_NAME)
-	public TaskScheduler catalogWatchTaskScheduler() {
-		return new ThreadPoolTaskScheduler();
+	@ConditionalOnMissingBean(name = CATALOG_WATCH_TASK_SCHEDULER_NAME)
+	public TaskSchedulerWrapper<TaskScheduler> catalogWatchTaskScheduler() {
+		ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+		taskScheduler.setThreadNamePrefix(CATALOG_WATCH_TASK_SCHEDULER_NAME + "-");
+		return new TaskSchedulerWrapper<>(taskScheduler);
 	}
 
 }
