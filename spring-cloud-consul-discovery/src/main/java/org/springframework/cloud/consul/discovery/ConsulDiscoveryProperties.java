@@ -38,6 +38,7 @@ import org.springframework.util.StringUtils;
  * @author Donnabell Dmello
  * @author Venil Noronha
  * @author Richard Kettelerij
+ * @author Asish Kumar
  */
 @ConfigurationProperties(ConsulDiscoveryProperties.PREFIX)
 public class ConsulDiscoveryProperties {
@@ -95,6 +96,21 @@ public class ConsulDiscoveryProperties {
 	 * Requires consul version 7.x or higher.
 	 */
 	private String healthCheckCriticalTimeout;
+
+	/**
+	 * Port of the gRPC server to health check. When set, a gRPC health check is
+	 * registered instead of the HTTP health check.
+	 */
+	private Integer healthCheckGrpcPort;
+
+	/**
+	 * Name of the service to health check using the gRPC health checking protocol. The
+	 * health of the whole gRPC server is checked if not set.
+	 */
+	private String healthCheckGrpcService;
+
+	/** Whether to use TLS for the gRPC health check. */
+	private boolean healthCheckGrpcUseTls = false;
 
 	/**
 	 * IP address to use when accessing service (must also set preferIpAddress to use).
@@ -374,6 +390,30 @@ public class ConsulDiscoveryProperties {
 		this.healthCheckCriticalTimeout = healthCheckCriticalTimeout;
 	}
 
+	public Integer getHealthCheckGrpcPort() {
+		return this.healthCheckGrpcPort;
+	}
+
+	public void setHealthCheckGrpcPort(Integer healthCheckGrpcPort) {
+		this.healthCheckGrpcPort = healthCheckGrpcPort;
+	}
+
+	public String getHealthCheckGrpcService() {
+		return this.healthCheckGrpcService;
+	}
+
+	public void setHealthCheckGrpcService(String healthCheckGrpcService) {
+		this.healthCheckGrpcService = healthCheckGrpcService;
+	}
+
+	public boolean isHealthCheckGrpcUseTls() {
+		return this.healthCheckGrpcUseTls;
+	}
+
+	public void setHealthCheckGrpcUseTls(boolean healthCheckGrpcUseTls) {
+		this.healthCheckGrpcUseTls = healthCheckGrpcUseTls;
+	}
+
 	public String getIpAddress() {
 		return this.ipAddress;
 	}
@@ -630,6 +670,9 @@ public class ConsulDiscoveryProperties {
 			.append("failFast", this.failFast)
 			.append("hostInfo", this.hostInfo)
 			.append("healthCheckCriticalTimeout", this.healthCheckCriticalTimeout)
+			.append("healthCheckGrpcPort", this.healthCheckGrpcPort)
+			.append("healthCheckGrpcService", this.healthCheckGrpcService)
+			.append("healthCheckGrpcUseTls", this.healthCheckGrpcUseTls)
 			.append("healthCheckHeaders", this.healthCheckHeaders)
 			.append("healthCheckInterval", this.healthCheckInterval)
 			.append("healthCheckPath", this.healthCheckPath)

@@ -292,6 +292,33 @@ public CustomApplicationStatusProvider customAppStatusProvider() {
 }
 ----
 
+[[grpc-health-check]]
+=== gRPC Health Check
+
+A Consul https://developer.hashicorp.com/consul/docs/register/health-check/vm#grpc-checks[gRPC Check] can be used instead of the default configured HTTP check.
+Consul queries the gRPC server of the application using the https://github.com/grpc/grpc/blob/master/doc/health-checking.md[gRPC health checking protocol], so the server must implement the standard `grpc.health.v1.Health` service.
+
+To register a gRPC check, set the port of the gRPC server.
+Consul checks the health of the whole server by default.
+To check a single service instead, set its name.
+
+.application.yml
+----
+spring:
+  cloud:
+    consul:
+      discovery:
+        health-check-grpc-port: 9090
+        health-check-grpc-service: my.package.MyService
+----
+
+Set `spring.cloud.consul.discovery.health-check-grpc-use-tls` to `true` if the gRPC server uses TLS.
+The `health-check-interval`, `health-check-timeout`, `health-check-critical-timeout` and `health-check-tls-skip-verify` properties apply to the gRPC check as well.
+
+The gRPC check replaces the HTTP check of the service only.
+If a separate management service is registered, its check remains an HTTP check of the health endpoint.
+A <<ttl-health-check,TTL check>> takes precedence over the gRPC check when both are configured.
+
 [[actuator-health-indicators]]
 === Actuator Health Indicator(s)
 If the service instance is a Spring Boot Actuator application, it may be provided the following Actuator health indicators.

@@ -38,6 +38,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * @author Spencer Gibb
+ * @author Asish Kumar
  */
 public class ConsulAutoRegistration extends ConsulRegistration {
 
@@ -114,6 +115,11 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 	public static void setCheck(NewService service, AutoServiceRegistrationProperties autoServiceRegistrationProperties,
 			ConsulDiscoveryProperties properties, ApplicationContext context, HeartbeatProperties heartbeatProperties) {
 		if (properties.isRegisterHealthCheck() && service.getCheck() == null) {
+			// a TTL check takes precedence, since the heartbeat is what keeps it passing
+			if (properties.getHealthCheckGrpcPort() != null && !heartbeatProperties.isEnabled()) {
+				service.setCheck(createGrpcCheck(properties));
+				return;
+			}
 			Integer checkPort;
 			if (shouldRegisterManagement(autoServiceRegistrationProperties, properties, context)) {
 				checkPort = getManagementPort(properties, context);
@@ -235,6 +241,40 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 					properties.getHealthCheckPath()));
 		}
 		check.setHeader(properties.getHealthCheckHeaders());
+		check.setInterval(properties.getHealthCheckInterval());
+		check.setTimeout(properties.getHealthCheckTimeout());
+		check.setTlsSkipVerify(properties.getHealthCheckTlsSkipVerify());
+		return check;
+	}
+
+	/**
+	 * Creates a check that queries the gRPC server listening on
+	 * {@link ConsulDiscoveryProperties#getHealthCheckGrpcPort()} using the
+	 * <a href="https://github.com/grpc/grpc/blob/master/doc/health-checking.md">gRPC
+	 * health checking protocol</a>.
+	 * @param properties discovery properties
+	 * @return the gRPC check
+	 */
+	public static NewService.Check createGrpcCheck(ConsulDiscoveryProperties properties) {
+		Integer port = properties.getHealthCheckGrpcPort();
+		Assert.notNull(port, "createGrpcCheck port must not be null");
+		Assert.isTrue(port > 0, "createGrpcCheck port must be greater than 0");
+
+		NewService.Check check = new NewService.Check();
+		if (StringUtils.hasText(properties.getHealthCheckCriticalTimeout())) {
+			check.setDeregisterCriticalServiceAfter(properties.getHealthCheckCriticalTimeout());
+		}
+		String host = properties.getHostname();
+		if (host.contains(":") && !host.startsWith("[")) {
+			// IPv6 address
+			host = "[" + host + "]";
+		}
+		String grpc = host + ":" + port;
+		if (StringUtils.hasText(properties.getHealthCheckGrpcService())) {
+			grpc += "/" + properties.getHealthCheckGrpcService();
+		}
+		check.setGrpc(grpc);
+		check.setGrpcUseTLS(properties.isHealthCheckGrpcUseTls());
 		check.setInterval(properties.getHealthCheckInterval());
 		check.setTimeout(properties.getHealthCheckTimeout());
 		check.setTlsSkipVerify(properties.getHealthCheckTlsSkipVerify());
