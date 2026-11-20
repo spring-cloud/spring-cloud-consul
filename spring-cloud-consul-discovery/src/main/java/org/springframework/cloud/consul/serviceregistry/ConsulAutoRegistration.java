@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.cloud.client.discovery.ManagementServerPortUtils;
@@ -29,6 +30,7 @@ import org.springframework.cloud.commons.util.IdUtils;
 import org.springframework.cloud.consul.discovery.ConsulDiscoveryProperties;
 import org.springframework.cloud.consul.discovery.HeartbeatProperties;
 import org.springframework.cloud.consul.model.http.agent.NewService;
+import org.springframework.cloud.consul.model.http.health.Check.CheckStatus;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.util.Assert;
@@ -216,6 +218,12 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		NewService.Check check = new NewService.Check();
 		if (StringUtils.hasText(properties.getHealthCheckCriticalTimeout())) {
 			check.setDeregisterCriticalServiceAfter(properties.getHealthCheckCriticalTimeout());
+		}
+		CheckStatus initialStatus = properties.getHealthCheckInitialStatus();
+		if (initialStatus != null) {
+			Assert.isTrue(initialStatus != CheckStatus.UNKNOWN, ConsulDiscoveryProperties.PREFIX
+					+ ".health-check-initial-status must be one of passing, warning or critical");
+			check.setStatus(initialStatus.name().toLowerCase(Locale.ROOT));
 		}
 		if (ttlConfig.isEnabled()) {
 			// FIXME 3.0.0
