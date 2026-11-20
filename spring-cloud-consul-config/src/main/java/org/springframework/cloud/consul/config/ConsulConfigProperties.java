@@ -235,19 +235,19 @@ public class ConsulConfigProperties {
 
 		/**
 		 * Indicates that the configuration specified in consul is of property style i.e.,
-		 * value of the consul key would be a list of key=value pairs separated by new
+		 * value of the Consul key would be a list of key=value pairs separated by new
 		 * lines.
 		 */
 		PROPERTIES,
 
 		/**
-		 * Indicates that the configuration specified in consul is of YAML style i.e.,
-		 * value of the consul key would be YAML format.
+		 * Indicates that the configuration specified in Consul is of YAML style i.e.,
+		 * value of the Consul key would be YAML format.
 		 */
 		YAML,
 
 		/**
-		 * Indicates that the configuration specified in consul uses keys as files. This
+		 * Indicates that the configuration specified in Consul uses keys as files. This
 		 * is useful for tools like git2consul.
 		 */
 		FILES,
@@ -272,6 +272,12 @@ public class ConsulConfigProperties {
 
 		/** The value of the fixed delay for the watch in millis. Defaults to 1000. */
 		private int delay = 1000;
+
+		/**
+		 * If refresh events should be published when configuration keys are deleted.
+		 * Defaults to false.
+		 */
+		private boolean refreshOnDelete = false;
 
 		public Watch() {
 		}
@@ -300,11 +306,20 @@ public class ConsulConfigProperties {
 			this.delay = delay;
 		}
 
+		public boolean isRefreshOnDelete() {
+			return this.refreshOnDelete;
+		}
+
+		public void setRefreshOnDelete(boolean refreshOnDelete) {
+			this.refreshOnDelete = refreshOnDelete;
+		}
+
 		@Override
 		public String toString() {
 			return new ToStringCreator(this).append("waitTime", this.waitTime)
 				.append("enabled", this.enabled)
 				.append("delay", this.delay)
+				.append("refreshOnDelete", this.refreshOnDelete)
 				.toString();
 		}
 
