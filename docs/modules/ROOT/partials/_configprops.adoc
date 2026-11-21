@@ -1,6 +1,7 @@
 |===
 |Name | Default | Description
 
+|spring.cloud.consul.blocking-query-read-timeout | `+++11m+++` | Read timeout of blocking queries (requests with a wait or index parameter). Must exceed the longest wait time used. All other requests keep the default read timeout.
 |spring.cloud.consul.config.acl-token |  | 
 |spring.cloud.consul.config.data-key | `+++data+++` | If format is Format.PROPERTIES or Format.YAML then the following field is used as key to look up consul for configuration.
 |spring.cloud.consul.config.default-context | `+++application+++` | 
