@@ -91,6 +91,20 @@ To change the frequency of when the Config Watch is called change `spring.cloud.
 
 To disable the Config Watch set `spring.cloud.consul.config.watch.enabled=false`.
 
+To publish a context refresh event when configuration keys are deleted, set
+`spring.cloud.consul.config.watch.refresh-on-delete=true`. The default value is
+`false`.
+
+[source,yaml]
+----
+spring:
+  cloud:
+    consul:
+      config:
+        watch:
+          refresh-on-delete: true
+----
+
 The watch uses a Spring `TaskScheduler` to schedule the call to consul. By default it is a `ThreadPoolTaskScheduler` with a `poolSize` of 1. To change the `TaskScheduler`, create a bean of type `TaskScheduler` named with the `ConsulConfigAutoConfiguration.CONFIG_WATCH_TASK_SCHEDULER_NAME` constant.
 
 [[spring-cloud-consul-config-format]]

@@ -19,8 +19,10 @@ package org.springframework.cloud.consul.config;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
@@ -232,9 +234,16 @@ public class ConsulConfigDataLocationResolver implements ConfigDataLocationResol
 
 		private final LinkedHashMap<String, Long> indexes = new LinkedHashMap<>();
 
+		private final Set<String> populatedContexts = new HashSet<>();
+
 		@Override
 		public LinkedHashMap<String, Long> getIndexes() {
-			return indexes;
+			return this.indexes;
+		}
+
+		@Override
+		public Set<String> getPopulatedContexts() {
+			return this.populatedContexts;
 		}
 
 	}
