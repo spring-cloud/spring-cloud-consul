@@ -1,6 +1,7 @@
 |===
 |Name | Default | Description
 
+|spring.cloud.consul.blocking-query-read-timeout | `+++11m+++` | Read timeout of blocking queries (requests with a wait or index parameter). Must exceed the longest wait time used. All other requests keep the default read timeout.
 |spring.cloud.consul.config.acl-token |  | 
 |spring.cloud.consul.config.data-key | `+++data+++` | If format is Format.PROPERTIES or Format.YAML then the following field is used as key to look up consul for configuration.
 |spring.cloud.consul.config.default-context | `+++application+++` | 
@@ -11,8 +12,11 @@
 |spring.cloud.consul.config.prefix |  | 
 |spring.cloud.consul.config.prefixes |  | 
 |spring.cloud.consul.config.profile-separator | `+++,+++` | 
+|spring.cloud.consul.config.yaml-code-point-limit | `+++524288+++` | Maximum size, in code points, of a YAML document when format is Format.YAML or Format.FILES. Defaults to 524288, the default maximum size of a value in Consul.
+|spring.cloud.consul.config.yaml-max-aliases-for-collections | `+++1000+++` | Maximum number of aliases that may refer to non-scalar nodes (maps and lists) in a YAML document when format is Format.YAML or Format.FILES. Defaults to 1000.
 |spring.cloud.consul.config.watch.delay | `+++1000+++` | The value of the fixed delay for the watch in millis. Defaults to 1000.
 |spring.cloud.consul.config.watch.enabled | `+++true+++` | If the watch is enabled. Defaults to true.
+|spring.cloud.consul.config.watch.refresh-on-delete | `+++false+++` | Whether to publish a refresh event when configuration keys are deleted. Defaults to false.
 |spring.cloud.consul.config.watch.wait-time | `+++55+++` | The number of seconds to wait (or block) for watch query, defaults to 55. Needs to be less than default ConsulClient (defaults to 60). To increase ConsulClient timeout create a ConsulClient bean with a custom ConsulRawClient with a custom HttpClient.
 |spring.cloud.consul.discovery.acl-token |  | 
 |spring.cloud.consul.discovery.catalog-services-watch-delay | `+++1000+++` | The delay between calls to watch consul catalog in millis, default is 1000.

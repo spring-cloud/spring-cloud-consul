@@ -17,9 +17,12 @@
 package org.springframework.cloud.consul.config;
 
 import java.time.Duration;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -57,6 +60,8 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 	private final TaskScheduler taskScheduler;
 
+	private final Set<String> populatedContexts;
+
 	private final AtomicBoolean running = new AtomicBoolean(false);
 
 	private LinkedHashMap<String, Long> consulIndexes;
@@ -65,7 +70,7 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 	private boolean firstTime = true;
 
-	private ScheduledFuture<?> watchFuture;
+	private volatile ScheduledFuture<?> watchFuture;
 
 	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul,
 			LinkedHashMap<String, Long> initialIndexes) {
@@ -74,9 +79,19 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul,
 			LinkedHashMap<String, Long> initialIndexes, TaskScheduler taskScheduler) {
+		this(properties, consul, initialIndexes, Collections.emptySet(), taskScheduler);
+	}
+
+	public ConfigWatch(ConsulConfigProperties properties, ConsulClient consul,
+			LinkedHashMap<String, Long> initialIndexes, Set<String> populatedContexts, TaskScheduler taskScheduler) {
 		this.properties = properties;
 		this.consul = consul;
-		this.consulIndexes = new LinkedHashMap<>(initialIndexes);
+		this.consulIndexes = new LinkedHashMap<>();
+		initialIndexes
+			.forEach((context, index) -> this.consulIndexes.put(normalizeContext(context, properties), index));
+
+		this.populatedContexts = new HashSet<>();
+		populatedContexts.forEach(context -> this.populatedContexts.add(normalizeContext(context, properties)));
 		this.taskScheduler = taskScheduler;
 	}
 
@@ -132,13 +147,18 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 		if (!this.running.get()) {
 			return;
 		}
+
 		for (String context : this.consulIndexes.keySet()) {
 
-			// turn the context into a Consul folder path (unless our config format
-			// are FILES)
-			if (this.properties.getFormat() != FILES && !context.endsWith("/")) {
-				context = context + "/";
+			// Stop processing when the watcher is stopped. No further polling is
+			// required.
+			if (!this.running.get()) {
+				return;
 			}
+
+			// Turn the context into a Consul folder path unless the config format
+			// is FILES.
+			context = normalizeContext(context, this.properties);
 
 			try {
 				Long currentIndex = this.consulIndexes.get(context);
@@ -150,34 +170,55 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 					log.trace("watching consul for context '" + context + "' with index " + currentIndex);
 				}
 
-				// use the consul ACL token if found
+				// Use the Consul ACL token if found.
 				String aclToken = this.properties.getAclToken();
 				if (ObjectUtils.isEmpty(aclToken)) {
 					aclToken = null;
 				}
 
 				ResponseEntity<List<GetValue>> response = this.consul.getKVValues(context, aclToken,
-						(long) properties.getWatch().getWaitTime(), currentIndex);
+						(long) this.properties.getWatch().getWaitTime(), currentIndex);
 
-				// if response.value == null, response was a 404, otherwise it was a
-				// 200, reducing churn if there wasn't anything
-				if (HttpStatus.OK.isSameCodeAs(response.getStatusCode()) && response.hasBody()
-						&& !response.getBody().isEmpty()) {
+				if (shouldProcessResponse(response)) {
 					Long newIndex = ConsulHeaders.getConsulIndex(response);
 
 					if (newIndex != null && !newIndex.equals(currentIndex)) {
-						// don't publish the same index again, don't publish the first
-						// time (-1) so index can be primed
-						if (!this.consulIndexes.containsValue(newIndex) && !currentIndex.equals(-1L)) {
+						boolean hasValues = response.hasBody() && !response.getBody().isEmpty();
+
+						if (hasValues) {
+							this.populatedContexts.add(context);
+						}
+
+						boolean deletionResponse = this.properties.getWatch().isRefreshOnDelete() && !hasValues;
+						boolean contextWasPopulated = this.populatedContexts.contains(context);
+
+						// Don't publish the same index again, don't publish the first
+						// time (-1) so the index can be primed.
+						boolean indexAlreadyPublished = this.consulIndexes.containsValue(newIndex);
+
+						if (shouldPublishRefreshEvent(indexAlreadyPublished, deletionResponse, contextWasPopulated,
+								currentIndex)) {
 							if (log.isTraceEnabled()) {
 								log.trace("Context " + context + " has new index " + newIndex);
 							}
+
 							RefreshEventData data = new RefreshEventData(context, currentIndex, newIndex);
+
+							// Skip event publication if the watcher has been stopped.
+							if (!this.running.get()) {
+								return;
+							}
+
 							this.publisher.publishEvent(new RefreshEvent(this, data, data.toString()));
+
+							if (deletionResponse) {
+								this.populatedContexts.remove(context);
+							}
 						}
 						else if (log.isTraceEnabled()) {
-							log.trace("Event for index already published for context " + context);
+							log.trace("Event for index already published or context was never populated: " + context);
 						}
+
 						this.consulIndexes.put(context, newIndex);
 					}
 					else if (log.isTraceEnabled()) {
@@ -190,7 +231,12 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 
 			}
 			catch (Exception e) {
-				// only fail fast on the initial query, otherwise just log the error
+				if (!this.running.get() && (isInterruptedException(e) || Thread.currentThread().isInterrupted())) {
+					// The scheduled task was interrupted during shutdown.
+					return;
+				}
+
+				// Only fail fast on the initial query, otherwise just log the error.
 				if (this.firstTime && this.properties.isFailFast()) {
 					log.error("Fail fast is set and there was an error reading configuration from consul.");
 					ReflectionUtils.rethrowRuntimeException(e);
@@ -199,14 +245,60 @@ public class ConfigWatch implements ApplicationEventPublisherAware, SmartLifecyc
 					log.trace("Error querying consul Key/Values for context '" + context + "'", e);
 				}
 				else if (log.isWarnEnabled()) {
-					// simplified one line log message in the event of an agent
-					// failure
+					// Simplified one line log message in the event of an agent
+					// failure.
 					log.warn("Error querying consul Key/Values for context '" + context + "'. Message: "
 							+ e.getMessage());
 				}
 			}
 		}
+
 		this.firstTime = false;
+	}
+
+	/**
+	 * Determines whether the Consul response should be processed. Empty or not-found
+	 * responses are processed only when refresh-on-delete is enabled.
+	 * @param response the Consul response
+	 * @return whether the response should be processed
+	 */
+	private boolean shouldProcessResponse(ResponseEntity<List<GetValue>> response) {
+		if (HttpStatus.OK.isSameCodeAs(response.getStatusCode()) && response.hasBody()) {
+			return !response.getBody().isEmpty() || this.properties.getWatch().isRefreshOnDelete();
+		}
+
+		return HttpStatus.NOT_FOUND.isSameCodeAs(response.getStatusCode())
+				&& this.properties.getWatch().isRefreshOnDelete();
+	}
+
+	private boolean isInterruptedException(Throwable exception) {
+		Throwable cause = exception;
+		while (cause != null) {
+			if (cause instanceof InterruptedException) {
+				return true;
+			}
+			cause = cause.getCause();
+		}
+		return false;
+	}
+
+	static String normalizeContext(String context, ConsulConfigProperties properties) {
+		if (context.startsWith("/")) {
+			context = context.substring(1);
+		}
+
+		if (properties.getFormat() != FILES && !context.endsWith("/")) {
+			context = context + "/";
+		}
+
+		return context;
+	}
+
+	private boolean shouldPublishRefreshEvent(boolean indexAlreadyPublished, boolean deletionResponse,
+			boolean contextWasPopulated, Long currentIndex) {
+
+		return !currentIndex.equals(-1L) && (!indexAlreadyPublished || (deletionResponse && contextWasPopulated))
+				&& (!deletionResponse || contextWasPopulated);
 	}
 
 	public static class RefreshEventData {
