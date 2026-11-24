@@ -277,7 +277,9 @@ public class ConsulAutoRegistration extends ConsulRegistration {
 		check.setGrpcUseTLS(properties.isHealthCheckGrpcUseTls());
 		check.setInterval(properties.getHealthCheckInterval());
 		check.setTimeout(properties.getHealthCheckTimeout());
-		check.setTlsSkipVerify(properties.getHealthCheckTlsSkipVerify());
+		if (properties.isHealthCheckGrpcUseTls()) {
+			check.setTlsSkipVerify(properties.getHealthCheckTlsSkipVerify());
+		}
 		return check;
 	}
 

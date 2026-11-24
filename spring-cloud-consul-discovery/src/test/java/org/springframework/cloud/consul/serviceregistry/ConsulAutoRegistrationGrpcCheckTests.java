@@ -82,6 +82,25 @@ class ConsulAutoRegistrationGrpcCheckTests {
 	}
 
 	@Test
+	void grpcCheckOmitsTlsSkipVerifyWithoutTls() {
+		this.properties.setHealthCheckTlsSkipVerify(true);
+
+		NewService.Check check = ConsulAutoRegistration.createGrpcCheck(this.properties);
+
+		assertThat(check.getTlsSkipVerify()).isNull();
+	}
+
+	@Test
+	void grpcCheckPassesTlsSkipVerifyWithTls() {
+		this.properties.setHealthCheckGrpcUseTls(true);
+		this.properties.setHealthCheckTlsSkipVerify(true);
+
+		NewService.Check check = ConsulAutoRegistration.createGrpcCheck(this.properties);
+
+		assertThat(check.getTlsSkipVerify()).isTrue();
+	}
+
+	@Test
 	void grpcCheckRejectsInvalidPort() {
 		this.properties.setHealthCheckGrpcPort(0);
 
