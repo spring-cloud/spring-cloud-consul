@@ -17,6 +17,7 @@
 package org.springframework.cloud.consul;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -24,6 +25,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+import java.time.Duration;
 
 import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
@@ -51,12 +53,15 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.format.support.DefaultFormattingConversionService;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpRequest;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.retry.interceptor.RetryInterceptorBuilder;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
@@ -67,6 +72,7 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.DefaultUriBuilderFactory.EncodingMode;
 import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * @author Spencer Gibb
@@ -88,7 +94,8 @@ public class ConsulAutoConfiguration {
 	@ConditionalOnMissingBean
 	public ConsulClientSettings consulClientRestClientAdapter(ConsulProperties consulProperties) {
 		String baseUrl = createConsulClientBaseUrl(consulProperties);
-		return createConsulClientSettings(baseUrl, consulProperties.getTls());
+		return createConsulClientSettings(baseUrl, consulProperties.getTls(),
+				consulProperties.getBlockingQueryReadTimeout());
 	}
 
 	@Bean
@@ -123,7 +130,9 @@ public class ConsulAutoConfiguration {
 
 	public static ConsulClient createNewConsulClient(ConsulProperties consulProperties) {
 		String baseUrl = createConsulClientBaseUrl(consulProperties);
-		HttpExchangeAdapter adapter = createConsulClientSettings(baseUrl, consulProperties.getTls()).adapter();
+		HttpExchangeAdapter adapter = createConsulClientSettings(baseUrl, consulProperties.getTls(),
+				consulProperties.getBlockingQueryReadTimeout())
+			.adapter();
 		return createNewConsulClient(adapter);
 	}
 
@@ -136,9 +145,14 @@ public class ConsulAutoConfiguration {
 		return factory.createClient(ConsulClient.class);
 	}
 
-	// TODO: migrate to boot managed sslbundle
 	public static ConsulClientSettings createConsulClientSettings(String baseUrl,
 			ConsulProperties.TLSConfig tlsConfig) {
+		return createConsulClientSettings(baseUrl, tlsConfig, ConsulProperties.DEFAULT_BLOCKING_QUERY_READ_TIMEOUT);
+	}
+
+	// TODO: migrate to boot managed sslbundle
+	public static ConsulClientSettings createConsulClientSettings(String baseUrl, ConsulProperties.TLSConfig tlsConfig,
+			Duration blockingQueryReadTimeout) {
 		try {
 			DefaultUriBuilderFactory uriBuilderFactory = new DefaultUriBuilderFactory(baseUrl);
 			uriBuilderFactory.setEncodingMode(EncodingMode.NONE);
@@ -164,11 +178,13 @@ public class ConsulAutoConfiguration {
 						trustStore);
 				SslBundle sslBundle = SslBundle.of(sslStoreBundle);
 				settings = HttpClientSettings.ofSslBundle(sslBundle);
-				ClientHttpRequestFactory requestFactory = ClientHttpRequestFactoryBuilder.detect().build(settings);
-				builder.requestFactory(requestFactory);
 			}
+			HttpClientSettings defaultSettings = (settings != null) ? settings : HttpClientSettings.defaults();
+			ClientHttpRequestFactoryBuilder<?> requestFactoryBuilder = ClientHttpRequestFactoryBuilder.detect();
+			builder.requestFactory(new BlockingQueryRequestFactory(requestFactoryBuilder.build(defaultSettings),
+					requestFactoryBuilder.build(defaultSettings.withReadTimeout(blockingQueryReadTimeout))));
 
-			return new ConsulClientSettings(baseUrl, settings, RestClientAdapter.create(builder.build()));
+			return new ConsulClientSettings(baseUrl, defaultSettings, RestClientAdapter.create(builder.build()));
 		}
 		catch (KeyStoreException | IOException | NoSuchAlgorithmException | CertificateException e) {
 			throw new RuntimeException(e);
@@ -179,6 +195,33 @@ public class ConsulAutoConfiguration {
 		DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService();
 		conversionService.addFormatterForFieldAnnotation(new WaitTimeAnnotationFormatterFactory());
 		return conversionService;
+	}
+
+	/**
+	 * Sends blocking queries, which carry a {@code wait} or an {@code index} parameter,
+	 * through a request factory with a read timeout longer than any wait Consul accepts.
+	 * All other requests keep the default read timeout, so a hung agent still fails
+	 * quickly.
+	 */
+	static final class BlockingQueryRequestFactory implements ClientHttpRequestFactory {
+
+		private final ClientHttpRequestFactory defaultFactory;
+
+		private final ClientHttpRequestFactory blockingQueryFactory;
+
+		BlockingQueryRequestFactory(ClientHttpRequestFactory defaultFactory,
+				ClientHttpRequestFactory blockingQueryFactory) {
+			this.defaultFactory = defaultFactory;
+			this.blockingQueryFactory = blockingQueryFactory;
+		}
+
+		@Override
+		public ClientHttpRequest createRequest(URI uri, HttpMethod httpMethod) throws IOException {
+			MultiValueMap<String, String> params = UriComponentsBuilder.fromUri(uri).build().getQueryParams();
+			boolean blockingQuery = params.containsKey("wait") || params.containsKey("index");
+			return (blockingQuery ? this.blockingQueryFactory : this.defaultFactory).createRequest(uri, httpMethod);
+		}
+
 	}
 
 	public record ConsulClientSettings(String baseUrl, HttpClientSettings httpClientSettings,

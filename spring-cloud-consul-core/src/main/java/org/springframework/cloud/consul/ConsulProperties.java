@@ -16,11 +16,14 @@
 
 package org.springframework.cloud.consul;
 
+import java.time.Duration;
+
 import jakarta.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.cloud.consul.model.http.KeyStoreInstanceType;
 import org.springframework.core.style.ToStringCreator;
+import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 
 import static org.springframework.cloud.consul.ConsulProperties.PREFIX;
@@ -36,6 +39,13 @@ public class ConsulProperties {
 	 * Prefix for configuration properties.
 	 */
 	public static final String PREFIX = "spring.cloud.consul";
+
+	/**
+	 * Default read timeout of blocking queries. Consul caps the wait of a blocking query
+	 * at 10 minutes and adds up to 1/16 of the wait as jitter, so the timeout must exceed
+	 * that for a query to return before the client gives up on it.
+	 */
+	public static final Duration DEFAULT_BLOCKING_QUERY_READ_TIMEOUT = Duration.ofMinutes(11);
 
 	/** Consul agent hostname. Defaults to 'localhost'. */
 	@NotNull
@@ -59,6 +69,13 @@ public class ConsulProperties {
 
 	/** Custom path if consul is under non-root. */
 	private String path;
+
+	/**
+	 * Read timeout of blocking queries (requests with a wait or index parameter). Must
+	 * exceed the longest wait time used. All other requests keep the default read
+	 * timeout.
+	 */
+	private Duration blockingQueryReadTimeout = DEFAULT_BLOCKING_QUERY_READ_TIMEOUT;
 
 	public String getHost() {
 		return this.host;
@@ -108,10 +125,21 @@ public class ConsulProperties {
 		this.path = path;
 	}
 
+	public Duration getBlockingQueryReadTimeout() {
+		return this.blockingQueryReadTimeout;
+	}
+
+	public void setBlockingQueryReadTimeout(Duration blockingQueryReadTimeout) {
+		Assert.isTrue(!blockingQueryReadTimeout.isNegative() && !blockingQueryReadTimeout.isZero(),
+				"blockingQueryReadTimeout must be greater than zero");
+		this.blockingQueryReadTimeout = blockingQueryReadTimeout;
+	}
+
 	@Override
 	public String toString() {
 		return "ConsulProperties{" + "host='" + this.host + '\'' + ", port=" + this.port + ", scheme=" + this.scheme
-				+ ", tls=" + this.tls + ", enabled=" + this.enabled + ", path=" + this.path + "}";
+				+ ", tls=" + this.tls + ", enabled=" + this.enabled + ", path=" + this.path
+				+ ", blockingQueryReadTimeout=" + this.blockingQueryReadTimeout + "}";
 	}
 
 	/**

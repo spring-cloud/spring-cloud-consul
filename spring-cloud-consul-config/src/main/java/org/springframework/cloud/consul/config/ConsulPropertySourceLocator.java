@@ -19,8 +19,10 @@ package org.springframework.cloud.consul.config;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,6 +51,8 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 	private final List<String> contexts = new ArrayList<>();
 
 	private final LinkedHashMap<String, Long> contextIndex = new LinkedHashMap<>();
+
+	private final Set<String> populatedContexts = new HashSet<>();
 
 	public ConsulPropertySourceLocator(ConsulClient consul, ConsulConfigProperties properties) {
 		this.consul = consul;
@@ -89,12 +93,20 @@ public class ConsulPropertySourceLocator implements PropertySourceLocator, Consu
 						contextIndex::put);
 				if (propertySource != null) {
 					composite.addPropertySource(propertySource);
+					if (propertySource.getPropertyNames().length > 0) {
+						this.populatedContexts.add(propertySourceContext);
+					}
 				}
 			}
 
 			return composite;
 		}
 		return null;
+	}
+
+	@Override
+	public Set<String> getPopulatedContexts() {
+		return this.populatedContexts;
 	}
 
 	private void addIndex(String propertySourceContext, Long consulIndex) {

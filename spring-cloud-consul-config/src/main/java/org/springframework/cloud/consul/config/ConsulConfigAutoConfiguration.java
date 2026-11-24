@@ -59,9 +59,15 @@ public class ConsulConfigAutoConfiguration {
 				@Qualifier(CONFIG_WATCH_TASK_SCHEDULER_NAME) ObjectProvider<TaskScheduler> taskScheduler) {
 			// a plain TaskScheduler bean with the same name is still honoured for
 			// backwards compatibility
-			TaskScheduler scheduler = taskScheduler
-				.getIfAvailable(() -> taskSchedulerWrapper.getObject().getTaskScheduler());
-			return new ConfigWatch(properties, consul, indexes.getIndexes(), scheduler);
+			TaskScheduler scheduler = taskScheduler.getIfAvailable(() -> {
+				TaskSchedulerWrapper<? extends TaskScheduler> wrapper = taskSchedulerWrapper.getIfAvailable();
+				if (wrapper == null) {
+					throw new IllegalStateException("The bean named '" + CONFIG_WATCH_TASK_SCHEDULER_NAME
+							+ "' must be a TaskScheduler or a TaskSchedulerWrapper");
+				}
+				return wrapper.getTaskScheduler();
+			});
+			return new ConfigWatch(properties, consul, indexes.getIndexes(), indexes.getPopulatedContexts(), scheduler);
 		}
 
 		/**

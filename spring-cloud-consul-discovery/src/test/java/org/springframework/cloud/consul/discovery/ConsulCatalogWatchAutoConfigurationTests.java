@@ -133,6 +133,18 @@ class ConsulCatalogWatchAutoConfigurationTests {
 			});
 	}
 
+	@Test
+	void invalidCatalogWatchTaskSchedulerBeanFailsWithClearMessage() {
+		this.contextRunner
+			.withBean(ConsulCatalogWatchAutoConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME, String.class,
+					() -> "invalid")
+			.run(context -> assertThat(context).getFailure()
+				.rootCause()
+				.isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining(ConsulCatalogWatchAutoConfiguration.CATALOG_WATCH_TASK_SCHEDULER_NAME)
+				.hasMessageContaining("TaskSchedulerWrapper"));
+	}
+
 	private static ConsulClient consulClient() {
 		ConsulClient consulClient = mock(ConsulClient.class);
 		when(consulClient.getCatalogServices(any(), any())).thenReturn(ResponseEntity.ok(Collections.emptyMap()));

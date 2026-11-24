@@ -124,6 +124,17 @@ class ConsulConfigAutoConfigurationTests {
 			});
 	}
 
+	@Test
+	void invalidConfigWatchTaskSchedulerBeanFailsWithClearMessage() {
+		this.contextRunner
+			.withBean(ConsulConfigAutoConfiguration.CONFIG_WATCH_TASK_SCHEDULER_NAME, String.class, () -> "invalid")
+			.run(context -> assertThat(context).getFailure()
+				.rootCause()
+				.isInstanceOf(IllegalStateException.class)
+				.hasMessageContaining(ConsulConfigAutoConfiguration.CONFIG_WATCH_TASK_SCHEDULER_NAME)
+				.hasMessageContaining("TaskSchedulerWrapper"));
+	}
+
 	private static Object configWatchTaskScheduler(AssertableApplicationContext context) {
 		return ReflectionTestUtils.getField(context.getBean(ConfigWatch.class), "taskScheduler");
 	}
