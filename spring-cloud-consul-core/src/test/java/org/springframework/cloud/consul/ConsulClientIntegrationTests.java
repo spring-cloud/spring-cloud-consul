@@ -34,6 +34,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
+import org.springframework.cloud.consul.model.http.catalog.CatalogDeregistration;
+import org.springframework.cloud.consul.model.http.catalog.CatalogRegistration;
 import org.springframework.cloud.consul.model.http.event.Event;
 import org.springframework.cloud.consul.model.http.kv.GetValue;
 import org.springframework.http.HttpStatus;
@@ -81,6 +83,97 @@ class ConsulClientIntegrationTests {
 
 		// Verify response from consul
 		assertThat(statusLeader).isEqualTo("\"172.17.0.2:8300\"");
+	}
+
+	@Test
+	void catalogServiceRegister() {
+
+		mockServerClient.when(request().withMethod("PUT").withPath("/v1/catalog/register"))
+			.respond(response().withStatusCode(200));
+
+		CatalogRegistration registration = new CatalogRegistration();
+		registration.setDatacenter("dc1");
+		registration.setNode("test-node");
+		registration.setAddress("192.168.1.1");
+
+		CatalogRegistration.Service service = new CatalogRegistration.Service();
+		service.setId("test-service-1");
+		service.setService("test-service");
+		service.setPort(8080);
+		registration.setService(service);
+
+		ResponseEntity<Void> response = client.catalogServiceRegister(null, registration);
+
+		mockServerClient.verify(request().withMethod("PUT")
+			.withPath("/v1/catalog/register"), VerificationTimes.exactly(1));
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	@Test
+	void catalogServiceRegisterWithAclToken() {
+		mockServerClient
+			.when(request().withMethod("PUT")
+				.withPath("/v1/catalog/register")
+				.withHeader(Header.header("X-Consul-Token", "myAclToken")))
+			.respond(response().withStatusCode(200));
+
+		CatalogRegistration registration = new CatalogRegistration();
+		registration.setDatacenter("dc1");
+		registration.setNode("test-node");
+		registration.setAddress("192.168.1.1");
+
+		CatalogRegistration.Service service = new CatalogRegistration.Service();
+		service.setId("test-service-1");
+		service.setService("test-service");
+		service.setPort(8080);
+		registration.setService(service);
+
+		ResponseEntity<Void> response = client.catalogServiceRegister("myAclToken", registration);
+
+		mockServerClient.verify(request().withMethod("PUT")
+			.withPath("/v1/catalog/register")
+			.withHeader(Header.header("X-Consul-Token", "myAclToken")), VerificationTimes.exactly(1));
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	@Test
+	void catalogServiceDeregister() {
+		mockServerClient.when(request().withMethod("PUT").withPath("/v1/catalog/deregister"))
+			.respond(response().withStatusCode(200));
+
+		CatalogDeregistration deregistration = new CatalogDeregistration();
+		deregistration.setDatacenter("dc1");
+		deregistration.setNode("test-node");
+		deregistration.setServiceId("test-service-1");
+
+		ResponseEntity<Void> response = client.catalogServiceDeregister(null, deregistration);
+
+		verifyRequestSentToConsul("PUT", "/v1/catalog/deregister", 1);
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	@Test
+	void catalogServiceDeregisterWithAclToken() {
+		mockServerClient
+			.when(request().withMethod("PUT")
+				.withPath("/v1/catalog/deregister")
+				.withHeader(Header.header("X-Consul-Token", "myAclToken")))
+			.respond(response().withStatusCode(200));
+
+		CatalogDeregistration deregistration = new CatalogDeregistration();
+		deregistration.setDatacenter("dc1");
+		deregistration.setNode("test-node");
+		deregistration.setServiceId("test-service-1");
+
+		ResponseEntity<Void> response = client.catalogServiceDeregister("myAclToken", deregistration);
+
+		mockServerClient.verify(request().withMethod("PUT")
+			.withPath("/v1/catalog/deregister")
+			.withHeader(Header.header("X-Consul-Token", "myAclToken")), VerificationTimes.exactly(1));
+
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 	}
 
 	@Test
