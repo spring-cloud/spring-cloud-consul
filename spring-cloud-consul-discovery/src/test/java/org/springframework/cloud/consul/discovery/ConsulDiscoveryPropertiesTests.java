@@ -142,4 +142,15 @@ class ConsulDiscoveryPropertiesTests {
 		assertThat(properties.getManagementTags()).containsOnly(ConsulDiscoveryProperties.MANAGEMENT, "newTag");
 	}
 
+	@Test
+	void catalogServicesWatchTimeoutDefaultsToMinusOne() {
+		assertThat(properties.getCatalogServicesWatchTimeout()).isEqualTo(-1);
+	}
+
+	@Test
+	void catalogServicesWatchTimeoutCanBeConfigured() {
+		properties.setCatalogServicesWatchTimeout(5);
+		assertThat(properties.getCatalogServicesWatchTimeout()).isEqualTo(5);
+	}
+
 }

@@ -57,6 +57,9 @@ import static org.mockserver.model.HttpResponse.response;
 @Testcontainers
 public class ConsulConfigServerBootstrapperIT {
 
+	/**
+	 * The Docker image used to run MockServer in the integration tests.
+	 */
 	public static final DockerImageName MOCKSERVER_IMAGE = DockerImageName.parse("mockserver/mockserver")
 		.withTag("mockserver-" + MockServerClient.class.getPackage().getImplementationVersion());
 

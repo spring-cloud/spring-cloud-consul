@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 /**
- * Auto-configuration tests for {@link ConsulHeartbeatAutoConfiguration}
+ * Auto-configuration tests for {@link ConsulHeartbeatAutoConfiguration}.
  */
 class ConsulHeartbeatAutoConfigurationTests {
 
