@@ -137,8 +137,8 @@ public class ConsulDiscoveryProperties {
 	/** The delay between calls to watch consul catalog in millis, default is 1000. */
 	private int catalogServicesWatchDelay = 1000;
 
-	/** The number of seconds to block while watching consul catalog, default is 2. */
-	private int catalogServicesWatchTimeout = 2;
+	/** The number of seconds to block while watching consul catalog, default is -1. */
+	private int catalogServicesWatchTimeout = -1;
 
 	/** Service name. */
 	private String serviceName;

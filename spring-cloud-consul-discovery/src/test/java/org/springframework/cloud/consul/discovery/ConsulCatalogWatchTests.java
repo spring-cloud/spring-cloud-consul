@@ -16,12 +16,28 @@
 
 package org.springframework.cloud.consul.discovery;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.cloud.commons.util.InetUtilsProperties;
+import org.springframework.cloud.consul.ConsulClient;
+import org.springframework.cloud.consul.ConsulClient.QueryParams;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * @author Spencer Gibb
@@ -42,6 +58,30 @@ public class ConsulCatalogWatchTests {
 		assertThat(watch.isRunning()).isTrue();
 		watch.stop();
 		assertThat(watch.isRunning()).isFalse();
+	}
+
+	@ParameterizedTest
+	@ValueSource(ints = { -1, 0, 2 })
+	public void catalogServicesWatchUsesOnlyPositiveTimeout(int configuredTimeout) {
+		ConsulDiscoveryProperties properties = new ConsulDiscoveryProperties(new InetUtils(new InetUtilsProperties()));
+		properties.setCatalogServicesWatchTimeout(configuredTimeout);
+
+		ConsulClient consul = mock(ConsulClient.class);
+		ApplicationEventPublisher publisher = mock(ApplicationEventPublisher.class);
+
+		ResponseEntity<Map<String, List<String>>> response = ResponseEntity.ok(Collections.emptyMap());
+
+		given(consul.getCatalogServices(eq(properties.getAclToken()), any(QueryParams.class))).willReturn(response);
+
+		ConsulCatalogWatch watch = new ConsulCatalogWatch(properties, consul);
+		watch.setApplicationEventPublisher(publisher);
+
+		watch.catalogServicesWatch();
+
+		ArgumentCaptor<QueryParams> captor = ArgumentCaptor.forClass(QueryParams.class);
+		verify(consul).getCatalogServices(eq(properties.getAclToken()), captor.capture());
+
+		assertThat(captor.getValue().getWaitTime()).isEqualTo(configuredTimeout > 0 ? configuredTimeout : -1);
 	}
 
 }
