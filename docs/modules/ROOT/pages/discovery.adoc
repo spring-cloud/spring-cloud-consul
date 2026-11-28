@@ -436,6 +436,38 @@ where the STORES service lives.
 TIP: Spring Cloud now also offers support for
 https://cloud.spring.io/spring-cloud-commons/reference/html/#_spring_resttemplate_as_a_load_balancer_client[Spring Cloud LoadBalancer].
 
+[[load-balancing-passing-instances]]
+==== Load-balancing Only Instances with Passing Health Checks
+
+By default, the load balancer can pick any instance returned by the `DiscoveryClient`, including instances whose Consul health checks are failing.
+Setting `spring.cloud.consul.discovery.query-passing=true` makes Consul only return the instances that pass their health checks, but this applies to every use of the `DiscoveryClient`.
+
+To take the health of the instances into account for load balancing only, add a `PassingChecksServiceInstanceListSupplier` to the `ServiceInstanceListSupplier` hierarchy.
+It only provides the instances whose Consul health checks are all `passing`, so instances with a `warning` or `critical` check are not picked.
+Instances that do not carry Consul health information are kept, since their health is unknown.
+If no instance passes its health checks, the load balancer has no instance to pick.
+
+----
+public class PassingChecksLoadBalancerConfiguration {
+
+	@Bean
+	public ServiceInstanceListSupplier passingChecksServiceInstanceListSupplier(
+			ConfigurableApplicationContext context) {
+		return ServiceInstanceListSupplier.builder()
+			.withDiscoveryClient()
+			.with((ctx, delegate) -> new PassingChecksServiceInstanceListSupplier(delegate))
+			.withCaching()
+			.build(context);
+	}
+
+}
+----
+
+Then pass the configuration to `@LoadBalancerClient` for a single service, or to `@LoadBalancerClients(defaultConfiguration = ...)` for all services, as described in the https://docs.spring.io/spring-cloud-commons/reference/spring-cloud-commons/loadbalancer.html#custom-loadbalancer-configuration[Spring Cloud LoadBalancer documentation].
+Use `withBlockingDiscoveryClient()` instead of `withDiscoveryClient()` in a blocking application.
+
+NOTE: With caching enabled, the health of the instances is updated when the cached instances expire, as configured with `spring.cloud.loadbalancer.cache.ttl`.
+
 
 [[using-the-discoveryclient]]
 === Using the DiscoveryClient
